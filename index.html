@@ -119,14 +119,14 @@
     cycleLength = incrementTimes[incrementTimes.length - 1] + 1;
     
     // Initialize counter
-    updateCounter(0);
+    updateCounter(count);
     
     // Reset button event listener
     resetButton.addEventListener('click', function() {
-      count = 0;
+      count = 96600;
       startTime = Date.now();
       elapsedSeconds = 0;
-      updateCounter(0);
+      updateCounter(count);
     });
     
     // Format number with commas
