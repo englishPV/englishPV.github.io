@@ -5,42 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Animated Counter</title>
   <style>
-    /* Use only two colors: black and white */
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: black; /* Background is black */
+      background-color: black;
       margin: 0;
     }
-    /* Counter container styles */
+
     #counter {
-      position: relative;
-      width: 120px;
+      display: flex;
       height: 70px;
       overflow: hidden;
-      border: none; /* Border is white */
-      border-radius: 8px;
-      background-color: black; /* Container background is black */
+      background-color: black;
+      gap: 4px;
     }
-    /* Style for the digit elements */
-    .counter-number {
+
+    .digit-container {
+      position: relative;
+      width: 40px;
+      height: 70px;
+      overflow: hidden;
+    }
+
+    .digit {
       position: absolute;
-      left: 0;
       width: 100%;
+      height: 70px;
       font-size: 48px;
       line-height: 70px;
       text-align: center;
-      color: white; /* Digit text is white */
-      font-family: Arial, sans-serif;
+      color: white;
+      font-family: 'Courier New', monospace;
+      transition: transform 0.5s ease-out;
+    }
+
+    .digit.current {
+      transform: translateY(0);
+    }
+
+    .digit.new {
+      transform: translateY(100%);
     }
   </style>
 </head>
 <body>
   <div id="counter">
-    <!-- Initial counter value -->
-    <span class="counter-number current">0</span>
+    <div class="digit-container">
+      <span class="digit current">0</span>
+    </div>
   </div>
 
   <script>
@@ -48,41 +62,63 @@
     const counter = document.getElementById('counter');
 
     function animateChange(newVal) {
-      const currentSpan = document.querySelector('.counter-number.current');
-      // Create a new span for the updated value
-      const newSpan = document.createElement('span');
-      newSpan.classList.add('counter-number', 'new');
-      newSpan.innerText = newVal;
-      // Start off positioned below the visible area
-      newSpan.style.transform = 'translateY(100%)';
-      counter.appendChild(newSpan);
+      const newDigits = String(newVal).split('');
+      const digitContainers = counter.querySelectorAll('.digit-container');
 
-      // Force reflow so that the browser registers the starting position
-      newSpan.offsetHeight;
+      newDigits.forEach((newDigit, index) => {
+        if (index < digitContainers.length) {
+          const container = digitContainers[index];
+          const currentDigitSpan = container.querySelector('.digit.current');
+          const currentDigit = currentDigitSpan.textContent;
 
-      // Add transition effects
-      currentSpan.style.transition = 'transform 0.5s ease-out';
-      newSpan.style.transition = 'transform 0.5s ease-out';
+          if (currentDigit !== newDigit) {
+            const newDigitSpan = document.createElement('span');
+            newDigitSpan.className = 'digit new';
+            newDigitSpan.textContent = newDigit;
+            container.appendChild(newDigitSpan);
 
-      // Animate: slide the current value up and the new value into view
-      currentSpan.style.transform = 'translateY(-100%)';
-      newSpan.style.transform = 'translateY(0)';
+            // Trigger reflow
+            newDigitSpan.offsetHeight;
 
-      // After the animation, remove the old element and mark the new one as current
-      setTimeout(() => {
-        currentSpan.remove();
-        newSpan.classList.remove('new');
-        newSpan.classList.add('current');
-      }, 500);
+            currentDigitSpan.style.transform = 'translateY(-100%)';
+            newDigitSpan.style.transform = 'translateY(0)';
+
+            setTimeout(() => {
+              currentDigitSpan.remove();
+              newDigitSpan.classList.replace('new', 'current');
+            }, 500);
+          }
+        } else {
+          const newContainer = document.createElement('div');
+          newContainer.className = 'digit-container';
+          
+          const newDigitSpan = document.createElement('span');
+          newDigitSpan.className = 'digit new';
+          newDigitSpan.textContent = newDigit;
+          newDigitSpan.style.transform = 'translateY(100%)';
+          newContainer.appendChild(newDigitSpan);
+
+          counter.appendChild(newContainer);
+
+          setTimeout(() => {
+            newDigitSpan.style.transform = 'translateY(0)';
+          }, 0);
+
+          setTimeout(() => {
+            newDigitSpan.classList.replace('new', 'current');
+          }, 500);
+        }
+      });
+
+      // Remove extra containers if new number is shorter (not needed for incrementing counter)
     }
 
-    // Every second, there is a 50% chance to increase the counter by 1
     setInterval(() => {
-      if (Math.random() < 0.3) {
+      if (Math.random() < 0.5) {
         count++;
         animateChange(count);
       }
-    }, 100);
+    }, 1000);
   </script>
 </body>
 </html>
