@@ -53,6 +53,7 @@
   <script>
     let count = 0;
     const counter = document.getElementById('counter');
+    const animationDuration = 1.5; // Duration in seconds (adjust as needed)
 
     function animateChange(newVal) {
       const newStr = String(newVal);
@@ -109,9 +110,9 @@
         // Force a reflow so the starting position is registered.
         newDigitSpan.offsetHeight;
         
-        // Set up transitions for both the current and new digit spans.
-        currentDigitSpan.style.transition = 'transform 0.5s ease-out';
-        newDigitSpan.style.transition = 'transform 0.5s ease-out';
+        // Set up transitions for both the current and new digit spans using the defined animationDuration.
+        currentDigitSpan.style.transition = `transform ${animationDuration}s ease-out`;
+        newDigitSpan.style.transition = `transform ${animationDuration}s ease-out`;
         
         // Animate: current digit slides up and out; new digit slides into view.
         currentDigitSpan.style.transform = 'translateY(-100%)';
@@ -122,7 +123,7 @@
           currentDigitSpan.remove();
           newDigitSpan.classList.remove('new');
           newDigitSpan.classList.add('current');
-        }, 500);
+        }, animationDuration * 1000);
       }
     }
 
