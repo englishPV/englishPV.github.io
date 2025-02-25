@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Digit-by-Digit Rolling Counter</title>
+  <title> </title>
   <style>
     body {
       font-family: sans-serif;
@@ -42,17 +42,17 @@
       transition: transform 0.3s ease-in-out; /* Speed & easing of the flip */
     }
 
-    /* The old digit starts in place, the new digit is "above" (translated up -100%) */
+    /* The old digit starts in place, the new digit is "below" (translated down 100%) */
     .digit-old {
       transform: translateY(0%);
     }
     .digit-new {
-      transform: translateY(-100%);
+      transform: translateY(100%);
     }
 
-    /* When .animate is applied, old slides down, new slides in from top */
+    /* When .animate is applied, old slides up, new slides in from bottom */
     .digit.animate .digit-old {
-      transform: translateY(100%);
+      transform: translateY(-100%);
     }
     .digit.animate .digit-new {
       transform: translateY(0%);
