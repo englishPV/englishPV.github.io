@@ -19,14 +19,14 @@
       height: 70px;
       overflow: hidden;
       background-color: black;
-      gap: 4px;
+      gap: 1px; /* Reduced gap between digits */
     }
 
     .digit-container {
       position: relative;
-      width: 40px;
       height: 70px;
       overflow: hidden;
+      min-width: 0.4em; /* Minimum width based on character width */
     }
 
     .digit {
@@ -37,8 +37,9 @@
       line-height: 70px;
       text-align: center;
       color: white;
-      font-family: 'Courier New', monospace;
+      font-family: Arial, sans-serif; /* Changed to Arial */
       transition: transform 0.5s ease-out;
+      padding: 0 2px; /* Tight horizontal padding */
     }
 
     .digit.current {
