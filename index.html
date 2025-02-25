@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Compteur Macro</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #counter {
+      font-size: 2em;
+      color: #007acc;
+    }
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Compteur : <span id="counter">0</span></h1>
+  <button id="startButton">Démarrer la macro</button>
+
+  <script>
+    const counterSpan = document.getElementById("counter");
+    const startButton = document.getElementById("startButton");
+    let counter = 0;
+
+    // Fonction utilitaire pour attendre un certain temps (en millisecondes)
+    function attendre(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Fonction asynchrone pour exécuter la macro en boucle
+    async function lancerMacro() {
+      while (true) {
+        // Incrémentation puis attente de 10 secondes
+        counter++;
+        counterSpan.textContent = counter;
+        await attendre(10000); // 10 000 ms = 10 sec
+
+        // Incrémentation puis attente de 15 secondes
+        counter++;
+        counterSpan.textContent = counter;
+        await attendre(15000); // 15 sec
+
+        // Incrémentation puis attente de 2 secondes
+        counter++;
+        counterSpan.textContent = counter;
+        await attendre(2000);  // 2 sec
+
+        // Incrémentation sans délai spécifique avant de recommencer la boucle
+        counter++;
+        counterSpan.textContent = counter;
+        // La boucle recommence ici automatiquement
+      }
+    }
+
+    // Démarrer la macro lorsqu'on clique sur le bouton
+    startButton.addEventListener("click", () => {
+      startButton.disabled = true; // désactiver le bouton pour éviter plusieurs lancements
+      lancerMacro();
+    });
+  </script>
+</body>
+</html>
