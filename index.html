@@ -4,14 +4,18 @@
   <meta charset="UTF-8">
   <title>Compteur Macro</title>
   <style>
+    /* Fond noir et texte en blanc */
     body {
       font-family: sans-serif;
       text-align: center;
       margin-top: 50px;
+      background-color: black; /* Fond noir */
+      color: white;            /* Texte en blanc */
     }
+    /* Le nombre affiché est en blanc */
     #counter {
       font-size: 2em;
-      color: #007acc;
+      color: white; /* Couleur du nombre */
     }
     button {
       font-size: 1em;
@@ -20,7 +24,7 @@
   </style>
 </head>
 <body>
-  <h1> <span id="counter">0</span></h1>
+  <h1><span id="counter">0</span></h1>
   <button id="startButton">Démarrer la macro</button>
 
   <script>
@@ -28,40 +32,34 @@
     const startButton = document.getElementById("startButton");
     let counter = 0;
 
-    // Fonction utilitaire pour attendre un certain temps (en millisecondes)
-    function attendre(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    /**********************************************************
+     * Paramètres modifiables pour le comportement de la macro *
+     **********************************************************/
+    const INTERVAL_MS = 1000;       
+    // INTERVAL_MS définit l'intervalle en millisecondes entre chaque vérification.
+    // Exemples : 1000 ms = 1 seconde, 5000 ms = 5 secondes, 100 ms = 0.1 seconde.
 
-    // Fonction asynchrone pour exécuter la macro en boucle
-    async function lancerMacro() {
-      while (true) {
-        // Incrémentation puis attente de 10 secondes
-        counter++;
-        counterSpan.textContent = counter;
-        await attendre(10000); // 10 000 ms = 10 sec
+    const INCREMENT_PROBABILITY = 0.5;  
+    // INCREMENT_PROBABILITY définit la probabilité d'incrémenter le compteur à chaque intervalle.
+    // Exemples : 0.5 = 50% de chance, 0.33 ≈ 33% (soit 1 chance sur 3), etc.
 
-        // Incrémentation puis attente de 15 secondes
-        counter++;
-        counterSpan.textContent = counter;
-        await attendre(15000); // 15 sec
-
-        // Incrémentation puis attente de 2 secondes
-        counter++;
-        counterSpan.textContent = counter;
-        await attendre(2000);  // 2 sec
-
-        // Incrémentation sans délai spécifique avant de recommencer la boucle
-        counter++;
-        counterSpan.textContent = counter;
-        // La boucle recommence ici automatiquement
-      }
+    // Fonction pour démarrer la macro avec l'intervalle et la probabilité définis
+    function startMacro() {
+      // À chaque INTERVAL_MS, on vérifie si le compteur doit être incrémenté
+      setInterval(() => {
+        // Math.random() génère un nombre entre 0 et 1.
+        // Si ce nombre est inférieur à INCREMENT_PROBABILITY, on incrémente le compteur.
+        if (Math.random() < INCREMENT_PROBABILITY) {
+          counter++;
+          counterSpan.textContent = counter;
+        }
+      }, INTERVAL_MS);
     }
 
     // Démarrer la macro lorsqu'on clique sur le bouton
     startButton.addEventListener("click", () => {
-      startButton.disabled = true; // désactiver le bouton pour éviter plusieurs lancements
-      lancerMacro();
+      startButton.disabled = true; // Désactiver le bouton pour éviter de lancer plusieurs intervalles
+      startMacro();
     });
   </script>
 </body>
