@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Animated Digit Counter</title>
   <style>
-    /* Two-color theme: black background, white text */
     body {
       display: flex;
       justify-content: center;
@@ -14,22 +13,21 @@
       background-color: black;
       margin: 0;
     }
-    /* The counter’s outer container */
     #counter {
       display: inline-flex;
       border: 2px solid white;
       border-radius: 8px;
       background-color: black;
       overflow: hidden;
+      /* A little extra padding for clarity */
+      padding: 0 10px;
     }
-    /* Each digit container holds one digit and clips overflow */
     .digit-container {
       position: relative;
-      width: 30px; /* adjust width as needed */
+      width: 40px; /* increased from 30px to reduce overlap */
       height: 70px;
       overflow: hidden;
     }
-    /* Each digit element – they are absolutely positioned within their container */
     .digit {
       position: absolute;
       left: 0;
@@ -39,38 +37,42 @@
       text-align: center;
       color: white;
       font-family: Arial, sans-serif;
+      /* By default, old digits can sit at z-index: 0 */
+      z-index: 0;
+    }
+    .digit.new {
+      /* Put new digit on top */
+      z-index: 1;
     }
   </style>
 </head>
 <body>
   <div id="counter">
-    <!-- Start with a single-digit display ("0") -->
     <span class="digit-container">
       <span class="digit current">0</span>
     </span>
   </div>
 
   <script>
-    let count = 96600;
+    let count = 0;
     const counter = document.getElementById('counter');
 
     function animateChange(newVal) {
       const newStr = String(newVal);
-      // Get current digit containers and their digits
       let currentContainers = counter.querySelectorAll('.digit-container');
       const currentDigits = Array.from(currentContainers).map(container => {
         const digitElem = container.querySelector('.digit.current');
         return digitElem ? digitElem.innerText : '0';
       });
-      
-      // Align lengths (pad with zeros on the left) so digits line up correctly
+
+      // Pad both strings so they have equal length
       const maxLength = Math.max(currentDigits.length, newStr.length);
       const paddedCurrent = currentDigits.length < maxLength 
         ? Array(maxLength - currentDigits.length).fill('0').concat(currentDigits)
         : currentDigits;
       const paddedNew = newStr.padStart(maxLength, '0').split('');
-      
-      // If we need more digit containers, add them to the left.
+
+      // If more digits are needed, add digit-containers to the left
       if (currentContainers.length < maxLength) {
         const diff = maxLength - currentContainers.length;
         for (let i = 0; i < diff; i++) {
@@ -80,54 +82,52 @@
           digitSpan.classList.add('digit', 'current');
           digitSpan.innerText = '0';
           container.appendChild(digitSpan);
-          // Insert at the beginning so that the order (left to right) is preserved
           counter.insertBefore(container, counter.firstChild);
         }
         currentContainers = counter.querySelectorAll('.digit-container');
       }
-      
-      // Animate each digit container individually if the digit changes.
+
+      // Animate each digit that changes
       for (let i = 0; i < maxLength; i++) {
         const container = currentContainers[i];
         const currentDigitSpan = container.querySelector('.digit.current');
         const currentDigit = paddedCurrent[i];
         const newDigit = paddedNew[i];
-        
-        // If the digit is unchanged, update text (in case it was padded) and skip.
+
         if (currentDigit === newDigit) {
+          // If it didn't change, just update the text
           currentDigitSpan.innerText = newDigit;
           continue;
         }
-        
-        // Create a new span for the updated digit; position it below the container.
+
+        // Create the new digit (z-index: 1 via .new)
         const newDigitSpan = document.createElement('span');
         newDigitSpan.classList.add('digit', 'new');
         newDigitSpan.innerText = newDigit;
         newDigitSpan.style.transform = 'translateY(100%)';
         container.appendChild(newDigitSpan);
-        
-        // Force a reflow so the starting position is registered.
+
+        // Force a reflow to ensure starting position
         newDigitSpan.offsetHeight;
-        
-        // Set up transitions for both the current and new digit spans.
-        // Updated duration: 1s for a slower scroll
+
+        // Slow 1-second transition
         currentDigitSpan.style.transition = 'transform 1s ease-out';
         newDigitSpan.style.transition = 'transform 1s ease-out';
-        
-        // Animate: current digit slides up and out; new digit slides into view.
+
+        // Slide current digit up, new digit in
         currentDigitSpan.style.transform = 'translateY(-100%)';
         newDigitSpan.style.transform = 'translateY(0)';
-        
-        // After the animation, remove the old digit and update the class.
+
+        // Remove old digit after animation finishes
         setTimeout(() => {
           currentDigitSpan.remove();
           newDigitSpan.classList.remove('new');
           newDigitSpan.classList.add('current');
-        }, 1000); // Updated timeout to match the 1s duration
+        }, 1000);
       }
     }
 
-    // Every second, there's a 50% chance to increase the counter by 1.
+    // Demo: increment sometimes
     setInterval(() => {
       if (Math.random() < 0.5) {
         count++;
