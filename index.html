@@ -16,28 +16,31 @@
 
     #counter {
       display: flex;
-      height: 70px;
+      height: 80px;
       overflow: hidden;
       background-color: black;
+      gap: 1px; /* Reduced gap between digits */
     }
 
     .digit-container {
       position: relative;
-      width: 35px; /* Fixed width for consistent spacing */
-      height: 70px;
+      width: auto; /* Let width adjust to content */
+      height: 80px;
       overflow: hidden;
     }
 
     .digit {
       position: absolute;
       width: 100%;
-      height: 70px;
-      font-size: 48px;
-      line-height: 70px;
+      height: 80px;
+      font-size: 60px; /* Slightly larger font size */
+      line-height: 80px; /* Adjusted line height */
       text-align: center;
       color: white;
-      font-family: Arial, sans-serif;
-      transition: transform 0.5s ease-out;
+      font-family: 'Courier New', monospace;
+      font-weight: bold; /* Added bold for better readability */
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); /* Subtle glow effect */
     }
 
     .digit.current {
@@ -76,7 +79,7 @@
             newDigitSpan.textContent = newDigit;
             container.appendChild(newDigitSpan);
 
-            // Force reflow
+            // Trigger reflow
             newDigitSpan.offsetHeight;
 
             currentDigitSpan.style.transform = 'translateY(-100%)';
@@ -99,10 +102,9 @@
 
           counter.appendChild(newContainer);
 
-          // Force reflow before animation
           setTimeout(() => {
             newDigitSpan.style.transform = 'translateY(0)';
-          }, 10);
+          }, 0);
 
           setTimeout(() => {
             newDigitSpan.classList.replace('new', 'current');
@@ -110,7 +112,7 @@
         }
       });
 
-      // Remove extra containers if needed (not required for incrementing counter)
+      // Remove extra containers if new number is shorter (not needed for incrementing counter)
     }
 
     setInterval(() => {
