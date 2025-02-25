@@ -1,177 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title> </title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Counter</title>
   <style>
+    /* Center the counter on the page */
     body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
-      background-color: black;
-      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f7f7f7;
+      margin: 0;
     }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    /* The container for all digits */
-    .counter {
-      display: inline-flex;
-      gap: 5px; /* spacing between digit columns */
-    }
-
-    /* Each digit is in its own wrapper with overflow hidden */
-    .digit {
+    /* Counter container styles */
+    #counter {
       position: relative;
-      width: 1em;        /* Adjust as needed for styling */
-      height: 1.2em;     /* Slightly taller than the font size for smooth animation */
+      width: 120px;
+      height: 70px;
       overflow: hidden;
-      display: inline-block;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
     }
-
-    /* Each digit has two layers: old digit & new digit */
-    .digit-content {
+    /* Style for the digit elements */
+    .counter-number {
       position: absolute;
+      left: 0;
       width: 100%;
-      height: 100%;
+      font-size: 48px;
+      line-height: 70px;
       text-align: center;
-      font-size: 2em;
-      line-height: 1.2em;
-      transition: transform 0.3s ease-in-out; /* Speed & easing of the flip */
-    }
-
-    /* The old digit starts in place, the new digit is "below" (translated down 100%) */
-    .digit-old {
-      transform: translateY(0%);
-    }
-    .digit-new {
-      transform: translateY(100%);
-    }
-
-    /* When .animate is applied, old slides up, new slides in from bottom */
-    .digit.animate .digit-old {
-      transform: translateY(-100%);
-    }
-    .digit.animate .digit-new {
-      transform: translateY(0%);
-    }
-
-    button {
-      font-size: 1em;
-      padding: 10px 20px;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Digit-by-Digit Rolling Counter</h1>
-  <!-- This container will hold all digit elements side by side -->
-  <div class="counter" id="counter"></div>
-  <br />
-  <button id="startButton">Start</button>
+  <div id="counter">
+    <!-- Initial counter value -->
+    <span class="counter-number current">0</span>
+  </div>
 
   <script>
-    /*********************************************************
-     * 1) CONFIG: Adjust interval & probability as needed    *
-     *********************************************************/
-    const INTERVAL_MS         = 1000;   // e.g. 1000ms = 1s, 5000ms = 5s, etc.
-    const INCREMENT_PROBABILITY = 0.5;  // e.g. 0.5 = 50% chance, 0.33 = 33%, etc.
+    let count = 0;
+    const counter = document.getElementById('counter');
 
-    let currentNumber = 0;
+    function animateChange(newVal) {
+      const currentSpan = document.querySelector('.counter-number.current');
+      // Create a new span for the updated value
+      const newSpan = document.createElement('span');
+      newSpan.classList.add('counter-number', 'new');
+      newSpan.innerText = newVal;
+      // Start off positioned below the visible area
+      newSpan.style.transform = 'translateY(100%)';
+      counter.appendChild(newSpan);
 
-    // Grab DOM references
-    const counterContainer = document.getElementById("counter");
-    const startButton = document.getElementById("startButton");
+      // Force reflow so that the browser registers the starting position
+      newSpan.offsetHeight;
 
-    /**
-     * renderCounter(oldVal, newVal)
-     * - Breaks both old and new values into digits
-     * - For each digit, if it changed, animate from old to new
-     */
-    function renderCounter(oldVal, newVal) {
-      const oldStr = oldVal.toString();
-      const newStr = newVal.toString();
+      // Add transition effects
+      currentSpan.style.transition = 'transform 0.5s ease-out';
+      newSpan.style.transition = 'transform 0.5s ease-out';
 
-      // Ensure both strings have the same length by padding with leading zeros
-      const maxLen = Math.max(oldStr.length, newStr.length);
-      const oldPadded = oldStr.padStart(maxLen, "0");
-      const newPadded = newStr.padStart(maxLen, "0");
+      // Animate: slide the current value up and the new value into view
+      currentSpan.style.transform = 'translateY(-100%)';
+      newSpan.style.transform = 'translateY(0)';
 
-      // Clear out the current digit DOM
-      counterContainer.innerHTML = "";
+      // After the animation, remove the old element and mark the new one as current
+      setTimeout(() => {
+        currentSpan.remove();
+        newSpan.classList.remove('new');
+        newSpan.classList.add('current');
+      }, 500);
+    }
 
-      // Create digit elements from left to right
-      for (let i = 0; i < maxLen; i++) {
-        const oldDigit = oldPadded[i];
-        const newDigit = newPadded[i];
-
-        // Create the digit wrapper
-        const digitWrapper = document.createElement("div");
-        digitWrapper.classList.add("digit");
-
-        // Create the "old" digit element
-        const digitOld = document.createElement("div");
-        digitOld.classList.add("digit-content", "digit-old");
-        digitOld.textContent = oldDigit;
-
-        // Create the "new" digit element
-        const digitNew = document.createElement("div");
-        digitNew.classList.add("digit-content", "digit-new");
-        digitNew.textContent = newDigit;
-
-        // Add them to the wrapper
-        digitWrapper.appendChild(digitOld);
-        digitWrapper.appendChild(digitNew);
-
-        // Insert the digit wrapper into the counter
-        counterContainer.appendChild(digitWrapper);
-
-        // If the digit actually changed, trigger the flip animation
-        if (oldDigit !== newDigit) {
-          // Force a reflow before adding the .animate class so CSS transition applies
-          void digitWrapper.offsetWidth; 
-          digitWrapper.classList.add("animate");
-        }
+    // Every second, there is a 50% chance to increase the counter by 1
+    setInterval(() => {
+      if (Math.random() < 0.5) {
+        count++;
+        animateChange(count);
       }
-    }
-
-    /**
-     * incrementCounter()
-     * - Increments the global counter by 1
-     * - Calls renderCounter() to show the digit-by-digit animation
-     */
-    function incrementCounter() {
-      const oldVal = currentNumber;
-      const newVal = oldVal + 1;
-      currentNumber = newVal;
-
-      // Render digit-by-digit changes
-      renderCounter(oldVal, newVal);
-    }
-
-    /**
-     * startCounter()
-     * - Sets up an interval that randomly decides whether to increment
-     */
-    function startCounter() {
-      // Render initial "0"
-      renderCounter(0, 0);
-
-      setInterval(() => {
-        // Randomly decide if we increment
-        if (Math.random() < INCREMENT_PROBABILITY) {
-          incrementCounter();
-        }
-      }, INTERVAL_MS);
-    }
-
-    // When user clicks "Start"
-    startButton.addEventListener("click", () => {
-      startButton.disabled = true; // prevent multiple starts
-      startCounter();
-    });
+    }, 1000);
   </script>
 </body>
 </html>
