@@ -123,7 +123,7 @@
     
     // Reset button event listener
     resetButton.addEventListener('click', function() {
-      count = 96600;
+      count = 96800;
       startTime = Date.now();
       elapsedSeconds = 0;
       updateCounter(count);
@@ -206,8 +206,16 @@
         
         // Check if the counter should increment at this time
         if (incrementTimes.includes(cyclePosition)) {
-          updateCounter(count + 1);
-        }
+  if (cyclePosition === 0) {
+    // Add a 1-second delay when the cycle resets (timer goes to 0)
+    setTimeout(() => {
+      updateCounter(count + 1);
+    }, 1000);
+  } else {
+    updateCounter(count + 1);
+  }
+}
+
       }
       
       requestAnimationFrame(checkTime);
