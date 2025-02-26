@@ -238,7 +238,7 @@
         // If we've reached the end of a cycle, pause for 3 seconds
         if (cyclePosition === 0 && elapsedSeconds > 0) {
           isPaused = true;
-          pauseEnd = now + 3000; // Pause for 3 seconds
+          pauseEnd = now + 7000; // Pause for 3 seconds
           statusEl.textContent = "Paused between cycles: 3s remaining";
         }
         
