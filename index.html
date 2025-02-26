@@ -92,6 +92,13 @@
       position: fixed;
       bottom: 60px;
     }
+    
+    .status {
+      color: #555;
+      font-size: 14px;
+      position: fixed;
+      bottom: 90px;
+    }
   </style>
 </head>
 <body>
@@ -99,6 +106,7 @@
     <div class="counter" id="counter"></div>
   </div>
   
+  <div class="status" id="status"></div>
   <div class="timer" id="timer">Time: 0s</div>
   <button class="reset-button" id="resetButton">Reset</button>
 
@@ -108,9 +116,12 @@
     let startTime = Date.now();
     let elapsedSeconds = 0;
     let cycleLength = 0;
+    let isPaused = false;
+    let pauseEnd = 0;
     const counterEl = document.getElementById('counter');
     const resetButton = document.getElementById('resetButton');
     const timerEl = document.getElementById('timer');
+    const statusEl = document.getElementById('status');
     
     // The list of times when the counter should increment
     const incrementTimes = [9, 10, 16, 33, 55, 56, 57, 77, 80, 101, 104, 105, 107, 107, 133, 140, 157, 160, 160, 162, 173, 190, 191, 191, 192, 218, 224, 224, 233, 255, 256, 256, 267, 267, 290, 291, 320, 321, 321, 322, 345, 346, 352, 368, 374, 385, 410, 413, 423, 461, 462, 490, 491, 491, 499, 507, 530, 531, 532, 554, 558, 559, 570, 573, 599, 601, 601, 606, 622, 623, 630, 638, 653, 679, 680, 700, 701, 707, 717, 721, 721, 728, 734, 745, 760, 762, 781, 787, 808, 808, 809, 818, 825, 837, 841, 846, 850, 859, 888, 889, 892, 892, 901, 901, 902, 907, 910, 922, 939, 939, 940, 967, 967, 969, 987, 988, 995, 1009, 1010, 1012, 1013, 1013, 1013];
@@ -126,7 +137,9 @@
       count = 96800;
       startTime = Date.now();
       elapsedSeconds = 0;
+      isPaused = false;
       updateCounter(count);
+      statusEl.textContent = "";
     });
     
     // Format number with commas
@@ -192,6 +205,24 @@
     // Check time and update counter accordingly
     function checkTime() {
       const now = Date.now();
+      
+      // If we're in a pause between cycles
+      if (isPaused) {
+        if (now >= pauseEnd) {
+          // Pause is over, resume the cycle
+          isPaused = false;
+          startTime = now - (elapsedSeconds * 1000); // Adjust startTime to maintain continuity
+          statusEl.textContent = "";
+        } else {
+          // Still in pause, update pause countdown
+          const remainingPause = Math.ceil((pauseEnd - now) / 1000);
+          statusEl.textContent = `Paused between cycles: ${remainingPause}s remaining`;
+          timerEl.textContent = `Time: 0s / ${cycleLength}s (paused)`;
+          requestAnimationFrame(checkTime);
+          return;
+        }
+      }
+      
       const newElapsedSeconds = Math.floor((now - startTime) / 1000);
       
       // If a second has passed
@@ -204,14 +235,19 @@
         // Update timer display
         timerEl.textContent = `Time: ${cyclePosition}s / ${cycleLength}s`;
         
+        // If we've reached the end of a cycle, pause for 3 seconds
+        if (cyclePosition === 0 && elapsedSeconds > 0) {
+          isPaused = true;
+          pauseEnd = now + 3000; // Pause for 3 seconds
+          statusEl.textContent = "Paused between cycles: 3s remaining";
+        }
+        
         // Check if the counter should increment at this time
         if (incrementTimes.includes(cyclePosition)) {
-   setTimeout(() => {
-      updateCounter(count + 1);
-    }, 14000);
-  
-}
-
+          setTimeout(() => {
+            updateCounter(count + 1);
+          }, 0);
+        }
       }
       
       requestAnimationFrame(checkTime);
