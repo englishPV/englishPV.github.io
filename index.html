@@ -206,14 +206,10 @@
         
         // Check if the counter should increment at this time
         if (incrementTimes.includes(cyclePosition)) {
-  if (cyclePosition === 0) {
-    // Add a 1-second delay when the cycle resets (timer goes to 0)
-    setTimeout(() => {
+   setTimeout(() => {
       updateCounter(count + 1);
-    }, 10000);
-  } else {
-    updateCounter(count + 1);
-  }
+    }, 7000);
+  
 }
 
       }
