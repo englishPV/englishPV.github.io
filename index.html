@@ -1,260 +1,412 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: black;
-    }
-    
-    .counter-container {
-      text-align: center;
-      padding: 30px;
-      background-color: black;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-    
-    .counter {
-      font-size: 64px;
-      font-weight: bold;
-      color: white;
-      margin: 10px 0;
-      min-width: 150px;
-      display: inline-block;
-      line-height: 1.2;
-    }
-    
-    .digit-container {
-      display: inline-block;
-      vertical-align: top;
-    }
-    
-    .digit {
-      display: inline-block;
-      position: relative;
-      overflow: hidden;
-      height: 1.2em;
-      width: 0.6em;
-      vertical-align: top;
-    }
-    
-    .comma {
-      display: inline-block;
-      width: 0.2em;
-      vertical-align: top;
-    }
-    
-    .digit span {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transition: transform 1s ease;
-    }
-    
-    .digit.animate span {
-      transform: translateY(-100%);
-    }
-    
-    .digit span.next {
-      top: 100%;
-    }
-    
-    .digit.animate span.next {
-      transform: translateY(-100%);
-    }
-    
-    .reset-button {
-      position: fixed;
-      bottom: 20px;
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    
-    .reset-button:hover {
-      background-color: #555;
-    }
-    
-    .timer {
-      color: #555;
-      font-size: 12px;
-      position: fixed;
-      bottom: 60px;
-    }
-    
-    .status {
-      color: #555;
-      font-size: 14px;
-      position: fixed;
-      bottom: 90px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Cards | Vocabulaire du Travail</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #334e68;
+            --tertiary-color: #f0f4f8;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            height: 300px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+        
+        .card-front {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .card-back {
+            background-color: var(--tertiary-color);
+            color: var(--secondary-color);
+            transform: rotateY(180deg);
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .progress-text {
+            font-size: 16px;
+            color: var(--dark-color);
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-value {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            font-style: italic;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card-front, .card-back {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="counter-container">
-    <div class="counter" id="counter"></div>
-  </div>
-  
-  <div class="status" id="status"></div>
-  <div class="timer" id="timer">Time: 0s</div>
-  <button class="reset-button" id="resetButton">Reset</button>
+    <div class="container">
+        <h1>Vocabulaire du Travail et du Chômage</h1>
+        
+        <div class="instructions">
+            Cliquez sur la carte pour révéler la traduction en anglais
+        </div>
+        
+        <div class="progress">
+            <div class="progress-text">Carte <span id="current-card">1</span>/<span id="total-cards">0</span></div>
+            <div class="progress-bar">
+                <div class="progress-value" id="progress-value"></div>
+            </div>
+        </div>
+        
+        <div class="card-container">
+            <div class="card" id="flashcard">
+                <div class="card-front" id="front"></div>
+                <div class="card-back" id="back"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="prev-btn">Précédent</button>
+            <button id="random-btn">Aléatoire</button>
+            <button id="next-btn">Suivant</button>
+        </div>
+    </div>
+    
+    <script>
+        // Liste des cartes avec le français au recto et l'anglais au verso
+        const flashcards = [
+            { front: "le travail", back: "work" },
+            { front: "un travail, un emploi", back: "a job" },
+            { front: "une profession, une activité professionnelle", back: "an occupation" },
+            { front: "les professions libérales", back: "the professions" },
+            { front: "une carrière", back: "a career" },
+            { front: "le monde du travail", back: "the world of work" },
+            { front: "être au travail", back: "to be at work" },
+            { front: "le lieu de travail", back: "the workplace" },
+            { front: "travailler chez soi", back: "to work from home" },
+            { front: "travailler à temps partiel", back: "to work part time" },
+            { front: "travailler à plein temps", back: "to work full time" },
+            { front: "la classe ouvrière", back: "the working class" },
+            { front: "la population active", back: "the working population" },
+            { front: "la vie active", back: "the working life" },
+            { front: "les conditions de travail", back: "working conditions" },
+            { front: "un atelier", back: "a workshop" },
+            { front: "une usine", back: "a factory, a plant" },
+            { front: "un atelier clandestin", back: "a sweatshop" },
+            { front: "travailler beaucoup", back: "to work hard" },
+            { front: "être travailleur", back: "to be hard-working" },
+            { front: "un travailleur acharné", back: "a hard worker, a workaholic" },
+            { front: "un permis de travail", back: "a work permit" },
+            { front: "être/ne pas être de service", back: "to be on duty / off duty" },
+            { front: "le chômage", back: "unemployment, joblessness" },
+            { front: "être au chômage", back: "to be unemployed, jobless, out of work" },
+            { front: "taux de chômage", back: "unemployment rate, jobless rate" },
+            { front: "les chômeurs", back: "the unemployed, the jobless" },
+            { front: "le chômage de longue durée", back: "long-term unemployment" },
+            { front: "le chômage des jeunes", back: "youth unemployment" },
+            { front: "allocation chômage", back: "unemployment benefit" },
+            { front: "toucher le chômage", back: "to be on the dole (GB), to be on welfare (US)" },
+            { front: "le marché du travail, de l'emploi", back: "job market, labour market" },
+            { front: "un contrat à durée déterminée (CDD)", back: "a fixed-term contract" },
+            { front: "un contrat à durée indéterminée (CDI)", back: "an open-ended contract" },
+            { front: "la flexibilité de l'emploi", back: "job flexibility" },
+            { front: "avoir des horaires flexibles", back: "work flexitime" },
+            { front: "la sécurité/précarité de l'emploi", back: "job security/insecurity" },
+            { front: "un stage", back: "an internship, a work placement" },
+            { front: "un stagiaire", back: "an intern, a trainee" },
+            { front: "un travailleur précaire", back: "a casual worker" },
+            { front: "un petit boulot", back: "an odd job, a casual job" },
+            { front: "un boulot d'été", back: "a summer job" },
+            { front: "un intérimaire", back: "a temporary worker" },
+            { front: "faire de l'intérim", back: "to temp, to work as a temp" },
+            { front: "employer", back: "to employ" },
+            { front: "un employeur", back: "an employer" },
+            { front: "un employé", back: "an employee" },
+            { front: "changer de travail", back: "to change jobs" },
+            { front: "embaucher un travailleur", back: "to hire, to take on a worker" },
+            { front: "recruter", back: "to recruit" },
+            { front: "une période d'essai", back: "a trial period" },
+            { front: "un poste", back: "a post, a position" },
+            { front: "nommer quelqu'un à un poste", back: "to appoint sb to a post" },
+            { front: "muter quelqu'un", back: "to transfer sb" },
+            { front: "un poste à responsabilité(s)", back: "a responsible job" },
+            { front: "un emploi subalterne", back: "a menial job" },
+            { front: "un demandeur d'emploi", back: "a job-seeker" },
+            { front: "une agence Pôle emploi", back: "a Jobcenter (GB)" },
+            { front: "un CV, un curriculum vitae", back: "a curriculum vitae, a CV, a résumé (US)" },
+            { front: "expérience professionnelle", back: "work experience" },
+            { front: "des compétences", back: "skills" },
+            { front: "être candidat à un emploi", back: "to apply for a job" },
+            { front: "un candidat à un poste", back: "an applicant" },
+            { front: "un entretien d'embauche", back: "a job interview" },
+            { front: "une offre d'emploi", back: "a job offer, a job vacancy, a job opportunity" },
+            { front: "travail OU main d'œuvre", back: "labour" },
+            { front: "la main d'œuvre féminine", back: "female labour" },
+            { front: "le travail des enfants", back: "child labour" },
+            { front: "les normes en matière d'emploi", back: "labour standards" },
+            { front: "la main d'œuvre", back: "manpower, workforce" },
+            { front: "le personnel", back: "staff, personnel" },
+            { front: "un collègue, un camarade de travail", back: "a colleague, a co-worker, a workmate" },
+            { front: "les ressources humaines", back: "human resources" },
+            { front: "un travail qualifié/peu qualifié/non qualifié", back: "a skilled/low-skilled/an unskilled job" },
+            { front: "un ouvrier spécialisé (OS)", back: "an unskilled worker" },
+            { front: "un ouvrier", back: "a blue-collar worker" },
+            { front: "un employé de bureau", back: "a white-collar worker" },
+            { front: "un fonctionnaire", back: "a state employee, a civil servant" },
+            { front: "un salarié du secteur public", back: "a public-sector employee" },
+            { front: "un haut fonctionnaire", back: "a high-ranking civil servant" },
+            { front: "être indépendant, travailler à son compte", back: "to be self-employed" },
+            { front: "les travailleurs indépendants", back: "the self-employed" },
+            { front: "des honoraires", back: "fees" },
+            { front: "paie, paye", back: "pay" },
+            { front: "salaire", back: "salary" },
+            { front: "salaire (d'ouvrier)", back: "wages" },
+            { front: "gagner de l'argent", back: "to earn money, to make money" },
+            { front: "gagner sa vie", back: "to earn a living, to earn one's living, to make a living" },
+            { front: "Que fait-il dans la vie ?", back: "What does he do for a living?" },
+            { front: "un travail mal payé", back: "a badly-paid job, a low-paid job" },
+            { front: "un travail bien payé", back: "a well-paid job, a highly-paid job" },
+            { front: "un salarié", back: "a wage-earner" },
+            { front: "une prime", back: "a bonus" },
+            { front: "un avantage (en nature), avantage annexe", back: "a perk, a fringe benefit" },
+            { front: "une voiture de fonction", back: "a company car" },
+            { front: "salaire au rendement", back: "performance-related pay" },
+            { front: "être employé par une entreprise", back: "to be on a company's payroll" },
+            { front: "des vacances", back: "holiday, vacation (US)" },
+            { front: "les congés payés", back: "paid holiday" },
+            { front: "être en vacances", back: "to be on holiday" },
+            { front: "un jour férié", back: "a bank holiday" },
+            { front: "être en congé maladie", back: "to be on sick leave" },
+            { front: "prendre deux jours de congé", back: "to take two days off" },
+            { front: "réduction du temps de travail (RTT)", back: "reduction of working hours" },
+            { front: "les 35 heures", back: "the 35-hour working week" },
+            { front: "supprimer des emplois", back: "to cut jobs" },
+            { front: "faire des coupes sombres dans la main d'œuvre", back: "to slash, to axe jobs" },
+            { front: "des pertes d'emploi, suppressions d'emploi", back: "job losses" },
+            { front: "rationaliser", back: "to streamline" },
+            { front: "dégraisser ses effectifs", back: "to downsize" },
+            { front: "licencier des salariés", back: "to lay off workers, to make workers redundant" },
+            { front: "un licenciement (économique)", back: "a redundancy" },
+            { front: "un départ volontaire", back: "a voluntary redundancy" },
+            { front: "un plan social", back: "a redundancy plan" },
+            { front: "indemnité de licenciement, prime de départ", back: "redundancy payment, severance pay, severance package" },
+            { front: "un parachute doré", back: "a golden parachute, a golden handshake" },
+            { front: "renvoyer, licencier, congédier quelqu'un", back: "to dismiss sb" },
+            { front: "mettre à la porte, renvoyer, virer", back: "to fire, to sack, to give sb the sack" },
+            { front: "être renvoyé", back: "to get the sack" },
+            { front: "un conflit social", back: "an industrial dispute" },
+            { front: "se mettre/être en grève", back: "to go on strike / be on strike" },
+            { front: "un gréviste", back: "a striker" },
+            { front: "la direction et les salariés", back: "management and workers" },
+            { front: "un délégué syndical", back: "a shop steward" },
+            { front: "un syndicat", back: "a (trade) union" },
+            { front: "une revendication", back: "a claim" },
+            { front: "des revendications salariales", back: "wage claims, wage demands" },
+            { front: "une augmentation de salaire", back: "a payrise (GB), a payraise (US)" },
+            { front: "reprendre le travail", back: "to resume work" },
+            { front: "prendre sa retraite", back: "to retire" },
+            { front: "démissionner", back: "to resign, to step down" },
+            { front: "un retraité", back: "a pensioner, an old age pensioner, a retiree (US)" },
+            { front: "la retraite", back: "retirement" },
+            { front: "partir en pré-retraite", back: "to take early retirement" },
+            { front: "l'âge de la retraite", back: "retirement age" }
+        ];
 
-  <script>
-    // Counter state
-    let count = 96600;
-    let startTime = Date.now();
-    let elapsedSeconds = 0;
-    let cycleLength = 0;
-    let isPaused = false;
-    let pauseEnd = 0;
-    const counterEl = document.getElementById('counter');
-    const resetButton = document.getElementById('resetButton');
-    const timerEl = document.getElementById('timer');
-    const statusEl = document.getElementById('status');
-    
-    // The list of times when the counter should increment
-    const incrementTimes = [9, 10, 16, 33, 55, 56, 57, 77, 80, 101, 104, 105, 107, 107, 133, 140, 157, 160, 160, 162, 173, 190, 191, 191, 192, 218, 224, 224, 233, 255, 256, 256, 267, 267, 290, 291, 320, 321, 321, 322, 345, 346, 352, 368, 374, 385, 410, 413, 423, 461, 462, 490, 491, 491, 499, 507, 530, 531, 532, 554, 558, 559, 570, 573, 599, 601, 601, 606, 622, 623, 630, 638, 653, 679, 680, 700, 701, 707, 717, 721, 721, 728, 734, 745, 760, 762, 781, 787, 808, 808, 809, 818, 825, 837, 841, 846, 850, 859, 888, 889, 892, 892, 901, 901, 902, 907, 910, 922, 939, 939, 940, 967, 967, 969, 987, 988, 995, 1009, 1010, 1012, 1013, 1013, 1013];
-    
-    // Find the cycle length (last time value plus 1 to ensure we restart at the beginning)
-    cycleLength = incrementTimes[incrementTimes.length - 1] + 1;
-    
-    // Initialize counter
-    updateCounter(count);
-    
-    // Reset button event listener
-    resetButton.addEventListener('click', function() {
-      count = 96800;
-      startTime = Date.now();
-      elapsedSeconds = 0;
-      isPaused = false;
-      updateCounter(count);
-      statusEl.textContent = "";
-    });
-    
-    // Format number with commas
-    function formatNumber(num) {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    
-    // Update counter with animation
-    function updateCounter(newCount) {
-      const currentFormatted = formatNumber(count);
-      const newFormatted = formatNumber(newCount);
-      
-      // Clear counter
-      counterEl.innerHTML = '';
-      
-      // Wrap all digits in a container for better alignment
-      const digitContainer = document.createElement('div');
-      digitContainer.className = 'digit-container';
-      
-      // Create digits for animation
-      for (let i = 0; i < newFormatted.length; i++) {
-        // If this is a comma, just add it without animation
-        if (newFormatted[i] === ',') {
-          const comma = document.createElement('span');
-          comma.className = 'comma';
-          comma.textContent = ',';
-          digitContainer.appendChild(comma);
-          continue;
+        // Variables globales pour le suivi de l'état
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        // Éléments DOM
+        const flashcard = document.getElementById('flashcard');
+        const frontEl = document.getElementById('front');
+        const backEl = document.getElementById('back');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const currentCardEl = document.getElementById('current-card');
+        const totalCardsEl = document.getElementById('total-cards');
+        const progressValueEl = document.getElementById('progress-value');
+
+        // Initialisation
+        function init() {
+            totalCardsEl.textContent = flashcards.length;
+            updateCard();
+            updateProgress();
         }
-        
-        const digit = document.createElement('div');
-        digit.className = 'digit';
-        
-        // Current value
-        const current = document.createElement('span');
-        current.textContent = i < currentFormatted.length && currentFormatted[i] !== ',' ? 
-                             currentFormatted[i] : newFormatted[i];
-        digit.appendChild(current);
-        
-        // Next value (only if digit changes)
-        if (i >= currentFormatted.length || 
-            (currentFormatted[i] !== newFormatted[i] && currentFormatted[i] !== ',')) {
-          const next = document.createElement('span');
-          next.className = 'next';
-          next.textContent = newFormatted[i];
-          digit.appendChild(next);
-          
-          // Animate after a small delay
-          setTimeout(() => {
-            digit.classList.add('animate');
-          }, 10 * i); // Stagger animation
+
+        // Mise à jour de la carte actuelle
+        function updateCard() {
+            frontEl.textContent = flashcards[currentIndex].front;
+            backEl.textContent = flashcards[currentIndex].back;
+            currentCardEl.textContent = currentIndex + 1;
+            isFlipped = false;
+            flashcard.classList.remove('flipped');
+            updateProgress();
         }
-        
-        digitContainer.appendChild(digit);
-      }
-      
-      counterEl.appendChild(digitContainer);
-      
-      // Update count state
-      count = newCount;
-    }
-    
-    // Check time and update counter accordingly
-    function checkTime() {
-      const now = Date.now();
-      
-      // If we're in a pause between cycles
-      if (isPaused) {
-        if (now >= pauseEnd) {
-          // Pause is over, resume the cycle
-          isPaused = false;
-          startTime = now - (elapsedSeconds * 1000); // Adjust startTime to maintain continuity
-          statusEl.textContent = "";
-        } else {
-          // Still in pause, update pause countdown
-          const remainingPause = Math.ceil((pauseEnd - now) / 1000);
-          statusEl.textContent = `Paused between cycles: ${remainingPause}s remaining`;
-          timerEl.textContent = `Time: 0s / ${cycleLength}s (paused)`;
-          requestAnimationFrame(checkTime);
-          return;
+
+        // Mise à jour de la barre de progression
+        function updateProgress() {
+            const progress = ((currentIndex + 1) / flashcards.length) * 100;
+            progressValueEl.style.width = `${progress}%`;
         }
-      }
-      
-      const newElapsedSeconds = Math.floor((now - startTime) / 1000);
-      
-      // If a second has passed
-      if (newElapsedSeconds > elapsedSeconds) {
-        elapsedSeconds = newElapsedSeconds;
-        
-        // Calculate current position in the cycle
-        const cyclePosition = elapsedSeconds % cycleLength;
-        
-        // Update timer display
-        timerEl.textContent = `Time: ${cyclePosition}s / ${cycleLength}s`;
-        
-        // If we've reached the end of a cycle, pause for 3 seconds
-        if (cyclePosition === 0 && elapsedSeconds > 0) {
-          isPaused = true;
-          pauseEnd = now + 7000; // Pause for 3 seconds
-          statusEl.textContent = "Paused between cycles: 3s remaining";
+
+        // Naviguer vers la carte précédente
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+            updateCard();
         }
-        
-        // Check if the counter should increment at this time
-        if (incrementTimes.includes(cyclePosition)) {
-          setTimeout(() => {
-            updateCounter(count + 1);
-          }, 0);
+
+        // Naviguer vers la carte suivante
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % flashcards.length;
+            updateCard();
         }
-      }
-      
-      requestAnimationFrame(checkTime);
-    }
-    
-    // Start the timing check
-    checkTime();
-  </script>
+
+        // Sélectionner une carte aléatoire
+        function randomCard() {
+            const newIndex = Math.floor(Math.random() * flashcards.length);
+            currentIndex = newIndex;
+            updateCard();
+        }
+
+        // Retourner la carte
+        function flipCard() {
+            isFlipped = !isFlipped;
+            flashcard.classList.toggle('flipped');
+        }
+
+        // Événements
+        flashcard.addEventListener('click', flipCard);
+        prevBtn.addEventListener('click', prevCard);
+        nextBtn.addEventListener('click', nextCard);
+        randomBtn.addEventListener('click', randomCard);
+
+        // Touches du clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevCard();
+            if (e.key === 'ArrowRight') nextCard();
+            if (e.key === ' ' || e.key === 'Enter') flipCard();
+            if (e.key === 'r') randomCard();
+        });
+
+        // Initialiser l'application
+        init();
+    </script>
 </body>
 </html>
