@@ -1,15 +1,213 @@
-
-import React, { useState, useEffect } from 'react';
-
-const FlashcardApp = () => {
-  // State variables
-  const [currentCard, setCurrentCard] = useState(null);
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [selectedChapter, setSelectedChapter] = useState(1);
-  
-  // Chapters data
-  const chapters = {
-    1: [
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Cards Français-Anglais</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #333;
+            --card-bg: #fff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .chapters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .chapter-btn {
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .chapter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .card-container {
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px var(--card-shadow);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        .card-content {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .english-translation {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .card-content {
+                font-size: 1.5rem;
+            }
+            
+            .english-translation {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flash Cards Français-Anglais</h1>
+        <p class="subtitle">Cliquez sur la carte pour voir la traduction</p>
+        
+        <div class="chapters">
+            <button class="chapter-btn active" data-chapter="1">Chapitre 1</button>
+            <button class="chapter-btn" data-chapter="2">Chapitre 2</button>
+            <button class="chapter-btn" data-chapter="3">Chapitre 3</button>
+            <button class="chapter-btn" data-chapter="4">Chapitre 4</button>
+            <button class="chapter-btn" data-chapter="5">Chapitre 5</button>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 0%"></div>
+        </div>
+        
+        <div class="card-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="french-word"></div>
+                    <div class="english-translation"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="prev-btn">Précédent</button>
+            <button class="btn" id="random-btn">Aléatoire</button>
+            <button class="btn" id="next-btn">Suivant</button>
+        </div>
+        
+        <div class="info">
+            <span id="current-card">0</span>/<span id="total-cards">0</span>
+        </div>
+    </div>
+    
+    <script>
+        // Structure de données pour les mots par chapitre
+        const vocabularyByChapter = {
+            1: [
 { french: "monarchie", english: "monarchy" },
 { french: "monarque de droit divin", english: "a monarch by divine right" },
 { french: "souverain", english: "sovereign" },
@@ -510,87 +708,130 @@ const FlashcardApp = () => {
 { french: "partir en pré-retraite", english: "to take early retirement" },
 { french: "âge de la retraite", english: "retirement age" }
 ]};
-
-  // Initialize with a random card from the selected chapter
-  useEffect(() => {
-    selectRandomCard();
-  }, [selectedChapter]);
-
-  // Function to select a random card from the current chapter
-  const selectRandomCard = () => {
-    const currentChapterCards = chapters[selectedChapter];
-    const randomIndex = Math.floor(Math.random() * currentChapterCards.length);
-    setCurrentCard(currentChapterCards[randomIndex]);
-    setShowTranslation(false);
-  };
-
-  // Function to handle chapter change
-  const handleChapterChange = (chapter) => {
-    setSelectedChapter(chapter);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex flex-col items-center">
-      <h1 className="text-3xl font-bold text-indigo-800 mb-6">
-        Flashcards Français-Anglais
-      </h1>
-      
-      {/* Chapter navigation */}
-      <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {Object.keys(chapters).map(chapter => (
-          <button
-            key={chapter}
-            onClick={() => handleChapterChange(Number(chapter))}
-            className={`px-4 py-2 rounded-full font-medium shadow ${
-              selectedChapter === Number(chapter)
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-indigo-700 hover:bg-indigo-100'
-            }`}
-          >
-            Chapitre {chapter}
-          </button>
-        ))}
-      </div>
-      
-      {/* Flashcard */}
-      {currentCard && (
-        <div 
-          className="bg-white rounded-xl shadow-xl w-full max-w-lg aspect-video p-6 mb-8 flex flex-col justify-center items-center cursor-pointer"
-          onClick={() => setShowTranslation(!showTranslation)}
-        >
-          <div className="text-center">
-            <div className="text-2xl font-medium text-gray-800 mb-6">
-              {currentCard.french}
-            </div>
+        
+        // Variables d'état
+        let currentChapter = 1;
+        let currentCardIndex = 0;
+        let isTranslationVisible = false;
+        
+        // Éléments DOM
+        const chapterButtons = document.querySelectorAll('.chapter-btn');
+        const card = document.querySelector('.card');
+        const frenchWord = document.querySelector('.french-word');
+        const englishTranslation = document.querySelector('.english-translation');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const progressBar = document.querySelector('.progress-bar');
+        const currentCardElement = document.getElementById('current-card');
+        const totalCardsElement = document.getElementById('total-cards');
+        
+        // Fonction pour mettre à jour la carte
+        function updateCard() {
+            const cards = vocabularyByChapter[currentChapter];
             
-            <div className={`text-2xl font-medium text-indigo-600 transition-opacity duration-0 ${
-              showTranslation ? 'opacity-100' : 'opacity-0'
-            }`}>
-              {showTranslation ? currentCard.english : ''}
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Controls */}
-      <div className="flex gap-4">
-        <button
-          onClick={selectRandomCard}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:bg-indigo-700 transition-colors flex items-center"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          Aléatoire
-        </button>
-      </div>
-      
-      <div className="mt-8 text-center text-gray-600">
-        <p>Chapitre {selectedChapter} • {chapters[selectedChapter].length} mots</p>
-        <p className="text-sm mt-2">Cliquez sur la carte pour voir la traduction</p>
-      </div>
-    </div>
-  );
-};
-
-export default FlashcardApp;
+            if (cards.length > 0) {
+                const card = cards[currentCardIndex];
+                frenchWord.textContent = card.french;
+                englishTranslation.textContent = card.english;
+                
+                // Masquer la traduction anglaise
+                englishTranslation.style.display = 'none';
+                isTranslationVisible = false;
+                
+                // Mettre à jour l'information sur les cartes
+                currentCardElement.textContent = currentCardIndex + 1;
+                totalCardsElement.textContent = cards.length;
+                
+                // Mettre à jour la barre de progression
+                progressBar.style.width = `${((currentCardIndex + 1) / cards.length) * 100}%`;
+                
+                // Activer/désactiver les boutons
+                prevBtn.disabled = currentCardIndex === 0;
+                nextBtn.disabled = currentCardIndex === cards.length - 1;
+                randomBtn.disabled = cards.length <= 1;
+            } else {
+                frenchWord.textContent = "Aucune carte disponible";
+                englishTranslation.textContent = "";
+                englishTranslation.style.display = 'none';
+                isTranslationVisible = false;
+                
+                // Mettre à jour l'information sur les cartes
+                currentCardElement.textContent = "0";
+                totalCardsElement.textContent = "0";
+                
+                // Mettre à jour la barre de progression
+                progressBar.style.width = "0%";
+                
+                // Désactiver les boutons
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                randomBtn.disabled = true;
+            }
+        }
+        
+        // Fonction pour changer de chapitre
+        function changeChapter(chapter) {
+            currentChapter = chapter;
+            currentCardIndex = 0;
+            
+            // Mettre à jour les boutons de chapitre
+            chapterButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
+            });
+            
+            updateCard();
+        }
+        
+        // Initialisation
+        function init() {
+            updateCard();
+            
+            // Événement pour afficher/masquer la traduction
+            card.addEventListener('click', () => {
+                englishTranslation.style.display = isTranslationVisible ? 'none' : 'block';
+                isTranslationVisible = !isTranslationVisible;
+            });
+            
+            // Événements pour les boutons de navigation
+            prevBtn.addEventListener('click', () => {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    updateCard();
+                }
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                const cards = vocabularyByChapter[currentChapter];
+                if (currentCardIndex < cards.length - 1) {
+                    currentCardIndex++;
+                    updateCard();
+                }
+            });
+            
+            randomBtn.addEventListener('click', () => {
+                const cards = vocabularyByChapter[currentChapter];
+                if (cards.length > 1) {
+                    let randomIndex;
+                    do {
+                        randomIndex = Math.floor(Math.random() * cards.length);
+                    } while (randomIndex === currentCardIndex);
+                    
+                    currentCardIndex = randomIndex;
+                    updateCard();
+                }
+            });
+            
+            // Événements pour les boutons de chapitre
+            chapterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    changeChapter(parseInt(btn.dataset.chapter));
+                });
+            });
+        }
+        
+        // Démarrer l'application
+        init();
+    </script>
+</body>
+</html>
