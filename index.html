@@ -739,6 +739,7 @@
         let isTranslationVisible = false;
         let seenCards = new Set(); // Ensemble pour suivre les cartes déjà vues
         let remainingCards = []; // Liste des cartes restantes à montrer en mode aléatoire
+        let isTimerActive = true; // Variable pour suivre si le chrono est actif
         
         // Variables pour le chronomètre
         let startTime;
@@ -793,8 +794,7 @@
                 
                 // Vérifier si toutes les cartes ont été vues
                 if (seenCards.size === cards.length) {
-                    stopTimer();
-                    checkAndUpdateBestTime();
+                    stopTimer(); // Arrêt définitif uniquement quand toutes les cartes sont vues
                 }
             } else {
                 frenchWord.textContent = "Aucune carte disponible";
@@ -857,9 +857,8 @@
         
         // Fonction pour changer de chapitre
         function changeChapter(chapter) {
-            // Arrêter et vérifier le temps actuel
-            stopTimer();
-            checkAndUpdateBestTime();
+            // Mettre en pause le chronomètre sans vérifier le meilleur temps
+            pauseTimer();
             
             currentChapter = chapter;
             currentCardIndex = 0;
@@ -888,14 +887,26 @@
         function startTimer() {
             startTime = new Date();
             timerInterval = setInterval(updateTimer, 1000);
+            isTimerActive = true;
+        }
+        
+        function pauseTimer() {
+            if (isTimerActive) {
+                clearInterval(timerInterval);
+                isTimerActive = false;
+            }
         }
         
         function stopTimer() {
             clearInterval(timerInterval);
+            isTimerActive = false;
+            
+            // On vérifie uniquement le meilleur temps lorsqu'on arrête définitivement le chrono
+            checkAndUpdateBestTime();
         }
         
         function resetTimer() {
-            stopTimer();
+            clearInterval(timerInterval);
             timerElement.textContent = "00:00";
             startTime = new Date();
         }
