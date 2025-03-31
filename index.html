@@ -109,11 +109,11 @@
         }
         
         .english-translation {
-    color: var(--secondary-color);
-    font-size: 2rem; /* Même taille que le mot français */
-    font-weight: bold;
-    display: none;
-}
+            color: var(--secondary-color);
+            font-size: 2rem; /* Même taille que le mot français */
+            font-weight: bold;
+            display: none;
+        }
         
         .controls {
             display: flex;
@@ -150,6 +150,22 @@
             color: #666;
         }
         
+        .timer-container {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .stats-container {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
         @media (max-width: 600px) {
             .card-content {
                 font-size: 1.5rem;
@@ -179,6 +195,10 @@
             <button class="chapter-btn" data-chapter="5">Chapitre 5</button>
         </div>
         
+        <div class="timer-container">
+            <div id="timer">00:00</div>
+        </div>
+        
         <div class="progress-container">
             <div class="progress-bar" style="width: 0%"></div>
         </div>
@@ -200,6 +220,11 @@
         
         <div class="info">
             <span id="current-card">0</span>/<span id="total-cards">0</span>
+        </div>
+        
+        <div class="stats-container">
+            <div>Meilleur temps: <span id="best-time">-</span></div>
+            <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
         </div>
     </div>
     
@@ -712,6 +737,13 @@
         let currentChapter = 1;
         let currentCardIndex = 0;
         let isTranslationVisible = false;
+        let seenCards = new Set(); // Ensemble pour suivre les cartes déjà vues
+        let remainingCards = []; // Liste des cartes restantes à montrer en mode aléatoire
+        
+        // Variables pour le chronomètre
+        let startTime;
+        let timerInterval;
+        let bestTimes = {}; // Stockage des meilleurs temps par chapitre
         
         // Éléments DOM
         const chapterButtons = document.querySelectorAll('.chapter-btn');
@@ -724,6 +756,10 @@
         const progressBar = document.querySelector('.progress-bar');
         const currentCardElement = document.getElementById('current-card');
         const totalCardsElement = document.getElementById('total-cards');
+        const timerElement = document.getElementById('timer');
+        const bestTimeElement = document.getElementById('best-time');
+        const cardsSeenElement = document.getElementById('cards-seen');
+        const cardsTotalElement = document.getElementById('cards-total');
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -734,6 +770,9 @@
                 frenchWord.textContent = card.french;
                 englishTranslation.textContent = card.english;
                 
+                // Ajouter cette carte à l'ensemble des cartes vues
+                seenCards.add(currentCardIndex);
+                
                 // Masquer la traduction anglaise
                 englishTranslation.style.display = 'none';
                 isTranslationVisible = false;
@@ -741,14 +780,22 @@
                 // Mettre à jour l'information sur les cartes
                 currentCardElement.textContent = currentCardIndex + 1;
                 totalCardsElement.textContent = cards.length;
+                cardsSeenElement.textContent = seenCards.size;
+                cardsTotalElement.textContent = cards.length;
                 
                 // Mettre à jour la barre de progression
-                progressBar.style.width = `${((currentCardIndex + 1) / cards.length) * 100}%`;
+                progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
                 
                 // Activer/désactiver les boutons
                 prevBtn.disabled = currentCardIndex === 0;
                 nextBtn.disabled = currentCardIndex === cards.length - 1;
-                randomBtn.disabled = cards.length <= 1;
+                randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
+                
+                // Vérifier si toutes les cartes ont été vues
+                if (seenCards.size === cards.length) {
+                    stopTimer();
+                    checkAndUpdateBestTime();
+                }
             } else {
                 frenchWord.textContent = "Aucune carte disponible";
                 englishTranslation.textContent = "";
@@ -758,6 +805,8 @@
                 // Mettre à jour l'information sur les cartes
                 currentCardElement.textContent = "0";
                 totalCardsElement.textContent = "0";
+                cardsSeenElement.textContent = "0";
+                cardsTotalElement.textContent = "0";
                 
                 // Mettre à jour la barre de progression
                 progressBar.style.width = "0%";
@@ -769,22 +818,126 @@
             }
         }
         
+        // Fonction pour sélectionner une carte aléatoire non vue
+        function selectRandomCard() {
+            const cards = vocabularyByChapter[currentChapter];
+            
+            // Si toutes les cartes ont été vues, réinitialiser
+            if (seenCards.size >= cards.length) {
+                seenCards.clear();
+                initializeRemainingCards();
+            }
+            
+            // Si la liste des cartes restantes est vide, la réinitialiser
+            if (remainingCards.length === 0) {
+                initializeRemainingCards();
+            }
+            
+            // Prendre une carte aléatoire de la liste des cartes restantes
+            const randomIndex = Math.floor(Math.random() * remainingCards.length);
+            const selectedCardIndex = remainingCards[randomIndex];
+            
+            // Retirer la carte de la liste des cartes restantes
+            remainingCards.splice(randomIndex, 1);
+            
+            return selectedCardIndex;
+        }
+        
+        // Initialiser la liste des cartes restantes (non vues)
+        function initializeRemainingCards() {
+            const cards = vocabularyByChapter[currentChapter];
+            remainingCards = [];
+            
+            for (let i = 0; i < cards.length; i++) {
+                if (!seenCards.has(i)) {
+                    remainingCards.push(i);
+                }
+            }
+        }
+        
         // Fonction pour changer de chapitre
         function changeChapter(chapter) {
+            // Arrêter et vérifier le temps actuel
+            stopTimer();
+            checkAndUpdateBestTime();
+            
             currentChapter = chapter;
             currentCardIndex = 0;
+            seenCards.clear();
+            remainingCards = [];
             
             // Mettre à jour les boutons de chapitre
             chapterButtons.forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
             });
             
+            // Réinitialiser et démarrer le chronomètre
+            resetTimer();
+            startTimer();
+            
+            // Afficher le meilleur temps pour ce chapitre
+            updateBestTimeDisplay();
+            
+            // Initialiser les cartes restantes
+            initializeRemainingCards();
+            
             updateCard();
+        }
+        
+        // Fonctions pour le chronomètre
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+        
+        function resetTimer() {
+            stopTimer();
+            timerElement.textContent = "00:00";
+            startTime = new Date();
+        }
+        
+        function updateTimer() {
+            const now = new Date();
+            const elapsedTime = Math.floor((now - startTime) / 1000); // en secondes
+            
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function checkAndUpdateBestTime() {
+            if (seenCards.size === 0) return; // Ne pas enregistrer si aucune carte n'a été vue
+            
+            const now = new Date();
+            const elapsedTime = Math.floor((now - startTime) / 1000); // en secondes
+            
+            // Si c'est le premier temps pour ce chapitre ou si c'est meilleur que le précédent
+            if (!bestTimes[currentChapter] || elapsedTime < bestTimes[currentChapter]) {
+                bestTimes[currentChapter] = elapsedTime;
+                updateBestTimeDisplay();
+            }
+        }
+        
+        function updateBestTimeDisplay() {
+            if (bestTimes[currentChapter]) {
+                const minutes = Math.floor(bestTimes[currentChapter] / 60);
+                const seconds = bestTimes[currentChapter] % 60;
+                bestTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                bestTimeElement.textContent = "-";
+            }
         }
         
         // Initialisation
         function init() {
+            initializeRemainingCards();
             updateCard();
+            startTimer();
             
             // Événement pour afficher/masquer la traduction
             card.addEventListener('click', () => {
@@ -810,13 +963,8 @@
             
             randomBtn.addEventListener('click', () => {
                 const cards = vocabularyByChapter[currentChapter];
-                if (cards.length > 1) {
-                    let randomIndex;
-                    do {
-                        randomIndex = Math.floor(Math.random() * cards.length);
-                    } while (randomIndex === currentCardIndex);
-                    
-                    currentCardIndex = randomIndex;
+                if (cards.length > 1 && seenCards.size < cards.length) {
+                    currentCardIndex = selectRandomCard();
                     updateCard();
                 }
             });
