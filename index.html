@@ -230,8 +230,7 @@
     
     <script>
         // Structure de données pour les mots par chapitre
-        const vocabularyByChapter = {
-            1: [
+        const vocabularyByChapter = {1: [
 { french: "monarchie", english: "monarchy" },
 { french: "monarque de droit divin", english: "a monarch by divine right" },
 { french: "souverain", english: "sovereign" },
@@ -987,6 +986,7 @@
   "french": "âge de la retraite",
   "english": "retirement age"
 }]};
+            
         
         // Variables d'état
         let currentChapter = 1;
@@ -995,6 +995,7 @@
         let seenCards = new Set(); // Ensemble pour suivre les cartes déjà vues
         let remainingCards = []; // Liste des cartes restantes à montrer en mode aléatoire
         let isTimerActive = true; // Variable pour suivre si le chrono est actif
+        let cardHistory = []; // Historique des cartes visitées
         
         // Variables pour le chronomètre
         let startTime;
@@ -1043,7 +1044,7 @@
                 progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
                 
                 // Activer/désactiver les boutons
-                prevBtn.disabled = currentCardIndex === 0;
+                prevBtn.disabled = cardHistory.length === 0;
                 nextBtn.disabled = currentCardIndex === cards.length - 1;
                 randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
                 
@@ -1119,6 +1120,7 @@
             currentCardIndex = 0;
             seenCards.clear();
             remainingCards = [];
+            cardHistory = []; // Réinitialiser l'historique des cartes
             
             // Mettre à jour les boutons de chapitre
             chapterButtons.forEach(btn => {
@@ -1213,8 +1215,9 @@
             
             // Événements pour les boutons de navigation
             prevBtn.addEventListener('click', () => {
-                if (currentCardIndex > 0) {
-                    currentCardIndex--;
+                if (cardHistory.length > 0) {
+                    // Prendre le dernier élément de l'historique
+                    currentCardIndex = cardHistory.pop();
                     updateCard();
                 }
             });
@@ -1222,6 +1225,8 @@
             nextBtn.addEventListener('click', () => {
                 const cards = vocabularyByChapter[currentChapter];
                 if (currentCardIndex < cards.length - 1) {
+                    // Ajouter l'index actuel à l'historique avant de passer au suivant
+                    cardHistory.push(currentCardIndex);
                     currentCardIndex++;
                     updateCard();
                 }
@@ -1230,6 +1235,8 @@
             randomBtn.addEventListener('click', () => {
                 const cards = vocabularyByChapter[currentChapter];
                 if (cards.length > 1 && seenCards.size < cards.length) {
+                    // Ajouter l'index actuel à l'historique avant de passer à une carte aléatoire
+                    cardHistory.push(currentCardIndex);
                     currentCardIndex = selectRandomCard();
                     updateCard();
                 }
@@ -1248,3 +1255,7 @@
     </script>
 </body>
 </html>
+
+
+
+
