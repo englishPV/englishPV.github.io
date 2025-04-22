@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -138,6 +137,7 @@
         .card-container {
             height: 300px;
             margin-bottom: 20px;
+            position: relative;
         }
         
         .card {
@@ -154,6 +154,7 @@
             box-sizing: border-box;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .card-content {
@@ -167,6 +168,17 @@
             font-size: 2rem;
             font-weight: bold;
             display: none;
+        }
+        
+        .success-rate {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 3px 8px;
+            border-radius: 10px;
         }
         
         .controls {
@@ -275,7 +287,7 @@
         .validation-result {
             margin-top: 5px;
             font-weight: bold;
-            height: 20px; /* Hauteur fixe pour éviter les sauts de mise en page */
+            height: 20px;
         }
         
         .correct {
@@ -360,6 +372,7 @@
                     <div class="french-word"></div>
                     <div class="english-translation"></div>
                 </div>
+                <div class="success-rate" id="success-rate"></div>
             </div>
         </div>
         
@@ -1157,137 +1170,169 @@
         let currentChapter = 1;
         let currentCardIndex = 0;
         let isTranslationVisible = false;
-        let seenCards = new Set(); // Ensemble pour suivre les cartes déjà vues
-        let remainingCards = []; // Liste des cartes restantes à montrer en mode aléatoire
-        let isTimerActive = true; // Variable pour suivre si le chrono est actif
-        let cardHistory = []; // Historique des cartes visitées
-        let isDarkMode = false; // Mode sombre désactivé par défaut
-        let isRawMode = false; // Mode raw désactivé par défaut
-        let currentScore = 0; // Score actuel
-        let bestScores = {}; // Meilleurs scores par chapitre
-        
-        // Stockage des performances pour chaque carte (mémoire des résultats passés)
+        let seenCards = new Set();
+        let cardHistory = [];
+        let isDarkMode = false;
+        let isRawMode = false;
+        let currentScore = 0;
+        let bestScores = {};
         let cardPerformance = {};
-        
-        // Variables pour le chronomètre
         let startTime;
         let timerInterval;
-        let bestTimes = {}; // Stockage des meilleurs temps par chapitre
+        let bestTimes = {};
+        let isTimerActive = true;
         
         // Éléments DOM
-        const chapterButtons = document.querySelectorAll('.chapter-btn');
-        const card = document.querySelector('.card');
-        const cardContainer = document.querySelector('.card-container');
-        const rawContent = document.getElementById('raw-content');
-        const frenchWord = document.querySelector('.french-word');
-        const englishTranslation = document.querySelector('.english-translation');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const randomBtn = document.getElementById('random-btn');
-        const progressBar = document.querySelector('.progress-bar');
-        const currentCardElement = document.getElementById('current-card');
-        const totalCardsElement = document.getElementById('total-cards');
-        const timerElement = document.getElementById('timer');
-        const bestTimeElement = document.getElementById('best-time');
-        const cardsSeenElement = document.getElementById('cards-seen');
-        const cardsTotalElement = document.getElementById('cards-total');
-        const themeToggle = document.getElementById('theme-toggle');
-        const rawToggle = document.getElementById('raw-toggle');
-        const translationInput = document.getElementById('translation-input');
-        const validateBtn = document.getElementById('validate-btn');
-        const validationResult = document.getElementById('validation-result');
-        const currentScoreElement = document.getElementById('current-score');
-        const bestScoreElement = document.getElementById('best-score');
+        const elements = {
+            chapterButtons: document.querySelectorAll('.chapter-btn'),
+            card: document.querySelector('.card'),
+            cardContainer: document.querySelector('.card-container'),
+            rawContent: document.getElementById('raw-content'),
+            frenchWord: document.querySelector('.french-word'),
+            englishTranslation: document.querySelector('.english-translation'),
+            prevBtn: document.getElementById('prev-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            randomBtn: document.getElementById('random-btn'),
+            progressBar: document.querySelector('.progress-bar'),
+            currentCardElement: document.getElementById('current-card'),
+            totalCardsElement: document.getElementById('total-cards'),
+            timerElement: document.getElementById('timer'),
+            bestTimeElement: document.getElementById('best-time'),
+            cardsSeenElement: document.getElementById('cards-seen'),
+            cardsTotalElement: document.getElementById('cards-total'),
+            themeToggle: document.getElementById('theme-toggle'),
+            rawToggle: document.getElementById('raw-toggle'),
+            translationInput: document.getElementById('translation-input'),
+            validateBtn: document.getElementById('validate-btn'),
+            validationResult: document.getElementById('validation-result'),
+            currentScoreElement: document.getElementById('current-score'),
+            bestScoreElement: document.getElementById('best-score'),
+            successRateElement: document.getElementById('success-rate')
+        };
+        
+        // Fonction pour calculer et trier les cartes selon leur taux de succès
+        function getSortedCardsByPerformance() {
+            const cards = vocabularyByChapter[currentChapter];
+            if (!cards || cards.length === 0) return [];
+            
+            // Créer un tableau d'objets contenant l'index et le taux de succès
+            const cardsWithRates = cards.map((_, index) => {
+                const cardKey = `${currentChapter}-${index}`;
+                const perf = cardPerformance[cardKey];
+                const successRate = perf ? perf.successes / perf.attempts : 1; // Par défaut 100% si jamais tentée
+                return { index, successRate };
+            });
+            
+            // Trier par taux de succès (ascendant)
+            cardsWithRates.sort((a, b) => {
+                // Si même taux de succès, ordre aléatoire
+                if (a.successRate === b.successRate) {
+                    return Math.random() - 0.5;
+                }
+                return a.successRate - b.successRate;
+            });
+            
+            // Retourner seulement les indices
+            return cardsWithRates.map(card => card.index);
+        }
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
             const cards = vocabularyByChapter[currentChapter];
             
-            if (cards.length > 0) {
+            if (cards && cards.length > 0) {
                 const cardData = cards[currentCardIndex];
-                frenchWord.textContent = cardData.french;
-                englishTranslation.textContent = cardData.english;
+                elements.frenchWord.textContent = cardData.french;
+                elements.englishTranslation.textContent = cardData.english;
                 
-                // Ajouter cette carte à l'ensemble des cartes vues
                 seenCards.add(currentCardIndex);
                 
-                // Masquer la traduction anglaise
-                englishTranslation.style.display = 'none';
+                elements.englishTranslation.style.display = 'none';
                 isTranslationVisible = false;
                 
-                // Effacer l'input de traduction et le résultat de validation
-                translationInput.value = '';
-                validationResult.textContent = '';
-                validationResult.className = 'validation-result';
+                elements.translationInput.value = '';
+                elements.validationResult.textContent = '';
+                elements.validationResult.className = 'validation-result';
                 
-                // Mettre à jour l'information sur les cartes
-                currentCardElement.textContent = currentCardIndex + 1;
-                totalCardsElement.textContent = cards.length;
-                cardsSeenElement.textContent = seenCards.size;
-                cardsTotalElement.textContent = cards.length;
+                // Mettre à jour l'affichage des statistiques
+                updateStatsDisplay();
                 
                 // Mettre à jour la barre de progression
-                progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
+                elements.progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
                 
                 // Activer/désactiver les boutons
-                prevBtn.disabled = cardHistory.length === 0;
-                nextBtn.disabled = currentCardIndex === cards.length - 1;
-                randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
+                elements.prevBtn.disabled = cardHistory.length === 0;
+                elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
+                elements.randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
                 
-                // Définir la couleur de la carte en fonction des performances passées
-                updateCardColor();
+                // Mettre à jour la couleur de la carte et le taux de succès
+                updateCardColorAndSuccessRate();
                 
                 // Vérifier si toutes les cartes ont été vues
                 if (seenCards.size === cards.length) {
-                    stopTimer(); // Arrêt définitif uniquement quand toutes les cartes sont vues
+                    stopTimer();
                 }
             } else {
-                frenchWord.textContent = "Aucune carte disponible";
-                englishTranslation.textContent = "";
-                englishTranslation.style.display = 'none';
-                isTranslationVisible = false;
-                
-                // Mettre à jour l'information sur les cartes
-                currentCardElement.textContent = "0";
-                totalCardsElement.textContent = "0";
-                cardsSeenElement.textContent = "0";
-                cardsTotalElement.textContent = "0";
-                
-                // Mettre à jour la barre de progression
-                progressBar.style.width = "0%";
-                
-                // Désactiver les boutons
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-                randomBtn.disabled = true;
+                showNoCardsMessage();
             }
         }
         
-        // Fonction pour mettre à jour la couleur de la carte en fonction des performances passées
-        function updateCardColor() {
+        // Fonction pour afficher un message quand il n'y a pas de cartes
+        function showNoCardsMessage() {
+            elements.frenchWord.textContent = "Aucune carte disponible";
+            elements.englishTranslation.textContent = "";
+            elements.englishTranslation.style.display = 'none';
+            elements.currentCardElement.textContent = "0";
+            elements.totalCardsElement.textContent = "0";
+            elements.cardsSeenElement.textContent = "0";
+            elements.cardsTotalElement.textContent = "0";
+            elements.progressBar.style.width = "0%";
+            elements.prevBtn.disabled = true;
+            elements.nextBtn.disabled = true;
+            elements.randomBtn.disabled = true;
+            elements.successRateElement.textContent = "";
+        }
+        
+        // Fonction pour mettre à jour l'affichage des statistiques
+        function updateStatsDisplay() {
+            const cards = vocabularyByChapter[currentChapter];
+            elements.currentCardElement.textContent = currentCardIndex + 1;
+            elements.totalCardsElement.textContent = cards.length;
+            elements.cardsSeenElement.textContent = seenCards.size;
+            elements.cardsTotalElement.textContent = cards.length;
+        }
+        
+        // Fonction pour mettre à jour la couleur et le taux de succès de la carte
+        function updateCardColorAndSuccessRate() {
             const cardKey = `${currentChapter}-${currentCardIndex}`;
             
             if (cardPerformance[cardKey]) {
                 const performance = cardPerformance[cardKey];
                 const successRate = performance.successes / performance.attempts;
+                const successPercentage = Math.round(successRate * 100);
+                
+                // Afficher le pourcentage de réussite
+                elements.successRateElement.textContent = `${successPercentage}%`;
                 
                 // Couleur allant du rouge (0% correct) au vert (100% correct)
-                const r = Math.round(231 - (successRate * 231)); // 231 pour e74c3c (rouge)
-                const g = Math.round(46 + (successRate * 140)); // 46 à 186 pour aller de e74c3c (rouge) à 2ecc71 (vert)
-                const b = Math.round(60 - (successRate * 50)); // 60 à 10 pour e74c3c (rouge) à 2ecc71 (vert)
+                const r = Math.round(231 - (successRate * 231));
+                const g = Math.round(46 + (successRate * 140));
+                const b = Math.round(60 - (successRate * 50));
                 
-                card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
                 
                 // Ajuster la couleur du texte pour un meilleur contraste
-                if (successRate > 0.5) {
-                    frenchWord.style.color = "#333"; // Texte foncé sur fond clair
-                } else {
-                    frenchWord.style.color = "#fff"; // Texte clair sur fond foncé
-                }
+                elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
+                
+                // Ajuster la couleur du texte du taux de succès
+                elements.successRateElement.style.backgroundColor = successRate > 0.5 ? 
+                    "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
+                elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
             } else {
                 // Réinitialiser aux couleurs par défaut si pas d'historique
-                card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
-                frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
+                elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
+                elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
+                elements.successRateElement.textContent = "";
             }
         }
         
@@ -1300,112 +1345,77 @@
                 content += `${cards[i].english}    ${cards[i].french}\n\n`;
             }
             
-            rawContent.textContent = content;
+            elements.rawContent.textContent = content;
         }
         
         // Fonction pour basculer le mode sombre
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode', isDarkMode);
-            themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            themeToggle.classList.toggle('active', isDarkMode);
-            
-            // Mettre à jour la couleur de la carte en fonction des performances
-            updateCardColor();
+            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+            elements.themeToggle.classList.toggle('active', isDarkMode);
+            updateCardColorAndSuccessRate();
         }
         
         // Fonction pour basculer le mode raw
         function toggleRawMode() {
             isRawMode = !isRawMode;
-            rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-            rawToggle.classList.toggle('active', isRawMode);
+            elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+            elements.rawToggle.classList.toggle('active', isRawMode);
             
             if (isRawMode) {
-                cardContainer.style.display = 'none';
+                elements.cardContainer.style.display = 'none';
                 document.querySelector('.validation-container').style.display = 'none';
-                rawContent.style.display = 'block';
+                elements.rawContent.style.display = 'block';
                 generateRawContent();
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-                randomBtn.disabled = true;
+                elements.prevBtn.disabled = true;
+                elements.nextBtn.disabled = true;
+                elements.randomBtn.disabled = true;
             } else {
-                cardContainer.style.display = 'block';
+                elements.cardContainer.style.display = 'block';
                 document.querySelector('.validation-container').style.display = 'flex';
-                rawContent.style.display = 'none';
-                updateCard(); // Remet à jour les boutons de navigation
+                elements.rawContent.style.display = 'none';
+                updateCard();
             }
         }
         
-        // Fonction pour sélectionner une carte aléatoire non vue
-        function selectRandomCard() {
-            const cards = vocabularyByChapter[currentChapter];
+        // Fonction pour sélectionner une carte selon le taux de succès
+        function selectCardByPerformance() {
+            const sortedCardIndices = getSortedCardsByPerformance();
             
-            // Si toutes les cartes ont été vues, réinitialiser
-            if (seenCards.size >= cards.length) {
+            // Filtrer pour ne garder que les cartes non vues
+            const unseenSortedCards = sortedCardIndices.filter(index => !seenCards.has(index));
+            
+            // Si toutes les cartes ont été vues ou pas de carte triée, réinitialiser
+            if (unseenSortedCards.length === 0) {
                 seenCards.clear();
-                initializeRemainingCards();
+                return sortedCardIndices[0]; // Retourner la carte avec le taux de succès le plus bas
             }
             
-            // Si la liste des cartes restantes est vide, la réinitialiser
-            if (remainingCards.length === 0) {
-                initializeRemainingCards();
-            }
-            
-            // Prendre une carte aléatoire de la liste des cartes restantes
-            const randomIndex = Math.floor(Math.random() * remainingCards.length);
-            const selectedCardIndex = remainingCards[randomIndex];
-            
-            // Retirer la carte de la liste des cartes restantes
-            remainingCards.splice(randomIndex, 1);
-            
-            return selectedCardIndex;
-        }
-        
-        // Initialiser la liste des cartes restantes (non vues)
-        function initializeRemainingCards() {
-            const cards = vocabularyByChapter[currentChapter];
-            remainingCards = [];
-            
-            for (let i = 0; i < cards.length; i++) {
-                if (!seenCards.has(i)) {
-                    remainingCards.push(i);
-                }
-            }
+            // Retourner la première carte non vue (celle avec le taux de succès le plus bas)
+            return unseenSortedCards[0];
         }
         
         // Fonction pour changer de chapitre
         function changeChapter(chapter) {
-            // Mettre en pause le chronomètre sans vérifier le meilleur temps
             pauseTimer();
-            
-            // Sauvegarder le score actuel et réinitialiser
             updateBestScore();
             currentScore = 0;
-            currentScoreElement.textContent = currentScore;
+            elements.currentScoreElement.textContent = currentScore;
             
             currentChapter = chapter;
             currentCardIndex = 0;
             seenCards.clear();
-            remainingCards = [];
-            cardHistory = []; // Réinitialiser l'historique des cartes
+            cardHistory = [];
             
-            // Mettre à jour les boutons de chapitre
-            chapterButtons.forEach(btn => {
+            elements.chapterButtons.forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
             });
             
-            // Réinitialiser et démarrer le chronomètre
             resetTimer();
             startTimer();
-            
-            // Afficher le meilleur score pour ce chapitre
             updateBestScoreDisplay();
-            
-            // Afficher le meilleur temps pour ce chapitre
             updateBestTimeDisplay();
-            
-            // Initialiser les cartes restantes
-            initializeRemainingCards();
             
             if (isRawMode) {
                 generateRawContent();
@@ -1414,7 +1424,7 @@
             }
         }
         
-        // Fonctions pour le chronomètre
+        // Fonctions pour le chrono
         function startTimer() {
             startTime = new Date();
             timerInterval = setInterval(updateTimer, 1000);
@@ -1431,34 +1441,31 @@
         function stopTimer() {
             clearInterval(timerInterval);
             isTimerActive = false;
-            
-            // On vérifie uniquement le meilleur temps lorsqu'on arrête définitivement le chrono
             checkAndUpdateBestTime();
         }
         
         function resetTimer() {
             clearInterval(timerInterval);
-            timerElement.textContent = "00:00";
+            elements.timerElement.textContent = "00:00";
             startTime = new Date();
         }
         
         function updateTimer() {
             const now = new Date();
-            const elapsedTime = Math.floor((now - startTime) / 1000); // en secondes
+            const elapsedTime = Math.floor((now - startTime) / 1000);
             
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
             
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            elements.timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
         function checkAndUpdateBestTime() {
-            if (seenCards.size === 0) return; // Ne pas enregistrer si aucune carte n'a été vue
+            if (seenCards.size === 0) return;
             
             const now = new Date();
-            const elapsedTime = Math.floor((now - startTime) / 1000); // en secondes
+            const elapsedTime = Math.floor((now - startTime) / 1000);
             
-            // Si c'est le premier temps pour ce chapitre ou si c'est meilleur que le précédent
             if (!bestTimes[currentChapter] || elapsedTime < bestTimes[currentChapter]) {
                 bestTimes[currentChapter] = elapsedTime;
                 updateBestTimeDisplay();
@@ -1469,9 +1476,9 @@
             if (bestTimes[currentChapter]) {
                 const minutes = Math.floor(bestTimes[currentChapter] / 60);
                 const seconds = bestTimes[currentChapter] % 60;
-                bestTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                elements.bestTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             } else {
-                bestTimeElement.textContent = "-";
+                elements.bestTimeElement.textContent = "-";
             }
         }
         
@@ -1480,51 +1487,40 @@
             s1 = s1.toLowerCase().trim();
             s2 = s2.toLowerCase().trim();
             
-            // Si les deux chaînes sont vides, elles sont identiques
             if (s1 === s2) return 1.0;
             if (s1.length === 0 || s2.length === 0) return 0.0;
             
-            // Calcul de la distance de Levenshtein
             const matrix = [];
             
-            // Initialisation de la matrice
-            for (let i = 0; i <= s1.length; i++) {
-                matrix[i] = [i];
-            }
+            for (let i = 0; i <= s1.length; i++) matrix[i] = [i];
+            for (let j = 0; j <= s2.length; j++) matrix[0][j] = j;
             
-            for (let j = 0; j <= s2.length; j++) {
-                matrix[0][j] = j;
-            }
-            
-            // Remplissage de la matrice
             for (let i = 1; i <= s1.length; i++) {
                 for (let j = 1; j <= s2.length; j++) {
                     const cost = s1.charAt(i - 1) === s2.charAt(j - 1) ? 0 : 1;
                     matrix[i][j] = Math.min(
-                        matrix[i - 1][j] + 1, // suppression
-                        matrix[i][j - 1] + 1, // insertion
-                        matrix[i - 1][j - 1] + cost // substitution
+                        matrix[i - 1][j] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j - 1] + cost
                     );
                 }
             }
             
-            // La distance est le dernier élément calculé dans la matrice
             const distance = matrix[s1.length][s2.length];
-            
-            // Calcul de la similarité (1 - distance normalisée)
             const maxLength = Math.max(s1.length, s2.length);
             return 1 - distance / maxLength;
         }
         
         // Fonction pour valider la traduction entrée par l'utilisateur
         function validateTranslation() {
-            const userTranslation = translationInput.value.trim();
+            const userTranslation = elements.translationInput.value.trim();
             
             if (userTranslation === "") {
-                validationResult.textContent = "Veuillez entrer une traduction";
-                validationResult.className = "validation-result";
+                elements.validationResult.textContent = "Veuillez entrer une traduction";
+                elements.validationResult.className = "validation-result";
                 return;
             }
+            
             const correctTranslation = vocabularyByChapter[currentChapter][currentCardIndex].english;
             const similarityScore = similarity(userTranslation, correctTranslation);
             
@@ -1538,116 +1534,92 @@
             
             // Si la similarité est supérieure à 80%, considérer comme correct
             if (similarityScore >= 0.8) {
-                validationResult.textContent = "Correct!";
-                validationResult.className = "validation-result correct";
-                
-                // Incrémenter le compteur de succès
+                elements.validationResult.textContent = "Correct!";
+                elements.validationResult.className = "validation-result correct";
                 cardPerformance[cardKey].successes++;
-                
-                // Incrémenter le score actuel
                 currentScore++;
-                currentScoreElement.textContent = currentScore;
+                elements.currentScoreElement.textContent = currentScore;
             } else {
-                validationResult.textContent = `Incorrect. La réponse correcte est: ${correctTranslation}`;
-                validationResult.className = "validation-result incorrect";
-                
-                // Afficher la traduction correcte
-                englishTranslation.style.display = 'block';
+                elements.validationResult.textContent = `Incorrect. La réponse correcte est: ${correctTranslation}`;
+                elements.validationResult.className = "validation-result incorrect";
+elements.englishTranslation.style.display = 'block';
                 isTranslationVisible = true;
             }
             
-            // Mettre à jour la couleur de la carte en fonction des performances
-            updateCardColor();
+            // Mettre à jour l'affichage du taux de succès
+            updateCardColorAndSuccessRate();
         }
         
         // Fonction pour mettre à jour le meilleur score
         function updateBestScore() {
-            if (currentScore > 0) {
-                if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-                    bestScores[currentChapter] = currentScore;
-                }
+            if (currentScore > 0 && (!bestScores[currentChapter] || currentScore > bestScores[currentChapter])) {
+                bestScores[currentChapter] = currentScore;
+                updateBestScoreDisplay();
             }
         }
         
-        // Fonction pour afficher le meilleur score
         function updateBestScoreDisplay() {
-            if (bestScores[currentChapter]) {
-                bestScoreElement.textContent = bestScores[currentChapter];
-            } else {
-                bestScoreElement.textContent = "0";
-            }
+            elements.bestScoreElement.textContent = bestScores[currentChapter] || 0;
         }
+        
+        // Événements d'écouteurs
+        elements.card.addEventListener('click', function() {
+            if (!isTranslationVisible) {
+                elements.englishTranslation.style.display = 'block';
+                isTranslationVisible = true;
+            } else {
+                elements.englishTranslation.style.display = 'none';
+                isTranslationVisible = false;
+            }
+        });
+        
+        elements.prevBtn.addEventListener('click', function() {
+            if (cardHistory.length > 0) {
+                currentCardIndex = cardHistory.pop();
+                updateCard();
+            }
+        });
+        
+        elements.nextBtn.addEventListener('click', function() {
+            const cards = vocabularyByChapter[currentChapter];
+            if (currentCardIndex < cards.length - 1) {
+                cardHistory.push(currentCardIndex);
+                currentCardIndex++;
+                updateCard();
+            }
+        });
+        
+        elements.randomBtn.addEventListener('click', function() {
+            if (vocabularyByChapter[currentChapter].length > 0) {
+                cardHistory.push(currentCardIndex);
+                
+                // Utiliser la sélection par performance
+                currentCardIndex = selectCardByPerformance();
+                updateCard();
+            }
+        });
+        
+        elements.chapterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const chapter = parseInt(this.dataset.chapter);
+                if (chapter !== currentChapter) {
+                    changeChapter(chapter);
+                }
+            });
+        });
+        
+        elements.themeToggle.addEventListener('click', toggleDarkMode);
+        elements.rawToggle.addEventListener('click', toggleRawMode);
+        
+        elements.validateBtn.addEventListener('click', validateTranslation);
+        elements.translationInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateTranslation();
+            }
+        });
         
         // Initialisation
-        function init() {
-            initializeRemainingCards();
-            updateCard();
-            startTimer();
-            
-            // Événement pour afficher/masquer la traduction
-            card.addEventListener('click', () => {
-                englishTranslation.style.display = isTranslationVisible ? 'none' : 'block';
-                isTranslationVisible = !isTranslationVisible;
-            });
-            
-            // Événement pour le bouton de validation
-            validateBtn.addEventListener('click', validateTranslation);
-            
-            // Événement pour valider avec la touche Entrée
-            translationInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    validateTranslation();
-                }
-            });
-            
-            // Événements pour les boutons de navigation
-            prevBtn.addEventListener('click', () => {
-                if (cardHistory.length > 0) {
-                    // Prendre le dernier élément de l'historique
-                    currentCardIndex = cardHistory.pop();
-                    updateCard();
-                }
-            });
-            
-            nextBtn.addEventListener('click', () => {
-                const cards = vocabularyByChapter[currentChapter];
-                if (currentCardIndex < cards.length - 1) {
-                    // Ajouter l'index actuel à l'historique avant de passer au suivant
-                    cardHistory.push(currentCardIndex);
-                    currentCardIndex++;
-                    updateCard();
-                }
-            });
-            
-            randomBtn.addEventListener('click', () => {
-                const cards = vocabularyByChapter[currentChapter];
-                if (cards.length > 1 && seenCards.size < cards.length) {
-                    // Ajouter l'index actuel à l'historique avant de passer à une carte aléatoire
-                    cardHistory.push(currentCardIndex);
-                    currentCardIndex = selectRandomCard();
-                    updateCard();
-                }
-            });
-            
-            // Événements pour les boutons de chapitre
-            chapterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    changeChapter(parseInt(btn.dataset.chapter));
-                });
-            });
-            
-            // Événement pour le bouton du thème sombre/clair
-            themeToggle.addEventListener('click', toggleDarkMode);
-            
-            // Événement pour le bouton du mode raw
-            rawToggle.addEventListener('click', toggleRawMode);
-            
-            // Initialiser l'affichage du meilleur score
-            updateBestScoreDisplay();
-        }
-        
-        // Démarrer l'application
-        init();
+        changeChapter(1);
     </script>
 </body>
 </html>
