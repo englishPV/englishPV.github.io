@@ -1401,46 +1401,38 @@ function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
     
-    // Créer un tableau d'objets contenant l'index et le taux de succès
+    // Create array with index and success rate
     const cardsWithRates = cards.map((_, index) => {
         const cardKey = `${currentChapter}-${index}`;
         const perf = cardPerformance[cardKey];
         
-        // Valeurs par défaut pour les cartes jamais vues
-        let successRate = -1;  // -1 pour les cartes jamais vues
-        let isCardSeen = seenCards.has(index);
+        let successRate = -1;  // Default for unseen cards
         
-        if (perf) {
+        if (perf && perf.attempts > 0) {
             successRate = perf.successes / perf.attempts;
-            isCardSeen = true;
         }
         
-        return { index, successRate, isCardSeen };
+        return { index, successRate };
     });
     
-    // Trier les cartes:
-    // 1. D'abord les cartes vues avec le plus faible taux de succès
-    // 2. Ensuite les cartes jamais vues
-    // 3. Enfin les cartes avec 100% de succès
+    // Sort cards:
+    // 1. Unseen cards (-1 success rate)
+    // 2. Cards with lowest success rates
+    // 3. Cards with highest success rates
     cardsWithRates.sort((a, b) => {
-        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
-        if (a.successRate === -1 && b.successRate === 1) return -1;
-        if (a.successRate === 1 && b.successRate === -1) return 1;
+        // If one is unseen and the other isn't
+        if (a.successRate === -1 && b.successRate !== -1) return -1;
+        if (a.successRate !== -1 && b.successRate === -1) return 1;
         
-        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
-        if (a.successRate === b.successRate) {
+        // If both have same status, add some randomness for unseen cards
+        if (a.successRate === -1 && b.successRate === -1) {
             return Math.random() - 0.5;
         }
         
-        // Cartes jamais vues ont priorité sur cartes déjà vues
-        if (a.successRate === -1) return -1;
-        if (b.successRate === -1) return 1;
-        
-        // Sinon, trier par taux de succès (ascendant)
+        // Otherwise sort by success rate (lowest first)
         return a.successRate - b.successRate;
     });
     
-    // Retourner seulement les indices
     return cardsWithRates.map(card => card.index);
 }
         
@@ -1722,12 +1714,8 @@ elements.randomBtn.addEventListener('click', () => {
     
     if (sortedIndices.length > 0) {
         // Always select the first card (lowest success rate)
-        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
-            ? sortedIndices[1] 
-            : sortedIndices[0];
-        
         cardHistory.push(currentCardIndex);
-        currentCardIndex = newIndex;
+        currentCardIndex = sortedIndices[0];
         updateCard();
     }
 });
