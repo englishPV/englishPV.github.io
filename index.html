@@ -1716,25 +1716,57 @@ elements.chapterButtons.forEach(button => {
     
     // Bouton aléatoire
     // Bouton aléatoire
+// 1. Fix the random button to truly get the lowest score card
 elements.randomBtn.addEventListener('click', () => {
-    const cards = vocabularyByChapter[currentChapter];
-    
-    // Use the getSortedCardsByPerformance function to get ordered card indices
     const sortedIndices = getSortedCardsByPerformance();
     
     if (sortedIndices.length > 0) {
-        // Take the first card (lowest success rate or unseen)
-        // But make sure it's not the current card
-        let newIndex = sortedIndices[0];
-        if (newIndex === currentCardIndex && sortedIndices.length > 1) {
-            newIndex = sortedIndices[1];
-        }
+        // Always select the first card (lowest success rate)
+        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
+            ? sortedIndices[1] 
+            : sortedIndices[0];
         
-        // Update card display
         cardHistory.push(currentCardIndex);
         currentCardIndex = newIndex;
         updateCard();
     }
+});
+
+// 2. Modify the chapter button event listener to sort cards by performance
+elements.chapterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const chapter = parseInt(button.dataset.chapter);
+        
+        // Skip if clicking current chapter
+        if (chapter === currentChapter) return;
+        
+        // Update active chapter button
+        elements.chapterButtons.forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
+        });
+        
+        // Change chapter
+        currentChapter = chapter;
+        cardHistory = [];
+        seenCards = new Set();
+        
+        // Set current card to the one with lowest score
+        const sortedIndices = getSortedCardsByPerformance();
+        currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
+        
+        // Reset timer and update UI
+        resetTimer();
+        startTimer();
+        updateBestScoreDisplay();
+        updateBestTimeDisplay();
+        
+        // Update display
+        if (isRawMode) {
+            generateRawContent();
+        } else {
+            updateCard();
+        }
+    });
 });
     
     // Validation de la traduction
