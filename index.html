@@ -1396,30 +1396,53 @@
         }
         
         // Fonction pour calculer et trier les cartes selon leur taux de succès
-        function getSortedCardsByPerformance() {
-            const cards = vocabularyByChapter[currentChapter];
-            if (!cards || cards.length === 0) return [];
-            
-            // Créer un tableau d'objets contenant l'index et le taux de succès
-            const cardsWithRates = cards.map((_, index) => {
-                const cardKey = `${currentChapter}-${index}`;
-                const perf = cardPerformance[cardKey];
-                const successRate = perf ? perf.successes / perf.attempts : 1; // Par défaut 100% si jamais tentée
-                return { index, successRate };
-            });
-            
-            // Trier par taux de succès (ascendant)
-            cardsWithRates.sort((a, b) => {
-                // Si même taux de succès, ordre aléatoire
-                if (a.successRate === b.successRate) {
-                    return Math.random() - 0.5;
-                }
-                return a.successRate - b.successRate;
-            });
-            
-            // Retourner seulement les indices
-            return cardsWithRates.map(card => card.index);
+        // Fonction pour calculer et trier les cartes selon leur taux de succès
+function getSortedCardsByPerformance() {
+    const cards = vocabularyByChapter[currentChapter];
+    if (!cards || cards.length === 0) return [];
+    
+    // Créer un tableau d'objets contenant l'index et le taux de succès
+    const cardsWithRates = cards.map((_, index) => {
+        const cardKey = `${currentChapter}-${index}`;
+        const perf = cardPerformance[cardKey];
+        
+        // Valeurs par défaut pour les cartes jamais vues
+        let successRate = -1;  // -1 pour les cartes jamais vues
+        let isCardSeen = seenCards.has(index);
+        
+        if (perf) {
+            successRate = perf.successes / perf.attempts;
+            isCardSeen = true;
         }
+        
+        return { index, successRate, isCardSeen };
+    });
+    
+    // Trier les cartes:
+    // 1. D'abord les cartes vues avec le plus faible taux de succès
+    // 2. Ensuite les cartes jamais vues
+    // 3. Enfin les cartes avec 100% de succès
+    cardsWithRates.sort((a, b) => {
+        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
+        if (a.successRate === -1 && b.successRate === 1) return -1;
+        if (a.successRate === 1 && b.successRate === -1) return 1;
+        
+        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
+        if (a.successRate === b.successRate) {
+            return Math.random() - 0.5;
+        }
+        
+        // Cartes jamais vues ont priorité sur cartes déjà vues
+        if (a.successRate === -1) return -1;
+        if (b.successRate === -1) return 1;
+        
+        // Sinon, trier par taux de succès (ascendant)
+        return a.successRate - b.successRate;
+    });
+    
+    // Retourner seulement les indices
+    return cardsWithRates.map(card => card.index);
+}
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -1543,25 +1566,26 @@
         }
         
         // Fonction pour basculer le mode raw
-        function toggleRawMode() {
-            isRawMode = !isRawMode;
-            elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-            elements.rawToggle.classList.toggle('active', isRawMode);
-            
-            // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
-        if (isRawMode) {
-            elements.cardContainer.style.display = 'none';
-            elements.rawContent.style.display = 'block';
-            elements.controls.style.display = 'none';
-            elements.validationContainer.style.display = 'none';
-            generateRawContent();
-        } else {
-            elements.cardContainer.style.display = 'block';
-            elements.rawContent.style.display = 'none';
-            elements.controls.style.display = 'flex';
-            elements.validationContainer.style.display = 'flex';
-            updateCard();
-        }
+       // Fonction pour basculer le mode raw
+function toggleRawMode() {
+    isRawMode = !isRawMode;
+    elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+    elements.rawToggle.classList.toggle('active', isRawMode);
+    
+    // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
+    if (isRawMode) {
+        elements.cardContainer.style.display = 'none';
+        elements.rawContent.style.display = 'block';
+        document.querySelector('.controls').style.display = 'none';
+        elements.validationContainer.style.display = 'none';
+        generateRawContent();
+    } else {
+        elements.cardContainer.style.display = 'block';
+        elements.rawContent.style.display = 'none';
+        document.querySelector('.controls').style.display = 'flex';
+        elements.validationContainer.style.display = 'flex';
+        updateCard();
+    }
 }
 
 // Fonction pour mettre à jour l'affichage du meilleur score
