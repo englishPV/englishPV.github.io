@@ -484,7 +484,7 @@
     <script>
         // Structure de données pour les mots par chapitre
         const vocabularyByChapter = {
-           1: [
+            1: [
 { french: "monarchie", english: "monarchy" },
 { french: "monarque de droit divin", english: "a monarch by divine right" },
 { french: "souverain", english: "sovereign" },
@@ -1401,12 +1401,13 @@ function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
     
-    // Create array with index and success rate
+    // Créer un tableau d'objets contenant l'index et le taux de succès
     const cardsWithRates = cards.map((_, index) => {
         const cardKey = `${currentChapter}-${index}`;
         const perf = cardPerformance[cardKey];
         
-        let successRate = 0.5;  // Default 50% for unrated cards
+        // Valeurs par défaut pour les cartes jamais vues
+        let successRate = -1;  // -1 pour les cartes jamais vues
         let isCardSeen = seenCards.has(index);
         
         if (perf) {
@@ -1417,32 +1418,29 @@ function getSortedCardsByPerformance() {
         return { index, successRate, isCardSeen };
     });
     
-    // Sort cards:
-    // 1. First, cards with lowest success rates
-    // 2. Then, unseen cards (at 50%)
-    // 3. Finally, cards with 100% success
+    // Trier les cartes:
+    // 1. D'abord les cartes vues avec le plus faible taux de succès
+    // 2. Ensuite les cartes jamais vues
+    // 3. Enfin les cartes avec 100% de succès
     cardsWithRates.sort((a, b) => {
-        // If one card is unseen but the other isn't
-        const aUnseen = !seenCards.has(a.index);
-        const bUnseen = !seenCards.has(b.index);
+        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
+        if (a.successRate === -1 && b.successRate === 1) return -1;
+        if (a.successRate === 1 && b.successRate === -1) return 1;
         
-        if (aUnseen && !bUnseen) return -1; // Prioritize unseen cards
-        if (!aUnseen && bUnseen) return 1;
-        
-        // If both cards are seen or both unseen
-        if (a.successRate === 1 && b.successRate < 1) return 1; // 100% success goes last
-        if (a.successRate < 1 && b.successRate === 1) return -1;
-        
-        // Otherwise sort by success rate (ascending)
-        if (a.successRate !== b.successRate) {
-            return a.successRate - b.successRate;
+        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
+        if (a.successRate === b.successRate) {
+            return Math.random() - 0.5;
         }
         
-        // If same success rate, randomize order
-        return Math.random() - 0.5;
+        // Cartes jamais vues ont priorité sur cartes déjà vues
+        if (a.successRate === -1) return -1;
+        if (b.successRate === -1) return 1;
+        
+        // Sinon, trier par taux de succès (ascendant)
+        return a.successRate - b.successRate;
     });
     
-    // Return only indices
+    // Retourner seulement les indices
     return cardsWithRates.map(card => card.index);
 }
         
