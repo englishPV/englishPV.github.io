@@ -1286,8 +1286,7 @@
             saveBtn: document.getElementById('save-btn'),
             loadBtn: document.getElementById('load-btn'),
             loadInput: document.getElementById('load-input'),
-            toastMessage: document.getElementById('toast-message'),
-            validationContainer: document.querySelector('.validation-container')
+            toastMessage: document.getElementById('toast-message')
         };
         
         // Fonction pour afficher un message toast
@@ -1397,52 +1396,53 @@
         }
         
         // Fonction pour calculer et trier les cartes selon leur taux de succès
-        function getSortedCardsByPerformance() {
-            const cards = vocabularyByChapter[currentChapter];
-            if (!cards || cards.length === 0) return [];
-            
-            // Créer un tableau d'objets contenant l'index et le taux de succès
-            const cardsWithRates = cards.map((_, index) => {
-                const cardKey = `${currentChapter}-${index}`;
-                const perf = cardPerformance[cardKey];
-                
-                // Valeurs par défaut pour les cartes jamais vues
-                let successRate = -1;  // -1 pour les cartes jamais vues
-                let attempts = 0;
-                
-                if (perf) {
-                    successRate = perf.attempts > 0 ? perf.successes / perf.attempts : -1;
-                    attempts = perf.attempts;
-                }
-                
-                return { index, successRate, attempts };
-            });
-            
-            // Grouper les cartes par taux de succès
-            const rateGroups = {};
-            
-            for (const card of cardsWithRates) {
-                // Arrondir le taux de succès à 2 décimales pour le regroupement
-                const rate = card.successRate === -1 ? -1 : Math.round(card.successRate * 100) / 100;
-                if (!rateGroups[rate]) {
-                    rateGroups[rate] = [];
-                }
-                rateGroups[rate].push(card.index);
-            }
-            
-            // Trier les groupes par taux de succès (ascendant)
-            const sortedRates = Object.keys(rateGroups).sort((a, b) => parseFloat(a) - parseFloat(b));
-            
-            // Créer la liste finale des cartes triées
-            const result = [];
-            for (const rate of sortedRates) {
-                // Mélanger aléatoirement les cartes ayant le même taux de succès
-                const shuffled = rateGroups[rate].sort(() => Math.random() - 0.5);
-                result.push(...shuffled);
-            }
-            
-            return result;
+        // Fonction pour calculer et trier les cartes selon leur taux de succès
+function getSortedCardsByPerformance() {
+    const cards = vocabularyByChapter[currentChapter];
+    if (!cards || cards.length === 0) return [];
+    
+    // Créer un tableau d'objets contenant l'index et le taux de succès
+    const cardsWithRates = cards.map((_, index) => {
+        const cardKey = `${currentChapter}-${index}`;
+        const perf = cardPerformance[cardKey];
+        
+        // Valeurs par défaut pour les cartes jamais vues
+        let successRate = -1;  // -1 pour les cartes jamais vues
+        let isCardSeen = seenCards.has(index);
+        
+        if (perf) {
+            successRate = perf.successes / perf.attempts;
+            isCardSeen = true;
         }
+        
+        return { index, successRate, isCardSeen };
+    });
+    
+    // Trier les cartes:
+    // 1. D'abord les cartes vues avec le plus faible taux de succès
+    // 2. Ensuite les cartes jamais vues
+    // 3. Enfin les cartes avec 100% de succès
+    cardsWithRates.sort((a, b) => {
+        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
+        if (a.successRate === -1 && b.successRate === 1) return -1;
+        if (a.successRate === 1 && b.successRate === -1) return 1;
+        
+        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
+        if (a.successRate === b.successRate) {
+            return Math.random() - 0.5;
+        }
+        
+        // Cartes jamais vues ont priorité sur cartes déjà vues
+        if (a.successRate === -1) return -1;
+        if (b.successRate === -1) return 1;
+        
+        // Sinon, trier par taux de succès (ascendant)
+        return a.successRate - b.successRate;
+    });
+    
+    // Retourner seulement les indices
+    return cardsWithRates.map(card => card.index);
+}
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -1471,7 +1471,7 @@
                 // Activer/désactiver les boutons
                 elements.prevBtn.disabled = cardHistory.length === 0;
                 elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
-                elements.randomBtn.disabled = cards.length <= 1;
+                elements.randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
                 
                 // Mettre à jour la couleur de la carte et le taux de succès
                 updateCardColorAndSuccessRate();
@@ -1514,7 +1514,7 @@
         function updateCardColorAndSuccessRate() {
             const cardKey = `${currentChapter}-${currentCardIndex}`;
             
-            if (cardPerformance[cardKey] && cardPerformance[cardKey].attempts > 0) {
+            if (cardPerformance[cardKey]) {
                 const performance = cardPerformance[cardKey];
                 const successRate = performance.successes / performance.attempts;
                 const successPercentage = Math.round(successRate * 100);
@@ -1566,7 +1566,8 @@
         }
         
         // Fonction pour basculer le mode raw
-       function toggleRawMode() {
+       // Fonction pour basculer le mode raw
+function toggleRawMode() {
     isRawMode = !isRawMode;
     elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
     elements.rawToggle.classList.toggle('active', isRawMode);
@@ -1622,7 +1623,6 @@ function stopTimer() {
         if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
             bestTimes[currentChapter] = totalTime;
             updateBestTimeDisplay();
-            showToast('Nouveau record de temps!');
         }
     }
 }
@@ -1651,44 +1651,45 @@ function updateBestTimeDisplay() {
 // Gestionnaires d'événements
 function initEventListeners() {
     // Changement de chapitre
-    elements.chapterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const chapter = parseInt(button.dataset.chapter);
-            
-            // Ne rien faire si on clique sur le chapitre actif
-            if (chapter === currentChapter) return;
-            
-            // Désactiver le chapitre actuel et activer le nouveau
-            elements.chapterButtons.forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-            });
-            
-            // Changer le chapitre
-            currentChapter = chapter;
-            currentCardIndex = 0;
-            cardHistory = [];
-            
-            // Réinitialiser la liste des cartes vues
-            seenCards = new Set();
-            
-            // Réinitialiser le timer
-            resetTimer();
-            startTimer();
-            
-            // Mettre à jour le meilleur score
-            updateBestScoreDisplay();
-            
-            // Mettre à jour le meilleur temps
-            updateBestTimeDisplay();
-            
-            // Mettre à jour la carte ou le contenu raw
-            if (isRawMode) {
-                generateRawContent();
-            } else {
-                updateCard();
-            }
+    // Changement de chapitre
+elements.chapterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const chapter = parseInt(button.dataset.chapter);
+        
+        // Ne rien faire si on clique sur le chapitre actif
+        if (chapter === currentChapter) return;
+        
+        // Désactiver le chapitre actuel et activer le nouveau
+        elements.chapterButtons.forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
         });
+        
+        // Changer le chapitre
+        currentChapter = chapter;
+        currentCardIndex = 0;
+        cardHistory = [];
+        
+        // Réinitialiser la liste des cartes vues
+        seenCards = new Set();
+        
+        // Réinitialiser le timer
+        resetTimer();
+        startTimer();
+        
+        // Mettre à jour le meilleur score
+        updateBestScoreDisplay();
+        
+        // Mettre à jour le meilleur temps
+        updateBestTimeDisplay();
+        
+        // Mettre à jour la carte ou le contenu raw
+        if (isRawMode) {
+            generateRawContent();
+        } else {
+            updateCard();
+        }
     });
+});
     
     // Retourner la carte
     elements.card.addEventListener('click', () => {
@@ -1861,3 +1862,6 @@ function init() {
 
 // Lancer l'initialisation
 init();
+</script>
+</body>
+</html>
