@@ -1401,51 +1401,46 @@ function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
     
-    // Create array of objects with index and success rate
+    // Créer un tableau d'objets contenant l'index et le taux de succès
     const cardsWithRates = cards.map((_, index) => {
         const cardKey = `${currentChapter}-${index}`;
         const perf = cardPerformance[cardKey];
         
-        // Default values for cards never seen
-        let successRate = -1;  // -1 for never seen cards
-        let attempts = 0;
+        // Valeurs par défaut pour les cartes jamais vues
+        let successRate = -1;  // -1 pour les cartes jamais vues
+        let isCardSeen = seenCards.has(index);
         
         if (perf) {
-            attempts = perf.attempts;
-            successRate = perf.attempts > 0 ? perf.successes / perf.attempts : -1;
+            successRate = perf.successes / perf.attempts;
+            isCardSeen = true;
         }
         
-        return { 
-            index, 
-            successRate, 
-            seen: seenCards.has(index),
-            attempts
-        };
+        return { index, successRate, isCardSeen };
     });
     
-    // Sort the cards properly according to the specified priorities:
+    // Trier les cartes:
+    // 1. D'abord les cartes vues avec le plus faible taux de succès
+    // 2. Ensuite les cartes jamais vues
+    // 3. Enfin les cartes avec 100% de succès
     cardsWithRates.sort((a, b) => {
-        // First condition: Never seen cards come second in priority
-        if (!a.seen && b.seen) return 1;
-        if (a.seen && !b.seen) return -1;
+        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
+        if (a.successRate === -1 && b.successRate === 1) return -1;
+        if (a.successRate === 1 && b.successRate === -1) return 1;
         
-        // If both cards are not seen or both are seen, sort by success rate
-        if (a.seen && b.seen) {
-            // Give priority to cards with attempts but lower success rate
-            if (a.attempts > 0 && b.attempts > 0) {
-                return a.successRate - b.successRate;
-            }
-            
-            // If one has attempts and the other doesn't, prioritize the one with attempts
-            if (a.attempts > 0 && b.attempts === 0) return -1;
-            if (a.attempts === 0 && b.attempts > 0) return 1;
+        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
+        if (a.successRate === b.successRate) {
+            return Math.random() - 0.5;
         }
         
-        // If we reach here, they're equal priority so randomize
-        return Math.random() - 0.5;
+        // Cartes jamais vues ont priorité sur cartes déjà vues
+        if (a.successRate === -1) return -1;
+        if (b.successRate === -1) return 1;
+        
+        // Sinon, trier par taux de succès (ascendant)
+        return a.successRate - b.successRate;
     });
     
-    // Return only the indices
+    // Retourner seulement les indices
     return cardsWithRates.map(card => card.index);
 }
         
@@ -1726,14 +1721,10 @@ elements.randomBtn.addEventListener('click', () => {
     const sortedIndices = getSortedCardsByPerformance();
     
     if (sortedIndices.length > 0) {
-        // Always get the first card (highest priority according to our sorting)
-        // But avoid showing the same card twice in a row if possible
-        let newIndex;
-        if (sortedIndices[0] === currentCardIndex && sortedIndices.length > 1) {
-            newIndex = sortedIndices[1]; 
-        } else {
-            newIndex = sortedIndices[0];
-        }
+        // Always select the first card (lowest success rate)
+        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
+            ? sortedIndices[1] 
+            : sortedIndices[0];
         
         cardHistory.push(currentCardIndex);
         currentCardIndex = newIndex;
@@ -1757,12 +1748,9 @@ elements.chapterButtons.forEach(button => {
         // Change chapter
         currentChapter = chapter;
         cardHistory = [];
+        seenCards = new Set();
         
-        // Do NOT reset seenCards when changing chapters if you want to maintain
-        // which cards have been seen across chapter changes
-        // seenCards = new Set();
-        
-        // Set current card to the highest priority one
+        // Set current card to the one with lowest score
         const sortedIndices = getSortedCardsByPerformance();
         currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
         
