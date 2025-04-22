@@ -24,7 +24,6 @@
             --save-button-bg: #f39c12;
             --load-button-bg: #9b59b6;
         }
-        
         body.dark-mode {
             --primary-color: #ffffff;
             --secondary-color: #3498db;
@@ -43,7 +42,6 @@
             --save-button-bg: #d35400;
             --load-button-bg: #8e44ad;
         }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--body-bg);
@@ -56,8 +54,8 @@
             color: var(--text-color);
             transition: all 0.3s ease;
         }
-        
-        h1 {
+       
+    h1 {
             color: var(--primary-color);
             text-align: center;
             margin-bottom: 10px;
@@ -411,12 +409,10 @@
     <div class="container">
         <h1>Flash Cards Français-Anglais</h1>
         <p class="subtitle">Traduisez le mot ou cliquez sur la carte pour voir la traduction</p>
-        
         <div class="mode-controls">
             <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
             <button class="mode-btn" id="raw-toggle">Mode Raw</button>
         </div>
-        
         <div class="chapters">
             <button class="chapter-btn active" data-chapter="1">Democracy</button>
             <button class="chapter-btn" data-chapter="2">Genetics</button>
@@ -424,15 +420,8 @@
             <button class="chapter-btn" data-chapter="4">International tensions</button>
             <button class="chapter-btn" data-chapter="5">Unemployment</button>
         </div>
-        
-        <div class="timer-container">
-            <div id="timer">00:00</div>
-        </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar" style="width: 0%"></div>
-        </div>
-        
+        <div class="timer-container"><div id="timer">00:00</div></div>
+        <div class="progress-container"><div class="progress-bar" style="width: 0%"></div></div>
         <div class="card-container">
             <div class="card">
                 <div class="card-content">
@@ -442,7 +431,6 @@
                 <div class="success-rate" id="success-rate"></div>
             </div>
         </div>
-        
         <div class="validation-container">
             <div class="input-group">
                 <input type="text" class="translation-input" id="translation-input" placeholder="Entrez la traduction en anglais">
@@ -454,37 +442,28 @@
                 <div class="score-item">Meilleur score: <span id="best-score">0</span></div>
             </div>
         </div>
-        
         <div class="raw-content" id="raw-content"></div>
-        
         <div class="controls">
             <button class="btn" id="prev-btn">Précédent</button>
             <button class="btn" id="random-btn">Aléatoire</button>
             <button class="btn" id="next-btn">Suivant</button>
         </div>
-        
         <div class="save-load-controls">
             <button class="save-btn" id="save-btn">Sauvegarder</button>
             <input type="file" id="load-input" class="load-input" accept=".json">
             <button class="load-btn" id="load-btn">Charger</button>
         </div>
-        
-        <div class="info">
-            <span id="current-card">0</span>/<span id="total-cards">0</span>
-        </div>
-        
+        <div class="info"><span id="current-card">0</span>/<span id="total-cards">0</span></div>
         <div class="stats-container">
             <div>Meilleur temps: <span id="best-time">-</span></div>
             <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
         </div>
     </div>
-    
     <div class="toast" id="toast-message"></div>
-    
     <script>
-        // Structure de données pour les mots par chapitre
+        // Données et état
         const vocabularyByChapter = {
-           1: [
+            1: [
 { french: "monarchie", english: "monarchy" },
 { french: "monarque de droit divin", english: "a monarch by divine right" },
 { french: "souverain", english: "sovereign" },
@@ -1240,655 +1219,136 @@
   "french": "âge de la retraite",
   "english": "retirement age"
 }]};
-        
-        // Variables d'état
         let currentChapter = 1;
         let currentCardIndex = 0;
-        let isTranslationVisible = false;
         let seenCards = new Set();
         let cardHistory = [];
-        let isDarkMode = false;
-        let isRawMode = false;
+        let cardPerformance = {};
         let currentScore = 0;
         let bestScores = {};
-        let cardPerformance = {};
-        let startTime;
-        let timerInterval;
         let bestTimes = {};
-        let isTimerActive = true;
-        
-        // Éléments DOM
+        let isDarkMode = false;
+        let isRawMode = false;
+        let timerInterval, startTime;
         const elements = {
             chapterButtons: document.querySelectorAll('.chapter-btn'),
-            card: document.querySelector('.card'),
-            cardContainer: document.querySelector('.card-container'),
-            rawContent: document.getElementById('raw-content'),
             frenchWord: document.querySelector('.french-word'),
             englishTranslation: document.querySelector('.english-translation'),
-            prevBtn: document.getElementById('prev-btn'),
-            nextBtn: document.getElementById('next-btn'),
-            randomBtn: document.getElementById('random-btn'),
+            successRate: document.getElementById('success-rate'),
             progressBar: document.querySelector('.progress-bar'),
-            currentCardElement: document.getElementById('current-card'),
-            totalCardsElement: document.getElementById('total-cards'),
-            timerElement: document.getElementById('timer'),
-            bestTimeElement: document.getElementById('best-time'),
-            cardsSeenElement: document.getElementById('cards-seen'),
-            cardsTotalElement: document.getElementById('cards-total'),
+            currentCard: document.getElementById('current-card'),
+            totalCards: document.getElementById('total-cards'),
+            cardsSeen: document.getElementById('cards-seen'),
+            cardsTotal: document.getElementById('cards-total'),
+            timer: document.getElementById('timer'),
+            bestTime: document.getElementById('best-time'),
+            currentScore: document.getElementById('current-score'),
+            bestScore: document.getElementById('best-score'),
             themeToggle: document.getElementById('theme-toggle'),
             rawToggle: document.getElementById('raw-toggle'),
             translationInput: document.getElementById('translation-input'),
             validateBtn: document.getElementById('validate-btn'),
-            validationResult: document.getElementById('validation-result'),
-            currentScoreElement: document.getElementById('current-score'),
-            bestScoreElement: document.getElementById('best-score'),
-            successRateElement: document.getElementById('success-rate'),
-            saveBtn: document.getElementById('save-btn'),
-            loadBtn: document.getElementById('load-btn'),
-            loadInput: document.getElementById('load-input'),
-            toastMessage: document.getElementById('toast-message')
+            prevBtn: document.getElementById('prev-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            randomBtn: document.getElementById('random-btn'),
+            toast: document.getElementById('toast-message'),
+            rawContent: document.getElementById('raw-content')
         };
-        
-        // Fonction pour afficher un message toast
-        function showToast(message, duration = 3000) {
-            elements.toastMessage.textContent = message;
-            elements.toastMessage.classList.add('show');
-            
-            setTimeout(() => {
-                elements.toastMessage.classList.remove('show');
-            }, duration);
-        }
-        
-        // Fonction pour sauvegarder l'état actuel
-        function saveState() {
-            const state = {
-                currentChapter,
-                seenCards: Array.from(seenCards),
-                cardPerformance,
-                bestScores,
-                bestTimes,
-                isDarkMode,
-                currentScore
-            };
-            
-            // Convertir en JSON
-            const stateJSON = JSON.stringify(state);
-            
-            // Créer un objet Blob
-            const blob = new Blob([stateJSON], { type: 'application/json' });
-            
-            // Créer une URL pour le Blob
-            const url = URL.createObjectURL(blob);
-            
-            // Créer un élément de lien
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
-            
-            // Ajouter le lien au document et cliquer dessus
-            document.body.appendChild(a);
-            a.click();
-            
-            // Nettoyer
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Sauvegarde réussie!');
-        }
-        
-        // Fonction pour charger un état sauvegardé
-        function loadState(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const state = JSON.parse(e.target.result);
-                    
-                    // Restaurer l'état
-                    currentChapter = state.currentChapter || 1;
-                    seenCards = new Set(state.seenCards || []);
-                    cardPerformance = state.cardPerformance || {};
-                    bestScores = state.bestScores || {};
-                    bestTimes = state.bestTimes || {};
-                    currentScore = state.currentScore || 0;
-                    
-                    // Restaurer le thème
-                    isDarkMode = state.isDarkMode || false;
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                    elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-                    elements.themeToggle.classList.toggle('active', isDarkMode);
-                    
-                    // Recharger le chapitre courant
-                    currentCardIndex = 0;
-                    cardHistory = [];
-                    
-                    elements.chapterButtons.forEach(btn => {
-                        btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
-                    });
-                    
-                    // Mettre à jour l'affichage
-                    elements.currentScoreElement.textContent = currentScore;
-                    updateBestScoreDisplay();
-                    updateBestTimeDisplay();
-                    resetTimer();
-                    startTimer();
-                    
-                    if (isRawMode) {
-                        generateRawContent();
-                    } else {
-                        updateCard();
-                    }
-                    
-                    showToast('Chargement réussi!');
-                } catch (error) {
-                    console.error('Erreur lors du chargement:', error);
-                    showToast('Erreur lors du chargement du fichier');
-                }
-                
-                // Réinitialiser l'input file pour permettre le rechargement du même fichier
-                elements.loadInput.value = '';
-            };
-            
-            reader.readAsText(file);
-        }
-        
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-function getSortedCardsByPerformance() {
-    const cards = vocabularyByChapter[currentChapter];
-    if (!cards || cards.length === 0) return [];
 
-    // Construire le tableau avec status :
-    const cardsWithRates = cards.map((_, index) => {
-        const key = `${currentChapter}-${index}`;
-        const perf = cardPerformance[key];
-        let successRate, group;
+        function showToast(msg, d=3000){ elements.toast.textContent=msg; elements.toast.classList.add('show'); setTimeout(()=>elements.toast.classList.remove('show'), d); }
 
-        if (!perf) {
-            // jamais vues → groupe 2
-            successRate = -1;
-            group = 2;
-        } else {
-            successRate = perf.successes / perf.attempts;
-            // 100% → groupe 3, sinon → groupe 1
-            group = successRate === 1 ? 3 : 1;
+        function getSortedCardsByPerformance() {
+            const cards = vocabularyByChapter[currentChapter];
+            const arr = cards.map((_, i) => {
+                const key = `${currentChapter}-${i}`;
+                const perf = cardPerformance[key];
+                return { i, rate: perf ? perf.successes / perf.attempts : -1 };
+            });
+            arr.sort((a,b)=>{
+                if(a.rate===b.rate) return Math.random()-0.5;
+                if(a.rate===-1) return -1;
+                if(b.rate===-1) return 1;
+                return a.rate-b.rate;
+            });
+            return arr.map(x=>x.i);
         }
 
-        return { index, successRate, group };
-    });
-
-    cardsWithRates.sort((a, b) => {
-        // 1) on compare d'abord le groupe
-        if (a.group !== b.group) return a.group - b.group;
-
-        // 2) même groupe :
-        switch (a.group) {
-            case 1: // cartes vues (ni jamais vues ni parfaites) : tri par taux de succès
-                return a.successRate - b.successRate;
-            case 2: // jamais vues : ordre aléatoire
-            case 3: // parfaites : ordre aléatoire
-            default:
-                return Math.random() - 0.5;
-        }
-    });
-
-    return cardsWithRates.map(c => c.index);
-}
-
-        
-        // Fonction pour mettre à jour la carte
         function updateCard() {
             const cards = vocabularyByChapter[currentChapter];
-            
-            if (cards && cards.length > 0) {
-                const cardData = cards[currentCardIndex];
-                elements.frenchWord.textContent = cardData.french;
-                elements.englishTranslation.textContent = cardData.english;
-                
-                seenCards.add(currentCardIndex);
-                
-                elements.englishTranslation.style.display = 'none';
-                isTranslationVisible = false;
-                
-                elements.translationInput.value = '';
-                elements.validationResult.textContent = '';
-                elements.validationResult.className = 'validation-result';
-                
-                // Mettre à jour l'affichage des statistiques
-                updateStatsDisplay();
-                
-                // Mettre à jour la barre de progression
-                elements.progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
-                
-                // Activer/désactiver les boutons
-                elements.prevBtn.disabled = cardHistory.length === 0;
-                elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
-                elements.randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
-                
-                // Mettre à jour la couleur de la carte et le taux de succès
-                updateCardColorAndSuccessRate();
-                
-                // Vérifier si toutes les cartes ont été vues
-                if (seenCards.size === cards.length) {
-                    stopTimer();
-                }
-            } else {
-                showNoCardsMessage();
-            }
-        }
-        
-        // Fonction pour afficher un message quand il n'y a pas de cartes
-        function showNoCardsMessage() {
-            elements.frenchWord.textContent = "Aucune carte disponible";
-            elements.englishTranslation.textContent = "";
+            const data = cards[currentCardIndex];
+            elements.frenchWord.textContent = data.french;
+            elements.englishTranslation.textContent = data.english;
             elements.englishTranslation.style.display = 'none';
-            elements.currentCardElement.textContent = "0";
-            elements.totalCardsElement.textContent = "0";
-            elements.cardsSeenElement.textContent = "0";
-            elements.cardsTotalElement.textContent = "0";
-            elements.progressBar.style.width = "0%";
-            elements.prevBtn.disabled = true;
-            elements.nextBtn.disabled = true;
-            elements.randomBtn.disabled = true;
-            elements.successRateElement.textContent = "";
+            updateStatsDisplay(); updateProgress(); updateSuccessDisplay();
         }
-        
-        // Fonction pour mettre à jour l'affichage des statistiques
         function updateStatsDisplay() {
             const cards = vocabularyByChapter[currentChapter];
-            elements.currentCardElement.textContent = currentCardIndex + 1;
-            elements.totalCardsElement.textContent = cards.length;
-            elements.cardsSeenElement.textContent = seenCards.size;
-            elements.cardsTotalElement.textContent = cards.length;
+            elements.currentCard.textContent = currentCardIndex+1;
+            elements.totalCards.textContent = cards.length;
+            elements.cardsSeen.textContent = seenCards.size;
+            elements.cardsTotal.textContent = cards.length;
         }
-        
-        // Fonction pour mettre à jour la couleur et le taux de succès de la carte
-        function updateCardColorAndSuccessRate() {
-            const cardKey = `${currentChapter}-${currentCardIndex}`;
-            
-            if (cardPerformance[cardKey]) {
-                const performance = cardPerformance[cardKey];
-                const successRate = performance.successes / performance.attempts;
-                const successPercentage = Math.round(successRate * 100);
-                
-                // Afficher le pourcentage de réussite
-                elements.successRateElement.textContent = `${successPercentage}%`;
-                
-                // Couleur allant du rouge (0% correct) au vert (100% correct)
-                const r = Math.round(231 - (successRate * 231));
-                const g = Math.round(46 + (successRate * 140));
-                const b = Math.round(60 - (successRate * 50));
-                
-                elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-                
-                // Ajuster la couleur du texte pour un meilleur contraste
-                elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
-                
-                // Ajuster la couleur du texte du taux de succès
-                elements.successRateElement.style.backgroundColor = successRate > 0.5 ? 
-                    "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
-                elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
-            } else {
-                // Réinitialiser aux couleurs par défaut si pas d'historique
-                elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
-                elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
-                elements.successRateElement.textContent = "";
-            }
+        function updateProgress() {
+            const pct = (seenCards.size / vocabularyByChapter[currentChapter].length)*100;
+            elements.progressBar.style.width = pct+"%";
         }
-        
-        // Fonction pour générer le contenu en mode "raw"
-        function generateRawContent() {
-            const cards = vocabularyByChapter[currentChapter];
-            let content = "";
-            
-            for (let i = 0; i < cards.length; i++) {
-                content += `${cards[i].english}    ${cards[i].french}\n\n`;
-            }
-            
-            elements.rawContent.textContent = content;
+        function updateSuccessDisplay() {
+            const key = `${currentChapter}-${currentCardIndex}`;
+            if(cardPerformance[key]){
+                const p=cardPerformance[key];
+                const rate=p.successes/p.attempts;
+                elements.successRate.textContent = Math.round(rate*100)+"%";
+                const r=Math.round(231-(rate*231)),g=Math.round(46+(rate*140)),b=Math.round(60-(rate*50));
+                document.querySelector('.card').style.backgroundColor=`rgb(${r},${g},${b})`;
+            } else elements.successRate.textContent="";
         }
-        
-        // Fonction pour basculer le mode sombre
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            elements.themeToggle.classList.toggle('active', isDarkMode);
-            updateCardColorAndSuccessRate();
+
+        function startTimer(){ clearInterval(timerInterval); startTime=new Date(); timerInterval=setInterval(()=>{
+            const d=new Date(new Date()-startTime);
+            elements.timer.textContent = `${String(d.getUTCMinutes()).padStart(2,'0')}:${String(d.getUTCSeconds()).padStart(2,'0')}`;
+        },1000); }
+        function resetTimer(){ clearInterval(timerInterval); elements.timer.textContent='00:00'; }
+
+        function initEventListeners() {
+            elements.chapterButtons.forEach(btn=>btn.addEventListener('click',()=>{
+                const ch=+btn.dataset.chapter;
+                if(ch===currentChapter) return;
+                elements.chapterButtons.forEach(b=>b.classList.toggle('active',+b.dataset.chapter===ch));
+                currentChapter=ch; seenCards.clear(); cardHistory=[]; currentScore=0;
+                // Trier les cartes une seule fois
+                const orig=vocabularyByChapter[ch].slice();
+                const sortedIdx=getSortedCardsByPerformance();
+                vocabularyByChapter[ch] = sortedIdx.map(i=>orig[i]);
+                currentCardIndex=0;
+                resetTimer(); startTimer();
+                updateCard();
+            }));
+            // Autres boutons: prev, next
+            elements.prevBtn.addEventListener('click',()=>{ if(cardHistory.length){ currentCardIndex=cardHistory.pop(); updateCard(); }});
+            elements.nextBtn.addEventListener('click',()=>{ if(currentCardIndex<vocabularyByChapter[currentChapter].length-1){ cardHistory.push(currentCardIndex); currentCardIndex++; updateCard(); }});
+            elements.randomBtn.addEventListener('click',()=>{ const cards=vocabularyByChapter[currentChapter]; if(cards.length>1){ let ni; do{ ni=Math.floor(Math.random()*cards.length);}while(ni===currentCardIndex); cardHistory.push(currentCardIndex); currentCardIndex=ni; updateCard(); }});
+            // Toggle mode sombre/raw
+            elements.themeToggle.addEventListener('click',()=>{ isDarkMode=!isDarkMode; document.body.classList.toggle('dark-mode',isDarkMode); });
+            elements.rawToggle.addEventListener('click',()=>{
+                isRawMode=!isRawMode;
+                document.body.classList.toggle('raw-active', isRawMode);
+                if(isRawMode){ document.querySelector('.card-container').style.display='none'; elements.rawContent.style.display='block'; generateRaw(); }
+                else{ document.querySelector('.card-container').style.display='block'; elements.rawContent.style.display='none'; updateCard(); }
+            });
+            // Validation
+            elements.validateBtn.addEventListener('click',validate);
+            elements.translationInput.addEventListener('keypress',e=>{ if(e.key==='Enter') validate(); });
         }
-        
-        // Fonction pour basculer le mode raw
-       // Fonction pour basculer le mode raw
-function toggleRawMode() {
-    isRawMode = !isRawMode;
-    elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-    elements.rawToggle.classList.toggle('active', isRawMode);
-    
-    // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
-    if (isRawMode) {
-        elements.cardContainer.style.display = 'none';
-        elements.rawContent.style.display = 'block';
-        document.querySelector('.controls').style.display = 'none';
-        elements.validationContainer.style.display = 'none';
-        generateRawContent();
-    } else {
-        elements.cardContainer.style.display = 'block';
-        elements.rawContent.style.display = 'none';
-        document.querySelector('.controls').style.display = 'flex';
-        elements.validationContainer.style.display = 'flex';
-        updateCard();
-    }
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur score
-function updateBestScoreDisplay() {
-    const bestScore = bestScores[currentChapter] || 0;
-    elements.bestScoreElement.textContent = bestScore;
-}
-
-// Fonction pour démarrer le timer
-function startTimer() {
-    if (!isTimerActive) return;
-    
-    clearInterval(timerInterval);
-    startTime = new Date();
-    
-    timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = new Date(now - startTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.timerElement.textContent = `${minutes}:${seconds}`;
-    }, 1000);
-}
-
-// Fonction pour arrêter le timer
-function stopTimer() {
-    clearInterval(timerInterval);
-    
-    // Sauvegarder le meilleur temps si c'est le cas
-    if (isTimerActive) {
-        const now = new Date();
-        const totalTime = now - startTime;
-        
-        if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
-            bestTimes[currentChapter] = totalTime;
-            updateBestTimeDisplay();
+        function generateRaw(){ let txt=''; vocabularyByChapter[currentChapter].forEach(c=>txt+=`${c.english}    ${c.french}\n\n`); elements.rawContent.textContent=txt; }
+        function validate(){ const inp=elements.translationInput.value.trim().toLowerCase(); const ans=vocabularyByChapter[currentChapter][currentCardIndex].english.toLowerCase();
+            const key=`${currentChapter}-${currentCardIndex}`; if(!cardPerformance[key]) cardPerformance[key]={attempts:0,successes:0};
+            cardPerformance[key].attempts++;
+            if(inp===ans){cardPerformance[key].successes++; showToast('Correct !');}
+            else showToast(`Incorrect. Réponse: ${ans}`);
+            updateSuccessDisplay();
         }
-    }
-}
-
-// Fonction pour réinitialiser le timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    elements.timerElement.textContent = "00:00";
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur temps
-function updateBestTimeDisplay() {
-    const bestTime = bestTimes[currentChapter];
-    
-    if (bestTime) {
-        const diff = new Date(bestTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
-    } else {
-        elements.bestTimeElement.textContent = "-";
-    }
-}
-
-// Gestionnaires d'événements
-function initEventListeners() {
-    // Changement de chapitre
-    // Changement de chapitre
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Ne rien faire si on clique sur le chapitre actif
-        if (chapter === currentChapter) return;
-        
-        // Désactiver le chapitre actuel et activer le nouveau
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Changer le chapitre
-        currentChapter = chapter;
-        currentCardIndex = 0;
-        cardHistory = [];
-        
-        // Réinitialiser la liste des cartes vues
-        seenCards = new Set();
-        
-        // Réinitialiser le timer
-        resetTimer();
-        startTimer();
-        
-        // Mettre à jour le meilleur score
-        updateBestScoreDisplay();
-        
-        // Mettre à jour le meilleur temps
-        updateBestTimeDisplay();
-        
-        // Mettre à jour la carte ou le contenu raw
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Retourner la carte
-    elements.card.addEventListener('click', () => {
-        isTranslationVisible = !isTranslationVisible;
-        elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
-    });
-    
-    // Bouton précédent
-    elements.prevBtn.addEventListener('click', () => {
-        if (cardHistory.length > 0) {
-            currentCardIndex = cardHistory.pop();
-            updateCard();
-        }
-    });
-    
-    // Bouton suivant
-    elements.nextBtn.addEventListener('click', () => {
-        if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }
-    });
-    
-    // Bouton aléatoire
-    // Bouton aléatoire
-// 1. Fix the random button to truly get the lowest score card
-elements.randomBtn.addEventListener('click', () => {
-    const sorted = getSortedCardsByPerformance();
-    if (sorted.length === 0) return;
-
-    // on prend toujours la première carte (celle du groupe 1 la plus faible,
-    // ou une jamais vue si groupe 1 épuisé, etc.)
-    let next = sorted[0];
-    // si c’est la même que la carte actuelle, on passe à la suivante
-    if (next === currentCardIndex && sorted.length > 1) {
-        next = sorted[1];
-    }
-
-    cardHistory.push(currentCardIndex);
-    currentCardIndex = next;
-    updateCard();
-});
-
-// 2. Modify the chapter button event listener to sort cards by performance
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Skip if clicking current chapter
-        if (chapter === currentChapter) return;
-        
-        // Update active chapter button
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Change chapter
-        currentChapter = chapter;
-        cardHistory = [];
-        seenCards = new Set();
-        
-        // Set current card to the one with lowest score
-        const sortedIndices = getSortedCardsByPerformance();
-        currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
-        
-        // Reset timer and update UI
-        resetTimer();
-        startTimer();
-        updateBestScoreDisplay();
-        updateBestTimeDisplay();
-        
-        // Update display
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Validation de la traduction
-    elements.validateBtn.addEventListener('click', validateTranslation);
-    elements.translationInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            validateTranslation();
-        }
-    });
-    
-    // Basculer le mode sombre
-    elements.themeToggle.addEventListener('click', toggleDarkMode);
-    
-    // Basculer le mode raw
-    elements.rawToggle.addEventListener('click', toggleRawMode);
-    
-    // Boutons de sauvegarde et chargement
-    elements.saveBtn.addEventListener('click', saveState);
-    elements.loadBtn.addEventListener('click', () => {
-        elements.loadInput.click();
-    });
-    elements.loadInput.addEventListener('change', loadState);
-}
-
-// Fonction de validation de traduction
-function validateTranslation() {
-    const userInput = elements.translationInput.value.trim().toLowerCase();
-    const cards = vocabularyByChapter[currentChapter];
-    const correctAnswer = cards[currentCardIndex].english.toLowerCase();
-    
-    // Vérifier la réponse
-    const isCorrect = userInput === correctAnswer;
-    
-    // Mettre à jour la performance de la carte
-    const cardKey = `${currentChapter}-${currentCardIndex}`;
-    if (!cardPerformance[cardKey]) {
-        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-    }
-    cardPerformance[cardKey].attempts++;
-    
-    if (isCorrect) {
-        cardPerformance[cardKey].successes++;
-        elements.validationResult.textContent = "Correct !";
-        elements.validationResult.className = "validation-result correct";
-        
-        // Incrémenter le score
-        currentScore++;
-        elements.currentScoreElement.textContent = currentScore;
-        
-        // Mettre à jour le meilleur score
-        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-            bestScores[currentChapter] = currentScore;
-            elements.bestScoreElement.textContent = bestScores[currentChapter];
-        }
-    } else {
-        elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
-        elements.validationResult.className = "validation-result incorrect";
-    }
-    
-    // Mettre à jour la couleur de la carte
-    updateCardColorAndSuccessRate();
-    
-    // Passer automatiquement à la carte suivante après quelques secondes si la réponse est correcte
-    if (isCorrect && currentCardIndex < cards.length - 1) {
-        setTimeout(() => {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }, 1500);
-    }
-}
-
-// Initialisation
-function init() {
-    // Charger les données depuis le localStorage
-    const savedData = localStorage.getItem('flashcardsData');
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            seenCards = new Set(data.seenCards || []);
-            cardPerformance = data.cardPerformance || {};
-            bestScores = data.bestScores || {};
-            bestTimes = data.bestTimes || {};
-            isDarkMode = data.isDarkMode || false;
-            
-            // Appliquer le mode sombre si nécessaire
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            elements.themeToggle.classList.toggle('active', isDarkMode);
-        } catch (e) {
-            console.error("Erreur lors du chargement des données:", e);
-        }
-    }
-    
-    // Initialiser les gestionnaires d'événements
-    initEventListeners();
-    
-    // Initialiser l'affichage
-    updateBestScoreDisplay();
-    updateBestTimeDisplay();
-    
-    // Démarrer le timer
-    startTimer();
-    
-    // Afficher la première carte
-    if (isRawMode) {
-        generateRawContent();
-    } else {
-        updateCard();
-    }
-    
-    // Sauvegarder les données avant de quitter
-    window.addEventListener('beforeunload', () => {
-        localStorage.setItem('flashcardsData', JSON.stringify({
-            seenCards: Array.from(seenCards),
-            cardPerformance,
-            bestScores,
-            bestTimes,
-            isDarkMode
-        }));
-    });
-}
-
-// Lancer l'initialisation
-init();
-</script>
+        // Initialisation
+        initEventListeners(); startTimer(); updateCard();
+    </script>
 </body>
 </html>
