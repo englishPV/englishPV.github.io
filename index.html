@@ -1620,6 +1620,264 @@ elements.englishTranslation.style.display = 'block';
         
         // Initialisation
         changeChapter(1);
+        // Add this to the existing script section
+
+// Variables for save/load functionality
+let gameState = {};
+
+// Function to generate a save code
+function generateSaveCode() {
+    gameState = {
+        ch: currentChapter,
+        ci: currentCardIndex,
+        sc: seenCards.size > 0 ? Array.from(seenCards) : [],
+        ch: cardHistory,
+        dm: isDarkMode ? 1 : 0,
+        rm: isRawMode ? 1 : 0,
+        cs: currentScore,
+        bs: bestScores,
+        cp: cardPerformance,
+        bt: bestTimes
+    };
+    
+    // Convert to string and compress
+    return btoa(JSON.stringify(gameState)).replace(/=/g, '');
+}
+
+// Function to load a save code
+function loadFromSaveCode(code) {
+    try {
+        // Pad the code with '=' if needed for base64 decoding
+        while (code.length % 4 !== 0) {
+            code += '=';
+        }
+        
+        // Decode and parse the game state
+        gameState = JSON.parse(atob(code));
+        
+        // Restore game state
+        currentChapter = gameState.ch || 1;
+        currentCardIndex = gameState.ci || 0;
+        seenCards = new Set(gameState.sc || []);
+        cardHistory = gameState.ch || [];
+        isDarkMode = gameState.dm === 1;
+        isRawMode = gameState.rm === 1;
+        currentScore = gameState.cs || 0;
+        bestScores = gameState.bs || {};
+        cardPerformance = gameState.cp || {};
+        bestTimes = gameState.bt || {};
+        
+        // Update UI
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+        elements.themeToggle.classList.toggle('active', isDarkMode);
+        
+        elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+        elements.rawToggle.classList.toggle('active', isRawMode);
+        
+        elements.chapterButtons.forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
+        });
+        
+        elements.currentScoreElement.textContent = currentScore;
+        updateBestScoreDisplay();
+        updateBestTimeDisplay();
+        
+        if (isRawMode) {
+            elements.cardContainer.style.display = 'none';
+            document.querySelector('.validation-container').style.display = 'none';
+            elements.rawContent.style.display = 'block';
+            generateRawContent();
+        } else {
+            elements.cardContainer.style.display = 'block';
+            document.querySelector('.validation-container').style.display = 'flex';
+            elements.rawContent.style.display = 'none';
+        }
+        
+        resetTimer();
+        startTimer();
+        updateCard();
+        return true;
+    } catch (e) {
+        console.error("Failed to load save code:", e);
+        return false;
+    }
+}
+
+// Create save/load UI elements
+function createSaveLoadUI() {
+    // Create container
+    const saveLoadContainer = document.createElement('div');
+    saveLoadContainer.className = 'save-load-container';
+    saveLoadContainer.style.display = 'flex';
+    saveLoadContainer.style.justifyContent = 'center';
+    saveLoadContainer.style.marginBottom = '20px';
+    saveLoadContainer.style.gap = '10px';
+    
+    // Create save button
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'mode-btn';
+    saveBtn.id = 'save-btn';
+    saveBtn.textContent = 'Sauvegarder';
+    saveBtn.addEventListener('click', showSaveCode);
+    
+    // Create load button
+    const loadBtn = document.createElement('button');
+    loadBtn.className = 'mode-btn';
+    loadBtn.id = 'load-btn';
+    loadBtn.textContent = 'Charger';
+    loadBtn.addEventListener('click', promptLoadCode);
+    
+    // Add buttons to container
+    saveLoadContainer.appendChild(saveBtn);
+    saveLoadContainer.appendChild(loadBtn);
+    
+    // Insert after mode controls
+    const modeControls = document.querySelector('.mode-controls');
+    modeControls.parentNode.insertBefore(saveLoadContainer, modeControls.nextSibling);
+    
+    // Create modal for save code
+    const saveModal = document.createElement('div');
+    saveModal.id = 'save-modal';
+    saveModal.style.display = 'none';
+    saveModal.style.position = 'fixed';
+    saveModal.style.top = '0';
+    saveModal.style.left = '0';
+    saveModal.style.width = '100%';
+    saveModal.style.height = '100%';
+    saveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    saveModal.style.zIndex = '1000';
+    saveModal.style.justifyContent = 'center';
+    saveModal.style.alignItems = 'center';
+    saveModal.style.flexDirection = 'column';
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.padding = '20px';
+    modalContent.style.backgroundColor = 'var(--card-bg)';
+    modalContent.style.borderRadius = '10px';
+    modalContent.style.maxWidth = '90%';
+    modalContent.style.width = '500px';
+    modalContent.style.color = 'var(--text-color)';
+    modalContent.style.textAlign = 'center';
+    
+    const modalTitle = document.createElement('h3');
+    modalTitle.textContent = 'Code de sauvegarde';
+    modalTitle.style.marginBottom = '15px';
+    
+    const saveCodeInput = document.createElement('input');
+    saveCodeInput.id = 'save-code-input';
+    saveCodeInput.style.width = '100%';
+    saveCodeInput.style.padding = '10px';
+    saveCodeInput.style.marginBottom = '15px';
+    saveCodeInput.style.backgroundColor = 'var(--card-bg)';
+    saveCodeInput.style.color = 'var(--text-color)';
+    saveCodeInput.style.border = '1px solid var(--button-bg)';
+    saveCodeInput.style.borderRadius = '5px';
+    saveCodeInput.readOnly = true;
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copier';
+    copyBtn.className = 'btn';
+    copyBtn.style.marginRight = '10px';
+    copyBtn.addEventListener('click', () => {
+        saveCodeInput.select();
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copié!';
+        setTimeout(() => {
+            copyBtn.textContent = 'Copier';
+        }, 2000);
+    });
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Fermer';
+    closeBtn.className = 'btn';
+    closeBtn.addEventListener('click', () => {
+        saveModal.style.display = 'none';
+    });
+    
+    modalContent.appendChild(modalTitle);
+    modalContent.appendChild(saveCodeInput);
+    modalContent.appendChild(copyBtn);
+    modalContent.appendChild(closeBtn);
+    saveModal.appendChild(modalContent);
+    
+    document.body.appendChild(saveModal);
+}
+
+// Show save code modal
+function showSaveCode() {
+    const saveCode = generateSaveCode();
+    const saveCodeInput = document.getElementById('save-code-input');
+    saveCodeInput.value = saveCode;
+    
+    const saveModal = document.getElementById('save-modal');
+    saveModal.style.display = 'flex';
+}
+
+// Prompt for load code
+function promptLoadCode() {
+    const code = prompt('Entrez votre code de sauvegarde:');
+    if (code) {
+        const success = loadFromSaveCode(code);
+        if (!success) {
+            alert('Code de sauvegarde invalide. Veuillez vérifier et réessayer.');
+        }
+    }
+}
+
+// Check for saved code on first load
+function checkForSavedCode() {
+    const savedCode = localStorage.getItem('flashCardsLastSave');
+    if (savedCode) {
+        if (confirm('Une sauvegarde précédente a été trouvée. Voulez-vous la charger?')) {
+            loadFromSaveCode(savedCode);
+        } else {
+            localStorage.removeItem('flashCardsLastSave');
+        }
+    } else {
+        // Show initial welcome/load dialog
+        showWelcomeDialog();
+    }
+}
+
+// Welcome dialog
+function showWelcomeDialog() {
+    const hasCode = confirm('Bienvenue! Avez-vous un code de sauvegarde à charger?');
+    if (hasCode) {
+        promptLoadCode();
+    }
+}
+
+// Auto-save functionality
+function setupAutoSave() {
+    // Save every minute and on page unload
+    setInterval(() => {
+        const saveCode = generateSaveCode();
+        localStorage.setItem('flashCardsLastSave', saveCode);
+    }, 60000);
+    
+    window.addEventListener('beforeunload', () => {
+        const saveCode = generateSaveCode();
+        localStorage.setItem('flashCardsLastSave', saveCode);
+    });
+}
+
+// Initialize save/load feature
+document.addEventListener('DOMContentLoaded', () => {
+    createSaveLoadUI();
+    setupAutoSave();
+    checkForSavedCode();
+});
+
+// Add CSS for save/load UI to the existing style section
+document.head.appendChild(document.createElement('style')).textContent = `
+.save-load-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+`;
     </script>
 </body>
 </html>
