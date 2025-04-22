@@ -1651,41 +1651,45 @@ function updateBestTimeDisplay() {
 // Gestionnaires d'événements
 function initEventListeners() {
     // Changement de chapitre
-    elements.chapterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const chapter = parseInt(button.dataset.chapter);
-            
-            // Ne rien faire si on clique sur le chapitre actif
-            if (chapter === currentChapter) return;
-            
-            // Désactiver le chapitre actuel et activer le nouveau
-            elements.chapterButtons.forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-            });
-            
-            // Changer le chapitre
-            currentChapter = chapter;
-            currentCardIndex = 0;
-            cardHistory = [];
-            
-            // Réinitialiser le timer
-            resetTimer();
-            startTimer();
-            
-            // Mettre à jour le meilleur score
-            updateBestScoreDisplay();
-            
-            // Mettre à jour le meilleur temps
-            updateBestTimeDisplay();
-            
-            // Mettre à jour la carte ou le contenu raw
-            if (isRawMode) {
-                generateRawContent();
-            } else {
-                updateCard();
-            }
+    // Changement de chapitre
+elements.chapterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const chapter = parseInt(button.dataset.chapter);
+        
+        // Ne rien faire si on clique sur le chapitre actif
+        if (chapter === currentChapter) return;
+        
+        // Désactiver le chapitre actuel et activer le nouveau
+        elements.chapterButtons.forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
         });
+        
+        // Changer le chapitre
+        currentChapter = chapter;
+        currentCardIndex = 0;
+        cardHistory = [];
+        
+        // Réinitialiser la liste des cartes vues
+        seenCards = new Set();
+        
+        // Réinitialiser le timer
+        resetTimer();
+        startTimer();
+        
+        // Mettre à jour le meilleur score
+        updateBestScoreDisplay();
+        
+        // Mettre à jour le meilleur temps
+        updateBestTimeDisplay();
+        
+        // Mettre à jour la carte ou le contenu raw
+        if (isRawMode) {
+            generateRawContent();
+        } else {
+            updateCard();
+        }
     });
+});
     
     // Retourner la carte
     elements.card.addEventListener('click', () => {
