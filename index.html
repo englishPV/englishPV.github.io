@@ -1400,49 +1400,44 @@
 function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
-    
-    // Créer un tableau d'objets contenant l'index et le taux de succès
+
+    // Construire le tableau avec status :
     const cardsWithRates = cards.map((_, index) => {
-        const cardKey = `${currentChapter}-${index}`;
-        const perf = cardPerformance[cardKey];
-        
-        // Valeurs par défaut pour les cartes jamais vues
-        let successRate = -1;  // -1 pour les cartes jamais vues
-        let isCardSeen = seenCards.has(index);
-        
-        if (perf) {
+        const key = `${currentChapter}-${index}`;
+        const perf = cardPerformance[key];
+        let successRate, group;
+
+        if (!perf) {
+            // jamais vues → groupe 2
+            successRate = -1;
+            group = 2;
+        } else {
             successRate = perf.successes / perf.attempts;
-            isCardSeen = true;
+            // 100% → groupe 3, sinon → groupe 1
+            group = successRate === 1 ? 3 : 1;
         }
-        
-        return { index, successRate, isCardSeen };
+
+        return { index, successRate, group };
     });
-    
-    // Trier les cartes:
-    // 1. D'abord les cartes vues avec le plus faible taux de succès
-    // 2. Ensuite les cartes jamais vues
-    // 3. Enfin les cartes avec 100% de succès
+
     cardsWithRates.sort((a, b) => {
-        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
-        if (a.successRate === -1 && b.successRate === 1) return -1;
-        if (a.successRate === 1 && b.successRate === -1) return 1;
-        
-        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
-        if (a.successRate === b.successRate) {
-            return Math.random() - 0.5;
+        // 1) on compare d'abord le groupe
+        if (a.group !== b.group) return a.group - b.group;
+
+        // 2) même groupe :
+        switch (a.group) {
+            case 1: // cartes vues (ni jamais vues ni parfaites) : tri par taux de succès
+                return a.successRate - b.successRate;
+            case 2: // jamais vues : ordre aléatoire
+            case 3: // parfaites : ordre aléatoire
+            default:
+                return Math.random() - 0.5;
         }
-        
-        // Cartes jamais vues ont priorité sur cartes déjà vues
-        if (a.successRate === -1) return -1;
-        if (b.successRate === -1) return 1;
-        
-        // Sinon, trier par taux de succès (ascendant)
-        return a.successRate - b.successRate;
     });
-    
-    // Retourner seulement les indices
-    return cardsWithRates.map(card => card.index);
+
+    return cardsWithRates.map(c => c.index);
 }
+
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -1718,18 +1713,20 @@ elements.chapterButtons.forEach(button => {
     // Bouton aléatoire
 // 1. Fix the random button to truly get the lowest score card
 elements.randomBtn.addEventListener('click', () => {
-    const sortedIndices = getSortedCardsByPerformance();
-    
-    if (sortedIndices.length > 0) {
-        // Always select the first card (lowest success rate)
-        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
-            ? sortedIndices[1] 
-            : sortedIndices[0];
-        
-        cardHistory.push(currentCardIndex);
-        currentCardIndex = newIndex;
-        updateCard();
+    const sorted = getSortedCardsByPerformance();
+    if (sorted.length === 0) return;
+
+    // on prend toujours la première carte (celle du groupe 1 la plus faible,
+    // ou une jamais vue si groupe 1 épuisé, etc.)
+    let next = sorted[0];
+    // si c’est la même que la carte actuelle, on passe à la suivante
+    if (next === currentCardIndex && sorted.length > 1) {
+        next = sorted[1];
     }
+
+    cardHistory.push(currentCardIndex);
+    currentCardIndex = next;
+    updateCard();
 });
 
 // 2. Modify the chapter button event listener to sort cards by performance
