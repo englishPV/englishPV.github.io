@@ -1715,29 +1715,57 @@ elements.chapterButtons.forEach(button => {
     });
     
     // Bouton aléatoire
-    elements.randomBtn.addEventListener('click', () => {
-        const cards = vocabularyByChapter[currentChapter];
-        const sortedIndices = getSortedCardsByPerformance();
+    // Bouton aléatoire
+elements.randomBtn.addEventListener('click', () => {
+    const cards = vocabularyByChapter[currentChapter];
+    
+    // 1. Find cards with performance data and unseen cards
+    let lowestScoreIndex = -1;
+    let lowestScoreValue = 1.1; // Higher than any possible score (0-1)
+    const unseenIndices = [];
+    
+    for (let i = 0; i < cards.length; i++) {
+        const cardKey = `${currentChapter}-${i}`;
+        const perf = cardPerformance[cardKey];
         
-        // Sélectionner principalement parmi les cartes avec le taux de succès le plus bas
-        const selectionPool = sortedIndices.slice(0, Math.max(3, Math.ceil(sortedIndices.length * 0.3)));
-        
-        // Sélectionner une carte aléatoire du pool
-        let newIndex;
-        if (selectionPool.length > 0) {
-            const randomPos = Math.floor(Math.random() * selectionPool.length);
-            newIndex = selectionPool[randomPos];
-        } else {
-            // Fallback à la sélection complètement aléatoire
-            do {
-                newIndex = Math.floor(Math.random() * cards.length);
-            } while (newIndex === currentCardIndex);
+        if (!seenCards.has(i)) {
+            // This is an unseen card
+            unseenIndices.push(i);
+        } else if (perf) {
+            // Calculate success rate
+            const successRate = perf.successes / perf.attempts;
+            
+            // Check if this is the lowest score so far
+            if (successRate < lowestScoreValue) {
+                lowestScoreValue = successRate;
+                lowestScoreIndex = i;
+            }
         }
-        
-        cardHistory.push(currentCardIndex);
-        currentCardIndex = newIndex;
-        updateCard();
-    });
+    }
+    
+    // 2. Determine which card to show
+    let newIndex;
+    
+    if (lowestScoreIndex >= 0) {
+        // We have at least one card with a score - use the lowest one
+        newIndex = lowestScoreIndex;
+    } else if (unseenIndices.length > 0) {
+        // No cards with scores, but we have unseen cards - pick a random unseen one
+        const randomPos = Math.floor(Math.random() * unseenIndices.length);
+        newIndex = unseenIndices[randomPos];
+    } else {
+        // All cards have been seen but none have scores (edge case)
+        // Pick a completely random different card
+        do {
+            newIndex = Math.floor(Math.random() * cards.length);
+        } while (newIndex === currentCardIndex);
+    }
+    
+    // Update card display
+    cardHistory.push(currentCardIndex);
+    currentCardIndex = newIndex;
+    updateCard();
+});
     
     // Validation de la traduction
     elements.validateBtn.addEventListener('click', validateTranslation);
