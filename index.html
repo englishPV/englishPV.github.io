@@ -1401,22 +1401,35 @@ function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
     
-    // Créer un tableau d'objets contenant l'index et le taux de succès
+    // Créer un tableau d'objets avec l'index et le taux de succès
     const cardsWithRates = cards.map((_, index) => {
         const cardKey = `${currentChapter}-${index}`;
         const perf = cardPerformance[cardKey];
         
-        // Valeurs par défaut pour les cartes jamais vues
-        let successRate = -1;  // -1 pour les cartes jamais vues
-        let isCardSeen = seenCards.has(index);
-        
+        let successRate = -1; // -1 pour les cartes jamais vues
         if (perf) {
             successRate = perf.successes / perf.attempts;
-            isCardSeen = true;
         }
         
-        return { index, successRate, isCardSeen };
+        return { index, successRate };
     });
+    
+    // Séparer en trois groupes
+    const seenWithMistakes = cardsWithRates.filter(card => card.successRate >= 0 && card.successRate < 1);
+    const neverSeen = cardsWithRates.filter(card => card.successRate === -1);
+    const perfect = cardsWithRates.filter(card => card.successRate === 1);
+    
+    // Trier chaque groupe
+    seenWithMistakes.sort((a, b) => a.successRate - b.successRate); // Croissant pour les scores faibles
+    neverSeen.sort(() => Math.random() - 0.5); // Aléatoire pour les cartes jamais vues
+    perfect.sort(() => Math.random() - 0.5); // Aléatoire pour les cartes à 100%
+    
+    // Concaténer dans l'ordre demandé
+    const sortedCards = [...seenWithMistakes, ...neverSeen, ...perfect];
+    
+    // Retourner les indices
+    return sortedCards.map(card => card.index);
+}
     
     // Trier les cartes:
     // 1. D'abord les cartes vues avec le plus faible taux de succès
@@ -1720,14 +1733,12 @@ elements.chapterButtons.forEach(button => {
 elements.randomBtn.addEventListener('click', () => {
     const sortedIndices = getSortedCardsByPerformance();
     
-    if (sortedIndices.length > 0) {
-        // Always select the first card (lowest success rate)
-        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
-            ? sortedIndices[1] 
-            : sortedIndices[0];
-        
+    // Trouver la première carte qui n'est pas la carte actuelle
+    const nextIndex = sortedIndices.find(index => index !== currentCardIndex);
+    
+    if (nextIndex !== undefined) {
         cardHistory.push(currentCardIndex);
-        currentCardIndex = newIndex;
+        currentCardIndex = nextIndex;
         updateCard();
     }
 });
@@ -1737,30 +1748,25 @@ elements.chapterButtons.forEach(button => {
     button.addEventListener('click', () => {
         const chapter = parseInt(button.dataset.chapter);
         
-        // Skip if clicking current chapter
         if (chapter === currentChapter) return;
         
-        // Update active chapter button
         elements.chapterButtons.forEach(btn => {
             btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
         });
         
-        // Change chapter
         currentChapter = chapter;
         cardHistory = [];
         seenCards = new Set();
         
-        // Set current card to the one with lowest score
+        // Sélectionner la carte avec le score le plus faible
         const sortedIndices = getSortedCardsByPerformance();
         currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
         
-        // Reset timer and update UI
         resetTimer();
         startTimer();
         updateBestScoreDisplay();
         updateBestTimeDisplay();
         
-        // Update display
         if (isRawMode) {
             generateRawContent();
         } else {
