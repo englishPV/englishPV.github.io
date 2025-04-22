@@ -1397,6 +1397,7 @@
         
         // Fonction pour calculer et trier les cartes selon leur taux de succès
         // Fonction pour calculer et trier les cartes selon leur taux de succès
+// Fonction pour calculer et trier les cartes selon leur taux de succès
 function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
@@ -1419,30 +1420,48 @@ function getSortedCardsByPerformance() {
     });
     
     // Trier les cartes:
-    // 1. D'abord les cartes vues avec le plus faible taux de succès
-    // 2. Ensuite les cartes jamais vues
-    // 3. Enfin les cartes avec 100% de succès
+    // 1. D'abord les cartes jamais vues
+    // 2. Ensuite les cartes avec le plus faible taux de succès
     cardsWithRates.sort((a, b) => {
-        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
-        if (a.successRate === -1 && b.successRate === 1) return -1;
-        if (a.successRate === 1 && b.successRate === -1) return 1;
+        // Priorité absolue aux cartes jamais vues
+        if (a.successRate === -1 && b.successRate !== -1) return -1;
+        if (a.successRate !== -1 && b.successRate === -1) return 1;
         
-        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
-        if (a.successRate === b.successRate) {
-            return Math.random() - 0.5;
+        // Si les deux ont un score, comparer leurs taux de succès
+        if (a.successRate !== -1 && b.successRate !== -1) {
+            return a.successRate - b.successRate;
         }
         
-        // Cartes jamais vues ont priorité sur cartes déjà vues
-        if (a.successRate === -1) return -1;
-        if (b.successRate === -1) return 1;
-        
-        // Sinon, trier par taux de succès (ascendant)
-        return a.successRate - b.successRate;
+        // Si les deux sont jamais vues, ordre aléatoire
+        return Math.random() - 0.5;
     });
     
     // Retourner seulement les indices
     return cardsWithRates.map(card => card.index);
 }
+
+// Bouton aléatoire (à remplacer dans le bloc initEventListeners)
+elements.randomBtn.addEventListener('click', () => {
+    const sortedIndices = getSortedCardsByPerformance();
+    
+    // S'il n'y a pas de cartes disponibles, ne rien faire
+    if (sortedIndices.length === 0) return;
+    
+    // Prendre toujours la première carte (celle avec le plus faible score ou jamais vue)
+    const newIndex = sortedIndices[0];
+    
+    // Ne pas changer si c'est la même carte
+    if (newIndex === currentCardIndex && sortedIndices.length > 1) {
+        // Prendre la deuxième carte dans ce cas
+        cardHistory.push(currentCardIndex);
+        currentCardIndex = sortedIndices[1];
+    } else {
+        cardHistory.push(currentCardIndex);
+        currentCardIndex = newIndex;
+    }
+    
+    updateCard();
+});
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
