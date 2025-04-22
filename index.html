@@ -1626,40 +1626,89 @@ elements.englishTranslation.style.display = 'block';
 let gameState = {};
 
 // Function to generate a save code
-function generateSaveCode() {
-    // Create minimal state object
-    const state = [
-        currentChapter,
-        currentCardIndex,
-        Array.from(seenCards),
-        isDarkMode ? 1 : 0,
-        isRawMode ? 1 : 0,
-        currentScore,
-        cardPerformance,
-        bestTimes
-    ];
-    
-    // Convert to base64 and remove padding
-    return LZString.compressToBase64(JSON.stringify(state)).replace(/=/g, '');
+// Modifions le système de sauvegarde pour des codes courts
+// Remplaçons la fonction generateSaveCode() et loadFromSaveCode()
+
+// Array de caractères pour les codes courts (62 caractères)
+const SHORT_CODE_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+// Fonction pour générer un code court aléatoire (5 caractères)
+function generateShortCode() {
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+        code += SHORT_CODE_CHARS.charAt(Math.floor(Math.random() * SHORT_CODE_CHARS.length));
+    }
+    return code;
 }
 
-// Function to load a save code
+// Objet pour stocker les codes courts et leurs données correspondantes
+const savedStates = {};
+
+// Fonction pour générer un code de sauvegarde court
+function generateSaveCode() {
+    // Créer un état minimal
+    const state = {
+        ch: currentChapter,
+        idx: currentCardIndex,
+        seen: Array.from(seenCards),
+        dark: isDarkMode ? 1 : 0,
+        raw: isRawMode ? 1 : 0,
+        score: currentScore,
+        perf: cardPerformance,
+        times: bestTimes
+    };
+    
+    // Générer un code court unique
+    let shortCode = generateShortCode();
+    
+    // S'assurer que le code est unique
+    while (savedStates[shortCode]) {
+        shortCode = generateShortCode();
+    }
+    
+    // Stocker l'état avec le code court
+    savedStates[shortCode] = state;
+    
+    // Sauvegarder tous les états en local storage
+    try {
+        localStorage.setItem('flashCardsSavedStates', JSON.stringify(savedStates));
+    } catch (e) {
+        console.error("Impossible de sauvegarder tous les états:", e);
+        // En cas d'erreur, essayer de nettoyer le stockage
+        clearOldSavedStates();
+    }
+    
+    return shortCode;
+}
+
+// Fonction pour charger à partir d'un code court
 function loadFromSaveCode(code) {
     try {
-        // Decompress and parse state
-        const state = JSON.parse(LZString.decompressFromBase64(code));
+        // Essayer de charger les états depuis localStorage
+        const storedStates = localStorage.getItem('flashCardsSavedStates');
+        if (storedStates) {
+            Object.assign(savedStates, JSON.parse(storedStates));
+        }
         
-        // Restore game state
-        currentChapter = state[0] || 1;
-        currentCardIndex = state[1] || 0;
-        seenCards = new Set(state[2] || []);
-        isDarkMode = state[3] === 1;
-        isRawMode = state[4] === 1;
-        currentScore = state[5] || 0;
-        cardPerformance = state[6] || {};
-        bestTimes = state[7] || {};
+        // Vérifier si le code existe
+        if (!savedStates[code]) {
+            return false;
+        }
         
-        // Update UI elements
+        // Récupérer l'état
+        const state = savedStates[code];
+        
+        // Restaurer l'état du jeu
+        currentChapter = state.ch || 1;
+        currentCardIndex = state.idx || 0;
+        seenCards = new Set(state.seen || []);
+        isDarkMode = state.dark === 1;
+        isRawMode = state.raw === 1;
+        currentScore = state.score || 0;
+        cardPerformance = state.perf || {};
+        bestTimes = state.times || {};
+        
+        // Mettre à jour les éléments UI
         document.body.classList.toggle('dark-mode', isDarkMode);
         elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
         elements.themeToggle.classList.toggle('active', isDarkMode);
@@ -1667,7 +1716,7 @@ function loadFromSaveCode(code) {
         elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
         elements.rawToggle.classList.toggle('active', isRawMode);
         
-        // Make sure the chapter buttons are updated correctly
+        // S'assurer que les boutons de chapitre sont correctement mis à jour
         elements.chapterButtons.forEach(btn => {
             btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
         });
@@ -1676,7 +1725,7 @@ function loadFromSaveCode(code) {
         updateBestScoreDisplay();
         updateBestTimeDisplay();
         
-        // Set display state based on raw mode
+        // Définir l'état d'affichage en fonction du mode raw
         if (isRawMode) {
             elements.cardContainer.style.display = 'none';
             document.querySelector('.validation-container').style.display = 'none';
@@ -1691,136 +1740,73 @@ function loadFromSaveCode(code) {
         resetTimer();
         startTimer();
         
-        // Critical fix: Make sure we have cards before updating
+        // S'assurer que nous avons des cartes avant de mettre à jour
         if (vocabularyByChapter[currentChapter] && vocabularyByChapter[currentChapter].length > 0) {
             updateCard();
             return true;
         }
         return false;
     } catch (e) {
-        console.error("Failed to load save code:", e);
+        console.error("Échec du chargement du code de sauvegarde:", e);
         return false;
     }
 }
 
-// Create save/load UI elements
-function createSaveLoadUI() {
-    // Create container
-    const saveLoadContainer = document.createElement('div');
-    saveLoadContainer.className = 'save-load-container';
-    saveLoadContainer.style.display = 'flex';
-    saveLoadContainer.style.justifyContent = 'center';
-    saveLoadContainer.style.gap = '10px';
-    saveLoadContainer.style.marginBottom = '20px';
-    
-    // Create save button
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'mode-btn';
-    saveBtn.id = 'save-btn';
-    saveBtn.textContent = 'Sauvegarder';
-    saveBtn.addEventListener('click', showSaveCode);
-    
-    // Create load button
-    const loadBtn = document.createElement('button');
-    loadBtn.className = 'mode-btn';
-    loadBtn.id = 'load-btn';
-    loadBtn.textContent = 'Charger';
-    loadBtn.addEventListener('click', promptLoadCode);
-    
-    // Add buttons to container
-    saveLoadContainer.appendChild(saveBtn);
-    saveLoadContainer.appendChild(loadBtn);
-    
-    // Insert after mode controls
-    const modeControls = document.querySelector('.mode-controls');
-    modeControls.parentNode.insertBefore(saveLoadContainer, modeControls.nextSibling);
-    
-    // Create modal for save code
-    const saveModal = document.createElement('div');
-    saveModal.id = 'save-modal';
-    saveModal.style.display = 'none';
-    saveModal.style.position = 'fixed';
-    saveModal.style.top = '0';
-    saveModal.style.left = '0';
-    saveModal.style.width = '100%';
-    saveModal.style.height = '100%';
-    saveModal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    saveModal.style.zIndex = '1000';
-    saveModal.style.justifyContent = 'center';
-    saveModal.style.alignItems = 'center';
-    saveModal.style.flexDirection = 'column';
-    
-    const modalContent = document.createElement('div');
-    modalContent.style.padding = '20px';
-    modalContent.style.backgroundColor = 'var(--card-bg)';
-    modalContent.style.borderRadius = '10px';
-    modalContent.style.maxWidth = '90%';
-    modalContent.style.width = '500px';
-    modalContent.style.color = 'var(--text-color)';
-    modalContent.style.textAlign = 'center';
-    
-    const modalTitle = document.createElement('h3');
-    modalTitle.textContent = 'Code de sauvegarde';
-    modalTitle.style.marginBottom = '15px';
-    
-    const saveCodeInput = document.createElement('input');
-    saveCodeInput.id = 'save-code-input';
-    saveCodeInput.style.width = '100%';
-    saveCodeInput.style.padding = '10px';
-    saveCodeInput.style.marginBottom = '15px';
-    saveCodeInput.style.backgroundColor = 'var(--card-bg)';
-    saveCodeInput.style.color = 'var(--text-color)';
-    saveCodeInput.style.border = '1px solid var(--button-bg)';
-    saveCodeInput.style.borderRadius = '5px';
-    saveCodeInput.readOnly = true;
-    
-    const copyBtn = document.createElement('button');
-    copyBtn.textContent = 'Copier';
-    copyBtn.className = 'btn';
-    copyBtn.style.marginRight = '10px';
-    copyBtn.addEventListener('click', () => {
-        saveCodeInput.select();
-        document.execCommand('copy');
-        copyBtn.textContent = 'Copié!';
-        setTimeout(() => copyBtn.textContent = 'Copier', 2000);
-    });
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = 'Fermer';
-    closeBtn.className = 'btn';
-    closeBtn.addEventListener('click', () => saveModal.style.display = 'none');
-    
-    modalContent.appendChild(modalTitle);
-    modalContent.appendChild(saveCodeInput);
-    modalContent.appendChild(copyBtn);
-    modalContent.appendChild(closeBtn);
-    saveModal.appendChild(modalContent);
-    
-    document.body.appendChild(saveModal);
-}
-
-// Show save code modal
-function showSaveCode() {
-    const saveCode = generateSaveCode();
-    const saveCodeInput = document.getElementById('save-code-input');
-    saveCodeInput.value = saveCode;
-    
-    const saveModal = document.getElementById('save-modal');
-    saveModal.style.display = 'flex';
-}
-
-// Prompt for load code
-function promptLoadCode() {
-    const code = prompt('Entrez votre code de sauvegarde:');
-    if (code) {
-        const success = loadFromSaveCode(code);
-        if (!success) {
-            alert('Code de sauvegarde invalide ou aucune carte disponible. Essayez un autre chapitre.');
+// Fonction pour nettoyer les anciens états sauvegardés
+function clearOldSavedStates() {
+    const keys = Object.keys(savedStates);
+    if (keys.length > 50) { // Garder seulement les 50 derniers états
+        const keysToKeep = keys.slice(-50);
+        const newSavedStates = {};
+        keysToKeep.forEach(key => {
+            newSavedStates[key] = savedStates[key];
+        });
+        savedStates = newSavedStates;
+        try {
+            localStorage.setItem('flashCardsSavedStates', JSON.stringify(savedStates));
+        } catch (e) {
+            console.error("Impossible de sauvegarder même après nettoyage:", e);
         }
     }
 }
 
-// Add LZString compression library (for tiny save codes)
+// Fonction modifiée pour charger au démarrage sans demander
+function checkForSavedCode() {
+    const savedCode = localStorage.getItem('flashCardsLastSave');
+    if (savedCode) {
+        loadFromSaveCode(savedCode);
+    }
+}
+
+// Modifions la fonction de dialogue de bienvenue pour qu'elle ne s'affiche pas
+function showWelcomeDialog() {
+    // Ne rien faire - pas de dialogue
+}
+
+// Fonction pour l'auto-sauvegarde
+function setupAutoSave() {
+    // Sauvegarde toutes les minutes et lors du déchargement de la page
+    setInterval(() => {
+        const saveCode = generateSaveCode();
+        localStorage.setItem('flashCardsLastSave', saveCode);
+    }, 60000);
+    
+    window.addEventListener('beforeunload', () => {
+        const saveCode = generateSaveCode();
+        localStorage.setItem('flashCardsLastSave', saveCode);
+    });
+}
+
+// Remplaçons la fonction promptLoadCode pour éviter les alertes
+function promptLoadCode() {
+    const code = prompt('Entrez votre code de sauvegarde (5 caractères):');
+    if (code) {
+        const success = loadFromSaveCode(code);
+        if (!success) {
+            alert('Code de sauvegarde invalide ou aucune carte disponible.');
+        }
+    }
+}
 var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(o){if(null==o)return"";var r=i._compress(o,6,function(o){return n.charAt(o)});switch(r.length%4){default:case 0:return r;case 1:return r+"===";case 2:return r+"==";case 3:return r+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(e){return o(n,r.charAt(e))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(o){return null==o?"":""==o?null:i._decompress(o.length,16384,function(r){return o.charCodeAt(r)-32})},compressToUint8Array:function(o){for(var r=i.compress(o),n=new Uint8Array(2*r.length),e=0,t=r.length;t>e;e++){var s=r.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null===o||void 0===o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;t>e;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(o){return null==o?"":i._compress(o,6,function(o){return e.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(n){return o(e,r.charAt(n))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(o,r,n){if(null==o)return"";var e,t,i,s={},p={},u="",c="",a="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<o.length;i+=1)if(u=o.charAt(i),Object.prototype.hasOwnProperty.call(s,u)||(s[u]=f++,p[u]=!0),c=a+u,Object.prototype.hasOwnProperty.call(s,c))a=c;else{if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++),s[c]=f++,a=String(u)}if(""!==a){if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==r-1){d.push(n(m));break}v++}return d.join("")},decompress:function(o){return null==o?"":""==o?null:i._decompress(o.length,32768,function(r){return o.charCodeAt(r)})},_decompress:function(o,n,e){var t,i,s,p,u,c,a,l,f=[],h=4,d=4,m=3,v="",w=[],A={val:e(0),position:n,index:1};for(i=0;3>i;i+=1)f[i]=i;for(p=0,c=Math.pow(2,2),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(t=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 2:return""}for(f[3]=l,s=l,w.push(l);;){if(A.index>o)return"";for(p=0,c=Math.pow(2,m),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(l=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 2:return w.join("")}if(0==h&&(h=Math.pow(2,m),m++),f[l])v=f[l];else{if(l!==d)return null;v=s+s.charAt(0)}w.push(v),f[d++]=s+v.charAt(0),h--,s=v,0==h&&(h=Math.pow(2,m),m++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module&&(module.exports=LZString);
 
 // Check for saved code on first load
