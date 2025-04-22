@@ -1241,7 +1241,6 @@
   "english": "retirement age"
 }]};
         
-        // Variables d'état
         let currentChapter = 1;
         let currentCardIndex = 0;
         let isTranslationVisible = false;
@@ -1286,7 +1285,8 @@
             saveBtn: document.getElementById('save-btn'),
             loadBtn: document.getElementById('load-btn'),
             loadInput: document.getElementById('load-input'),
-            toastMessage: document.getElementById('toast-message')
+            toastMessage: document.getElementById('toast-message'),
+            validationContainer: document.querySelector('.validation-container')
         };
         
         // Fonction pour afficher un message toast
@@ -1395,46 +1395,54 @@
             reader.readAsText(file);
         }
         
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-function getSortedCardsByPerformance() {
-    const cards = vocabularyByChapter[currentChapter];
-    if (!cards || cards.length === 0) return [];
-    
-    // Create array with index and success rate
-    const cardsWithRates = cards.map((_, index) => {
-        const cardKey = `${currentChapter}-${index}`;
-        const perf = cardPerformance[cardKey];
-        
-        let successRate = -1;  // Default for unseen cards
-        
-        if (perf && perf.attempts > 0) {
-            successRate = perf.successes / perf.attempts;
+        // FIXED: Fonction pour calculer et trier les cartes selon leur taux de succès
+        function getSortedCardsByPerformance() {
+            const cards = vocabularyByChapter[currentChapter];
+            if (!cards || cards.length === 0) return [];
+            
+            // Create array with card performance data
+            const cardsWithRates = cards.map((_, index) => {
+                const cardKey = `${currentChapter}-${index}`;
+                const perf = cardPerformance[cardKey];
+                
+                // Set default values
+                let successRate = 0;
+                let attempts = 0;
+                let isCardSeen = seenCards.has(index);
+                
+                // If card has performance data
+                if (perf && perf.attempts > 0) {
+                    successRate = perf.successes / perf.attempts;
+                    attempts = perf.attempts;
+                }
+                
+                return { index, successRate, attempts, isCardSeen };
+            });
+            
+            // Sort cards by priority:
+            // 1. Cards with attempts but low success rate
+            // 2. Cards never attempted
+            // 3. Cards with high success rates
+            cardsWithRates.sort((a, b) => {
+                // First priority: Sort cards with attempts by success rate (lowest first)
+                if (a.attempts > 0 && b.attempts > 0) {
+                    return a.successRate - b.successRate;
+                }
+                
+                // Second priority: Cards never attempted before cards with attempts
+                if (a.attempts === 0 && b.attempts > 0) return -1;
+                if (b.attempts === 0 && a.attempts > 0) return 1;
+                
+                // If both have no attempts, add some randomness
+                return Math.random() - 0.5;
+            });
+            
+            // Log sorted cards for debugging
+            console.log("Sorted cards:", cardsWithRates);
+            
+            // Return just the indices
+            return cardsWithRates.map(card => card.index);
         }
-        
-        return { index, successRate };
-    });
-    
-    // Sort cards:
-    // 1. Unseen cards (-1 success rate)
-    // 2. Cards with lowest success rates
-    // 3. Cards with highest success rates
-    cardsWithRates.sort((a, b) => {
-        // If one is unseen and the other isn't
-        if (a.successRate === -1 && b.successRate !== -1) return -1;
-        if (a.successRate !== -1 && b.successRate === -1) return 1;
-        
-        // If both have same status, add some randomness for unseen cards
-        if (a.successRate === -1 && b.successRate === -1) {
-            return Math.random() - 0.5;
-        }
-        
-        // Otherwise sort by success rate (lowest first)
-        return a.successRate - b.successRate;
-    });
-    
-    return cardsWithRates.map(card => card.index);
-}
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -1463,7 +1471,7 @@ function getSortedCardsByPerformance() {
                 // Activer/désactiver les boutons
                 elements.prevBtn.disabled = cardHistory.length === 0;
                 elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
-                elements.randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
+                elements.randomBtn.disabled = cards.length <= 1;
                 
                 // Mettre à jour la couleur de la carte et le taux de succès
                 updateCardColorAndSuccessRate();
@@ -1506,7 +1514,7 @@ function getSortedCardsByPerformance() {
         function updateCardColorAndSuccessRate() {
             const cardKey = `${currentChapter}-${currentCardIndex}`;
             
-            if (cardPerformance[cardKey]) {
+            if (cardPerformance[cardKey] && cardPerformance[cardKey].attempts > 0) {
                 const performance = cardPerformance[cardKey];
                 const successRate = performance.successes / performance.attempts;
                 const successPercentage = Math.round(successRate * 100);
@@ -1558,328 +1566,302 @@ function getSortedCardsByPerformance() {
         }
         
         // Fonction pour basculer le mode raw
-       // Fonction pour basculer le mode raw
-function toggleRawMode() {
-    isRawMode = !isRawMode;
-    elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-    elements.rawToggle.classList.toggle('active', isRawMode);
-    
-    // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
-    if (isRawMode) {
-        elements.cardContainer.style.display = 'none';
-        elements.rawContent.style.display = 'block';
-        document.querySelector('.controls').style.display = 'none';
-        elements.validationContainer.style.display = 'none';
-        generateRawContent();
-    } else {
-        elements.cardContainer.style.display = 'block';
-        elements.rawContent.style.display = 'none';
-        document.querySelector('.controls').style.display = 'flex';
-        elements.validationContainer.style.display = 'flex';
-        updateCard();
-    }
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur score
-function updateBestScoreDisplay() {
-    const bestScore = bestScores[currentChapter] || 0;
-    elements.bestScoreElement.textContent = bestScore;
-}
-
-// Fonction pour démarrer le timer
-function startTimer() {
-    if (!isTimerActive) return;
-    
-    clearInterval(timerInterval);
-    startTime = new Date();
-    
-    timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = new Date(now - startTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.timerElement.textContent = `${minutes}:${seconds}`;
-    }, 1000);
-}
-
-// Fonction pour arrêter le timer
-function stopTimer() {
-    clearInterval(timerInterval);
-    
-    // Sauvegarder le meilleur temps si c'est le cas
-    if (isTimerActive) {
-        const now = new Date();
-        const totalTime = now - startTime;
-        
-        if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
-            bestTimes[currentChapter] = totalTime;
-            updateBestTimeDisplay();
-        }
-    }
-}
-
-// Fonction pour réinitialiser le timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    elements.timerElement.textContent = "00:00";
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur temps
-function updateBestTimeDisplay() {
-    const bestTime = bestTimes[currentChapter];
-    
-    if (bestTime) {
-        const diff = new Date(bestTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
-    } else {
-        elements.bestTimeElement.textContent = "-";
-    }
-}
-
-// Gestionnaires d'événements
-function initEventListeners() {
-    // Changement de chapitre
-    // Changement de chapitre
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Ne rien faire si on clique sur le chapitre actif
-        if (chapter === currentChapter) return;
-        
-        // Désactiver le chapitre actuel et activer le nouveau
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Changer le chapitre
-        currentChapter = chapter;
-        currentCardIndex = 0;
-        cardHistory = [];
-        
-        // Réinitialiser la liste des cartes vues
-        seenCards = new Set();
-        
-        // Réinitialiser le timer
-        resetTimer();
-        startTimer();
-        
-        // Mettre à jour le meilleur score
-        updateBestScoreDisplay();
-        
-        // Mettre à jour le meilleur temps
-        updateBestTimeDisplay();
-        
-        // Mettre à jour la carte ou le contenu raw
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Retourner la carte
-    elements.card.addEventListener('click', () => {
-        isTranslationVisible = !isTranslationVisible;
-        elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
-    });
-    
-    // Bouton précédent
-    elements.prevBtn.addEventListener('click', () => {
-        if (cardHistory.length > 0) {
-            currentCardIndex = cardHistory.pop();
-            updateCard();
-        }
-    });
-    
-    // Bouton suivant
-    elements.nextBtn.addEventListener('click', () => {
-        if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }
-    });
-    
-    // Bouton aléatoire
-    // Bouton aléatoire
-// 1. Fix the random button to truly get the lowest score card
-elements.randomBtn.addEventListener('click', () => {
-    const sortedIndices = getSortedCardsByPerformance();
-    
-    if (sortedIndices.length > 0) {
-        // Always select the first card (lowest success rate)
-        cardHistory.push(currentCardIndex);
-        currentCardIndex = sortedIndices[0];
-        updateCard();
-    }
-});
-
-// 2. Modify the chapter button event listener to sort cards by performance
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Skip if clicking current chapter
-        if (chapter === currentChapter) return;
-        
-        // Update active chapter button
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Change chapter
-        currentChapter = chapter;
-        cardHistory = [];
-        seenCards = new Set();
-        
-        // Set current card to the one with lowest score
-        const sortedIndices = getSortedCardsByPerformance();
-        currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
-        
-        // Reset timer and update UI
-        resetTimer();
-        startTimer();
-        updateBestScoreDisplay();
-        updateBestTimeDisplay();
-        
-        // Update display
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Validation de la traduction
-    elements.validateBtn.addEventListener('click', validateTranslation);
-    elements.translationInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            validateTranslation();
-        }
-    });
-    
-    // Basculer le mode sombre
-    elements.themeToggle.addEventListener('click', toggleDarkMode);
-    
-    // Basculer le mode raw
-    elements.rawToggle.addEventListener('click', toggleRawMode);
-    
-    // Boutons de sauvegarde et chargement
-    elements.saveBtn.addEventListener('click', saveState);
-    elements.loadBtn.addEventListener('click', () => {
-        elements.loadInput.click();
-    });
-    elements.loadInput.addEventListener('change', loadState);
-}
-
-// Fonction de validation de traduction
-function validateTranslation() {
-    const userInput = elements.translationInput.value.trim().toLowerCase();
-    const cards = vocabularyByChapter[currentChapter];
-    const correctAnswer = cards[currentCardIndex].english.toLowerCase();
-    
-    // Vérifier la réponse
-    const isCorrect = userInput === correctAnswer;
-    
-    // Mettre à jour la performance de la carte
-    const cardKey = `${currentChapter}-${currentCardIndex}`;
-    if (!cardPerformance[cardKey]) {
-        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-    }
-    cardPerformance[cardKey].attempts++;
-    
-    if (isCorrect) {
-        cardPerformance[cardKey].successes++;
-        elements.validationResult.textContent = "Correct !";
-        elements.validationResult.className = "validation-result correct";
-        
-        // Incrémenter le score
-        currentScore++;
-        elements.currentScoreElement.textContent = currentScore;
-        
-        // Mettre à jour le meilleur score
-        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-            bestScores[currentChapter] = currentScore;
-            elements.bestScoreElement.textContent = bestScores[currentChapter];
-        }
-    } else {
-        elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
-        elements.validationResult.className = "validation-result incorrect";
-    }
-    
-    // Mettre à jour la couleur de la carte
-    updateCardColorAndSuccessRate();
-    
-    // Passer automatiquement à la carte suivante après quelques secondes si la réponse est correcte
-    if (isCorrect && currentCardIndex < cards.length - 1) {
-        setTimeout(() => {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }, 1500);
-    }
-}
-
-// Initialisation
-function init() {
-    // Charger les données depuis le localStorage
-    const savedData = localStorage.getItem('flashcardsData');
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            seenCards = new Set(data.seenCards || []);
-            cardPerformance = data.cardPerformance || {};
-            bestScores = data.bestScores || {};
-            bestTimes = data.bestTimes || {};
-            isDarkMode = data.isDarkMode || false;
+        function toggleRawMode() {
+            isRawMode = !isRawMode;
+            elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+            elements.rawToggle.classList.toggle('active', isRawMode);
             
-            // Appliquer le mode sombre si nécessaire
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            elements.themeToggle.classList.toggle('active', isDarkMode);
-        } catch (e) {
-            console.error("Erreur lors du chargement des données:", e);
+            // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
+            if (isRawMode) {
+                elements.cardContainer.style.display = 'none';
+                elements.rawContent.style.display = 'block';
+                document.querySelector('.controls').style.display = 'none';
+                elements.validationContainer.style.display = 'none';
+                generateRawContent();
+            } else {
+                elements.cardContainer.style.display = 'block';
+                elements.rawContent.style.display = 'none';
+                document.querySelector('.controls').style.display = 'flex';
+                elements.validationContainer.style.display = 'flex';
+                updateCard();
+            }
         }
-    }
-    
-    // Initialiser les gestionnaires d'événements
-    initEventListeners();
-    
-    // Initialiser l'affichage
-    updateBestScoreDisplay();
-    updateBestTimeDisplay();
-    
-    // Démarrer le timer
-    startTimer();
-    
-    // Afficher la première carte
-    if (isRawMode) {
-        generateRawContent();
-    } else {
-        updateCard();
-    }
-    
-    // Sauvegarder les données avant de quitter
-    window.addEventListener('beforeunload', () => {
-        localStorage.setItem('flashcardsData', JSON.stringify({
-            seenCards: Array.from(seenCards),
-            cardPerformance,
-            bestScores,
-            bestTimes,
-            isDarkMode
-        }));
-    });
-}
-
-// Lancer l'initialisation
-init();
-</script>
+        
+        // Fonction pour mettre à jour l'affichage du meilleur score
+        function updateBestScoreDisplay() {
+            const bestScore = bestScores[currentChapter] || 0;
+            elements.bestScoreElement.textContent = bestScore;
+        }
+        
+        // Fonction pour démarrer le timer
+        function startTimer() {
+            if (!isTimerActive) return;
+            
+            clearInterval(timerInterval);
+            startTime = new Date();
+            
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = new Date(now - startTime);
+                const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+                
+                elements.timerElement.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+        
+        // Fonction pour arrêter le timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+            
+            // Sauvegarder le meilleur temps si c'est le cas
+            if (isTimerActive) {
+                const now = new Date();
+                const totalTime = now - startTime;
+                
+                if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
+                    bestTimes[currentChapter] = totalTime;
+                    updateBestTimeDisplay();
+                }
+            }
+        }
+        
+        // Fonction pour réinitialiser le timer
+        function resetTimer() {
+            clearInterval(timerInterval);
+            elements.timerElement.textContent = "00:00";
+        }
+        
+        // Fonction pour mettre à jour l'affichage du meilleur temps
+        function updateBestTimeDisplay() {
+            const bestTime = bestTimes[currentChapter];
+            
+            if (bestTime) {
+                const diff = new Date(bestTime);
+                const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+                
+                elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
+            } else {
+                elements.bestTimeElement.textContent = "-";
+            }
+        }
+        
+        // FIXED: Fonction de validation de traduction
+        function validateTranslation() {
+            const userInput = elements.translationInput.value.trim().toLowerCase();
+            const cards = vocabularyByChapter[currentChapter];
+            const correctAnswer = cards[currentCardIndex].english.toLowerCase();
+            
+            // Vérifier la réponse
+            const isCorrect = userInput === correctAnswer;
+            
+            // Mettre à jour la performance de la carte
+            const cardKey = `${currentChapter}-${currentCardIndex}`;
+            if (!cardPerformance[cardKey]) {
+                cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+            }
+            cardPerformance[cardKey].attempts++;
+            
+            if (isCorrect) {
+                cardPerformance[cardKey].successes++;
+                elements.validationResult.textContent = "Correct !";
+                elements.validationResult.className = "validation-result correct";
+                
+                // Incrémenter le score
+                currentScore++;
+                elements.currentScoreElement.textContent = currentScore;
+                
+                // Mettre à jour le meilleur score
+                if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+                    bestScores[currentChapter] = currentScore;
+                    elements.bestScoreElement.textContent = bestScores[currentChapter];
+                }
+            } else {
+                elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
+                elements.validationResult.className = "validation-result incorrect";
+            }
+            
+            // Mettre à jour la couleur de la carte
+            updateCardColorAndSuccessRate();
+            
+            // Log performance data for debugging
+            console.log("Card performance updated:", cardKey, cardPerformance[cardKey]);
+            
+            // Passer automatiquement à la carte suivante après quelques secondes si la réponse est correcte
+            if (isCorrect && currentCardIndex < cards.length - 1) {
+                setTimeout(() => {
+                    cardHistory.push(currentCardIndex);
+                    currentCardIndex++;
+                    updateCard();
+                }, 1500);
+            }
+        }
+        
+        // Gestionnaires d'événements
+        function initEventListeners() {
+            // Changement de chapitre
+            elements.chapterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const chapter = parseInt(button.dataset.chapter);
+                    
+                    // Ne rien faire si on clique sur le chapitre actif
+                    if (chapter === currentChapter) return;
+                    
+                    // Désactiver le chapitre actuel et activer le nouveau
+                    elements.chapterButtons.forEach(btn => {
+                        btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
+                    });
+                    
+                    // Changer le chapitre
+                    currentChapter = chapter;
+                    currentCardIndex = 0;
+                    cardHistory = [];
+                    
+                    // Réinitialiser la liste des cartes vues
+                    seenCards = new Set();
+                    
+                    // Réinitialiser le timer
+                    resetTimer();
+                    startTimer();
+                    
+                    // Mettre à jour le meilleur score
+                    updateBestScoreDisplay();
+                    
+                    // Mettre à jour le meilleur temps
+                    updateBestTimeDisplay();
+                    
+                    // Mettre à jour la carte ou le contenu raw
+                    if (isRawMode) {
+                        generateRawContent();
+                    } else {
+                        updateCard();
+                    }
+                });
+            });
+            
+            // Retourner la carte
+            elements.card.addEventListener('click', () => {
+                isTranslationVisible = !isTranslationVisible;
+                elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
+            });
+            
+            // Bouton précédent
+            elements.prevBtn.addEventListener('click', () => {
+                if (cardHistory.length > 0) {
+                    currentCardIndex = cardHistory.pop();
+                    updateCard();
+                }
+            });
+            
+            // Bouton suivant
+            elements.nextBtn.addEventListener('click', () => {
+                if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
+                    cardHistory.push(currentCardIndex);
+                    currentCardIndex++;
+                    updateCard();
+                }
+            });
+            
+            // FIXED: Bouton aléatoire - Now shows cards that need practice
+            elements.randomBtn.addEventListener('click', () => {
+                const sortedIndices = getSortedCardsByPerformance();
+                
+                if (sortedIndices.length > 0) {
+                    // Choose the most difficult card
+                    let newIndex;
+                    
+                    // If current card is already the most difficult, pick the second one
+                    if (sortedIndices[0] === currentCardIndex && sortedIndices.length > 1) {
+                        newIndex = sortedIndices[1];
+                    } else {
+                        newIndex = sortedIndices[0];
+                    }
+                    
+                    // Store current position in history and update
+                    cardHistory.push(currentCardIndex);
+                    currentCardIndex = newIndex;
+                    updateCard();
+                    
+                    console.log("Selected card index:", newIndex);
+                }
+            });
+            
+            // Validation de la traduction
+            elements.validateBtn.addEventListener('click', validateTranslation);
+            elements.translationInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    validateTranslation();
+                }
+            });
+            
+            // Basculer le mode sombre
+            elements.themeToggle.addEventListener('click', toggleDarkMode);
+            
+            // Basculer le mode raw
+            elements.rawToggle.addEventListener('click', toggleRawMode);
+            
+            // Boutons de sauvegarde et chargement
+            elements.saveBtn.addEventListener('click', saveState);
+            elements.loadBtn.addEventListener('click', () => {
+                elements.loadInput.click();
+            });
+            elements.loadInput.addEventListener('change', loadState);
+        }
+        
+        // Initialisation
+        function init() {
+            // Charger les données depuis le localStorage
+            const savedData = localStorage.getItem('flashcardsData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    seenCards = new Set(data.seenCards || []);
+                    cardPerformance = data.cardPerformance || {};
+                    bestScores = data.bestScores || {};
+                    bestTimes = data.bestTimes || {};
+                    isDarkMode = data.isDarkMode || false;
+                    
+                    // Appliquer le mode sombre si nécessaire
+                    document.body.classList.toggle('dark-mode', isDarkMode);
+                    elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+                    elements.themeToggle.classList.toggle('active', isDarkMode);
+                } catch (e) {
+                    console.error("Erreur lors du chargement des données:", e);
+                }
+            }
+            
+            // Initialiser les gestionnaires d'événements
+            initEventListeners();
+            
+            // Initialiser l'affichage
+            updateBestScoreDisplay();
+            updateBestTimeDisplay();
+            
+            // Démarrer le timer
+            startTimer();
+            
+            // Afficher la première carte
+            if (isRawMode) {
+                generateRawContent();
+            } else {
+                updateCard();
+            }
+            
+            // Sauvegarder les données avant de quitter
+            window.addEventListener('beforeunload', () => {
+                localStorage.setItem('flashcardsData', JSON.stringify({
+                    seenCards: Array.from(seenCards),
+                    cardPerformance,
+                    bestScores,
+                    bestTimes,
+                    isDarkMode
+                }));
+            });
+        }
+        
+        // Lancer l'initialisation
+        init();
+    </script>
 </body>
 </html>
