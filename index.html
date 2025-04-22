@@ -1758,7 +1758,7 @@ elements.randomBtn.addEventListener('click', () => {
         // Pick a completely random different card
         do {
             newIndex = Math.floor(Math.random() * cards.length);
-        } while (newIndex === currentCardIndex);
+        } while (newIndex === currentCardIndex && cards.length > 1);
     }
     
     // Update card display
