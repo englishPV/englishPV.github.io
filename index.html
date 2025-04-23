@@ -1400,49 +1400,38 @@
 function getSortedCardsByPerformance() {
     const cards = vocabularyByChapter[currentChapter];
     if (!cards || cards.length === 0) return [];
-    
-    // Créer un tableau d'objets contenant l'index et le taux de succès
+
+    // Build an array of { index, successRate }
     const cardsWithRates = cards.map((_, index) => {
-        const cardKey = `${currentChapter}-${index}`;
-        const perf = cardPerformance[cardKey];
-        
-        // Valeurs par défaut pour les cartes jamais vues
-        let successRate = -1;  // -1 pour les cartes jamais vues
-        let isCardSeen = seenCards.has(index);
-        
-        if (perf) {
-            successRate = perf.successes / perf.attempts;
-            isCardSeen = true;
-        }
-        
-        return { index, successRate, isCardSeen };
+        const key = `${currentChapter}-${index}`;
+        const perf = cardPerformance[key];
+        // unseen → successRate = -1; perfect → successRate = 1; else in-between
+        const successRate = perf
+            ? perf.successes / perf.attempts
+            : -1;
+        return { index, successRate };
     });
-    
-    // Trier les cartes:
-    // 1. D'abord les cartes vues avec le plus faible taux de succès
-    // 2. Ensuite les cartes jamais vues
-    // 3. Enfin les cartes avec 100% de succès
+
+    // Ranking helper: seen-but-not-perfect → 0; unseen → 1; perfect → 2
+    const rank = rate => rate === -1 ? 1
+                         : rate === 1  ? 2
+                         :               0;
+
     cardsWithRates.sort((a, b) => {
-        // Priorité aux cartes jamais vues vs cartes avec 100% de succès
-        if (a.successRate === -1 && b.successRate === 1) return -1;
-        if (a.successRate === 1 && b.successRate === -1) return 1;
-        
-        // Si les deux sont jamais vues ou les deux ont le même score, ordre aléatoire
-        if (a.successRate === b.successRate) {
-            return Math.random() - 0.5;
-        }
-        
-        // Cartes jamais vues ont priorité sur cartes déjà vues
-        if (a.successRate === -1) return -1;
-        if (b.successRate === -1) return 1;
-        
-        // Sinon, trier par taux de succès (ascendant)
-        return a.successRate - b.successRate;
+        const rankA = rank(a.successRate);
+        const rankB = rank(b.successRate);
+        // 1) by rank
+        if (rankA !== rankB) return rankA - rankB;
+        // 2) within “seen but not perfect” (rank 0), sort by successRate asc
+        if (rankA === 0) return a.successRate - b.successRate;
+        // 3) for unseen (rank 1) or perfect (rank 2), randomize order
+        return Math.random() - 0.5;
     });
-    
-    // Retourner seulement les indices
-    return cardsWithRates.map(card => card.index);
+
+    // Return just the indices
+    return cardsWithRates.map(c => c.index);
 }
+
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
@@ -1718,19 +1707,29 @@ elements.chapterButtons.forEach(button => {
     // Bouton aléatoire
 // 1. Fix the random button to truly get the lowest score card
 elements.randomBtn.addEventListener('click', () => {
-    const sortedIndices = getSortedCardsByPerformance();
-    
-    if (sortedIndices.length > 0) {
-        // Always select the first card (lowest success rate)
-        const newIndex = sortedIndices[0] === currentCardIndex && sortedIndices.length > 1 
-            ? sortedIndices[1] 
-            : sortedIndices[0];
-        
-        cardHistory.push(currentCardIndex);
-        currentCardIndex = newIndex;
-        updateCard();
+    const cards = vocabularyByChapter[currentChapter];
+    // Build a list of indices you haven’t seen yet:
+    const unseenIndices = cards
+        .map((_, idx) => idx)
+        .filter(idx => !seenCards.has(idx));
+
+    // If you’ve seen them all, do nothing (or reset seenCards here if you prefer)
+    if (unseenIndices.length === 0) {
+        showToast("Toutes les cartes ont été vues !");
+        return;
     }
+
+    // Pick one at random among the unseen
+    const randomIdx = unseenIndices[
+        Math.floor(Math.random() * unseenIndices.length)
+    ];
+
+    // Push current index to history, switch to the new one, then render
+    cardHistory.push(currentCardIndex);
+    currentCardIndex = randomIdx;
+    updateCard();
 });
+
 
 // 2. Modify the chapter button event listener to sort cards by performance
 elements.chapterButtons.forEach(button => {
