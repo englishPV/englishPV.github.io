@@ -468,6 +468,9 @@
             <input type="file" id="load-input" class="load-input" accept=".json">
             <button class="load-btn" id="load-btn">Charger</button>
         </div>
+        <div class="reset-container" style="text-align: center; margin-top: 15px;">
+            <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
+        </div>
         
         <div class="info">
             <span id="current-card">0</span>/<span id="total-cards">0</span>
@@ -1259,6 +1262,7 @@
         
         // Éléments DOM
         const elements = {
+            resetBtn: document.getElementById('reset-btn'),
             chapterButtons: document.querySelectorAll('.chapter-btn'),
             card: document.querySelector('.card'),
             cardContainer: document.querySelector('.card-container'),
@@ -1298,6 +1302,196 @@
                 elements.toastMessage.classList.remove('show');
             }, duration);
         }
+        function resetProgress() {
+    // Reset progress variables
+    seenCards = new Set();
+    cardHistory = [];
+    currentScore = 0;
+    
+    // Reset card performance for current chapter only
+    Object.keys(cardPerformance).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) {
+            delete cardPerformance[key];
+        }
+    });
+    
+    // Reset best time for current chapter
+    if (bestTimes[currentChapter]) {
+        delete bestTimes[currentChapter];
+        updateBestTimeDisplay(); // Update the best time display
+    }
+    
+    // Reset best score for current chapter
+    if (bestScores[currentChapter]) {
+        delete bestScores[currentChapter];
+        updateBestScoreDisplay(); // Update the best score display
+    }
+    
+    // Update UI elements
+    elements.currentScoreElement.textContent = currentScore;
+    elements.progressBar.style.width = "0%";
+    
+    // Reset timer
+    resetTimer();
+    startTimer();
+    
+    // Reset card display
+    currentCardIndex = 0;
+    updateCard();
+    
+    // Enable input fields that might have been disabled
+    elements.translationInput.disabled = false;
+    elements.validateBtn.disabled = false;
+    
+    // Show confirmation toast
+    showToast('Progression réinitialisée !');
+}
+
+// 2. Modify validateTranslation function to remove auto-advance
+function validateTranslation() {
+    const userInput = elements.translationInput.value.trim().toLowerCase();
+    const cards = vocabularyByChapter[currentChapter];
+    const correctAnswer = cards[currentCardIndex].english.toLowerCase();
+    
+    // Vérifier la réponse
+    const isCorrect = userInput === correctAnswer;
+    
+    // Mettre à jour la performance de la carte
+    const cardKey = `${currentChapter}-${currentCardIndex}`;
+    if (!cardPerformance[cardKey]) {
+        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+    }
+    cardPerformance[cardKey].attempts++;
+    
+    if (isCorrect) {
+        cardPerformance[cardKey].successes++;
+        elements.validationResult.textContent = "Correct !";
+        elements.validationResult.className = "validation-result correct";
+        
+        // Incrémenter le score
+        currentScore++;
+        elements.currentScoreElement.textContent = currentScore;
+        
+        // Mettre à jour le meilleur score
+        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+            bestScores[currentChapter] = currentScore;
+            elements.bestScoreElement.textContent = bestScores[currentChapter];
+        }
+    } else {
+        elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
+        elements.validationResult.className = "validation-result incorrect";
+    }
+    
+    // Mettre à jour la couleur de la carte
+    updateCardColorAndSuccessRate();
+    
+    // Check if all cards have been seen and show final screen if necessary
+    if (seenCards.size === cards.length) {
+        showFinalScreen();
+    }
+    
+    // No setTimeout for auto-advance here - removed completely
+}
+
+// 3. Add function to show final screen
+function showFinalScreen() {
+    // Stop the timer
+    stopTimer();
+    
+    // Create the final screen content
+    const finalTime = elements.timerElement.textContent;
+    const finalScore = currentScore;
+    const totalCards = vocabularyByChapter[currentChapter].length;
+    const bestScore = bestScores[currentChapter] || 0;
+    const bestTime = elements.bestTimeElement.textContent;
+    
+    // Store the chapter content for after reset
+    const chapterContent = elements.card.innerHTML;
+    
+    // Update the card with final screen content
+    elements.frenchWord.style.display = 'none';
+    elements.englishTranslation.style.display = 'none';
+    elements.card.innerHTML = `
+        <div style="text-align: center; width: 100%; padding: 20px;">
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Félicitations !</h2>
+            <p>Vous avez terminé toutes les cartes de ce chapitre !</p>
+            <div style="margin: 20px 0;">
+                <p><strong>Score final :</strong> ${finalScore}/${totalCards}</p>
+                <p><strong>Temps :</strong> ${finalTime}</p>
+                <p><strong>Meilleur score :</strong> ${bestScore}/${totalCards}</p>
+                <p><strong>Meilleur temps :</strong> ${bestTime}</p>
+            </div>
+            <button id="restart-btn" style="padding: 10px 20px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Recommencer</button>
+        </div>
+    `;
+    
+    // Add event listener to the restart button
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        // Restore the original card content
+        elements.card.innerHTML = chapterContent;
+        elements.frenchWord = document.querySelector('.french-word');
+        elements.englishTranslation = document.querySelector('.english-translation');
+        elements.successRateElement = document.getElementById('success-rate');
+        
+        // Reset progress but keep best times and scores
+        restartChapter();
+    });
+    
+    // Disable controls
+    elements.prevBtn.disabled = true;
+    elements.nextBtn.disabled = true;
+    elements.randomBtn.disabled = true;
+    elements.translationInput.disabled = true;
+    elements.validateBtn.disabled = true;
+}
+
+function restartChapter() {
+    // Reset progress variables
+    seenCards = new Set();
+    cardHistory = [];
+    currentScore = 0;
+    
+    // Reset card performance for current chapter only
+    Object.keys(cardPerformance).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) {
+            delete cardPerformance[key];
+        }
+    });
+    
+    // Update UI elements
+    elements.currentScoreElement.textContent = currentScore;
+    elements.progressBar.style.width = "0%";
+    
+    // Reset timer
+    resetTimer();
+    startTimer();
+    
+    // Reset card display
+    currentCardIndex = 0;
+    updateCard();
+    
+    // Enable input fields that might have been disabled
+    elements.translationInput.disabled = false;
+    elements.validateBtn.disabled = false;
+    
+    // Show confirmation toast
+    showToast('Chapitre redémarré !');
+}
+
+
+// 4. Helper function to restore original card structure (for the final screen)
+function restoreCardStructure() {
+    elements.card.innerHTML = `
+        <div class="card-content">
+            <div class="french-word"></div>
+            <div class="english-translation"></div>
+        </div>
+        <div class="success-rate" id="success-rate"></div>
+    `;
+    elements.frenchWord = document.querySelector('.french-word');
+    elements.englishTranslation = document.querySelector('.english-translation');
+    elements.successRateElement = document.getElementById('success-rate');
+}
         
         // Fonction pour sauvegarder l'état actuel
         function saveState() {
@@ -1435,6 +1629,7 @@ function getSortedCardsByPerformance() {
         
         // Fonction pour mettre à jour la carte
         function updateCard() {
+            
             const cards = vocabularyByChapter[currentChapter];
             
             if (cards && cards.length > 0) {
@@ -1468,10 +1663,18 @@ function getSortedCardsByPerformance() {
                 // Vérifier si toutes les cartes ont été vues
                 if (seenCards.size === cards.length) {
                     stopTimer();
+                    showFinalScreen();
                 }
+                // At the end of the updateCard function, after updating the card color:
+// Vérifier si toutes les cartes ont été vues
+
             } else {
                 showNoCardsMessage();
             }
+        
+        
+        
+        
         }
         
         // Fonction pour afficher un message quand il n'y a pas de cartes
@@ -1641,6 +1844,8 @@ function updateBestTimeDisplay() {
 function initEventListeners() {
     // Changement de chapitre
     // Changement de chapitre
+    // Reset button
+elements.resetBtn.addEventListener('click', resetProgress);
 elements.chapterButtons.forEach(button => {
     button.addEventListener('click', () => {
         const chapter = parseInt(button.dataset.chapter);
@@ -1829,18 +2034,14 @@ function validateTranslation() {
     updateCardColorAndSuccessRate();
     
     // Passer automatiquement à la carte suivante après quelques secondes si la réponse est correcte
-    if (isCorrect && currentCardIndex < cards.length - 1) {
-        setTimeout(() => {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }, 1500);
-    }
+    
 }
 
 // Initialisation
 function init() {
     // Charger les données depuis le localStorage
+    // Store references to card structure elements
+    const originalCardContent = elements.card.innerHTML;
     const savedData = localStorage.getItem('flashcardsData');
     if (savedData) {
         try {
