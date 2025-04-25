@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!DOCTYPE html><html lang="fr">
 <head>
     <link rel="manifest" href="/site.webmanifest">
     <meta charset="UTF-8">
@@ -25,469 +24,472 @@
             --load-button-bg: #9b59b6;
         }
         
-        body.dark-mode {
-            --primary-color: #ffffff;
-            --secondary-color: #3498db;
-            --text-color: #000000;
-            --card-bg: #2c3e50;
-            --card-shadow: rgba(0, 0, 0, 0.3);
-            --body-bg: #1a1a1a;
-            --translation-color: #3498db;
-            --subtitle-color: #bbb;
-            --info-color: #bbb;
-            --button-bg: #34495e;
-            --button-text: #fff;
-            --progress-bg: #34495e;
-            --incorrect-color: #e74c3c;
-            --correct-color: #2ecc71;
-            --save-button-bg: #d35400;
-            --load-button-bg: #8e44ad;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--body-bg);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
-            transition: all 0.3s ease;
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--subtitle-color);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 600px;
-        }
-        
-        .chapters {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .chapter-btn {
-            padding: 8px 15px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .chapter-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .mode-controls {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        
-        .mode-btn {
-            padding: 8px 15px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .mode-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background-color: var(--progress-bg);
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: var(--secondary-color);
-            border-radius: 5px;
-            transition: width 0.3s ease;
-        }
-        
-        .card-container {
-            height: 300px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .card {
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            box-shadow: 0 10px 25px var(--card-shadow);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--card-bg);
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
+
+    body.dark-mode {
+        --primary-color: #ffffff;
+        --secondary-color: #3498db;
+        --text-color: #000000;
+        --card-bg: #2c3e50;
+        --card-shadow: rgba(0, 0, 0, 0.3);
+        --body-bg: #1a1a1a;
+        --translation-color: #3498db;
+        --subtitle-color: #bbb;
+        --info-color: #bbb;
+        --button-bg: #34495e;
+        --button-text: #fff;
+        --progress-bg: #34495e;
+        --incorrect-color: #e74c3c;
+        --correct-color: #2ecc71;
+        --save-button-bg: #d35400;
+        --load-button-bg: #8e44ad;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--body-bg);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+    
+    h1 {
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--subtitle-color);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 600px;
+    }
+    
+    .chapters {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .chapter-btn {
+        padding: 8px 15px;
+        background-color: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .chapter-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .mode-controls {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+    
+    .mode-btn {
+        padding: 8px 15px;
+        background-color: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .mode-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .progress-container {
+        width: 100%;
+        height: 10px;
+        background-color: var(--progress-bg);
+        border-radius: 5px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background-color: var(--secondary-color);
+        border-radius: 5px;
+        transition: width 0.3s ease;
+    }
+    
+    .card-container {
+        height: 300px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .card {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        box-shadow: 0 10px 25px var(--card-shadow);
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--card-bg);
+        padding: 20px;
+        box-sizing: border-box;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .card-content {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+    
+    .english-translation {
+        color: var(--translation-color);
+        font-size: 2rem;
+        font-weight: bold;
+        display: none;
+    }
+    
+    .success-rate {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 3px 8px;
+        border-radius: 10px;
+    }
+    
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .save-load-controls {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 15px;
+        gap: 10px;
+    }
+    
+    .save-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: var(--save-button-bg);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .load-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: var(--load-button-bg);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .save-btn:hover, .load-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    
+    .save-input, .load-input {
+        display: none;
+    }
+    
+    .info {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: var(--info-color);
+    }
+    
+    .timer-container {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    .stats-container {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: var(--info-color);
+    }
+    
+    .raw-content {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+        width: 100%;
+        height: 300px;
+        overflow-y: auto;
+        display: none;
+        white-space: pre-line;
+        box-shadow: 0 10px 25px var(--card-shadow);
+        text-align: left;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .validation-container {
+        width: 100%;
+        margin: 15px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .input-group {
+        display: flex;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .translation-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--button-bg);
+        border-radius: 5px 0 0 5px;
+        font-size: 1rem;
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+    
+    .validate-btn {
+        padding: 10px 15px;
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    
+    .validation-result {
+        margin-top: 5px;
+        font-weight: bold;
+        height: 20px;
+    }
+    
+    .correct {
+        color: var(--correct-color);
+    }
+    
+    .incorrect {
+        color: var(--incorrect-color);
+    }
+    
+    .scores-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .score-item {
+        font-size: 0.9rem;
+        color: var(--info-color);
+    }
+    
+    .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .toast.show {
+        opacity: 1;
+    }
+    
+    @media (max-width: 600px) {
         .card-content {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
+            font-size: 1.5rem;
         }
         
         .english-translation {
-            color: var(--translation-color);
-            font-size: 2rem;
-            font-weight: bold;
-            display: none;
-        }
-        
-        .success-rate {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 3px 8px;
-            border-radius: 10px;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .save-load-controls {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            margin-top: 15px;
-            gap: 10px;
-        }
-        
-        .save-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: var(--save-button-bg);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .load-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: var(--load-button-bg);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .save-btn:hover, .load-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .save-input, .load-input {
-            display: none;
-        }
-        
-        .info {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: var(--info-color);
-        }
-        
-        .timer-container {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
             font-size: 1.2rem;
-            color: var(--primary-color);
-            font-weight: bold;
         }
         
-        .stats-container {
-            text-align: center;
-            margin-top: 10px;
+        .btn, .save-btn, .load-btn {
+            padding: 8px 15px;
             font-size: 0.9rem;
-            color: var(--info-color);
-        }
-        
-        .raw-content {
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            width: 100%;
-            height: 300px;
-            overflow-y: auto;
-            display: none;
-            white-space: pre-line;
-            box-shadow: 0 10px 25px var(--card-shadow);
-            text-align: left;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .validation-container {
-            width: 100%;
-            margin: 15px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         
         .input-group {
-            display: flex;
-            width: 100%;
-            margin-bottom: 10px;
+            flex-direction: column;
         }
         
         .translation-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid var(--button-bg);
-            border-radius: 5px 0 0 5px;
-            font-size: 1rem;
-            background-color: var(--card-bg);
-            color: var(--text-color);
+            border-radius: 5px;
+            margin-bottom: 5px;
         }
         
         .validate-btn {
-            padding: 10px 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .validation-result {
-            margin-top: 5px;
-            font-weight: bold;
-            height: 20px;
-        }
-        
-        .correct {
-            color: var(--correct-color);
-        }
-        
-        .incorrect {
-            color: var(--incorrect-color);
-        }
-        
-        .scores-container {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .score-item {
-            font-size: 0.9rem;
-            color: var(--info-color);
-        }
-        
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
             border-radius: 5px;
-            font-size: 0.9rem;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            width: 100%;
         }
         
-        .toast.show {
-            opacity: 1;
+        .save-load-controls {
+            flex-direction: column;
+            gap: 10px;
         }
-        
-        @media (max-width: 600px) {
-            .card-content {
-                font-size: 1.5rem;
-            }
-            
-            .english-translation {
-                font-size: 1.2rem;
-            }
-            
-            .btn, .save-btn, .load-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .translation-input {
-                border-radius: 5px;
-                margin-bottom: 5px;
-            }
-            
-            .validate-btn {
-                border-radius: 5px;
-                width: 100%;
-            }
-            
-            .save-load-controls {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
+    }
+</style>
+
 </head>
 <body>
     <div class="container">
         <h1>Flash Cards Français-Anglais</h1>
         <p class="subtitle">Traduisez le mot ou cliquez sur la carte pour voir la traduction</p>
         
-        <div class="mode-controls">
-            <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
-            <button class="mode-btn" id="raw-toggle">Mode Raw</button>
-        </div>
-        
-        <div class="chapters">
-            <button class="chapter-btn active" data-chapter="1">Democracy</button>
-            <button class="chapter-btn" data-chapter="2">Genetics</button>
-            <button class="chapter-btn" data-chapter="3">Immigration</button>
-            <button class="chapter-btn" data-chapter="4">International tensions</button>
-            <button class="chapter-btn" data-chapter="5">Unemployment</button>
-        </div>
-        
-        <div class="timer-container">
-            <div id="timer">00:00</div>
-        </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar" style="width: 0%"></div>
-        </div>
-        
-        <div class="card-container">
-            <div class="card">
-                <div class="card-content">
-                    <div class="french-word"></div>
-                    <div class="english-translation"></div>
-                </div>
-                <div class="success-rate" id="success-rate"></div>
+
+    <div class="mode-controls">
+        <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
+        <button class="mode-btn" id="raw-toggle">Mode Raw</button>
+    </div>
+    
+    <div class="chapters">
+        <button class="chapter-btn active" data-chapter="1">Democracy</button>
+        <button class="chapter-btn" data-chapter="2">Genetics</button>
+        <button class="chapter-btn" data-chapter="3">Immigration</button>
+        <button class="chapter-btn" data-chapter="4">International tensions</button>
+        <button class="chapter-btn" data-chapter="5">Unemployment</button>
+    </div>
+    
+    <div class="timer-container">
+        <div id="timer">00:00</div>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" style="width: 0%"></div>
+    </div>
+    
+    <div class="card-container">
+        <div class="card">
+            <div class="card-content">
+                <div class="french-word"></div>
+                <div class="english-translation"></div>
             </div>
-        </div>
-        
-        <div class="validation-container">
-            <div class="input-group">
-                <input type="text" class="translation-input" id="translation-input" placeholder="Entrez la traduction en anglais">
-                <button class="validate-btn" id="validate-btn">Valider</button>
-            </div>
-            <div class="validation-result" id="validation-result"></div>
-            <div class="scores-container">
-                <div class="score-item">Score: <span id="current-score">0</span></div>
-                <div class="score-item">Meilleur score: <span id="best-score">0</span></div>
-            </div>
-        </div>
-        
-        <div class="raw-content" id="raw-content"></div>
-        
-        <div class="controls">
-            <button class="btn" id="prev-btn">Précédent</button>
-            <button class="btn" id="random-btn">Aléatoire</button>
-            <button class="btn" id="next-btn">Suivant</button>
-        </div>
-        
-        <div class="save-load-controls">
-            <button class="save-btn" id="save-btn">Sauvegarder</button>
-            <input type="file" id="load-input" class="load-input" accept=".json">
-            <button class="load-btn" id="load-btn">Charger</button>
-        </div>
-        <div class="reset-container" style="text-align: center; margin-top: 15px;">
-            <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
-        </div>
-        
-        <div class="info">
-            <span id="current-card">0</span>/<span id="total-cards">0</span>
-        </div>
-        
-        <div class="stats-container">
-            <div>Meilleur temps: <span id="best-time">-</span></div>
-            <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
+            <div class="success-rate" id="success-rate"></div>
         </div>
     </div>
     
-    <div class="toast" id="toast-message"></div>
+    <div class="validation-container">
+        <div class="input-group">
+            <input type="text" class="translation-input" id="translation-input" placeholder="Entrez la traduction en anglais">
+            <button class="validate-btn" id="validate-btn">Valider</button>
+        </div>
+        <div class="validation-result" id="validation-result"></div>
+        <div class="scores-container">
+            <div class="score-item">Score: <span id="current-score">0</span></div>
+            <div class="score-item">Meilleur score: <span id="best-score">0</span></div>
+        </div>
+    </div>
     
-    <script>
-        // Structure de données pour les mots par chapitre
-        const vocabularyByChapter = {
-            1: [
+    <div class="raw-content" id="raw-content"></div>
+    
+    <div class="controls">
+        <button class="btn" id="prev-btn">Précédent</button>
+        <button class="btn" id="random-btn">Aléatoire</button>
+        <button class="btn" id="next-btn">Suivant</button>
+    </div>
+    
+    <div class="save-load-controls">
+        <button class="save-btn" id="save-btn">Sauvegarder</button>
+        <input type="file" id="load-input" class="load-input" accept=".json">
+        <button class="load-btn" id="load-btn">Charger</button>
+    </div>
+    <div class="reset-container" style="text-align: center; margin-top: 15px;">
+        <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
+    </div>
+    
+    <div class="info">
+        <span id="current-card">0</span>/<span id="total-cards">0</span>
+    </div>
+    
+    <div class="stats-container">
+        <div>Meilleur temps: <span id="best-time">-</span></div>
+        <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
+    </div>
+</div>
+
+<div class="toast" id="toast-message"></div>
+
+<script>
+    // Structure de données pour les mots par chapitre
+    const vocabularyByChapter = {
+       1: [
 { french: "monarchie", english: "monarchy" },
 { french: "monarque de droit divin", english: "a monarch by divine right" },
 { french: "souverain", english: "sovereign" },
@@ -1243,855 +1245,705 @@
   "french": "âge de la retraite",
   "english": "retirement age"
 }]};
+    
+    // Variables d'état
+    let currentChapter = 1;
+    let currentCardIndex = 0;
+    let isTranslationVisible = false;
+    let seenCards = new Set();
+    let cardHistory = [];
+    let isDarkMode = false;
+    let isRawMode = false;
+    let currentScore = 0;
+    let bestScores = {};
+    let cardPerformance = {};
+    let startTime;
+    let timerInterval;
+    let bestTimes = {};
+    let isTimerActive = true;
+    
+    // Éléments DOM
+    const elements = {
+        resetBtn: document.getElementById('reset-btn'),
+        chapterButtons: document.querySelectorAll('.chapter-btn'),
+        card: document.querySelector('.card'),
+        cardContainer: document.querySelector('.card-container'),
+        rawContent: document.getElementById('raw-content'),
+        frenchWord: document.querySelector('.french-word'),
+        englishTranslation: document.querySelector('.english-translation'),
+        prevBtn: document.getElementById('prev-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        randomBtn: document.getElementById('random-btn'),
+        progressBar: document.querySelector('.progress-bar'),
+        currentCardElement: document.getElementById('current-card'),
+        totalCardsElement: document.getElementById('total-cards'),
+        timerElement: document.getElementById('timer'),
+        bestTimeElement: document.getElementById('best-time'),
+        cardsSeenElement: document.getElementById('cards-seen'),
+        cardsTotalElement: document.getElementById('cards-total'),
+        themeToggle: document.getElementById('theme-toggle'),
+        rawToggle: document.getElementById('raw-toggle'),
+        translationInput: document.getElementById('translation-input'),
+        validateBtn: document.getElementById('validate-btn'),
+        validationResult: document.getElementById('validation-result'),
+        currentScoreElement: document.getElementById('current-score'),
+        bestScoreElement: document.getElementById('best-score'),
+        successRateElement: document.getElementById('success-rate'),
+        saveBtn: document.getElementById('save-btn'),
+        loadBtn: document.getElementById('load-btn'),
+        loadInput: document.getElementById('load-input'),
+        toastMessage: document.getElementById('toast-message')
+    };
+    
+    // Fonction pour afficher un message toast
+    function showToast(message, duration = 3000) {
+        elements.toastMessage.textContent = message;
+        elements.toastMessage.classList.add('show');
         
-        // Variables d'état
-        let currentChapter = 1;
-        let currentCardIndex = 0;
-        let isTranslationVisible = false;
-        let seenCards = new Set();
-        let cardHistory = [];
-        let isDarkMode = false;
-        let isRawMode = false;
-        let currentScore = 0;
-        let bestScores = {};
-        let cardPerformance = {};
-        let startTime;
-        let timerInterval;
-        let bestTimes = {};
-        let isTimerActive = true;
+        setTimeout(() => {
+            elements.toastMessage.classList.remove('show');
+        }, duration);
+    }
+    
+    function resetProgress() {
+        seenCards = new Set();
+        cardHistory = [];
+        currentScore = 0;
         
-        // Éléments DOM
-        const elements = {
-            resetBtn: document.getElementById('reset-btn'),
-            chapterButtons: document.querySelectorAll('.chapter-btn'),
-            card: document.querySelector('.card'),
-            cardContainer: document.querySelector('.card-container'),
-            rawContent: document.getElementById('raw-content'),
-            frenchWord: document.querySelector('.french-word'),
-            englishTranslation: document.querySelector('.english-translation'),
-            prevBtn: document.getElementById('prev-btn'),
-            nextBtn: document.getElementById('next-btn'),
-            randomBtn: document.getElementById('random-btn'),
-            progressBar: document.querySelector('.progress-bar'),
-            currentCardElement: document.getElementById('current-card'),
-            totalCardsElement: document.getElementById('total-cards'),
-            timerElement: document.getElementById('timer'),
-            bestTimeElement: document.getElementById('best-time'),
-            cardsSeenElement: document.getElementById('cards-seen'),
-            cardsTotalElement: document.getElementById('cards-total'),
-            themeToggle: document.getElementById('theme-toggle'),
-            rawToggle: document.getElementById('raw-toggle'),
-            translationInput: document.getElementById('translation-input'),
-            validateBtn: document.getElementById('validate-btn'),
-            validationResult: document.getElementById('validation-result'),
-            currentScoreElement: document.getElementById('current-score'),
-            bestScoreElement: document.getElementById('best-score'),
-            successRateElement: document.getElementById('success-rate'),
-            saveBtn: document.getElementById('save-btn'),
-            loadBtn: document.getElementById('load-btn'),
-            loadInput: document.getElementById('load-input'),
-            toastMessage: document.getElementById('toast-message')
-        };
+        Object.keys(cardPerformance).forEach(key => {
+            if (key.startsWith(`${currentChapter}-`)) {
+                delete cardPerformance[key];
+            }
+        });
         
-        // Fonction pour afficher un message toast
-        function showToast(message, duration = 3000) {
-            elements.toastMessage.textContent = message;
-            elements.toastMessage.classList.add('show');
-            
-            setTimeout(() => {
-                elements.toastMessage.classList.remove('show');
-            }, duration);
+        if (bestTimes[currentChapter]) {
+            delete bestTimes[currentChapter];
+            updateBestTimeDisplay();
         }
-        function resetProgress() {
-    // Reset progress variables
-    seenCards = new Set();
-    cardHistory = [];
-    currentScore = 0;
-    
-    // Reset card performance for current chapter only
-    Object.keys(cardPerformance).forEach(key => {
-        if (key.startsWith(`${currentChapter}-`)) {
-            delete cardPerformance[key];
-        }
-    });
-    
-    // Reset best time for current chapter
-    if (bestTimes[currentChapter]) {
-        delete bestTimes[currentChapter];
-        updateBestTimeDisplay(); // Update the best time display
-    }
-    
-    // Reset best score for current chapter
-    if (bestScores[currentChapter]) {
-        delete bestScores[currentChapter];
-        updateBestScoreDisplay(); // Update the best score display
-    }
-    
-    // Update UI elements
-    elements.currentScoreElement.textContent = currentScore;
-    elements.progressBar.style.width = "0%";
-    
-    // Reset timer
-    resetTimer();
-    startTimer();
-    
-    // Reset card display
-    currentCardIndex = 0;
-    updateCard();
-    
-    // Enable input fields that might have been disabled
-    elements.translationInput.disabled = false;
-    elements.validateBtn.disabled = false;
-    
-    // Show confirmation toast
-    showToast('Progression réinitialisée !');
-}
-
-// 2. Modify validateTranslation function to remove auto-advance
-function validateTranslation() {
-    const userInput = elements.translationInput.value.trim().toLowerCase();
-    const cards = vocabularyByChapter[currentChapter];
-    const correctAnswer = cards[currentCardIndex].english.toLowerCase();
-    
-    // Vérifier la réponse
-    const isCorrect = userInput === correctAnswer;
-    
-    // Mettre à jour la performance de la carte
-    const cardKey = `${currentChapter}-${currentCardIndex}`;
-    if (!cardPerformance[cardKey]) {
-        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-    }
-    cardPerformance[cardKey].attempts++;
-    
-    if (isCorrect) {
-        cardPerformance[cardKey].successes++;
-        elements.validationResult.textContent = "Correct !";
-        elements.validationResult.className = "validation-result correct";
         
-        // Incrémenter le score
-        currentScore++;
+        if (bestScores[currentChapter]) {
+            delete bestScores[currentChapter];
+            updateBestScoreDisplay();
+        }
+        
         elements.currentScoreElement.textContent = currentScore;
+        elements.progressBar.style.width = "0%";
         
-        // Mettre à jour le meilleur score
-        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-            bestScores[currentChapter] = currentScore;
-            elements.bestScoreElement.textContent = bestScores[currentChapter];
+        const percentButtons = document.getElementById('percent-buttons');
+        if (percentButtons) {
+            percentButtons.style.display = 'none';
         }
-    } else {
-        elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
-        elements.validationResult.className = "validation-result incorrect";
+        
+        resetTimer();
+        startTimer();
+        
+        currentCardIndex = 0;
+        updateCard();
+        
+        elements.translationInput.disabled = false;
+        elements.validateBtn.disabled = false;
+        
+        showToast('Progression réinitialisée !');
     }
     
-    // Mettre à jour la couleur de la carte
-    updateCardColorAndSuccessRate();
-    
-    // Check if all cards have been seen and show final screen if necessary
-    if (seenCards.size === cards.length) {
-        showFinalScreen();
+    function validateTranslation() {
+        const userInput = elements.translationInput.value.trim().toLowerCase();
+        const cards = vocabularyByChapter[currentChapter];
+        const correctAnswer = cards[currentCardIndex].english.toLowerCase();
+        
+        const isCorrect = userInput === correctAnswer;
+        
+        const cardKey = `${currentChapter}-${currentCardIndex}`;
+        if (!cardPerformance[cardKey]) {
+            cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+        }
+        cardPerformance[cardKey].attempts++;
+        
+        if (isCorrect) {
+            cardPerformance[cardKey].successes++;
+            elements.validationResult.textContent = "Correct !";
+            elements.validationResult.className = "validation-result correct";
+            
+            currentScore++;
+            elements.currentScoreElement.textContent = currentScore;
+            
+            if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+                bestScores[currentChapter] = currentScore;
+                elements.bestScoreElement.textContent = bestScores[currentChapter];
+            }
+        } else {
+            elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
+            elements.validationResult.className = "validation-result incorrect";
+        }
+        
+        updateCardColorAndSuccessRate();
+        
+        if (seenCards.size === cards.length) {
+            showFinalScreen();
+        }
     }
     
-    // No setTimeout for auto-advance here - removed completely
-}
-
-// 3. Add function to show final screen
-function showFinalScreen() {
-    // Stop the timer
-    stopTimer();
-    
-    // Create the final screen content
-    const finalTime = elements.timerElement.textContent;
-    const finalScore = currentScore;
-    const totalCards = vocabularyByChapter[currentChapter].length;
-    const bestScore = bestScores[currentChapter] || 0;
-    const bestTime = elements.bestTimeElement.textContent;
-    
-    // Store the chapter content for after reset
-    const chapterContent = elements.card.innerHTML;
-    
-    // Update the card with final screen content
-    elements.frenchWord.style.display = 'none';
-    elements.englishTranslation.style.display = 'none';
-    elements.card.innerHTML = `
-        <div style="text-align: center; width: 100%; padding: 20px;">
-            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Félicitations !</h2>
-            <p>Vous avez terminé toutes les cartes de ce chapitre !</p>
-            <div style="margin: 20px 0;">
-                <p><strong>Score final :</strong> ${finalScore}/${totalCards}</p>
-                <p><strong>Temps :</strong> ${finalTime}</p>
-                <p><strong>Meilleur score :</strong> ${bestScore}/${totalCards}</p>
-                <p><strong>Meilleur temps :</strong> ${bestTime}</p>
+    function showFinalScreen() {
+        stopTimer();
+        
+        const finalTime = elements.timerElement.textContent;
+        const finalScore = currentScore;
+        const totalCards = vocabularyByChapter[currentChapter].length;
+        const bestScore = bestScores[currentChapter] || 0;
+        const bestTime = elements.bestTimeElement.textContent;
+        
+        const chapterContent = elements.card.innerHTML;
+        
+        elements.frenchWord.style.display = 'none';
+        elements.englishTranslation.style.display = 'none';
+        elements.card.innerHTML = `
+            <div style="text-align: center; width: 100%; padding: 20px;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">Félicitations !</h2>
+                <p>Vous avez terminé toutes les cartes de ce chapitre !</p>
+                <div style="margin: 20px 0;">
+                    <p><strong>Score final :</strong> ${finalScore}/${totalCards}</p>
+                    <p><strong>Temps :</strong> ${finalTime}</p>
+                    <p><strong>Meilleur score :</strong> ${bestScore}/${totalCards}</p>
+                    <p><strong>Meilleur temps :</strong> ${bestTime}</p>
+                </div>
+                <button id="restart-btn" style="padding: 10px 20px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Recommencer</button>
             </div>
-            <button id="restart-btn" style="padding: 10px 20px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Recommencer</button>
-        </div>
-    `;
+        `;
+        
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            elements.card.innerHTML = chapterContent;
+            elements.frenchWord = document.querySelector('.french-word');
+            elements.englishTranslation = document.querySelector('.english-translation');
+            elements.successRateElement = document.getElementById('success-rate');
+            
+            restartChapter();
+        });
+        
+        elements.prevBtn.disabled = true;
+        elements.nextBtn.disabled = true;
+        elements.randomBtn.disabled = true;
+        elements.translationInput.disabled = true;
+        elements.validateBtn.disabled = true;
+    }
     
-    // Add event listener to the restart button
-    document.getElementById('restart-btn').addEventListener('click', () => {
-        // Restore the original card content
-        elements.card.innerHTML = chapterContent;
+    function restartChapter() {
+        seenCards = new Set();
+        cardHistory = [];
+        currentScore = 0;
+        
+        Object.keys(cardPerformance).forEach(key => {
+            if (key.startsWith(`${currentChapter}-`)) {
+                delete cardPerformance[key];
+            }
+        });
+        
+        elements.currentScoreElement.textContent = currentScore;
+        elements.progressBar.style.width = "0%";
+        
+        resetTimer();
+        startTimer();
+        
+        currentCardIndex = 0;
+        
+        if (!document.querySelector('.french-word')) {
+            restoreCardStructure();
+        }
+        
+        const oldPercentButtons = document.getElementById('percent-buttons');
+        if (oldPercentButtons) {
+            oldPercentButtons.remove();
+        }
+        
+        updateCard();
+        
+        elements.translationInput.disabled = false;
+        elements.validateBtn.disabled = false;
+        
+        showToast('Chapitre redémarré !');
+    }
+    
+    function restoreCardStructure() {
+        elements.card.innerHTML = `
+            <div class="card-content">
+                <div class="french-word"></div>
+                <div class="english-translation"></div>
+            </div>
+            <div class="success-rate" id="success-rate"></div>
+        `;
         elements.frenchWord = document.querySelector('.french-word');
         elements.englishTranslation = document.querySelector('.english-translation');
         elements.successRateElement = document.getElementById('success-rate');
-        
-        // Reset progress but keep best times and scores
-        restartChapter();
-    });
-    
-    // Disable controls
-    elements.prevBtn.disabled = true;
-    elements.nextBtn.disabled = true;
-    elements.randomBtn.disabled = true;
-    elements.translationInput.disabled = true;
-    elements.validateBtn.disabled = true;
-}
-
-function restartChapter() {
-    // Reset progress variables
-    seenCards = new Set();
-    cardHistory = [];
-    currentScore = 0;
-    
-    // Reset card performance for current chapter only
-    Object.keys(cardPerformance).forEach(key => {
-        if (key.startsWith(`${currentChapter}-`)) {
-            delete cardPerformance[key];
-        }
-    });
-    
-    // Update UI elements
-    elements.currentScoreElement.textContent = currentScore;
-    elements.progressBar.style.width = "0%";
-    
-    // Reset timer
-    resetTimer();
-    startTimer();
-    
-    // Reset card display
-    currentCardIndex = 0;
-    updateCard();
-    
-    // Enable input fields that might have been disabled
-    elements.translationInput.disabled = false;
-    elements.validateBtn.disabled = false;
-    
-    // Show confirmation toast
-    showToast('Chapitre redémarré !');
-}
-
-
-// 4. Helper function to restore original card structure (for the final screen)
-function restoreCardStructure() {
-    elements.card.innerHTML = `
-        <div class="card-content">
-            <div class="french-word"></div>
-            <div class="english-translation"></div>
-        </div>
-        <div class="success-rate" id="success-rate"></div>
-    `;
-    elements.frenchWord = document.querySelector('.french-word');
-    elements.englishTranslation = document.querySelector('.english-translation');
-    elements.successRateElement = document.getElementById('success-rate');
-}
-        
-        // Fonction pour sauvegarder l'état actuel
-        function saveState() {
-            const state = {
-                currentChapter,
-                seenCards: Array.from(seenCards),
-                cardPerformance,
-                bestScores,
-                bestTimes,
-                isDarkMode,
-                currentScore
-            };
-            
-            // Convertir en JSON
-            const stateJSON = JSON.stringify(state);
-            
-            // Créer un objet Blob
-            const blob = new Blob([stateJSON], { type: 'application/json' });
-            
-            // Créer une URL pour le Blob
-            const url = URL.createObjectURL(blob);
-            
-            // Créer un élément de lien
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
-            
-            // Ajouter le lien au document et cliquer dessus
-            document.body.appendChild(a);
-            a.click();
-            
-            // Nettoyer
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Sauvegarde réussie!');
-        }
-        
-        // Fonction pour charger un état sauvegardé
-        function loadState(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const state = JSON.parse(e.target.result);
-                    
-                    // Restaurer l'état
-                    currentChapter = state.currentChapter || 1;
-                    seenCards = new Set(state.seenCards || []);
-                    cardPerformance = state.cardPerformance || {};
-                    bestScores = state.bestScores || {};
-                    bestTimes = state.bestTimes || {};
-                    currentScore = state.currentScore || 0;
-                    
-                    // Restaurer le thème
-                    isDarkMode = state.isDarkMode || false;
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                    elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-                    elements.themeToggle.classList.toggle('active', isDarkMode);
-                    
-                    // Recharger le chapitre courant
-                    currentCardIndex = 0;
-                    cardHistory = [];
-                    
-                    elements.chapterButtons.forEach(btn => {
-                        btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
-                    });
-                    
-                    // Mettre à jour l'affichage
-                    elements.currentScoreElement.textContent = currentScore;
-                    updateBestScoreDisplay();
-                    updateBestTimeDisplay();
-                    resetTimer();
-                    startTimer();
-                    
-                    if (isRawMode) {
-                        generateRawContent();
-                    } else {
-                        updateCard();
-                    }
-                    
-                    showToast('Chargement réussi!');
-                } catch (error) {
-                    console.error('Erreur lors du chargement:', error);
-                    showToast('Erreur lors du chargement du fichier');
-                }
-                
-                // Réinitialiser l'input file pour permettre le rechargement du même fichier
-                elements.loadInput.value = '';
-            };
-            
-            reader.readAsText(file);
-        }
-        
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-        // Fonction pour calculer et trier les cartes selon leur taux de succès
-function getSortedCardsByPerformance() {
-    const cards = vocabularyByChapter[currentChapter];
-    if (!cards || cards.length === 0) return [];
-
-    // Build an array of { index, successRate }
-    const cardsWithRates = cards.map((_, index) => {
-        const key = `${currentChapter}-${index}`;
-        const perf = cardPerformance[key];
-        // unseen → successRate = -1; perfect → successRate = 1; else in-between
-        const successRate = perf
-            ? perf.successes / perf.attempts
-            : -1;
-        return { index, successRate };
-    });
-
-    // Ranking helper: seen-but-not-perfect → 0; unseen → 1; perfect → 2
-    const rank = rate => rate === -1 ? 1
-                         : rate === 1  ? 2
-                         :               0;
-
-    cardsWithRates.sort((a, b) => {
-        const rankA = rank(a.successRate);
-        const rankB = rank(b.successRate);
-        // 1) by rank
-        if (rankA !== rankB) return rankA - rankB;
-        // 2) within “seen but not perfect” (rank 0), sort by successRate asc
-        if (rankA === 0) return a.successRate - b.successRate;
-        // 3) for unseen (rank 1) or perfect (rank 2), randomize order
-        return Math.random() - 0.5;
-    });
-
-    // Return just the indices
-    return cardsWithRates.map(c => c.index);
-}
-
-        
-        // Fonction pour mettre à jour la carte
-        function updateCard() {
-            
-            const cards = vocabularyByChapter[currentChapter];
-            
-            if (cards && cards.length > 0) {
-                const cardData = cards[currentCardIndex];
-                elements.frenchWord.textContent = cardData.french;
-                elements.englishTranslation.textContent = cardData.english;
-                
-                seenCards.add(currentCardIndex);
-                
-                elements.englishTranslation.style.display = 'none';
-                isTranslationVisible = false;
-                
-                elements.translationInput.value = '';
-                elements.validationResult.textContent = '';
-                elements.validationResult.className = 'validation-result';
-                
-                // Mettre à jour l'affichage des statistiques
-                updateStatsDisplay();
-                
-                // Mettre à jour la barre de progression
-                elements.progressBar.style.width = `${(seenCards.size / cards.length) * 100}%`;
-                
-                // Activer/désactiver les boutons
-                elements.prevBtn.disabled = cardHistory.length === 0;
-                elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
-                elements.randomBtn.disabled = cards.length <= 1 || seenCards.size >= cards.length;
-                
-                // Mettre à jour la couleur de la carte et le taux de succès
-                updateCardColorAndSuccessRate();
-                
-                // Vérifier si toutes les cartes ont été vues
-                if (seenCards.size === cards.length) {
-                    stopTimer();
-                    showFinalScreen();
-                }
-                // At the end of the updateCard function, after updating the card color:
-// Vérifier si toutes les cartes ont été vues
-
-            } else {
-                showNoCardsMessage();
-            }
-        
-        
-        
-        
-        }
-        
-        // Fonction pour afficher un message quand il n'y a pas de cartes
-        function showNoCardsMessage() {
-            elements.frenchWord.textContent = "Aucune carte disponible";
-            elements.englishTranslation.textContent = "";
-            elements.englishTranslation.style.display = 'none';
-            elements.currentCardElement.textContent = "0";
-            elements.totalCardsElement.textContent = "0";
-            elements.cardsSeenElement.textContent = "0";
-            elements.cardsTotalElement.textContent = "0";
-            elements.progressBar.style.width = "0%";
-            elements.prevBtn.disabled = true;
-            elements.nextBtn.disabled = true;
-            elements.randomBtn.disabled = true;
-            elements.successRateElement.textContent = "";
-        }
-        
-        // Fonction pour mettre à jour l'affichage des statistiques
-        function updateStatsDisplay() {
-            const cards = vocabularyByChapter[currentChapter];
-            elements.currentCardElement.textContent = currentCardIndex + 1;
-            elements.totalCardsElement.textContent = cards.length;
-            elements.cardsSeenElement.textContent = seenCards.size;
-            elements.cardsTotalElement.textContent = cards.length;
-        }
-        
-        // Fonction pour mettre à jour la couleur et le taux de succès de la carte
-        function updateCardColorAndSuccessRate() {
-            const cardKey = `${currentChapter}-${currentCardIndex}`;
-            
-            if (cardPerformance[cardKey]) {
-                const performance = cardPerformance[cardKey];
-                const successRate = performance.successes / performance.attempts;
-                const successPercentage = Math.round(successRate * 100);
-                
-                // Afficher le pourcentage de réussite
-                elements.successRateElement.textContent = `${successPercentage}%`;
-                
-                // Couleur allant du rouge (0% correct) au vert (100% correct)
-                const r = Math.round(231 - (successRate * 231));
-                const g = Math.round(46 + (successRate * 140));
-                const b = Math.round(60 - (successRate * 50));
-                
-                elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-                
-                // Ajuster la couleur du texte pour un meilleur contraste
-                elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
-                
-                // Ajuster la couleur du texte du taux de succès
-                elements.successRateElement.style.backgroundColor = successRate > 0.5 ? 
-                    "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
-                elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
-            } else {
-                // Réinitialiser aux couleurs par défaut si pas d'historique
-                elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
-                elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
-                elements.successRateElement.textContent = "";
-            }
-        }
-        
-        // Fonction pour générer le contenu en mode "raw"
-        function generateRawContent() {
-            const cards = vocabularyByChapter[currentChapter];
-            let content = "";
-            
-            for (let i = 0; i < cards.length; i++) {
-                content += `${cards[i].english}    ${cards[i].french}\n\n`;
-            }
-            
-            elements.rawContent.textContent = content;
-        }
-        
-        // Fonction pour basculer le mode sombre
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            elements.themeToggle.classList.toggle('active', isDarkMode);
-            updateCardColorAndSuccessRate();
-        }
-        
-        // Fonction pour basculer le mode raw
-       // Fonction pour basculer le mode raw
-function toggleRawMode() {
-    isRawMode = !isRawMode;
-    elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-    elements.rawToggle.classList.toggle('active', isRawMode);
-    
-    // Si isRawMode est vrai, afficher le contenu brut et cacher la carte
-    if (isRawMode) {
-        elements.cardContainer.style.display = 'none';
-        elements.rawContent.style.display = 'block';
-        document.querySelector('.controls').style.display = 'none';
-        elements.validationContainer.style.display = 'none';
-        generateRawContent();
-    } else {
-        elements.cardContainer.style.display = 'block';
-        elements.rawContent.style.display = 'none';
-        document.querySelector('.controls').style.display = 'flex';
-        elements.validationContainer.style.display = 'flex';
-        updateCard();
-    }
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur score
-function updateBestScoreDisplay() {
-    const bestScore = bestScores[currentChapter] || 0;
-    elements.bestScoreElement.textContent = bestScore;
-}
-
-// Fonction pour démarrer le timer
-function startTimer() {
-    if (!isTimerActive) return;
-    
-    clearInterval(timerInterval);
-    startTime = new Date();
-    
-    timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = new Date(now - startTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.timerElement.textContent = `${minutes}:${seconds}`;
-    }, 1000);
-}
-
-// Fonction pour arrêter le timer
-function stopTimer() {
-    clearInterval(timerInterval);
-    
-    // Sauvegarder le meilleur temps si c'est le cas
-    if (isTimerActive) {
-        const now = new Date();
-        const totalTime = now - startTime;
-        
-        if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
-            bestTimes[currentChapter] = totalTime;
-            updateBestTimeDisplay();
-        }
-    }
-}
-
-// Fonction pour réinitialiser le timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    elements.timerElement.textContent = "00:00";
-}
-
-// Fonction pour mettre à jour l'affichage du meilleur temps
-function updateBestTimeDisplay() {
-    const bestTime = bestTimes[currentChapter];
-    
-    if (bestTime) {
-        const diff = new Date(bestTime);
-        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-        
-        elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
-    } else {
-        elements.bestTimeElement.textContent = "-";
-    }
-}
-
-// Gestionnaires d'événements
-function initEventListeners() {
-    // Changement de chapitre
-    // Changement de chapitre
-    // Reset button
-elements.resetBtn.addEventListener('click', resetProgress);
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Ne rien faire si on clique sur le chapitre actif
-        if (chapter === currentChapter) return;
-        
-        // Désactiver le chapitre actuel et activer le nouveau
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Changer le chapitre
-        currentChapter = chapter;
-        currentCardIndex = 0;
-        cardHistory = [];
-        
-        // Réinitialiser la liste des cartes vues
-        seenCards = new Set();
-        
-        // Réinitialiser le timer
-        resetTimer();
-        startTimer();
-        
-        // Mettre à jour le meilleur score
-        updateBestScoreDisplay();
-        
-        // Mettre à jour le meilleur temps
-        updateBestTimeDisplay();
-        
-        // Mettre à jour la carte ou le contenu raw
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Retourner la carte
-    elements.card.addEventListener('click', () => {
-        isTranslationVisible = !isTranslationVisible;
-        elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
-    });
-    
-    // Bouton précédent
-    elements.prevBtn.addEventListener('click', () => {
-        if (cardHistory.length > 0) {
-            currentCardIndex = cardHistory.pop();
-            updateCard();
-        }
-    });
-    
-    // Bouton suivant
-    elements.nextBtn.addEventListener('click', () => {
-        if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
-            cardHistory.push(currentCardIndex);
-            currentCardIndex++;
-            updateCard();
-        }
-    });
-    
-    // Bouton aléatoire
-    // Bouton aléatoire
-// 1. Fix the random button to truly get the lowest score card
-elements.randomBtn.addEventListener('click', () => {
-    const cards = vocabularyByChapter[currentChapter];
-    // Build a list of indices you haven’t seen yet:
-    const unseenIndices = cards
-        .map((_, idx) => idx)
-        .filter(idx => !seenCards.has(idx));
-
-    // If you’ve seen them all, do nothing (or reset seenCards here if you prefer)
-    if (unseenIndices.length === 0) {
-        showToast("Toutes les cartes ont été vues !");
-        return;
-    }
-
-    // Pick one at random among the unseen
-    const randomIdx = unseenIndices[
-        Math.floor(Math.random() * unseenIndices.length)
-    ];
-
-    // Push current index to history, switch to the new one, then render
-    cardHistory.push(currentCardIndex);
-    currentCardIndex = randomIdx;
-    updateCard();
-});
-
-
-// 2. Modify the chapter button event listener to sort cards by performance
-elements.chapterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const chapter = parseInt(button.dataset.chapter);
-        
-        // Skip if clicking current chapter
-        if (chapter === currentChapter) return;
-        
-        // Update active chapter button
-        elements.chapterButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-        });
-        
-        // Change chapter
-        currentChapter = chapter;
-        cardHistory = [];
-        seenCards = new Set();
-        
-        // Set current card to the one with lowest score
-        const sortedIndices = getSortedCardsByPerformance();
-        currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
-        
-        // Reset timer and update UI
-        resetTimer();
-        startTimer();
-        updateBestScoreDisplay();
-        updateBestTimeDisplay();
-        
-        // Update display
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-    });
-});
-    
-    // Validation de la traduction
-    elements.validateBtn.addEventListener('click', validateTranslation);
-    elements.translationInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            validateTranslation();
-        }
-    });
-    
-    // Basculer le mode sombre
-    elements.themeToggle.addEventListener('click', toggleDarkMode);
-    
-    // Basculer le mode raw
-    elements.rawToggle.addEventListener('click', toggleRawMode);
-    
-    // Boutons de sauvegarde et chargement
-    elements.saveBtn.addEventListener('click', saveState);
-    elements.loadBtn.addEventListener('click', () => {
-        elements.loadInput.click();
-    });
-    elements.loadInput.addEventListener('change', loadState);
-}
-
-// Fonction de validation de traduction
-function validateTranslation() {
-    const userInput = elements.translationInput.value.trim().toLowerCase();
-    const cards = vocabularyByChapter[currentChapter];
-    const correctAnswer = cards[currentCardIndex].english.toLowerCase();
-    
-    // Vérifier la réponse
-    const isCorrect = userInput === correctAnswer;
-    
-    // Mettre à jour la performance de la carte
-    const cardKey = `${currentChapter}-${currentCardIndex}`;
-    if (!cardPerformance[cardKey]) {
-        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-    }
-    cardPerformance[cardKey].attempts++;
-    
-    if (isCorrect) {
-        cardPerformance[cardKey].successes++;
-        elements.validationResult.textContent = "Correct !";
-        elements.validationResult.className = "validation-result correct";
-        
-        // Incrémenter le score
-        currentScore++;
-        elements.currentScoreElement.textContent = currentScore;
-        
-        // Mettre à jour le meilleur score
-        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-            bestScores[currentChapter] = currentScore;
-            elements.bestScoreElement.textContent = bestScores[currentChapter];
-        }
-    } else {
-        elements.validationResult.textContent = `Incorrect. La réponse était : ${cards[currentCardIndex].english}`;
-        elements.validationResult.className = "validation-result incorrect";
     }
     
-    // Mettre à jour la couleur de la carte
-    updateCardColorAndSuccessRate();
-    
-    // Passer automatiquement à la carte suivante après quelques secondes si la réponse est correcte
-    
-}
-
-// Initialisation
-function init() {
-    // Charger les données depuis le localStorage
-    // Store references to card structure elements
-    const originalCardContent = elements.card.innerHTML;
-    const savedData = localStorage.getItem('flashcardsData');
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            seenCards = new Set(data.seenCards || []);
-            cardPerformance = data.cardPerformance || {};
-            bestScores = data.bestScores || {};
-            bestTimes = data.bestTimes || {};
-            isDarkMode = data.isDarkMode || false;
-            
-            // Appliquer le mode sombre si nécessaire
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-            elements.themeToggle.classList.toggle('active', isDarkMode);
-        } catch (e) {
-            console.error("Erreur lors du chargement des données:", e);
-        }
-    }
-    
-    // Initialiser les gestionnaires d'événements
-    initEventListeners();
-    
-    // Initialiser l'affichage
-    updateBestScoreDisplay();
-    updateBestTimeDisplay();
-    
-    // Démarrer le timer
-    startTimer();
-    
-    // Afficher la première carte
-    if (isRawMode) {
-        generateRawContent();
-    } else {
-        updateCard();
-    }
-    
-    // Sauvegarder les données avant de quitter
-    window.addEventListener('beforeunload', () => {
-        localStorage.setItem('flashcardsData', JSON.stringify({
+    function saveState() {
+        const state = {
+            currentChapter,
             seenCards: Array.from(seenCards),
             cardPerformance,
             bestScores,
             bestTimes,
-            isDarkMode
-        }));
-    });
-}
-
-// Lancer l'initialisation
-init();
+            isDarkMode,
+            currentScore
+        };
+        
+        const stateJSON = JSON.stringify(state);
+        const blob = new Blob([stateJSON], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Sauvegarde réussie!');
+    }
+    
+    function loadState(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const state = JSON.parse(e.target.result);
+                currentChapter = state.currentChapter || 1;
+                seenCards = new Set(state.seenCards || []);
+                cardPerformance = state.cardPerformance || {};
+                bestScores = state.bestScores || {};
+                bestTimes = state.bestTimes || {};
+                currentScore = state.currentScore || 0;
+                isDarkMode = state.isDarkMode || false;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+                elements.themeToggle.classList.toggle('active', isDarkMode);
+                currentCardIndex = 0;
+                cardHistory = [];
+                elements.chapterButtons.forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
+                });
+                elements.currentScoreElement.textContent = currentScore;
+                updateBestScoreDisplay();
+                updateBestTimeDisplay();
+                resetTimer();
+                startTimer();
+                if (isRawMode) {
+                    generateRawContent();
+                } else {
+                    updateCard();
+                }
+                showToast('Chargement réussi!');
+            } catch (error) {
+                console.error('Erreur lors du chargement:', error);
+                showToast('Erreur lors du chargement du fichier');
+            }
+            elements.loadInput.value = '';
+        };
+        reader.readAsText(file);
+    }
+    
+    function getSortedCardsByPerformance() {
+        const cards = vocabularyByChapter[currentChapter];
+        if (!cards || cards.length === 0) return [];
+        const cardsWithRates = cards.map((_, index) => {
+            const key = `${currentChapter}-${index}`;
+            const perf = cardPerformance[key];
+            const successRate = perf ? perf.successes / perf.attempts : -1;
+            return { index, successRate };
+        });
+        cardsWithRates.sort((a, b) => {
+            const rankA = a.successRate === -1 ? 1 : a.successRate === 1 ? 2 : 0;
+            const rankB = b.successRate === -1 ? 1 : b.successRate === 1 ? 2 : 0;
+            if (rankA !== rankB) return rankA - rankB;
+            if (rankA === 0) return a.successRate - b.successRate;
+            return Math.random() - 0.5;
+        });
+        return cardsWithRates.map(c => c.index);
+    }
+    
+    function updateCard() {
+        const cards = vocabularyByChapter[currentChapter];
+        if (cards && cards.length > 0) {
+            const cardData = cards[currentCardIndex];
+            elements.frenchWord.textContent = cardData.french;
+            elements.englishTranslation.textContent = cardData.english;
+            seenCards.add(currentCardIndex);
+            elements.englishTranslation.style.display = 'none';
+            isTranslationVisible = false;
+            elements.translationInput.value = '';
+            elements.validationResult.textContent = '';
+            elements.validationResult.className = 'validation-result';
+            updateStatsDisplay();
+            const progressPercentage = (seenCards.size / cards.length) * 100;
+            elements.progressBar.style.width = `${progressPercentage}%`;
+            const percentageElement = elements.progressBar.parentElement.querySelector('.progress-percentage');
+            if (!percentageElement) {
+                const newPercentageElement = document.createElement('div');
+                newPercentageElement.className = 'progress-percentage';
+                newPercentageElement.style.position = 'absolute';
+                newPercentageElement.style.top = '50%';
+                newPercentageElement.style.left = '50%';
+                newPercentageElement.style.transform = 'translate(-50%, -50%)';
+                newPercentageElement.style.color = '#333';
+                newPercentageElement.style.fontWeight = 'bold';
+                newPercentageElement.style.fontSize = '12px';
+                newPercentageElement.style.textShadow = '0 0 2px white';
+                elements.progressBar.parentElement.style.position = 'relative';
+                elements.progressBar.parentElement.appendChild(newPercentageElement);
+            }
+            percentageElement.textContent = `${Math.round(progressPercentage)}% (${seenCards.size}/${cards.length})`;
+            elements.prevBtn.disabled = cardHistory.length === 0;
+            elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
+            updateCardColorAndSuccessRate();
+            if (areAllCardsAnswered()) {
+                stopTimer();
+                showFinalScreen();
+            }
+        } else {
+            showNoCardsMessage();
+        }
+    }
+    
+    function createPercentButton(text, successRate) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.style.padding = '8px 15px';
+        button.style.backgroundColor = getColorForSuccessRate(successRate);
+        button.style.color = 'white';
+        button.style.border = 'none';
+        button.style.borderRadius = '5px';
+        button.style.fontWeight = 'bold';
+        button.style.cursor = 'pointer';
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const cardKey = `${currentChapter}-${currentCardIndex}`;
+            if (!cardPerformance[cardKey]) {
+                cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+            }
+            cardPerformance[cardKey].attempts++;
+            if (successRate > 0) {
+                cardPerformance[cardKey].successes += successRate;
+            }
+            currentScore += successRate;
+            elements.currentScoreElement.textContent = currentScore;
+            if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+                bestScores[currentChapter] = currentScore;
+                elements.bestScoreElement.textContent = bestScores[currentChapter];
+            }
+            updateCardColorAndSuccessRate();
+            isTranslationVisible = false;
+            elements.englishTranslation.style.display = 'none';
+            const percentButtons = document.getElementById('percent-buttons');
+            if (percentButtons) {
+                percentButtons.style.display = 'none';
+            }
+            if (areAllCardsAnswered()) {
+                stopTimer();
+                showFinalScreen();
+            }
+        });
+        return button;
+    }
+    
+    function getColorForSuccessRate(rate) {
+        if (rate === 1) return '#2ecc71';
+        if (rate === 0.5) return '#f39c12';
+        return '#e74c3c';
+    }
+    
+    function showNoCardsMessage() {
+        elements.frenchWord.textContent = "Aucune carte disponible";
+        elements.englishTranslation.textContent = "";
+        elements.englishTranslation.style.display = 'none';
+        elements.currentCardElement.textContent = "0";
+        elements.totalCardsElement.textContent = "0";
+        elements.cardsSeenElement.textContent = "0";
+        elements.cardsTotalElement.textContent = "0";
+        elements.progressBar.style.width = "0%";
+        elements.prevBtn.disabled = true;
+        elements.nextBtn.disabled = true;
+        elements.randomBtn.disabled = true;
+        elements.successRateElement.textContent = "";
+    }
+    
+    function updateStatsDisplay() {
+        const cards = vocabularyByChapter[currentChapter];
+        elements.currentCardElement.textContent = currentCardIndex + 1;
+        elements.totalCardsElement.textContent = cards.length;
+        elements.cardsSeenElement.textContent = seenCards.size;
+        elements.cardsTotalElement.textContent = cards.length;
+    }
+    
+    function updateCardColorAndSuccessRate() {
+        const cardKey = `${currentChapter}-${currentCardIndex}`;
+        if (cardPerformance[cardKey]) {
+            const performance = cardPerformance[cardKey];
+            const successRate = performance.successes / performance.attempts;
+            const successPercentage = Math.round(successRate * 100);
+            elements.successRateElement.textContent = `${successPercentage}%`;
+            const r = Math.round(231 - (successRate * 231));
+            const g = Math.round(46 + (successRate * 140));
+            const b = Math.round(60 - (successRate * 50));
+            elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
+            elements.successRateElement.style.backgroundColor = successRate > 0.5 ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
+            elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
+        } else {
+            elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
+            elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
+            elements.successRateElement.textContent = "";
+        }
+    }
+    
+    function generateRawContent() {
+        const cards = vocabularyByChapter[currentChapter];
+        let content = "";
+        for (let i = 0; i < cards.length; i++) {
+            content += `${cards[i].english}    ${cards[i].french}\n\n`;
+        }
+        elements.rawContent.textContent = content;
+    }
+    
+    function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+        elements.themeToggle.classList.toggle('active', isDarkMode);
+        if (isDarkMode) {
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (btn.disabled) {
+                    btn.style.backgroundColor = '#4a5568';
+                    btn.style.color = '#a0aec0';
+                } else {
+                    btn.style.backgroundColor = '#3498db';
+                    btn.style.color = 'white';
+                }
+            });
+            document.querySelectorAll('.chapter-btn.active, .mode-btn.active').forEach(btn => {
+                btn.style.backgroundColor = '#3498db';
+                btn.style.color = 'white';
+            });
+        } else {
+            document.querySelectorAll('.btn, .chapter-btn, .mode-btn').forEach(btn => {
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+            });
+        }
+        updateCardColorAndSuccessRate();
+    }
+    
+    function toggleRawMode() {
+        isRawMode = !isRawMode;
+        elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+        elements.rawToggle.classList.toggle('active', isRawMode);
+        if (isRawMode) {
+            elements.cardContainer.style.display = 'none';
+            elements.rawContent.style.display = 'block';
+            document.querySelector('.controls').style.display = 'none';
+            elements.validationContainer.style.display = 'none';
+            generateRawContent();
+        } else {
+            elements.cardContainer.style.display = 'block';
+            elements.rawContent.style.display = 'none';
+            document.querySelector('.controls').style.display = 'flex';
+            elements.validationContainer.style.display = 'flex';
+            updateCard();
+        }
+    }
+    
+    function updateBestScoreDisplay() {
+        const bestScore = bestScores[currentChapter] || 0;
+        elements.bestScoreElement.textContent = bestScore;
+    }
+    
+    function startTimer() {
+        if (!isTimerActive) return;
+        clearInterval(timerInterval);
+        startTime = new Date();
+        timerInterval = setInterval(() => {
+            const now = new Date();
+            const diff = new Date(now - startTime);
+            const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+            elements.timerElement.textContent = `${minutes}:${seconds}`;
+        }, 1000);
+    }
+    
+    function stopTimer() {
+        clearInterval(timerInterval);
+        if (isTimerActive) {
+            const now = new Date();
+            const totalTime = now - startTime;
+            if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
+                bestTimes[currentChapter] = totalTime;
+                updateBestTimeDisplay();
+            }
+        }
+    }
+    
+    function resetTimer() {
+        clearInterval(timerInterval);
+        elements.timerElement.textContent = "00:00";
+    }
+    
+    function updateBestTimeDisplay() {
+        const bestTime = bestTimes[currentChapter];
+        if (bestTime) {
+            const diff = new Date(bestTime);
+            const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+            elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
+        } else {
+            elements.bestTimeElement.textContent = "-";
+        }
+    }
+    
+    function initEventListeners() {
+        elements.resetBtn.addEventListener('click', resetProgress);
+        elements.chapterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const chapter = parseInt(button.dataset.chapter);
+                if (chapter === currentChapter) return;
+                const percentButtons = document.getElementById('percent-buttons');
+                if (percentButtons) {
+                    percentButtons.style.display = 'none';
+                }
+                elements.chapterButtons.forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
+                });
+                currentChapter = chapter;
+                cardHistory = [];
+                seenCards = new Set();
+                currentScore = 0;
+                elements.currentScoreElement.textContent = currentScore;
+                const sortedIndices = getSortedCardsByPerformance();
+                currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
+                resetTimer();
+                startTimer();
+                updateBestScoreDisplay();
+                updateBestTimeDisplay();
+                if (isRawMode) {
+                    generateRawContent();
+                } else {
+                    updateCard();
+                }
+            });
+        });
+        elements.card.addEventListener('click', () => {
+            isTranslationVisible = !isTranslationVisible;
+            elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
+            if (isTranslationVisible) {
+                if (!document.getElementById('percent-buttons')) {
+                    const percentButtonsDiv = document.createElement('div');
+                    percentButtonsDiv.id = 'percent-buttons';
+                    percentButtonsDiv.style.display = 'flex';
+                    percentButtonsDiv.style.justifyContent = 'space-around';
+                    percentButtonsDiv.style.marginTop = '15px';
+                    percentButtonsDiv.style.position = 'absolute';
+                    percentButtonsDiv.style.bottom = '15px';
+                    percentButtonsDiv.style.left = '0';
+                    percentButtonsDiv.style.right = '0';
+                    const btn100 = createPercentButton('100%', 1);
+                    const btn50 = createPercentButton('50%', 0.5);
+                    const btn0 = createPercentButton('0%', 0);
+                    percentButtonsDiv.appendChild(btn100);
+                    percentButtonsDiv.appendChild(btn50);
+                    percentButtonsDiv.appendChild(btn0);
+                    elements.card.appendChild(percentButtonsDiv);
+                } else {
+                    document.getElementById('percent-buttons').style.display = 'flex';
+                }
+            } else {
+                const percentButtons = document.getElementById('percent-buttons');
+                if (percentButtons) {
+                    percentButtons.style.display = 'none';
+                }
+            }
+        });
+        elements.prevBtn.addEventListener('click', () => {
+            if (cardHistory.length > 0) {
+                currentCardIndex = cardHistory.pop();
+                updateCard();
+            }
+        });
+        elements.nextBtn.addEventListener('click', () => {
+            if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
+                cardHistory.push(currentCardIndex);
+                currentCardIndex++;
+                updateCard();
+            }
+        });
+        elements.randomBtn.addEventListener('click', () => {
+            const cards = vocabularyByChapter[currentChapter];
+            const unseenIndices = cards.map((_, index) => index).filter(index => !seenCards.has(index));
+            if (unseenIndices.length > 0) {
+                const randomIdx = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
+                cardHistory.push(currentCardIndex);
+                currentCardIndex = randomIdx;
+                updateCard();
+            } else {
+                seenCards = new Set();
+                showToast("Toutes les cartes ont été vues. Réinitialisation.");
+                const randomIdx = Math.floor(Math.random() * cards.length);
+                cardHistory.push(currentCardIndex);
+                currentCardIndex = randomIdx;
+                updateCard();
+            }
+        });
+        elements.validateBtn.addEventListener('click', validateTranslation);
+        elements.translationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validateTranslation();
+            }
+        });
+        elements.themeToggle.addEventListener('click', toggleDarkMode);
+        elements.rawToggle.addEventListener('click', toggleRawMode);
+        elements.saveBtn.addEventListener('click', saveState);
+        elements.loadBtn.addEventListener('click', () => {
+            elements.loadInput.click();
+        });
+        elements.loadInput.addEventListener('change', loadState);
+    }
+    
+    function init() {
+        const savedData = localStorage.getItem('flashcardsData');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                seenCards = new Set(data.seenCards || []);
+                cardPerformance = data.cardPerformance || {};
+                bestScores = data.bestScores || {};
+                bestTimes = data.bestTimes || {};
+                isDarkMode = data.isDarkMode || false;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+                elements.themeToggle.classList.toggle('active', isDarkMode);
+            } catch (e) {
+                console.error("Erreur lors du chargement des données:", e);
+            }
+        }
+        initEventListeners();
+        updateBestScoreDisplay();
+        updateBestTimeDisplay();
+        startTimer();
+        if (isRawMode) {
+            generateRawContent();
+        } else {
+            updateCard();
+        }
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('flashcardsData', JSON.stringify({
+                seenCards: Array.from(seenCards),
+                cardPerformance,
+                bestScores,
+                bestTimes,
+                isDarkMode
+            }));
+        });
+    }
+    
+    init();
 </script>
+
 </body>
 </html>
