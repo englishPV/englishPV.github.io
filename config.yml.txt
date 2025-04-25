@@ -1,2 +1,0 @@
-name: English words
-theme: minima
