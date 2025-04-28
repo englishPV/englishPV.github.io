@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash Cards Français-Anglais</title>
     <style>
-        :root {
+          :root {
             --primary-color: #3498db;
             --secondary-color: #2ecc71;
             --text-color: #333;
@@ -327,6 +327,7 @@
         font-weight: 600;
     }
     
+    
     .validation-result {
         margin-top: 5px;
         font-weight: bold;
@@ -352,6 +353,31 @@
         font-size: 0.9rem;
         color: var(--info-color);
     }
+    
+    .feedback-bar-container {
+        width: 100%;
+        height: 10px;
+        background-color: var(--progress-bg);
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+    
+    .feedback-bar {
+        height: 100%;
+        width: 50%; /* Valeur initiale de 50% */
+        transition: width 0.2s ease, background-color 0.2s ease;
+        background-color: var(--secondary-color);
+    }
+    
+    /* Ajuster la position en mode mobile */
+    @media (max-width: 600px) {
+        .feedback-bar-container {
+            right: -40px;
+        }
+    }
+    
     
     .toast {
         position: fixed;
@@ -446,6 +472,9 @@
     </div>
     
     <div class="validation-container">
+        <div class="feedback-bar-container">
+          <div class="feedback-bar"></div>
+          </div>
         <div class="input-group">
             <input type="text" class="translation-input" id="translation-input" placeholder="Entrez la traduction en anglais">
             <button class="validate-btn" id="validate-btn">Valider</button>
@@ -490,7 +519,7 @@
     // Structure de données pour les mots par chapitre
     const vocabularyByChapter = {
       
-  1: [
+   1: [
 
 { french: "monarchie", english: "monarchy" },
 
@@ -2072,7 +2101,82 @@
             elements.toastMessage.classList.remove('show');
         }, duration);
     }
+    function updateFeedbackBar(input) {
+    const cards = vocabularyByChapter[currentChapter];
+    if (!cards || cards.length === 0) return;
     
+    const currentWord = cards[currentCardIndex].english.toLowerCase().replace(/[^a-z]/g, '');
+    const wordLength = currentWord.length;
+    const userInput = input.toLowerCase().replace(/[^a-z]/g, '');
+    
+    // Compter les lettres correctes et incorrectes
+    let correctLetters = 0;
+    let incorrectLetters = 0;
+    
+    // Créer des copies que nous pouvons modifier
+    let remainingTarget = currentWord;
+    let remainingInput = userInput;
+    
+    // Compter d'abord les bonnes lettres
+    for (let i = 0; i < userInput.length; i++) {
+        const char = userInput[i];
+        const indexInTarget = remainingTarget.indexOf(char);
+        
+        if (indexInTarget !== -1) {
+            // La lettre est correcte
+            correctLetters++;
+            remainingTarget = remainingTarget.substring(0, indexInTarget) + 
+                             remainingTarget.substring(indexInTarget + 1);
+        }
+    }
+    
+    // Les lettres restantes dans l'entrée utilisateur sont incorrectes
+    incorrectLetters = userInput.length - correctLetters;
+    
+    // Calculer le score selon la formule donnée
+    const score = 0.5 + (correctLetters / (wordLength * 2)) - (incorrectLetters / (wordLength * 2));
+    
+    // Limiter le score entre 0 et 1
+    const clampedScore = Math.max(0, Math.min(1, score));
+    
+    // Mettre à jour la largeur de la barre
+    const feedbackBar = document.querySelector('.feedback-bar');
+    if (feedbackBar) {
+        feedbackBar.style.width = `${clampedScore * 100}%`;
+        
+        // Utiliser une palette de couleurs plus nuancée basée sur le score
+        if (clampedScore < 0.2) {
+            feedbackBar.style.backgroundColor = '#ff3b30'; // Rouge vif
+        } else if (clampedScore < 0.4) {
+            feedbackBar.style.backgroundColor = '#ff9500'; // Orange
+        } else if (clampedScore < 0.6) {
+            feedbackBar.style.backgroundColor = '#ffcc00'; // Jaune
+        } else if (clampedScore < 0.8) {
+            feedbackBar.style.backgroundColor = '#7bed9f'; // Vert clair
+        } else {
+            feedbackBar.style.backgroundColor = '#2ed573'; // Vert foncé
+        }
+    }
+    
+    // Valider automatiquement si le mot est correct
+    const originalCorrectAnswer = cards[currentCardIndex].english.toLowerCase();
+    const userInputProcessed = userInput.toLowerCase();
+    
+    // Vérifier si l'entrée utilisateur correspond exactement à la réponse correcte
+    if (userInputProcessed === originalCorrectAnswer.toLowerCase().replace(/[^a-z]/g, '') && 
+        userInput.length > 0 && userInput.length >= currentWord.length * 0.8) {
+        validateTranslation();
+    }
+}
+
+// Cette fonction réinitialise la barre à 50%
+function resetFeedbackBar() {
+    const feedbackBar = document.querySelector('.feedback-bar');
+    if (feedbackBar) {
+        feedbackBar.style.width = '50%';
+        feedbackBar.style.backgroundColor = 'var(--secondary-color)';
+    }
+}
     function resetProgress() {
         seenCards = new Set();
         cardHistory = [];
@@ -2354,6 +2458,13 @@
     }
     
     function updateCard() {
+function resetFeedbackBar() {
+    const feedbackBar = document.querySelector('.feedback-bar');
+    if (feedbackBar) {
+        feedbackBar.style.width = '50%';
+        feedbackBar.style.backgroundColor = 'var(--secondary-color)';
+    }
+}
         const cards = vocabularyByChapter[currentChapter];
         if (cards && cards.length > 0) {
             const cardData = cards[currentCardIndex];
@@ -2394,6 +2505,14 @@
         } else {
             showNoCardsMessage();
         }
+    
+      
+      
+      const originalUpdateCard = updateCard;
+updateCard = function() {
+    originalUpdateCard();
+    resetFeedbackBar();
+};
     }
     
     function createPercentButton(text, successRate) {
@@ -2699,6 +2818,10 @@
                 validateTranslation();
             }
         });
+        
+        elements.translationInput.addEventListener('input', (e) => {
+    updateFeedbackBar(e.target.value);
+});
         elements.themeToggle.addEventListener('click', toggleDarkMode);
         elements.rawToggle.addEventListener('click', toggleRawMode);
         elements.saveBtn.addEventListener('click', saveState);
