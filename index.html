@@ -725,7 +725,7 @@ body.dark-mode .settings-btn {
     
     <script>
         const vocabularyByChapter = {
-            1: [
+             1: [
 
 { french: "monarchie", english: "monarchy" },
 
@@ -2905,7 +2905,9 @@ function saveState() {
         bestTimes,
         isDarkMode,
         currentScore,
-        revealedCards
+        revealedCards,
+        autoNextMode,    // Save auto-next mode
+        autoNextType     // Save auto-next type
     };
     
     const stateJSON = JSON.stringify(state);
@@ -2920,7 +2922,6 @@ function saveState() {
     URL.revokeObjectURL(url);
     showToast('Sauvegarde réussie!');
 }
-
 function loadState(event) {
     const file = event.target.files[0];
     if (!file) return;
