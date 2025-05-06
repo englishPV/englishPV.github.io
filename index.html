@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash Cards Français-Anglais</title>
     <style>
-          :root {
+        :root {
             --primary-color: #3498db;
             --secondary-color: #2ecc71;
             --text-color: #333;
@@ -23,509 +23,709 @@
             --save-button-bg: #f39c12;
             --load-button-bg: #9b59b6;
         }
-        
-
-    body.dark-mode {
-        --primary-color: #ffffff;
-        --secondary-color: #3498db;
-        --text-color: #000000;
-        --card-bg: #2c3e50;
-        --card-shadow: rgba(0, 0, 0, 0.3);
-        --body-bg: #1a1a1a;
-        --translation-color: #3498db;
-        --subtitle-color: #bbb;
-        --info-color: #bbb;
-        --button-bg: #34495e;
-        --button-text: #fff;
-        --progress-bg: #34495e;
-        --incorrect-color: #e74c3c;
-        --correct-color: #2ecc71;
-        --save-button-bg: #d35400;
-        --load-button-bg: #8e44ad;
-    }
-    
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: var(--body-bg);
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        color: var(--text-color);
-        transition: all 0.3s ease;
-    }
-    
-    h1 {
-        color: var(--primary-color);
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    
-    .subtitle {
-        font-size: 1.1rem;
-        color: var(--subtitle-color);
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .container {
-        width: 100%;
-        max-width: 600px;
-    }
-    
-    .chapters {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    
-    .chapter-btn {
-        padding: 8px 15px;
-        background-color: var(--button-bg);
-        color: var(--button-text);
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .chapter-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-    }
-    
-    .mode-controls {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-        gap: 10px;
-    }
-    
-    .mode-btn {
-        padding: 8px 15px;
-        background-color: var(--button-bg);
-        color: var(--button-text);
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .mode-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-    }
-    
-    .progress-container {
-        width: 100%;
-        height: 10px;
-        background-color: var(--progress-bg);
-        border-radius: 5px;
-        margin-bottom: 20px;
-        overflow: hidden;
-    }
-    
-    .progress-bar {
-        height: 100%;
-        background-color: var(--secondary-color);
-        border-radius: 5px;
-        transition: width 0.3s ease;
-    }
-    
-    .card-container {
-        height: 300px;
-        margin-bottom: 20px;
-        position: relative;
-    }
-    
-    .card {
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-        box-shadow: 0 10px 25px var(--card-shadow);
-        border-radius: 15px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--card-bg);
-        padding: 20px;
-        box-sizing: border-box;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    
-    .card-content {
-        font-size: 2rem;
-        font-weight: bold;
-        color: var(--primary-color);
-    }
-    
-    .english-translation {
-        color: var(--translation-color);
-        font-size: 2rem;
-        font-weight: bold;
-        display: none;
-    }
-    
-    .success-rate {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 0.9rem;
-        font-weight: bold;
-        background-color: rgba(255, 255, 255, 0.7);
-        padding: 3px 8px;
-        border-radius: 10px;
-    }
-    
-    .controls {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-bottom: 15px;
-    }
-    
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: var(--primary-color);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-    
-    .btn:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    .save-load-controls {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-top: 15px;
-        gap: 10px;
-    }
-    
-    .save-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: var(--save-button-bg);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .load-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: var(--load-button-bg);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .save-btn:hover, .load-btn:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-    
-    .save-input, .load-input {
-        display: none;
-    }
-    
-    .info {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 0.9rem;
-        color: var(--info-color);
-    }
-    
-    .timer-container {
-        text-align: center;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        font-size: 1.2rem;
-        color: var(--primary-color);
-        font-weight: bold;
-    }
-    
-    .stats-container {
-        text-align: center;
-        margin-top: 10px;
-        font-size: 0.9rem;
-        color: var(--info-color);
-    }
-    
-    .raw-content {
-        background-color: var(--card-bg);
-        color: var(--text-color);
-        padding: 20px;
-        border-radius: 15px;
-        margin-top: 20px;
-        width: 100%;
-        height: 300px;
-        overflow-y: auto;
-        display: none;
-        white-space: pre-line;
-        box-shadow: 0 10px 25px var(--card-shadow);
-        text-align: left;
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-    
-    .validation-container {
-        width: 100%;
-        margin: 15px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .input-group {
-        display: flex;
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    .translation-input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid var(--button-bg);
-        border-radius: 5px 0 0 5px;
-        font-size: 1rem;
-        background-color: var(--card-bg);
-        color: var(--text-color);
-    }
-    
-    .validate-btn {
-        padding: 10px 15px;
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        border-radius: 0 5px 5px 0;
-        cursor: pointer;
-        font-weight: 600;
-    }
-    
-    
-    .validation-result {
-        margin-top: 5px;
-        font-weight: bold;
-        height: 20px;
-    }
-    
-    .correct {
-        color: var(--correct-color);
-    }
-    
-    .incorrect {
-        color: var(--incorrect-color);
-    }
-    
-    .scores-container {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-top: 10px;
-    }
-    
-    .score-item {
-        font-size: 0.9rem;
-        color: var(--info-color);
-    }
-    
-    .feedback-bar-container {
-        width: 100%;
-        height: 10px;
-        background-color: var(--progress-bg);
-        border-radius: 5px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        overflow: hidden;
-    }
-    
-    .feedback-bar {
-        height: 100%;
-        width: 50%; /* Valeur initiale de 50% */
-        transition: width 0.2s ease, background-color 0.2s ease;
-        background-color: var(--secondary-color);
-    }
-    
-    /* Ajuster la position en mode mobile */
-    @media (max-width: 600px) {
-        .feedback-bar-container {
-            right: -40px;
+        body.dark-mode {
+            --primary-color: #ffffff;
+            --secondary-color: #3498db;
+            --text-color: #000000;
+            --card-bg: #2c3e50;
+            --card-shadow: rgba(0, 0, 0, 0.3);
+            --body-bg: #1a1a1a;
+            --translation-color: #3498db;
+            --subtitle-color: #bbb;
+            --info-color: #bbb;
+            --button-bg: #34495e;
+            --button-text: #fff;
+            --progress-bg: #34495e;
+            --incorrect-color: #e74c3c;
+            --correct-color: #2ecc71;
+            --save-button-bg: #d35400;
+            --load-button-bg: #8e44ad;
         }
-    }
-    
-    
-    .toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 0.9rem;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .toast.show {
-        opacity: 1;
-    }
-    
-    @media (max-width: 600px) {
-        .card-content {
-            font-size: 1.5rem;
-        }
-        
-        .english-translation {
-            font-size: 1.2rem;
-        }
-        
-        .btn, .save-btn, .load-btn {
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-        
-        .input-group {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--body-bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
             flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
-        
-        .translation-input {
-            border-radius: 5px;
-            margin-bottom: 5px;
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
         }
-        
-        .validate-btn {
-            border-radius: 5px;
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--subtitle-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
             width: 100%;
+            max-width: 600px;
         }
-        
-        .save-load-controls {
-            flex-direction: column;
+        .chapters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
             gap: 10px;
         }
+        .chapter-btn {
+            padding: 8px 15px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .chapter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .mode-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .mode-btn {
+            padding: 8px 15px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--progress-bg);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        .card-container {
+            height: 300px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px var(--card-shadow);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .card-content {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .english-translation {
+            color: var(--translation-color);
+            font-size: 2rem;
+            font-weight: bold;
+            display: none;
+        }
+        .success-rate {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .save-load-controls {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .save-btn, .load-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .save-btn {
+            background-color: var(--save-button-bg);
+        }
+        .load-btn {
+            background-color: var(--load-button-bg);
+        }
+        .save-btn:hover, .load-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .save-input, .load-input {
+            display: none;
+        }
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--info-color);
+        }
+        .timer-container {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .stats-container {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--info-color);
+        }
+        .raw-content {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            width: 100%;
+            height: 300px;
+            overflow-y: auto;
+            display: none;
+            white-space: pre-line;
+            box-shadow: 0 10px 25px var(--card-shadow);
+            text-align: left;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .validation-container {
+            width: 100%;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-group {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .translation-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--button-bg);
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        .validate-btn {
+            padding: 10px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .validation-result {
+            margin-top: 5px;
+            font-weight: bold;
+            height: 20px;
+        }
+        .correct {
+            color: var(--correct-color);
+        }
+        .incorrect {
+            color: var(--incorrect-color);
+        }
+        .scores-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .score-item {
+            font-size: 0.9rem;
+            color: var(--info-color);
+        }
+        .feedback-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--progress-bg);
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .feedback-bar {
+            height: 100%;
+            width: 50%;
+            transition: width 0.2s ease, background-color 0.2s ease;
+            background-color: var(--secondary-color);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        @media (max-width: 600px) {
+            .card-content {
+                font-size: 1.5rem;
+            }
+            .english-translation {
+                font-size: 1.2rem;
+            }
+            .btn, .save-btn, .load-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .translation-input {
+                border-radius: 5px;
+                margin-bottom: 5px;
+            }
+            .validate-btn {
+                border-radius: 5px;
+                width: 100%;
+            }
+            .save-load-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .feedback-bar-container {
+                right: -40px;
+            }
+        }
+    .search-container {
+            width: 100%;
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--button-bg);
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        .search-btn {
+        padding: 8px 15px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
     }
-</style>
+    body.dark-mode .search-btn {
+    background-color: #34495e; /* Darker background for dark mode */
+    color: white;
+}
+body.dark-mode .settings-option label {
+    color: white;
+}
 
+/* Fix for dropdown text in dark mode */
+body.dark-mode #auto-next-type-select {
+    color: white;
+    background-color: #34495e;
+    border-color: #2c3e50;
+}
+
+/* Make sure the settings button also updates in dark mode */
+body.dark-mode .settings-btn {
+    background-color: #34495e;
+    color: white;
+}
+        /* Styles pour le bouton paramètres */
+        .settings-btn {
+            background-color: #FFDE21;
+            color: var(--text-color);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            padding: 8px 15px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .settings-panel {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px var(--card-shadow);
+            display: none;
+        }
+        .settings-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .settings-option label {
+            margin-left: 10px;
+            color: var(--text-color);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: .4s;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--secondary-color);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        body.dark-mode .translation-input,
+        body.dark-mode #search-input {
+            color: white;
+        }
+        .settings-panel {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.settings-section {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.settings-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.settings-option:last-child {
+    margin-bottom: 0;
+}
+
+.settings-select {
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Search container now in settings */
+.search-container {
+    display: flex;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 8px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background-color: var(--primary-dark-color);
+}
+
+/* Search preview dropdown */
+.search-preview {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 0 0 4px 4px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-preview-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.search-preview-item:last-child {
+    border-bottom: none;
+}
+
+.search-preview-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Dark mode adjustments */
+.dark-mode .search-preview {
+    background-color: #2c3e50;
+    border-color: #34495e;
+}
+
+.dark-mode .search-preview-item {
+    border-color: #34495e;
+    color: #ecf0f1;
+}
+
+.dark-mode .search-preview-item:hover {
+    background-color: #34495e;
+}
+
+.dark-mode .settings-select {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border-color: #34495e;
+}
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Flash Cards Français-Anglais</h1>
         <p class="subtitle">Traduisez le mot ou cliquez sur la carte pour voir la traduction</p>
         
-
-    <div class="mode-controls">
-        <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
-        <button class="mode-btn" id="raw-toggle">Mode Raw</button>
-    </div>
-    
-    <div class="chapters">
-        <button class="chapter-btn active" data-chapter="1">Democracy</button>
-        <button class="chapter-btn" data-chapter="2">Genetics</button>
-        <button class="chapter-btn" data-chapter="3">Immigration</button>
-        <button class="chapter-btn" data-chapter="4">International tensions</button>
-        <button class="chapter-btn" data-chapter="5">Unemployment</button>
-    </div>
-    
-    <div class="timer-container">
-        <div id="timer">00:00</div>
-    </div>
-    
-    <div class="progress-container">
-        <div class="progress-bar" style="width: 0%"></div>
-    </div>
-    
-    <div class="card-container">
-        <div class="card">
-            <div class="card-content">
-                <div class="french-word"></div>
-                <div class="english-translation"></div>
-            </div>
-            <div class="success-rate" id="success-rate"></div>
+        <div class="mode-controls">
+            <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
+            <button class="mode-btn" id="raw-toggle">Mode Raw</button>
+            <button class="settings-btn" id="settings-toggle">Paramètres</button>
+        </div>
+        
+        <div class="settings-panel" id="settings-panel">
+    <div class="settings-section">
+        <h3>Recherche</h3>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Rechercher une traduction...">
+            <button id="search-btn" class="search-btn">Rechercher</button>
         </div>
     </div>
     
-    <div class="validation-container">
-        <div class="feedback-bar-container">
-          <div class="feedback-bar"></div>
-          </div>
-        <div class="input-group">
-<input type="text" 
-       class="translation-input" 
-       id="translation-input" 
-       placeholder="Entrez la traduction en anglais"
-       autocorrect="off"
-       autocapitalize="off"
-       spellcheck="false">
-<button class="validate-btn" id="validate-btn">Valider</button>
+    <div class="settings-section">
+        <h3>Options</h3>
+        <div class="settings-option">
+            <label class="toggle-switch">
+                <input type="checkbox" id="auto-next-toggle">
+                <span class="toggle-slider"></span>
+            </label>
+            <label for="auto-next-toggle">Mode automatique</label>
         </div>
-        <div class="validation-result" id="validation-result"></div>
-        <div class="scores-container">
-            <div class="score-item">Score: <span id="current-score">0</span></div>
-            <div class="score-item">Meilleur score: <span id="best-score">0</span></div>
+        
+        <div class="settings-option">
+            <label for="auto-next-type-select">Type d'avancement:</label>
+            <select id="auto-next-type-select" class="settings-select">
+                <option value="next">Carte suivante</option>
+                <option value="random">Carte aléatoire</option>
+            </select>
         </div>
-    </div>
-    
-    <div class="raw-content" id="raw-content"></div>
-    
-    <div class="controls">
-        <button class="btn" id="prev-btn">Précédent</button>
-        <button class="btn" id="random-btn">Aléatoire</button>
-        <button class="btn" id="next-btn">Suivant</button>
-    </div>
-    
-    <div class="save-load-controls">
-        <button class="save-btn" id="save-btn">Sauvegarder</button>
-        <input type="file" id="load-input" class="load-input" accept=".json">
-        <button class="load-btn" id="load-btn">Charger</button>
-    </div>
-    <div class="reset-container" style="text-align: center; margin-top: 15px;">
-        <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
-    </div>
-    
-    <div class="info">
-        <span id="current-card">0</span>/<span id="total-cards">0</span>
-    </div>
-    
-    <div class="stats-container">
-        <div>Meilleur temps: <span id="best-time">-</span></div>
-        <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
     </div>
 </div>
+        
+        
+        
+        <div class="chapters">
+            <button class="chapter-btn active" data-chapter="1">Democracy</button>
+            <button class="chapter-btn" data-chapter="2">Genetics</button>
+            <button class="chapter-btn" data-chapter="3">Immigration</button>
+            <button class="chapter-btn" data-chapter="4">International tensions</button>
+            <button class="chapter-btn" data-chapter="5">Unemployment</button>
+        </div>
+        
+        <div class="timer-container">
+            <div id="timer">00:00</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 0%"></div>
+        </div>
+        
+        <div class="card-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="french-word"></div>
+                    <div class="english-translation"></div>
+                </div>
+                <div class="success-rate" id="success-rate"></div>
+            </div>
+        </div>
+        
+        <div class="validation-container">
+            <div class="feedback-bar-container">
+                <div class="feedback-bar"></div>
+            </div>
+            <div class="input-group">
+                <input type="text" class="translation-input" id="translation-input" 
+                       placeholder="Entrez la traduction en anglais"
+                       autocorrect="off" autocapitalize="off" spellcheck="false">
+                <button class="validate-btn" id="validate-btn">Valider</button>
+            </div>
+            <div class="validation-result" id="validation-result"></div>
+            <div class="scores-container">
+                <div class="score-item">Score: <span id="current-score">0</span></div>
+                <div class="score-item">Meilleur score: <span id="best-score">0</span></div>
+            </div>
+        </div>
+        
+        <div class="raw-content" id="raw-content"></div>
+        
+        <div class="controls">
+            <button class="btn" id="prev-btn">Précédent</button>
+            <button class="btn" id="random-btn">Aléatoire</button>
+            <button class="btn" id="next-btn">Suivant</button>
+        </div>
+        
+        <div class="save-load-controls">
+            <button class="save-btn" id="save-btn">Sauvegarder</button>
+            <input type="file" id="load-input" class="load-input" accept=".json">
+            <button class="load-btn" id="load-btn">Charger</button>
+        </div>
+        <div class="reset-container" style="text-align: center; margin-top: 15px;">
+            <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
+        </div>
+        
+        <div class="info">
+            <span id="current-card">0</span>/<span id="total-cards">0</span>
+        </div>
+        
+        <div class="stats-container">
+            <div>Meilleur temps: <span id="best-time">-</span></div>
+            <div>Cartes vues: <span id="cards-seen">0</span>/<span id="cards-total">0</span></div>
+        </div>
+    </div>
 
-<div class="toast" id="toast-message"></div>
-
-<script>
-    // Structure de données pour les mots par chapitre
-    const vocabularyByChapter = {
-      
-   1: [
+    <div class="toast" id="toast-message"></div>
+    
+    <script>
+        const vocabularyByChapter = {
+            1: [
 
 { french: "monarchie", english: "monarchy" },
 
@@ -2048,571 +2248,814 @@
   english: "retirement age"
 
 }]};
-    
-    // Variables d'état
-    let currentChapter = 1;
-    let currentCardIndex = 0;
-    let isTranslationVisible = false;
-    let seenCards = new Set();
-    let cardHistory = [];
-    let isDarkMode = false;
-    let isRawMode = false;
-    let currentScore = 0;
-    let bestScores = {};
-    let cardPerformance = {};
-    let startTime;
-    let timerInterval;
-    let bestTimes = {};
-    let isTimerActive = true;
-    
-    // Éléments DOM
-    const elements = {
-        resetBtn: document.getElementById('reset-btn'),
-        chapterButtons: document.querySelectorAll('.chapter-btn'),
-        card: document.querySelector('.card'),
-        cardContainer: document.querySelector('.card-container'),
-        rawContent: document.getElementById('raw-content'),
-        frenchWord: document.querySelector('.french-word'),
-        englishTranslation: document.querySelector('.english-translation'),
-        prevBtn: document.getElementById('prev-btn'),
-        nextBtn: document.getElementById('next-btn'),
-        randomBtn: document.getElementById('random-btn'),
-        progressBar: document.querySelector('.progress-bar'),
-        currentCardElement: document.getElementById('current-card'),
-        totalCardsElement: document.getElementById('total-cards'),
-        timerElement: document.getElementById('timer'),
-        bestTimeElement: document.getElementById('best-time'),
-        cardsSeenElement: document.getElementById('cards-seen'),
-        cardsTotalElement: document.getElementById('cards-total'),
-        themeToggle: document.getElementById('theme-toggle'),
-        rawToggle: document.getElementById('raw-toggle'),
-        translationInput: document.getElementById('translation-input'),
-        validateBtn: document.getElementById('validate-btn'),
-        validationResult: document.getElementById('validation-result'),
-        currentScoreElement: document.getElementById('current-score'),
-        bestScoreElement: document.getElementById('best-score'),
-        successRateElement: document.getElementById('success-rate'),
-        saveBtn: document.getElementById('save-btn'),
-        loadBtn: document.getElementById('load-btn'),
-        loadInput: document.getElementById('load-input'),
-        toastMessage: document.getElementById('toast-message')
-    };
-    
-    // Fonction pour afficher un message toast
-    function showToast(message, duration = 3000) {
-        elements.toastMessage.textContent = message;
-        elements.toastMessage.classList.add('show');
+        let autoNextMode = false;
+        let autoNextType = 'next';
+        let currentChapter = 1;
+        let currentCardIndex = 0;
+        let isTranslationVisible = false;
+        let seenCards = new Set();
+        let cardHistory = [];
+        let isDarkMode = false;
+        let isRawMode = false;
+        let currentScore = 0;
+        let bestScores = {};
+        let cardPerformance = {};
+        let startTime;
+        let timerInterval;
+        let bestTimes = {};
+        let isTimerActive = true;
+        let revealedCards = {};
+        let scoreButtonsUsed = false;
         
-        setTimeout(() => {
-            elements.toastMessage.classList.remove('show');
-        }, duration);
-    }
-    function updateFeedbackBar(input) {
-    const cards = vocabularyByChapter[currentChapter];
-    if (!cards || cards.length === 0) return;
-    
-    const currentWord = cards[currentCardIndex].english.toLowerCase().replace(/[^a-z]/g, '');
-    const wordLength = currentWord.length;
-    const userInput = input.toLowerCase().replace(/[^a-z]/g, '');
-    
-    // Compter les lettres correctes et incorrectes
-    let correctLetters = 0;
-    let incorrectLetters = 0;
-    
-    // Créer des copies que nous pouvons modifier
-    let remainingTarget = currentWord;
-    let remainingInput = userInput;
-    
-    // Compter d'abord les bonnes lettres
-    for (let i = 0; i < userInput.length; i++) {
-        const char = userInput[i];
-        const indexInTarget = remainingTarget.indexOf(char);
-        
-        if (indexInTarget !== -1) {
-            // La lettre est correcte
-            correctLetters++;
-            remainingTarget = remainingTarget.substring(0, indexInTarget) + 
-                             remainingTarget.substring(indexInTarget + 1);
-        }
-    }
-    
-    // Les lettres restantes dans l'entrée utilisateur sont incorrectes
-    incorrectLetters = userInput.length - correctLetters;
-    
-    // Calculer le score selon la formule donnée
-    const score = 0.5 + (correctLetters / (wordLength * 2)) - (incorrectLetters / (wordLength * 2));
-    
-    // Limiter le score entre 0 et 1
-    const clampedScore = Math.max(0, Math.min(1, score));
-    
-    // Mettre à jour la largeur de la barre
-    const feedbackBar = document.querySelector('.feedback-bar');
-    if (feedbackBar) {
-        feedbackBar.style.width = `${clampedScore * 100}%`;
-        
-        // Utiliser une palette de couleurs plus nuancée basée sur le score
-        if (clampedScore < 0.2) {
-            feedbackBar.style.backgroundColor = '#ff3b30'; // Rouge vif
-        } else if (clampedScore < 0.4) {
-            feedbackBar.style.backgroundColor = '#ff9500'; // Orange
-        } else if (clampedScore < 0.6) {
-            feedbackBar.style.backgroundColor = '#ffcc00'; // Jaune
-        } else if (clampedScore < 0.8) {
-            feedbackBar.style.backgroundColor = '#7bed9f'; // Vert clair
-        } else {
-            feedbackBar.style.backgroundColor = '#2ed573'; // Vert foncé
-        }
-    }
-    
-    // Valider automatiquement si le mot est correct
-    const originalCorrectAnswer = cards[currentCardIndex].english.toLowerCase();
-    const userInputProcessed = userInput.toLowerCase();
-    
-    // Vérifier si l'entrée utilisateur correspond exactement à la réponse correcte
-    if (userInputProcessed === originalCorrectAnswer.toLowerCase().replace(/[^a-z]/g, '') && 
-        userInput.length > 0 && userInput.length >= currentWord.length * 0.8) {
-        validateTranslation();
-    }
-}
-
-// Cette fonction réinitialise la barre à 50%
-function resetFeedbackBar() {
-    const feedbackBar = document.querySelector('.feedback-bar');
-    if (feedbackBar) {
-        feedbackBar.style.width = '50%';
-        feedbackBar.style.backgroundColor = 'var(--secondary-color)';
-    }
-}
-    function resetProgress() {
-        seenCards = new Set();
-        cardHistory = [];
-        currentScore = 0;
-        
-        Object.keys(cardPerformance).forEach(key => {
-            if (key.startsWith(`${currentChapter}-`)) {
-                delete cardPerformance[key];
-            }
-        });
-        
-        if (bestTimes[currentChapter]) {
-            delete bestTimes[currentChapter];
-            updateBestTimeDisplay();
-        }
-        
-        if (bestScores[currentChapter]) {
-            delete bestScores[currentChapter];
-            updateBestScoreDisplay();
-        }
-        
-        elements.currentScoreElement.textContent = currentScore;
-        elements.progressBar.style.width = "0%";
-        
-        const percentButtons = document.getElementById('percent-buttons');
-        if (percentButtons) {
-            percentButtons.style.display = 'none';
-        }
-        
-        resetTimer();
-        startTimer();
-        
-        currentCardIndex = 0;
-        updateCard();
-        
-        elements.translationInput.disabled = false;
-        elements.validateBtn.disabled = false;
-        
-        showToast('Progression réinitialisée !');
-    }
-    
-    function validateTranslation() {
-    // Get and normalize user input
-    const userInputRaw = elements.translationInput.value;
-    const userInputProcessed = userInputRaw.trim().toLowerCase().replace(/,/g, '');
-
-    // Get correct answer
-    const cards = vocabularyByChapter[currentChapter];
-    const originalCorrectAnswer = cards[currentCardIndex].english;
-    const correctAnswerLower = originalCorrectAnswer.toLowerCase();
-
-    const fullCorrectAnswerProcessed = correctAnswerLower.trim().replace(/,/g, '');
-
-    // Process alternatives with/without articles and "to"
-    const alternativeAnswersProcessed = correctAnswerLower.split(' / ').map(item => {
-        const processed = item.trim().replace(/,/g, '');
-        const withoutArticle = processed.replace(/^(a|an|the) /i, '');
-        const withoutTo = processed.replace(/^to /i, '');
-        const withoutBoth = processed.replace(/^(to |a |an |the )/i, '');
-        return [processed, withoutArticle, withoutTo, withoutBoth];
-    }).flat();
-
-    // Check correctness
-    const isCorrect = 
-        userInputProcessed === fullCorrectAnswerProcessed || 
-        alternativeAnswersProcessed.includes(userInputProcessed);
-
-    // Update performance stats
-    const cardKey = `${currentChapter}-${currentCardIndex}`;
-    if (!cardPerformance[cardKey]) {
-        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-    }
-    cardPerformance[cardKey].attempts++;
-
-    if (isCorrect) {
-        cardPerformance[cardKey].successes++;
-        currentScore++;
-        elements.currentScoreElement.textContent = currentScore.toFixed(1);
-        elements.validationResult.textContent = "Correct !";
-        elements.validationResult.className = "validation-result correct";
-    } else {
-        elements.validationResult.textContent = `Incorrect. La réponse était : ${originalCorrectAnswer}`;
-        elements.validationResult.className = "validation-result incorrect";
-    }
-
-    // Update best score
-    if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-        bestScores[currentChapter] = currentScore;
-        if (elements.bestScoreElement) {
-           elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
-        } else {
-           console.error("Best score element not found");
-        }
-    }
-
-    updateCardColorAndSuccessRate();
-
-    if (seenCards.size === cards.length) {
-        showFinalScreen();
-    }
-}
-    
-    function showFinalScreen() {
-        stopTimer();
-        
-        const finalTime = elements.timerElement.textContent;
-        const finalScore = currentScore;
-        const totalCards = vocabularyByChapter[currentChapter].length;
-        const bestScore = bestScores[currentChapter] || 0;
-        const bestTime = elements.bestTimeElement.textContent;
-        
-        const chapterContent = elements.card.innerHTML;
-        
-        elements.frenchWord.style.display = 'none';
-        elements.englishTranslation.style.display = 'none';
-        elements.card.innerHTML = `
-            <div style="text-align: center; width: 100%; padding: 20px;">
-                <h2 style="color: var(--primary-color); margin-bottom: 20px;">Félicitations !</h2>
-                <p>Vous avez terminé toutes les cartes de ce chapitre !</p>
-                <div style="margin: 20px 0;">
-                    <p><strong>Score final :</strong> ${finalScore}/${totalCards}</p>
-                    <p><strong>Temps :</strong> ${finalTime}</p>
-                    <p><strong>Meilleur score :</strong> ${bestScore}/${totalCards}</p>
-                    <p><strong>Meilleur temps :</strong> ${bestTime}</p>
-                </div>
-                <button id="restart-btn" style="padding: 10px 20px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Recommencer</button>
-            </div>
-        `;
-        
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            elements.card.innerHTML = chapterContent;
-            elements.frenchWord = document.querySelector('.french-word');
-            elements.englishTranslation = document.querySelector('.english-translation');
-            elements.successRateElement = document.getElementById('success-rate');
-            
-            restartChapter();
-        });
-        
-        elements.prevBtn.disabled = true;
-        elements.nextBtn.disabled = true;
-        elements.randomBtn.disabled = true;
-        elements.translationInput.disabled = true;
-        elements.validateBtn.disabled = true;
-    }
-    
-    function restartChapter() {
-        seenCards = new Set();
-        cardHistory = [];
-        currentScore = 0;
-        
-        Object.keys(cardPerformance).forEach(key => {
-            if (key.startsWith(`${currentChapter}-`)) {
-                delete cardPerformance[key];
-            }
-        });
-        
-        elements.currentScoreElement.textContent = currentScore;
-        elements.progressBar.style.width = "0%";
-        
-        resetTimer();
-        startTimer();
-        
-        currentCardIndex = 0;
-        
-        if (!document.querySelector('.french-word')) {
-            restoreCardStructure();
-        }
-        
-        const oldPercentButtons = document.getElementById('percent-buttons');
-        if (oldPercentButtons) {
-            oldPercentButtons.remove();
-        }
-        
-        updateCard();
-        
-        elements.translationInput.disabled = false;
-        elements.validateBtn.disabled = false;
-        
-        showToast('Chapitre redémarré !');
-    }
-    
-    function restoreCardStructure() {
-        elements.card.innerHTML = `
-            <div class="card-content">
-                <div class="french-word"></div>
-                <div class="english-translation"></div>
-            </div>
-            <div class="success-rate" id="success-rate"></div>
-        `;
-        elements.frenchWord = document.querySelector('.french-word');
-        elements.englishTranslation = document.querySelector('.english-translation');
-        elements.successRateElement = document.getElementById('success-rate');
-    }
-    
-    function saveState() {
-        const state = {
-            currentChapter,
-            seenCards: Array.from(seenCards),
-            cardPerformance,
-            bestScores,
-            bestTimes,
-            isDarkMode,
-            currentScore
-        };
-        
-        const stateJSON = JSON.stringify(state);
-        const blob = new Blob([stateJSON], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('Sauvegarde réussie!');
-    }
-    
-    function loadState(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const state = JSON.parse(e.target.result);
-                currentChapter = state.currentChapter || 1;
-                seenCards = new Set(state.seenCards || []);
-                cardPerformance = state.cardPerformance || {};
-                bestScores = state.bestScores || {};
-                bestTimes = state.bestTimes || {};
-                currentScore = state.currentScore || 0;
-                isDarkMode = state.isDarkMode || false;
-                document.body.classList.toggle('dark-mode', isDarkMode);
-                elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-                elements.themeToggle.classList.toggle('active', isDarkMode);
-                currentCardIndex = 0;
-                cardHistory = [];
-                elements.chapterButtons.forEach(btn => {
-                    btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
-                });
-                elements.currentScoreElement.textContent = currentScore;
-                updateBestScoreDisplay();
-                updateBestTimeDisplay();
-                resetTimer();
-                startTimer();
-                if (isRawMode) {
-                    generateRawContent();
-                } else {
-                    updateCard();
-                }
-                showToast('Chargement réussi!');
-            } catch (error) {
-                console.error('Erreur lors du chargement:', error);
-                showToast('Erreur lors du chargement du fichier');
-            }
-            elements.loadInput.value = '';
-        };
-        reader.readAsText(file);
-    }
-    
-    function getSortedCardsByPerformance() {
-        const cards = vocabularyByChapter[currentChapter];
-        if (!cards || cards.length === 0) return [];
-        const cardsWithRates = cards.map((_, index) => {
-            const key = `${currentChapter}-${index}`;
-            const perf = cardPerformance[key];
-            const successRate = perf ? perf.successes / perf.attempts : -1;
-            return { index, successRate };
-        });
-        cardsWithRates.sort((a, b) => {
-            const rankA = a.successRate === -1 ? 1 : a.successRate === 1 ? 2 : 0;
-            const rankB = b.successRate === -1 ? 1 : b.successRate === 1 ? 2 : 0;
-            if (rankA !== rankB) return rankA - rankB;
-            if (rankA === 0) return a.successRate - b.successRate;
-            return Math.random() - 0.5;
-        });
-        return cardsWithRates.map(c => c.index);
-    }
-    
-    function updateCard() {
-function resetFeedbackBar() {
-    const feedbackBar = document.querySelector('.feedback-bar');
-    if (feedbackBar) {
-        feedbackBar.style.width = '50%';
-        feedbackBar.style.backgroundColor = 'var(--secondary-color)';
-    }
-}
-        const cards = vocabularyByChapter[currentChapter];
-        if (cards && cards.length > 0) {
-            const cardData = cards[currentCardIndex];
-            elements.frenchWord.textContent = cardData.french;
-            elements.englishTranslation.textContent = cardData.english;
-            seenCards.add(currentCardIndex);
-            elements.englishTranslation.style.display = 'none';
-            isTranslationVisible = false;
-            elements.translationInput.value = '';
-            elements.validationResult.textContent = '';
-            elements.validationResult.className = 'validation-result';
-            updateStatsDisplay();
-            const progressPercentage = (seenCards.size / cards.length) * 100;
-            elements.progressBar.style.width = `${progressPercentage}%`;
-            const percentageElement = elements.progressBar.parentElement.querySelector('.progress-percentage');
-            if (!percentageElement) {
-                const newPercentageElement = document.createElement('div');
-                newPercentageElement.className = 'progress-percentage';
-                newPercentageElement.style.position = 'absolute';
-                newPercentageElement.style.top = '50%';
-                newPercentageElement.style.left = '50%';
-                newPercentageElement.style.transform = 'translate(-50%, -50%)';
-                newPercentageElement.style.color = '#333';
-                newPercentageElement.style.fontWeight = 'bold';
-                newPercentageElement.style.fontSize = '12px';
-                newPercentageElement.style.textShadow = '0 0 2px white';
-                elements.progressBar.parentElement.style.position = 'relative';
-                elements.progressBar.parentElement.appendChild(newPercentageElement);
-            }
-            percentageElement.textContent = `${Math.round(progressPercentage)}% (${seenCards.size}/${cards.length})`;
-            elements.prevBtn.disabled = cardHistory.length === 0;
-            elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
-            updateCardColorAndSuccessRate();
-            if (areAllCardsAnswered()) {
-                stopTimer();
-                showFinalScreen();
-            }
-        } else {
-            showNoCardsMessage();
-        }
-    
-      
-      
-      const originalUpdateCard = updateCard;
-updateCard = function() {
-    originalUpdateCard();
-    resetFeedbackBar();
+        const elements = {
+    searchInput: document.getElementById('search-input'),
+    searchBtn: document.getElementById('search-btn'),
+    searchContainer: document.querySelector('.search-container'),
+    settingsToggle: document.getElementById('settings-toggle'),
+    settingsPanel: document.getElementById('settings-panel'),
+    autoNextToggle: document.getElementById('auto-next-toggle'),
+    autoNextTypeSelect: document.getElementById('auto-next-type-select'),
+    resetBtn: document.getElementById('reset-btn'),
+    chapterButtons: document.querySelectorAll('.chapter-btn'),
+    card: document.querySelector('.card'),
+    cardContainer: document.querySelector('.card-container'),
+    rawContent: document.getElementById('raw-content'),
+    frenchWord: document.querySelector('.french-word'),
+    englishTranslation: document.querySelector('.english-translation'),
+    prevBtn: document.getElementById('prev-btn'),
+    nextBtn: document.getElementById('next-btn'),
+    randomBtn: document.getElementById('random-btn'),
+    progressBar: document.querySelector('.progress-bar'),
+    currentCardElement: document.getElementById('current-card'),
+    totalCardsElement: document.getElementById('total-cards'),
+    timerElement: document.getElementById('timer'),
+    bestTimeElement: document.getElementById('best-time'),
+    cardsSeenElement: document.getElementById('cards-seen'),
+    cardsTotalElement: document.getElementById('cards-total'),
+    themeToggle: document.getElementById('theme-toggle'),
+    rawToggle: document.getElementById('raw-toggle'),
+    translationInput: document.getElementById('translation-input'),
+    validateBtn: document.getElementById('validate-btn'),
+    validationResult: document.getElementById('validation-result'),
+    currentScoreElement: document.getElementById('current-score'),
+    bestScoreElement: document.getElementById('best-score'),
+    successRateElement: document.getElementById('success-rate'),
+    saveBtn: document.getElementById('save-btn'),
+    loadBtn: document.getElementById('load-btn'),
+    loadInput: document.getElementById('load-input'),
+    toastMessage: document.getElementById('toast-message')
 };
-    }
-    
-    function createPercentButton(text, successRate) {
-        const button = document.createElement('button');
-        button.textContent = text;
-        button.style.padding = '8px 15px';
-        button.style.backgroundColor = getColorForSuccessRate(successRate);
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.borderRadius = '5px';
-        button.style.fontWeight = 'bold';
-        button.style.cursor = 'pointer';
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
+        
+        function showToast(message, duration = 3000) {
+            elements.toastMessage.textContent = message;
+            elements.toastMessage.classList.add('show');
+            setTimeout(() => {
+                elements.toastMessage.classList.remove('show');
+            }, duration);
+        }
+
+        function updateFeedbackBar(input) {
+            const cards = vocabularyByChapter[currentChapter];
+            if (!cards || cards.length === 0) return;
+            
+            const currentWord = cards[currentCardIndex].english.toLowerCase().replace(/[^a-z]/g, '');
+            const wordLength = currentWord.length;
+            const userInput = input.toLowerCase().replace(/[^a-z]/g, '');
+            
+            let correctLetters = 0;
+            let incorrectLetters = 0;
+            let remainingTarget = currentWord;
+            
+            for (let i = 0; i < userInput.length; i++) {
+                const char = userInput[i];
+                const indexInTarget = remainingTarget.indexOf(char);
+                
+                if (indexInTarget !== -1) {
+                    correctLetters++;
+                    remainingTarget = remainingTarget.substring(0, indexInTarget) + 
+                                    remainingTarget.substring(indexInTarget + 1);
+                }
+            }
+            
+            incorrectLetters = userInput.length - correctLetters;
+            const score = 0.5 + (correctLetters / (wordLength * 2)) - (incorrectLetters / (wordLength * 2));
+            const clampedScore = Math.max(0, Math.min(1, score));
+            
+            const feedbackBar = document.querySelector('.feedback-bar');
+            if (feedbackBar) {
+                feedbackBar.style.width = `${clampedScore * 100}%`;
+                
+                if (clampedScore < 0.2) {
+                    feedbackBar.style.backgroundColor = '#ff3b30';
+                } else if (clampedScore < 0.4) {
+                    feedbackBar.style.backgroundColor = '#ff9500';
+                } else if (clampedScore < 0.6) {
+                    feedbackBar.style.backgroundColor = '#ffcc00';
+                } else if (clampedScore < 0.8) {
+                    feedbackBar.style.backgroundColor = '#7bed9f';
+                } else {
+                    feedbackBar.style.backgroundColor = '#2ed573';
+                }
+            }
+            
+            const originalCorrectAnswer = cards[currentCardIndex].english.toLowerCase();
+            const userInputProcessed = userInput.toLowerCase();
+            
+            if (userInputProcessed === originalCorrectAnswer.toLowerCase().replace(/[^a-z]/g, '') && 
+                userInput.length > 0 && userInput.length >= currentWord.length * 0.8) {
+                validateTranslation();
+            }
+        }
+
+        function resetFeedbackBar() {
+            const feedbackBar = document.querySelector('.feedback-bar');
+            if (feedbackBar) {
+                feedbackBar.style.width = '50%';
+                feedbackBar.style.backgroundColor = 'var(--secondary-color)';
+            }
+        }
+
+         function validateTranslation() {
+            const userInputRaw = elements.translationInput.value;
+            const userInputProcessed = userInputRaw.trim().toLowerCase().replace(/,/g, '');
+            const cards = vocabularyByChapter[currentChapter];
+            const originalCorrectAnswer = cards[currentCardIndex].english;
+            const correctAnswerLower = originalCorrectAnswer.toLowerCase();
+            const fullCorrectAnswerProcessed = correctAnswerLower.trim().replace(/,/g, '');
+            
+            const alternativeAnswersProcessed = correctAnswerLower.split(' / ').map(item => {
+                const processed = item.trim().replace(/,/g, '');
+                const withoutArticle = processed.replace(/^(a|an|the) /i, '');
+                const withoutTo = processed.replace(/^to /i, '');
+                const withoutBoth = processed.replace(/^(to |a |an |the )/i, '');
+                return [processed, withoutArticle, withoutTo, withoutBoth];
+            }).flat();
+            
+            const isCorrect = userInputProcessed === fullCorrectAnswerProcessed || 
+                            alternativeAnswersProcessed.includes(userInputProcessed);
+            
             const cardKey = `${currentChapter}-${currentCardIndex}`;
             if (!cardPerformance[cardKey]) {
                 cardPerformance[cardKey] = { attempts: 0, successes: 0 };
             }
             cardPerformance[cardKey].attempts++;
-            if (successRate > 0) {
-                cardPerformance[cardKey].successes += successRate;
+            
+            if (isCorrect) {
+                cardPerformance[cardKey].successes++;
+                currentScore++;
+                elements.currentScoreElement.textContent = currentScore.toFixed(1);
+                elements.validationResult.textContent = "Correct !";
+                elements.validationResult.className = "validation-result correct";
+                
+                // Changer automatiquement de mot si la réponse est correcte et le mode auto est activé
+                if (autoNextMode) {
+                    setTimeout(() => {
+                        moveToNextCard();
+                    }, 500); // Délai court pour permettre à l'utilisateur de voir la validation
+                }
+            } else {
+                elements.validationResult.textContent = `Incorrect. La réponse était : ${originalCorrectAnswer}`;
+                elements.validationResult.className = "validation-result incorrect";
             }
-            currentScore += successRate;
-            elements.currentScoreElement.textContent = currentScore;
+            
             if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
                 bestScores[currentChapter] = currentScore;
-                elements.bestScoreElement.textContent = bestScores[currentChapter];
+                if (elements.bestScoreElement) {
+                   elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
+                } else {
+                   console.error("Best score element not found");
+                }
             }
+            
             updateCardColorAndSuccessRate();
-            isTranslationVisible = false;
-            elements.englishTranslation.style.display = 'none';
-            const percentButtons = document.getElementById('percent-buttons');
-            if (percentButtons) {
-                percentButtons.style.display = 'none';
+        }
+        
+        
+        function createPercentButton(text, successRate) {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.style.padding = '8px 15px';
+            button.style.backgroundColor = getColorForSuccessRate(successRate);
+            button.style.color = 'white';
+            button.style.border = 'none';
+            button.style.borderRadius = '5px';
+            button.style.fontWeight = 'bold';
+            button.style.cursor = 'pointer';
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                if (scoreButtonsUsed) {
+                    showToast("Vous avez déjà évalué cette carte!");
+                    return;
+                }
+                
+                const cardKey = `${currentChapter}-${currentCardIndex}`;
+                if (!cardPerformance[cardKey]) {
+                    cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+                }
+                cardPerformance[cardKey].attempts++;
+                if (successRate > 0) {
+                    cardPerformance[cardKey].successes += successRate;
+                }
+                currentScore += successRate;
+                elements.currentScoreElement.textContent = currentScore.toFixed(1);
+                if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+                    bestScores[currentChapter] = currentScore;
+                    elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
+                }
+                updateCardColorAndSuccessRate();
+                
+                scoreButtonsUsed = true;
+                
+                const buttons = document.querySelectorAll('#percent-buttons button');
+                buttons.forEach(btn => {
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                });
+                
+                if (areAllCardsAnswered()) {
+                    stopTimer();
+                    showFinalScreen();
+                }
+            });
+            return button;
+        }
+
+        function handleCardClick() {
+            isTranslationVisible = !isTranslationVisible;
+            elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
+            
+            if (isTranslationVisible) {
+                revealedCards[`${currentChapter}-${currentCardIndex}`] = true;
+                elements.translationInput.disabled = true;
+                elements.validateBtn.disabled = true;
+                
+                if (!document.getElementById('percent-buttons')) {
+                    const percentButtonsDiv = document.createElement('div');
+                    percentButtonsDiv.id = 'percent-buttons';
+                    percentButtonsDiv.style.display = 'flex';
+                    percentButtonsDiv.style.justifyContent = 'space-around';
+                    percentButtonsDiv.style.marginTop = '15px';
+                    percentButtonsDiv.style.position = 'absolute';
+                    percentButtonsDiv.style.bottom = '15px';
+                    percentButtonsDiv.style.left = '0';
+                    percentButtonsDiv.style.right = '0';
+                    
+                    const btn100 = createPercentButton('100%', 1);
+                    const btn50 = createPercentButton('50%', 0.5);
+                    const btn0 = createPercentButton('0%', 0);
+                    
+                    const resetCardBtn = document.createElement('button');
+                    resetCardBtn.textContent = 'Reset';
+                    resetCardBtn.style.padding = '8px 15px';
+                    resetCardBtn.style.backgroundColor = '#7f8c8d';
+                    resetCardBtn.style.color = 'white';
+                    resetCardBtn.style.border = 'none';
+                    resetCardBtn.style.borderRadius = '5px';
+                    resetCardBtn.style.fontWeight = 'bold';
+                    resetCardBtn.style.cursor = 'pointer';
+                    resetCardBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const cardKey = `${currentChapter}-${currentCardIndex}`;
+                        if (cardPerformance[cardKey]) {
+                            delete cardPerformance[cardKey];
+                            updateCardColorAndSuccessRate();
+                            showToast("Score de carte réinitialisé!");
+                        }
+                    });
+                    
+                    percentButtonsDiv.appendChild(btn100);
+                    percentButtonsDiv.appendChild(btn50);
+                    percentButtonsDiv.appendChild(btn0);
+                    percentButtonsDiv.appendChild(resetCardBtn);
+                    
+                    elements.card.appendChild(percentButtonsDiv);
+                    
+                    if (scoreButtonsUsed) {
+                        const buttons = percentButtonsDiv.querySelectorAll('button');
+                        buttons.forEach(btn => {
+                            if (btn.textContent !== 'Reset') {
+                                btn.style.opacity = '0.5';
+                                btn.style.cursor = 'not-allowed';
+                            }
+                        });
+                    }
+                } else {
+                    document.getElementById('percent-buttons').style.display = 'flex';
+                    
+                    if (scoreButtonsUsed) {
+                        const buttons = document.querySelectorAll('#percent-buttons button');
+                        buttons.forEach(btn => {
+                            if (btn.textContent !== 'Reset') {
+                                btn.style.opacity = '0.5';
+                                btn.style.cursor = 'not-allowed';
+                            }
+                        });
+                    }
+                }
+            } else {
+                elements.translationInput.disabled = true;
+                elements.validateBtn.disabled = true;
+                
+                const percentButtons = document.getElementById('percent-buttons');
+                if (percentButtons) {
+                    percentButtons.style.display = 'none';
+                }
             }
-            if (areAllCardsAnswered()) {
-                stopTimer();
-                showFinalScreen();
-            }
-        });
-        return button;
-    }
+        }
+
+// Modify updateCard function to check if the card has been revealed
+function searchTranslation() {
+    const searchTerm = elements.searchInput.value.toLowerCase().trim();
+    if (!searchTerm) return;
     
-    function getColorForSuccessRate(rate) {
-        if (rate === 1) return '#2ecc71';
-        if (rate === 0.5) return '#f39c12';
-        return '#e74c3c';
-    }
-    
-    function showNoCardsMessage() {
-        elements.frenchWord.textContent = "Aucune carte disponible";
-        elements.englishTranslation.textContent = "";
-        elements.englishTranslation.style.display = 'none';
-        elements.currentCardElement.textContent = "0";
-        elements.totalCardsElement.textContent = "0";
-        elements.cardsSeenElement.textContent = "0";
-        elements.cardsTotalElement.textContent = "0";
-        elements.progressBar.style.width = "0%";
-        elements.prevBtn.disabled = true;
-        elements.nextBtn.disabled = true;
-        elements.randomBtn.disabled = true;
-        elements.successRateElement.textContent = "";
-    }
-    
-    function updateStatsDisplay() {
-        const cards = vocabularyByChapter[currentChapter];
-        elements.currentCardElement.textContent = currentCardIndex + 1;
-        elements.totalCardsElement.textContent = cards.length;
-        elements.cardsSeenElement.textContent = seenCards.size;
-        elements.cardsTotalElement.textContent = cards.length;
-    }
-    
-    function updateCardColorAndSuccessRate() {
-        const cardKey = `${currentChapter}-${currentCardIndex}`;
-        if (cardPerformance[cardKey]) {
-            const performance = cardPerformance[cardKey];
-            const successRate = performance.successes / performance.attempts;
-            const successPercentage = Math.round(successRate * 100);
-            elements.successRateElement.textContent = `${successPercentage}%`;
-            const r = Math.round(231 - (successRate * 231));
-            const g = Math.round(46 + (successRate * 140));
-            const b = Math.round(60 - (successRate * 50));
-            elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-            elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
-            elements.successRateElement.style.backgroundColor = successRate > 0.5 ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
-            elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
-        } else {
-            elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
-            elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
-            elements.successRateElement.textContent = "";
+    const cards = vocabularyByChapter[currentChapter];
+    for (let i = 0; i < cards.length; i++) {
+        const frenchTerm = cards[i].french.toLowerCase();
+        const englishTerm = cards[i].english.toLowerCase();
+        
+        if (frenchTerm.includes(searchTerm) || englishTerm.includes(searchTerm)) {
+            currentCardIndex = i;
+            updateCard();
+            showToast(`Trouvé: "${cards[i].french} - ${cards[i].english}"`);
+            return;
         }
     }
     
-    function generateRawContent() {
+    showToast("Aucune correspondance trouvée");
+}
+
+function showSearchPreview(e) {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    if (!searchTerm) {
+        if (elements.searchPreview) {
+            elements.searchPreview.style.display = 'none';
+        }
+        return;
+    }
+    
+    const cards = vocabularyByChapter[currentChapter];
+    let matches = [];
+    
+    for (let i = 0; i < cards.length; i++) {
+        const frenchTerm = cards[i].french.toLowerCase();
+        const englishTerm = cards[i].english.toLowerCase();
+        
+        if (frenchTerm.includes(searchTerm) || englishTerm.includes(searchTerm)) {
+            matches.push({
+                index: i,
+                french: cards[i].french,
+                english: cards[i].english
+            });
+            
+            if (matches.length >= 5) break; // Limit to 5 preview results
+        }
+    }
+    
+    // Create or update search preview dropdown
+    if (!elements.searchPreview) {
+        elements.searchPreview = document.createElement('div');
+        elements.searchPreview.className = 'search-preview';
+        elements.searchPreview.style.position = 'absolute';
+        elements.searchPreview.style.width = '100%';
+        elements.searchPreview.style.maxHeight = '200px';
+        elements.searchPreview.style.overflow = 'auto';
+        elements.searchPreview.style.backgroundColor = 'white';
+        elements.searchPreview.style.border = '1px solid #ccc';
+        elements.searchPreview.style.borderRadius = '4px';
+        elements.searchPreview.style.zIndex = '1000';
+        elements.searchPreview.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        elements.searchContainer.appendChild(elements.searchPreview);
+    }
+    
+    if (matches.length > 0) {
+        elements.searchPreview.innerHTML = '';
+        matches.forEach(match => {
+            const item = document.createElement('div');
+            item.className = 'search-preview-item';
+            item.style.padding = '8px 12px';
+            item.style.cursor = 'pointer';
+            item.style.borderBottom = '1px solid #eee';
+            item.innerHTML = `<b>${match.french}</b> = ${match.english}`;
+            
+            item.addEventListener('click', () => {
+                currentCardIndex = match.index;
+                updateCard();
+                elements.searchPreview.style.display = 'none';
+                elements.searchInput.value = '';
+                showToast(`Sélectionné: "${match.french} - ${match.english}"`);
+            });
+            
+            item.addEventListener('mouseover', () => {
+                item.style.backgroundColor = '#f0f0f0';
+            });
+            
+            item.addEventListener('mouseout', () => {
+                item.style.backgroundColor = 'white';
+            });
+            
+            elements.searchPreview.appendChild(item);
+        });
+        elements.searchPreview.style.display = 'block';
+    } else {
+        elements.searchPreview.innerHTML = '<div style="padding: 8px 12px; color: #999;">Aucune correspondance</div>';
+        elements.searchPreview.style.display = 'block';
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (elements.searchPreview && !elements.searchContainer.contains(e.target)) {
+        elements.searchPreview.style.display = 'none';
+    }
+});
+       function initAdditionalEventListeners() {
+    // Écouteur pour la recherche
+    elements.searchBtn.addEventListener('click', searchTranslation);
+    elements.searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchTranslation();
+    });
+    
+    // Add predictive search functionality
+    elements.searchInput.addEventListener('input', showSearchPreview);
+    
+    // Écouteur pour le toggle des paramètres
+    elements.settingsToggle.addEventListener('click', () => {
+        elements.settingsPanel.style.display = 
+            elements.settingsPanel.style.display === 'none' || 
+            elements.settingsPanel.style.display === '' ? 'block' : 'none';
+    });
+    
+    // Écouteur pour le toggle du mode automatique
+    elements.autoNextToggle.addEventListener('change', (e) => {
+        autoNextMode = e.target.checked;
+    });
+    
+    // Écouter pour le type d'avancement automatique
+    elements.autoNextTypeSelect.addEventListener('change', (e) => {
+        autoNextType = e.target.value;
+    });
+}
+       
+       function moveToNextCard() {
+    if (autoNextType === 'next') {
+        // Original behavior - move to next card
+        if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
+            cardHistory.push(currentCardIndex);
+            currentCardIndex++;
+            updateCard();
+        } else {
+            const randomIndex = Math.floor(Math.random() * vocabularyByChapter[currentChapter].length);
+            cardHistory.push(currentCardIndex);
+            currentCardIndex = randomIndex;
+            updateCard();
+        }
+    } else {
+        // Random behavior - choose a random card
+        const cards = vocabularyByChapter[currentChapter];
+        const randomIndex = Math.floor(Math.random() * cards.length);
+        cardHistory.push(currentCardIndex);
+        currentCardIndex = randomIndex;
+        updateCard();
+    }
+    
+    // Réinitialiser le champ de saisie
+    elements.translationInput.value = '';
+    elements.validationResult.textContent = '';
+    elements.translationInput.focus();
+}
+
+function updateCard() {
+    const cards = vocabularyByChapter[currentChapter];
+    if (!cards || cards.length === 0) {
+        showNoCardsMessage();
+        return;
+    }
+    
+    const cardData = cards[currentCardIndex];
+    elements.frenchWord.textContent = cardData.french;
+    elements.englishTranslation.textContent = cardData.english;
+    seenCards.add(currentCardIndex);
+    elements.englishTranslation.style.display = 'none';
+    isTranslationVisible = false;
+    
+    // Remove percentage buttons when changing card
+    const percentButtons = document.getElementById('percent-buttons');
+    if (percentButtons) percentButtons.remove();
+    
+    elements.translationInput.value = '';
+    elements.validationResult.textContent = '';
+    elements.validationResult.className = 'validation-result';
+    
+    const cardKey = `${currentChapter}-${currentCardIndex}`;
+    elements.translationInput.disabled = revealedCards[cardKey] ? true : false;
+    elements.validateBtn.disabled = revealedCards[cardKey] ? true : false;
+    scoreButtonsUsed = false;
+    
+    if (areAllCardsAnswered()) {
+        elements.translationInput.disabled = false;
+        elements.validateBtn.disabled = false;
+        revealedCards = {};
+    }
+    
+    updateStatsDisplay();
+    
+    const progressPercentage = (seenCards.size / cards.length) * 100;
+    elements.progressBar.style.width = `${progressPercentage}%`;
+    
+    let percentageElement = elements.progressBar.parentElement.querySelector('.progress-percentage');
+    if (!percentageElement) {
+        percentageElement = document.createElement('div');
+        percentageElement.className = 'progress-percentage';
+        percentageElement.style.position = 'absolute';
+        percentageElement.style.top = '50%';
+        percentageElement.style.left = '50%';
+        percentageElement.style.transform = 'translate(-50%, -50%)';
+        percentageElement.style.color = '#333';
+        percentageElement.style.fontWeight = 'bold';
+        percentageElement.style.fontSize = '12px';
+        percentageElement.style.textShadow = '0 0 2px white';
+        elements.progressBar.parentElement.style.position = 'relative';
+        elements.progressBar.parentElement.appendChild(percentageElement);
+    }
+    percentageElement.textContent = `${Math.round(progressPercentage)}% (${seenCards.size}/${cards.length})`;
+    
+    elements.prevBtn.disabled = cardHistory.length === 0;
+    elements.nextBtn.disabled = currentCardIndex === cards.length - 1;
+    
+    updateCardColorAndSuccessRate();
+    resetFeedbackBar();
+}
+function areAllCardsAnswered() {
+    const cards = vocabularyByChapter[currentChapter];
+    return seenCards.size === cards.length && seenCards.size > 0;
+}
+
+function restartChapter() {
+    seenCards = new Set();
+    cardHistory = [];
+    currentScore = 0;
+    
+    Object.keys(revealedCards).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) delete revealedCards[key];
+    });
+    
+    Object.keys(cardPerformance).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) delete cardPerformance[key];
+    });
+    
+    elements.currentScoreElement.textContent = currentScore;
+    elements.progressBar.style.width = "0%";
+    
+    resetTimer();
+    startTimer();
+    
+    currentCardIndex = 0;
+    
+    if (!document.querySelector('.french-word')) restoreCardStructure();
+    
+    const oldPercentButtons = document.getElementById('percent-buttons');
+    if (oldPercentButtons) oldPercentButtons.remove();
+    
+    updateCard();
+    
+    elements.translationInput.disabled = false;
+    elements.validateBtn.disabled = false;
+    
+    showToast('Chapitre redémarré !');
+}
+
+function resetProgress() {
+    seenCards = new Set();
+    cardHistory = [];
+    currentScore = 0;
+    
+    Object.keys(revealedCards).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) delete revealedCards[key];
+    });
+    
+    Object.keys(cardPerformance).forEach(key => {
+        if (key.startsWith(`${currentChapter}-`)) delete cardPerformance[key];
+    });
+    
+    if (bestTimes[currentChapter]) {
+        delete bestTimes[currentChapter];
+        updateBestTimeDisplay();
+    }
+    
+    if (bestScores[currentChapter]) {
+        delete bestScores[currentChapter];
+        updateBestScoreDisplay();
+    }
+    
+    elements.currentScoreElement.textContent = currentScore;
+    elements.progressBar.style.width = "0%";
+    
+    const percentButtons = document.getElementById('percent-buttons');
+    if (percentButtons) percentButtons.style.display = 'none';
+    
+    resetTimer();
+    startTimer();
+    
+    currentCardIndex = 0;
+    updateCard();
+    
+    elements.translationInput.disabled = false;
+    elements.validateBtn.disabled = false;
+    
+    showToast('Progression réinitialisée !');
+}
+
+function handleChapterChange(chapter) {
+    if (chapter === currentChapter) return;
+    
+    const percentButtons = document.getElementById('percent-buttons');
+    if (percentButtons) percentButtons.style.display = 'none';
+    
+    elements.chapterButtons.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
+    });
+    
+    if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+        bestScores[currentChapter] = currentScore;
+    }
+    
+    currentChapter = chapter;
+    cardHistory = [];
+    seenCards = new Set();
+    currentScore = 0;
+    currentCardIndex = 0; // Reset to first card of new chapter
+    
+    resetTimer();
+    startTimer();
+    updateBestScoreDisplay();
+    updateBestTimeDisplay();
+    
+    scoreButtonsUsed = false;
+    elements.currentScoreElement.textContent = currentScore.toFixed(1);
+    
+    if (isRawMode) generateRawContent();
+    else updateCard();
+}
+function saveState() {
+    const state = {
+        currentChapter,
+        seenCards: Array.from(seenCards),
+        cardPerformance,
+        bestScores,
+        bestTimes,
+        isDarkMode,
+        currentScore,
+        revealedCards
+    };
+    
+    const stateJSON = JSON.stringify(state);
+    const blob = new Blob([stateJSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Sauvegarde réussie!');
+}
+
+function loadState(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const state = JSON.parse(e.target.result);
+            currentChapter = state.currentChapter || 1;
+            seenCards = new Set(state.seenCards || []);
+            cardPerformance = state.cardPerformance || {};
+            bestScores = state.bestScores || {};
+            bestTimes = state.bestTimes || {};
+            currentScore = state.currentScore || 0;
+            isDarkMode = state.isDarkMode || false;
+            revealedCards = state.revealedCards || {};
+            
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+            elements.themeToggle.classList.toggle('active', isDarkMode);
+            currentCardIndex = 0;
+            cardHistory = [];
+            elements.chapterButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
+            });
+            elements.currentScoreElement.textContent = currentScore;
+            updateBestScoreDisplay();
+            updateBestTimeDisplay();
+            resetTimer();
+            startTimer();
+            
+            if (isRawMode) generateRawContent();
+            else updateCard();
+            
+            showToast('Chargement réussi!');
+        } catch (error) {
+            console.error('Erreur lors du chargement:', error);
+            showToast('Erreur lors du chargement du fichier');
+        }
+        elements.loadInput.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function init() {
+  initAdditionalEventListeners();
+    const savedData = localStorage.getItem('flashcardsData');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            seenCards = new Set(data.seenCards || []);
+            cardPerformance = data.cardPerformance || {};
+            bestScores = data.bestScores || {};
+            bestTimes = data.bestTimes || {};
+            isDarkMode = data.isDarkMode || false;
+            revealedCards = data.revealedCards || {};
+            
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+            elements.themeToggle.classList.toggle('active', isDarkMode);
+        } catch (e) {
+            console.error("Erreur lors du chargement des données:", e);
+        }
+    }
+    initEventListeners();
+    updateBestScoreDisplay();
+    updateBestTimeDisplay();
+    startTimer();
+    
+    if (isRawMode) generateRawContent();
+    else updateCard();
+    
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('flashcardsData', JSON.stringify({
+            seenCards: Array.from(seenCards),
+            cardPerformance,
+            bestScores,
+            bestTimes,
+            isDarkMode,
+            revealedCards
+        }));
+    });
+}
+
+function getColorForSuccessRate(rate) {
+    if (rate === 1) return '#2ecc71';
+    if (rate === 0.5) return '#f39c12';
+    return '#e74c3c';
+}
+
+function showNoCardsMessage() {
+    elements.frenchWord.textContent = "Aucune carte disponible";
+    elements.englishTranslation.textContent = "";
+    elements.englishTranslation.style.display = 'none';
+    elements.currentCardElement.textContent = "0";
+    elements.totalCardsElement.textContent = "0";
+    elements.cardsSeenElement.textContent = "0";
+    elements.cardsTotalElement.textContent = "0";
+    elements.progressBar.style.width = "0%";
+    elements.prevBtn.disabled = true;
+    elements.nextBtn.disabled = true;
+    elements.randomBtn.disabled = true;
+    elements.successRateElement.textContent = "";
+}
+
+function updateStatsDisplay() {
+    const cards = vocabularyByChapter[currentChapter];
+    elements.currentCardElement.textContent = currentCardIndex + 1;
+    elements.totalCardsElement.textContent = cards.length;
+    elements.cardsSeenElement.textContent = seenCards.size;
+    elements.cardsTotalElement.textContent = cards.length;
+}
+
+function updateCardColorAndSuccessRate() {
+    const cardKey = `${currentChapter}-${currentCardIndex}`;
+    if (cardPerformance[cardKey]) {
+        const performance = cardPerformance[cardKey];
+        const successRate = performance.successes / performance.attempts;
+        const successPercentage = Math.round(successRate * 100);
+        elements.successRateElement.textContent = `${successPercentage}%`;
+        const r = Math.round(231 - (successRate * 231));
+        const g = Math.round(46 + (successRate * 140));
+        const b = Math.round(60 - (successRate * 50));
+        elements.card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        elements.frenchWord.style.color = successRate > 0.5 ? "#333" : "#fff";
+        elements.successRateElement.style.backgroundColor = successRate > 0.5 ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)";
+        elements.successRateElement.style.color = successRate > 0.5 ? "#333" : "#fff";
+    } else {
+        elements.card.style.backgroundColor = isDarkMode ? "#2c3e50" : "#fff";
+        elements.frenchWord.style.color = isDarkMode ? "#ffffff" : "#3498db";
+        elements.successRateElement.textContent = "";
+    }
+}
+
+function generateRawContent() {
     const cards = vocabularyByChapter[currentChapter];
     let content = `Chapter ${currentChapter}\n\n`;
     
@@ -2626,255 +3069,297 @@ updateCard = function() {
     
     elements.rawContent.textContent = content;
 }
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    document.body.classList.toggle('dark-mode', isDarkMode);
+    elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+    elements.themeToggle.classList.toggle('active', isDarkMode);
     
-    function toggleDarkMode() {
-        isDarkMode = !isDarkMode;
-        document.body.classList.toggle('dark-mode', isDarkMode);
-        elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-        elements.themeToggle.classList.toggle('active', isDarkMode);
-        if (isDarkMode) {
-            document.querySelectorAll('.btn').forEach(btn => {
-                if (btn.disabled) {
-                    btn.style.backgroundColor = '#4a5568';
-                    btn.style.color = '#a0aec0';
-                } else {
-                    btn.style.backgroundColor = '#3498db';
-                    btn.style.color = 'white';
-                }
-            });
-            document.querySelectorAll('.chapter-btn.active, .mode-btn.active').forEach(btn => {
+    if (isDarkMode) {
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (btn.disabled) {
+                btn.style.backgroundColor = '#4a5568';
+                btn.style.color = '#a0aec0';
+            } else {
                 btn.style.backgroundColor = '#3498db';
                 btn.style.color = 'white';
-            });
-        } else {
-            document.querySelectorAll('.btn, .chapter-btn, .mode-btn').forEach(btn => {
-                btn.style.backgroundColor = '';
-                btn.style.color = '';
-            });
-        }
-        updateCardColorAndSuccessRate();
+            }
+        });
+        document.querySelectorAll('.chapter-btn.active, .mode-btn.active').forEach(btn => {
+            btn.style.backgroundColor = '#3498db';
+            btn.style.color = 'white';
+        });
+    } else {
+        document.querySelectorAll('.btn, .chapter-btn, .mode-btn').forEach(btn => {
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+        });
     }
+    updateCardColorAndSuccessRate();
+}
+
+function toggleRawMode() {
+    isRawMode = !isRawMode;
+    elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
+    elements.rawToggle.classList.toggle('active', isRawMode);
     
-    function toggleRawMode() {
-        isRawMode = !isRawMode;
-        elements.rawToggle.textContent = isRawMode ? "Mode Flash Cards" : "Mode Raw";
-        elements.rawToggle.classList.toggle('active', isRawMode);
-        if (isRawMode) {
-            elements.cardContainer.style.display = 'none';
-            elements.rawContent.style.display = 'block';
-            document.querySelector('.controls').style.display = 'none';
-            elements.validationContainer.style.display = 'none';
-            generateRawContent();
-        } else {
-            elements.cardContainer.style.display = 'block';
-            elements.rawContent.style.display = 'none';
-            document.querySelector('.controls').style.display = 'flex';
-            elements.validationContainer.style.display = 'flex';
+    if (isRawMode) {
+        elements.cardContainer.style.display = 'none';
+        elements.rawContent.style.display = 'block';
+        document.querySelector('.controls').style.display = 'none';
+        elements.validationContainer.style.display = 'none';
+        generateRawContent();
+    } else {
+        elements.cardContainer.style.display = 'block';
+        elements.rawContent.style.display = 'none';
+        document.querySelector('.controls').style.display = 'flex';
+        elements.validationContainer.style.display = 'flex';
+        updateCard();
+    }
+}
+
+function updateBestScoreDisplay() {
+    const bestScore = bestScores[currentChapter] || 0;
+    elements.bestScoreElement.textContent = bestScore;
+}
+
+function startTimer() {
+    if (!isTimerActive) return;
+    clearInterval(timerInterval);
+    startTime = new Date();
+    timerInterval = setInterval(() => {
+        const now = new Date();
+        const diff = new Date(now - startTime);
+        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+        elements.timerElement.textContent = `${minutes}:${seconds}`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    if (isTimerActive) {
+        const now = new Date();
+        const totalTime = now - startTime;
+        if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
+            bestTimes[currentChapter] = totalTime;
+            updateBestTimeDisplay();
+        }
+    }
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    elements.timerElement.textContent = "00:00";
+}
+
+function updateBestTimeDisplay() {
+    const bestTime = bestTimes[currentChapter];
+    if (bestTime) {
+        const diff = new Date(bestTime);
+        const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
+        elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
+    } else {
+        elements.bestTimeElement.textContent = "-";
+    }
+}
+
+function initEventListeners() {
+    elements.resetBtn.addEventListener('click', resetProgress);
+    
+    elements.chapterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const chapter = parseInt(button.dataset.chapter);
+            handleChapterChange(chapter);
+        });
+    });
+    
+    elements.card.addEventListener('click', handleCardClick);
+    
+    elements.prevBtn.addEventListener('click', () => {
+        if (cardHistory.length > 0) {
+            currentCardIndex = cardHistory.pop();
             updateCard();
         }
-    }
+    });
     
-    function updateBestScoreDisplay() {
-        const bestScore = bestScores[currentChapter] || 0;
-        elements.bestScoreElement.textContent = bestScore;
-    }
-    
-    function startTimer() {
-        if (!isTimerActive) return;
-        clearInterval(timerInterval);
-        startTime = new Date();
-        timerInterval = setInterval(() => {
-            const now = new Date();
-            const diff = new Date(now - startTime);
-            const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-            const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-            elements.timerElement.textContent = `${minutes}:${seconds}`;
-        }, 1000);
-    }
-    
-    function stopTimer() {
-        clearInterval(timerInterval);
-        if (isTimerActive) {
-            const now = new Date();
-            const totalTime = now - startTime;
-            if (!bestTimes[currentChapter] || totalTime < bestTimes[currentChapter]) {
-                bestTimes[currentChapter] = totalTime;
-                updateBestTimeDisplay();
-            }
+    elements.nextBtn.addEventListener('click', () => {
+        if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
+            cardHistory.push(currentCardIndex);
+            currentCardIndex++;
+            updateCard();
         }
-    }
+    });
     
-    function resetTimer() {
-        clearInterval(timerInterval);
-        elements.timerElement.textContent = "00:00";
-    }
-    
-    function updateBestTimeDisplay() {
-        const bestTime = bestTimes[currentChapter];
-        if (bestTime) {
-            const diff = new Date(bestTime);
-            const minutes = String(diff.getUTCMinutes()).padStart(2, '0');
-            const seconds = String(diff.getUTCSeconds()).padStart(2, '0');
-            elements.bestTimeElement.textContent = `${minutes}:${seconds}`;
-        } else {
-            elements.bestTimeElement.textContent = "-";
-        }
-    }
-    
-    function initEventListeners() {
-        elements.resetBtn.addEventListener('click', resetProgress);
-        elements.chapterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const chapter = parseInt(button.dataset.chapter);
-                if (chapter === currentChapter) return;
-                const percentButtons = document.getElementById('percent-buttons');
-                if (percentButtons) {
-                    percentButtons.style.display = 'none';
-                }
-                elements.chapterButtons.forEach(btn => {
-                    btn.classList.toggle('active', parseInt(btn.dataset.chapter) === chapter);
-                });
-                currentChapter = chapter;
-                cardHistory = [];
-                seenCards = new Set();
-                currentScore = 0;
-                elements.currentScoreElement.textContent = currentScore;
-                const sortedIndices = getSortedCardsByPerformance();
-                currentCardIndex = sortedIndices.length > 0 ? sortedIndices[0] : 0;
-                resetTimer();
-                startTimer();
-                updateBestScoreDisplay();
-                updateBestTimeDisplay();
-                if (isRawMode) {
-                    generateRawContent();
-                } else {
-                    updateCard();
-                }
-            });
-        });
-        elements.card.addEventListener('click', () => {
-            isTranslationVisible = !isTranslationVisible;
-            elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
-            if (isTranslationVisible) {
-                if (!document.getElementById('percent-buttons')) {
-                    const percentButtonsDiv = document.createElement('div');
-                    percentButtonsDiv.id = 'percent-buttons';
-                    percentButtonsDiv.style.display = 'flex';
-                    percentButtonsDiv.style.justifyContent = 'space-around';
-                    percentButtonsDiv.style.marginTop = '15px';
-                    percentButtonsDiv.style.position = 'absolute';
-                    percentButtonsDiv.style.bottom = '15px';
-                    percentButtonsDiv.style.left = '0';
-                    percentButtonsDiv.style.right = '0';
-                    const btn100 = createPercentButton('100%', 1);
-                    const btn50 = createPercentButton('50%', 0.5);
-                    const btn0 = createPercentButton('0%', 0);
-                    percentButtonsDiv.appendChild(btn100);
-                    percentButtonsDiv.appendChild(btn50);
-                    percentButtonsDiv.appendChild(btn0);
-                    elements.card.appendChild(percentButtonsDiv);
-                } else {
-                    document.getElementById('percent-buttons').style.display = 'flex';
-                }
-            } else {
-                const percentButtons = document.getElementById('percent-buttons');
-                if (percentButtons) {
-                    percentButtons.style.display = 'none';
-                }
-            }
-        });
-        elements.prevBtn.addEventListener('click', () => {
-            if (cardHistory.length > 0) {
-                currentCardIndex = cardHistory.pop();
-                updateCard();
-            }
-        });
-        elements.nextBtn.addEventListener('click', () => {
-            if (currentCardIndex < vocabularyByChapter[currentChapter].length - 1) {
-                cardHistory.push(currentCardIndex);
-                currentCardIndex++;
-                updateCard();
-            }
-        });
-        elements.randomBtn.addEventListener('click', () => {
-    // Hide percent buttons if visible
+    elements.randomBtn.addEventListener('click', () => {
     const percentButtons = document.getElementById('percent-buttons');
-    if (percentButtons) {
-        percentButtons.style.display = 'none';
-    }
-            const cards = vocabularyByChapter[currentChapter];
-            const unseenIndices = cards.map((_, index) => index).filter(index => !seenCards.has(index));
-            if (unseenIndices.length > 0) {
-                const randomIdx = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
-                cardHistory.push(currentCardIndex);
-                currentCardIndex = randomIdx;
-                updateCard();
-            } else {
-                seenCards = new Set();
-                showToast("Toutes les cartes ont été vues. Réinitialisation.");
-                const randomIdx = Math.floor(Math.random() * cards.length);
-                cardHistory.push(currentCardIndex);
-                currentCardIndex = randomIdx;
-                updateCard();
-            }
-        });
-        elements.validateBtn.addEventListener('click', validateTranslation);
-        elements.translationInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                validateTranslation();
-            }
-        });
-        
-        elements.translationInput.addEventListener('input', (e) => {
-    updateFeedbackBar(e.target.value);
-});
-        elements.themeToggle.addEventListener('click', toggleDarkMode);
-        elements.rawToggle.addEventListener('click', toggleRawMode);
-        elements.saveBtn.addEventListener('click', saveState);
-        elements.loadBtn.addEventListener('click', () => {
-            elements.loadInput.click();
-        });
-        elements.loadInput.addEventListener('change', loadState);
-    }
+    if (percentButtons) percentButtons.style.display = 'none';
     
-    function init() {
-        const savedData = localStorage.getItem('flashcardsData');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                seenCards = new Set(data.seenCards || []);
-                cardPerformance = data.cardPerformance || {};
-                bestScores = data.bestScores || {};
-                bestTimes = data.bestTimes || {};
-                isDarkMode = data.isDarkMode || false;
-                document.body.classList.toggle('dark-mode', isDarkMode);
-                elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
-                elements.themeToggle.classList.toggle('active', isDarkMode);
-            } catch (e) {
-                console.error("Erreur lors du chargement des données:", e);
-            }
-        }
-        initEventListeners();
-        updateBestScoreDisplay();
-        updateBestTimeDisplay();
-        startTimer();
-        if (isRawMode) {
-            generateRawContent();
-        } else {
-            updateCard();
-        }
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('flashcardsData', JSON.stringify({
-                seenCards: Array.from(seenCards),
-                cardPerformance,
-                bestScores,
-                bestTimes,
-                isDarkMode
-            }));
-        });
+    const cards = vocabularyByChapter[currentChapter];
+    const unseenIndices = cards.map((_, index) => index).filter(index => !seenCards.has(index));
+    
+    if (unseenIndices.length > 0) {
+        const randomIdx = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
+        cardHistory.push(currentCardIndex);
+        currentCardIndex = randomIdx;
+        updateCard();
+    } else {
+        seenCards = new Set();
+        showToast("Toutes les cartes ont été vues. Réinitialisation.");
+        const randomIdx = Math.floor(Math.random() * cards.length);
+        cardHistory.push(currentCardIndex);
+        currentCardIndex = randomIdx;
+        
+        // Enable input fields when resetting
+        const cardKey = `${currentChapter}-${randomIdx}`;
+        elements.translationInput.disabled = revealedCards[cardKey] ? true : false;
+        elements.validateBtn.disabled = revealedCards[cardKey] ? true : false;
+        
+        updateCard();
     }
+});
+    
+    elements.validateBtn.addEventListener('click', validateTranslation);
+    
+    elements.translationInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validateTranslation();
+    });
+    
+    elements.translationInput.addEventListener('input', (e) => {
+        updateFeedbackBar(e.target.value);
+    });
+    
+    elements.themeToggle.addEventListener('click', toggleDarkMode);
+    elements.rawToggle.addEventListener('click', toggleRawMode);
+    elements.saveBtn.addEventListener('click', saveState);
+    
+    elements.loadBtn.addEventListener('click', () => {
+        elements.loadInput.click();
+    });
+    
+    elements.loadInput.addEventListener('change', loadState);
+}
+
     
     init();
+    const originalInit = init;
+init = function() {
+    originalInit();
+    initAdditionalEventListeners();
+    
+    // Restaurer l'état des toggles depuis localStorage
+    const savedData = localStorage.getItem('flashcardsData');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            autoNextMode = data.autoNextMode || false;
+            autoNextType = data.autoNextType || 'next';
+            elements.autoNextToggle.checked = autoNextMode;
+            elements.autoNextTypeSelect.value = autoNextType;
+        } catch (e) {
+            console.error("Erreur lors du chargement des données:", e);
+        }
+    }
+    
+    // Focus sur le champ de saisie par défaut
+    elements.translationInput.focus();
+};
+
+// Modify the save function to include new parameters
+const originalSaveState = saveState;
+saveState = function() {
+    const state = {
+        currentChapter,
+        seenCards: Array.from(seenCards),
+        cardPerformance,
+        bestScores,
+        bestTimes,
+        isDarkMode,
+        currentScore,
+        revealedCards,
+        autoNextMode,
+        autoNextType
+    };
+    
+    const stateJSON = JSON.stringify(state);
+    const blob = new Blob([stateJSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flashcards_save_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Sauvegarde réussie!');
+};
+
+// Modify the load function to include new parameters
+const originalLoadState = loadState;
+loadState = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const state = JSON.parse(e.target.result);
+            currentChapter = state.currentChapter || 1;
+            seenCards = new Set(state.seenCards || []);
+            cardPerformance = state.cardPerformance || {};
+            bestScores = state.bestScores || {};
+            bestTimes = state.bestTimes || {};
+            currentScore = state.currentScore || 0;
+            isDarkMode = state.isDarkMode || false;
+            revealedCards = state.revealedCards || {};
+            autoNextMode = state.autoNextMode || false;
+            autoNextType = state.autoNextType || 'next';
+            
+            elements.autoNextToggle.checked = autoNextMode;
+            elements.autoNextTypeSelect.value = autoNextType;
+            
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            elements.themeToggle.textContent = isDarkMode ? "Mode Clair" : "Mode Sombre";
+            elements.themeToggle.classList.toggle('active', isDarkMode);
+            currentCardIndex = 0;
+            cardHistory = [];
+            elements.chapterButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.chapter) === currentChapter);
+            });
+            elements.currentScoreElement.textContent = currentScore;
+            updateBestScoreDisplay();
+            updateBestTimeDisplay();
+            resetTimer();
+            startTimer();
+            
+            if (isRawMode) generateRawContent();
+            else updateCard();
+            
+            showToast('Chargement réussi!');
+        } catch (error) {
+            console.error('Erreur lors du chargement:', error);
+            showToast('Erreur lors du chargement du fichier');
+        }
+        elements.loadInput.value = '';
+    };
+    reader.readAsText(file);
+};
+
+// Update beforeunload event to save new parameters
+window.addEventListener('beforeunload', () => {
+    localStorage.setItem('flashcardsData', JSON.stringify({
+        seenCards: Array.from(seenCards),
+        cardPerformance,
+        bestScores,
+        bestTimes,
+        isDarkMode,
+        revealedCards,
+        autoNextMode,
+        autoNextType
+    }));
+});
 </script>
 
 </body>
