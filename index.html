@@ -733,8 +733,9 @@ body.dark-mode .settings-btn {
       const showFeedbackToggle = document.getElementById('show-feedback-toggle');
 const feedbackBarContainer = document.querySelector('.feedback-bar-container');
 
-// État initial
+// État initial - définir à false par défaut
 showFeedbackToggle.checked = false;
+feedbackBarContainer.style.display = 'none';
 
 // Écouteur d'événement
 showFeedbackToggle.addEventListener('change', function() {
@@ -751,6 +752,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const shouldShow = savedPreference === 'true';
         showFeedbackToggle.checked = shouldShow;
         feedbackBarContainer.style.display = shouldShow ? 'block' : 'none';
+    } else {
+        // Si aucune préférence n'est sauvegardée, utiliser la valeur par défaut (false)
+        feedbackBarContainer.style.display = 'none';
     }
 });
         const vocabularyByChapter = {
