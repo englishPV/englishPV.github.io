@@ -638,7 +638,13 @@ body.dark-mode .settings-btn {
             </label>
             <label for="auto-next-toggle">Mode automatique (Si la réponse est bonne: change automatiquement le mot)</label>
         </div>
-        
+        <div class="settings-option">
+    <label class="toggle-switch">
+        <input type="checkbox" id="show-feedback-toggle" checked>
+        <span class="toggle-slider"></span>
+    </label>
+    <label for="show-feedback-toggle">Afficher la barre d'évaluation</label>
+</div>
         <div class="settings-option">
             <label for="auto-next-type-select">Type d'avancement:</label>
             <select id="auto-next-type-select" class="settings-select">
@@ -724,8 +730,31 @@ body.dark-mode .settings-btn {
     <div class="toast" id="toast-message"></div>
     
     <script>
+      const showFeedbackToggle = document.getElementById('show-feedback-toggle');
+const feedbackBarContainer = document.querySelector('.feedback-bar-container');
+
+// État initial
+showFeedbackToggle.checked = false;
+
+// Écouteur d'événement
+showFeedbackToggle.addEventListener('change', function() {
+    feedbackBarContainer.style.display = this.checked ? 'block' : 'none';
+    
+    // Sauvegarder la préférence
+    localStorage.setItem('showFeedbackBar', this.checked);
+});
+
+// Charger la préférence sauvegardée
+document.addEventListener('DOMContentLoaded', function() {
+    const savedPreference = localStorage.getItem('showFeedbackBar');
+    if (savedPreference !== null) {
+        const shouldShow = savedPreference === 'true';
+        showFeedbackToggle.checked = shouldShow;
+        feedbackBarContainer.style.display = shouldShow ? 'block' : 'none';
+    }
+});
         const vocabularyByChapter = {
-             1: [
+              1: [
 
 { french: "monarchie", english: "monarchy" },
 
@@ -2248,7 +2277,7 @@ body.dark-mode .settings-btn {
   english: "retirement age"
 
 }]};
-        let autoNextMode = false;
+        let autoNextMode = true;
         let autoNextType = 'next';
         let currentChapter = 1;
         let currentCardIndex = 0;
@@ -2375,195 +2404,220 @@ body.dark-mode .settings-btn {
             }
         }
 
-         function validateTranslation() {
-            const userInputRaw = elements.translationInput.value;
-            const userInputProcessed = userInputRaw.trim().toLowerCase().replace(/,/g, '');
-            const cards = vocabularyByChapter[currentChapter];
-            const originalCorrectAnswer = cards[currentCardIndex].english;
-            const correctAnswerLower = originalCorrectAnswer.toLowerCase();
-            const fullCorrectAnswerProcessed = correctAnswerLower.trim().replace(/,/g, '');
-            
-            const alternativeAnswersProcessed = correctAnswerLower.split(' / ').map(item => {
-                const processed = item.trim().replace(/,/g, '');
-                const withoutArticle = processed.replace(/^(a|an|the) /i, '');
-                const withoutTo = processed.replace(/^to /i, '');
-                const withoutBoth = processed.replace(/^(to |a |an |the )/i, '');
-                return [processed, withoutArticle, withoutTo, withoutBoth];
-            }).flat();
-            
-            const isCorrect = userInputProcessed === fullCorrectAnswerProcessed || 
-                            alternativeAnswersProcessed.includes(userInputProcessed);
-            
-            const cardKey = `${currentChapter}-${currentCardIndex}`;
-            if (!cardPerformance[cardKey]) {
-                cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-            }
-            cardPerformance[cardKey].attempts++;
-            
-            if (isCorrect) {
-                cardPerformance[cardKey].successes++;
-                currentScore++;
-                elements.currentScoreElement.textContent = currentScore.toFixed(1);
-                elements.validationResult.textContent = "Correct !";
-                elements.validationResult.className = "validation-result correct";
-                
-                // Changer automatiquement de mot si la réponse est correcte et le mode auto est activé
-                if (autoNextMode) {
-                    setTimeout(() => {
-                        moveToNextCard();
-                    }, 500); // Délai court pour permettre à l'utilisateur de voir la validation
-                }
-            } else {
-                elements.validationResult.textContent = `Incorrect. La réponse était : ${originalCorrectAnswer}`;
-                elements.validationResult.className = "validation-result incorrect";
-            }
-            
-            if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-                bestScores[currentChapter] = currentScore;
-                if (elements.bestScoreElement) {
-                   elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
-                } else {
-                   console.error("Best score element not found");
-                }
-            }
-            
-            updateCardColorAndSuccessRate();
+        function validateTranslation() {
+    const userInputRaw = elements.translationInput.value;
+    const userInputProcessed = userInputRaw.trim().toLowerCase().replace(/,/g, '');
+    const cards = vocabularyByChapter[currentChapter];
+    const originalCorrectAnswer = cards[currentCardIndex].english;
+    const correctAnswerLower = originalCorrectAnswer.toLowerCase();
+    const fullCorrectAnswerProcessed = correctAnswerLower.trim().replace(/,/g, '');
+    
+    const alternativeAnswersProcessed = correctAnswerLower.split(' / ').map(item => {
+        const processed = item.trim().replace(/,/g, '');
+        const withoutArticle = processed.replace(/^(a|an|the) /i, '');
+        const withoutTo = processed.replace(/^to /i, '');
+        const withoutBoth = processed.replace(/^(to |a |an |the )/i, '');
+        return [processed, withoutArticle, withoutTo, withoutBoth];
+    }).flat();
+    
+    const isCorrect = userInputProcessed === fullCorrectAnswerProcessed || 
+                    alternativeAnswersProcessed.includes(userInputProcessed);
+    
+    const cardKey = `${currentChapter}-${currentCardIndex}`;
+    if (!cardPerformance[cardKey]) {
+        cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+    }
+    cardPerformance[cardKey].attempts++;
+    
+    if (isCorrect) {
+        cardPerformance[cardKey].successes++;
+        currentScore++;
+        elements.currentScoreElement.textContent = currentScore.toFixed(1);
+        elements.validationResult.textContent = "Correct !";
+        elements.validationResult.className = "validation-result correct";
+        
+        // Disable the validation button after correct answer
+        elements.validateBtn.disabled = true;
+        elements.translationInput.disabled = true;
+        
+        // Also mark this card as validated so we don't show percentage buttons
+        scoreButtonsUsed = true;
+        
+        // Hide percentage buttons if they exist
+        const percentButtons = document.getElementById('percent-buttons');
+        if (percentButtons) {
+            percentButtons.style.display = 'none';
         }
         
+        // Move to next card if auto-next mode is activated
+        if (autoNextMode) {
+            setTimeout(() => {
+                moveToNextCard();
+            }, 500);
+        }
+    } else {
+        // Instead of showing incorrect message, flip the card
+        handleCardClick();
+    }
+    
+    if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+        bestScores[currentChapter] = currentScore;
+        if (elements.bestScoreElement) {
+           elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
+        } else {
+           console.error("Best score element not found");
+        }
+    }
+    
+    updateCardColorAndSuccessRate();
+}
         
         function createPercentButton(text, successRate) {
-            const button = document.createElement('button');
-            button.textContent = text;
-            button.style.padding = '8px 15px';
-            button.style.backgroundColor = getColorForSuccessRate(successRate);
-            button.style.color = 'white';
-            button.style.border = 'none';
-            button.style.borderRadius = '5px';
-            button.style.fontWeight = 'bold';
-            button.style.cursor = 'pointer';
-            button.addEventListener('click', (e) => {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.style.padding = '8px 15px';
+    button.style.backgroundColor = getColorForSuccessRate(successRate);
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.borderRadius = '5px';
+    button.style.fontWeight = 'bold';
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        if (scoreButtonsUsed) {
+            showToast("Vous avez déjà évalué cette carte!");
+            return;
+        }
+        
+        const cardKey = `${currentChapter}-${currentCardIndex}`;
+        if (!cardPerformance[cardKey]) {
+            cardPerformance[cardKey] = { attempts: 0, successes: 0 };
+        }
+        cardPerformance[cardKey].attempts++;
+        if (successRate > 0) {
+            cardPerformance[cardKey].successes += successRate;
+        }
+        currentScore += successRate;
+        elements.currentScoreElement.textContent = currentScore.toFixed(1);
+        if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
+            bestScores[currentChapter] = currentScore;
+            elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
+        }
+        updateCardColorAndSuccessRate();
+        
+        scoreButtonsUsed = true;
+        
+        const buttons = document.querySelectorAll('#percent-buttons button');
+        buttons.forEach(btn => {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        });
+        
+        if (areAllCardsAnswered()) {
+            stopTimer();
+            showFinalScreen();
+        }
+        
+        // Move to next card if auto-next mode is activated and 100% button was clicked
+        if (autoNextMode && successRate === 1) {
+            setTimeout(() => {
+                moveToNextCard();
+            }, 500);
+        }
+    });
+    return button;
+}
+       function handleCardClick() {
+    isTranslationVisible = !isTranslationVisible;
+    elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
+    
+    if (isTranslationVisible) {
+        revealedCards[`${currentChapter}-${currentCardIndex}`] = true;
+        elements.translationInput.disabled = true;
+        elements.validateBtn.disabled = true;
+        
+        // Check if validation was done and don't show percentage buttons if so
+        const cardKey = `${currentChapter}-${currentCardIndex}`;
+        const isValidated = scoreButtonsUsed;
+        
+        // Only show percentage buttons if not coming from incorrect answer and not validated
+        const validationResult = elements.validationResult.textContent;
+        const isFromIncorrect = !validationResult || validationResult === "";
+        
+        if (!document.getElementById('percent-buttons') && !isFromIncorrect && !isValidated) {
+            const percentButtonsDiv = document.createElement('div');
+            percentButtonsDiv.id = 'percent-buttons';
+            percentButtonsDiv.style.display = 'flex';
+            percentButtonsDiv.style.justifyContent = 'space-around';
+            percentButtonsDiv.style.marginTop = '15px';
+            percentButtonsDiv.style.position = 'absolute';
+            percentButtonsDiv.style.bottom = '15px';
+            percentButtonsDiv.style.left = '0';
+            percentButtonsDiv.style.right = '0';
+            
+            const btn100 = createPercentButton('100%', 1);
+            const btn50 = createPercentButton('50%', 0.5);
+            const btn0 = createPercentButton('0%', 0);
+            
+            const resetCardBtn = document.createElement('button');
+            resetCardBtn.textContent = 'Reset';
+            resetCardBtn.style.padding = '8px 15px';
+            resetCardBtn.style.backgroundColor = '#7f8c8d';
+            resetCardBtn.style.color = 'white';
+            resetCardBtn.style.border = 'none';
+            resetCardBtn.style.borderRadius = '5px';
+            resetCardBtn.style.fontWeight = 'bold';
+            resetCardBtn.style.cursor = 'pointer';
+            resetCardBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                
-                if (scoreButtonsUsed) {
-                    showToast("Vous avez déjà évalué cette carte!");
-                    return;
-                }
-                
                 const cardKey = `${currentChapter}-${currentCardIndex}`;
-                if (!cardPerformance[cardKey]) {
-                    cardPerformance[cardKey] = { attempts: 0, successes: 0 };
-                }
-                cardPerformance[cardKey].attempts++;
-                if (successRate > 0) {
-                    cardPerformance[cardKey].successes += successRate;
-                }
-                currentScore += successRate;
-                elements.currentScoreElement.textContent = currentScore.toFixed(1);
-                if (!bestScores[currentChapter] || currentScore > bestScores[currentChapter]) {
-                    bestScores[currentChapter] = currentScore;
-                    elements.bestScoreElement.textContent = bestScores[currentChapter].toFixed(1);
-                }
-                updateCardColorAndSuccessRate();
-                
-                scoreButtonsUsed = true;
-                
-                const buttons = document.querySelectorAll('#percent-buttons button');
-                buttons.forEach(btn => {
-                    btn.style.opacity = '0.5';
-                    btn.style.cursor = 'not-allowed';
-                });
-                
-                if (areAllCardsAnswered()) {
-                    stopTimer();
-                    showFinalScreen();
+                if (cardPerformance[cardKey]) {
+                    delete cardPerformance[cardKey];
+                    updateCardColorAndSuccessRate();
+                    showToast("Score de carte réinitialisé!");
                 }
             });
-            return button;
-        }
-
-        function handleCardClick() {
-            isTranslationVisible = !isTranslationVisible;
-            elements.englishTranslation.style.display = isTranslationVisible ? 'block' : 'none';
             
-            if (isTranslationVisible) {
-                revealedCards[`${currentChapter}-${currentCardIndex}`] = true;
-                elements.translationInput.disabled = true;
-                elements.validateBtn.disabled = true;
-                
-                if (!document.getElementById('percent-buttons')) {
-                    const percentButtonsDiv = document.createElement('div');
-                    percentButtonsDiv.id = 'percent-buttons';
-                    percentButtonsDiv.style.display = 'flex';
-                    percentButtonsDiv.style.justifyContent = 'space-around';
-                    percentButtonsDiv.style.marginTop = '15px';
-                    percentButtonsDiv.style.position = 'absolute';
-                    percentButtonsDiv.style.bottom = '15px';
-                    percentButtonsDiv.style.left = '0';
-                    percentButtonsDiv.style.right = '0';
-                    
-                    const btn100 = createPercentButton('100%', 1);
-                    const btn50 = createPercentButton('50%', 0.5);
-                    const btn0 = createPercentButton('0%', 0);
-                    
-                    const resetCardBtn = document.createElement('button');
-                    resetCardBtn.textContent = 'Reset';
-                    resetCardBtn.style.padding = '8px 15px';
-                    resetCardBtn.style.backgroundColor = '#7f8c8d';
-                    resetCardBtn.style.color = 'white';
-                    resetCardBtn.style.border = 'none';
-                    resetCardBtn.style.borderRadius = '5px';
-                    resetCardBtn.style.fontWeight = 'bold';
-                    resetCardBtn.style.cursor = 'pointer';
-                    resetCardBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const cardKey = `${currentChapter}-${currentCardIndex}`;
-                        if (cardPerformance[cardKey]) {
-                            delete cardPerformance[cardKey];
-                            updateCardColorAndSuccessRate();
-                            showToast("Score de carte réinitialisé!");
-                        }
-                    });
-                    
-                    percentButtonsDiv.appendChild(btn100);
-                    percentButtonsDiv.appendChild(btn50);
-                    percentButtonsDiv.appendChild(btn0);
-                    percentButtonsDiv.appendChild(resetCardBtn);
-                    
-                    elements.card.appendChild(percentButtonsDiv);
-                    
-                    if (scoreButtonsUsed) {
-                        const buttons = percentButtonsDiv.querySelectorAll('button');
-                        buttons.forEach(btn => {
-                            if (btn.textContent !== 'Reset') {
-                                btn.style.opacity = '0.5';
-                                btn.style.cursor = 'not-allowed';
-                            }
-                        });
+            percentButtonsDiv.appendChild(btn100);
+            percentButtonsDiv.appendChild(btn50);
+            percentButtonsDiv.appendChild(btn0);
+            percentButtonsDiv.appendChild(resetCardBtn);
+            
+            elements.card.appendChild(percentButtonsDiv);
+            
+            if (scoreButtonsUsed) {
+                const buttons = percentButtonsDiv.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.textContent !== 'Reset') {
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
                     }
-                } else {
-                    document.getElementById('percent-buttons').style.display = 'flex';
-                    
-                    if (scoreButtonsUsed) {
-                        const buttons = document.querySelectorAll('#percent-buttons button');
-                        buttons.forEach(btn => {
-                            if (btn.textContent !== 'Reset') {
-                                btn.style.opacity = '0.5';
-                                btn.style.cursor = 'not-allowed';
-                            }
-                        });
+                });
+            }
+        } else if (document.getElementById('percent-buttons') && !isFromIncorrect && !isValidated) {
+            document.getElementById('percent-buttons').style.display = 'flex';
+            
+            if (scoreButtonsUsed) {
+                const buttons = document.querySelectorAll('#percent-buttons button');
+                buttons.forEach(btn => {
+                    if (btn.textContent !== 'Reset') {
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
                     }
-                }
-            } else {
-                elements.translationInput.disabled = true;
-                elements.validateBtn.disabled = true;
-                
-                const percentButtons = document.getElementById('percent-buttons');
-                if (percentButtons) {
-                    percentButtons.style.display = 'none';
-                }
+                });
             }
         }
-
+    } else {
+        elements.translationInput.disabled = true;
+        elements.validateBtn.disabled = true;
+        
+        const percentButtons = document.getElementById('percent-buttons');
+        if (percentButtons) {
+            percentButtons.style.display = 'none';
+        }
+    }
+}
 // Modify updateCard function to check if the card has been revealed
 function searchTranslation() {
     const searchTerm = elements.searchInput.value.toLowerCase().trim();
@@ -2749,7 +2803,7 @@ function updateCard() {
     const cardKey = `${currentChapter}-${currentCardIndex}`;
     elements.translationInput.disabled = revealedCards[cardKey] ? true : false;
     elements.validateBtn.disabled = revealedCards[cardKey] ? true : false;
-    scoreButtonsUsed = false;
+    scoreButtonsUsed = false; // Reset this flag when changing cards
     
     if (areAllCardsAnswered()) {
         elements.translationInput.disabled = false;
@@ -2784,6 +2838,9 @@ function updateCard() {
     
     updateCardColorAndSuccessRate();
     resetFeedbackBar();
+    
+    // Focus on input field for better UX
+    elements.translationInput.focus();
 }
 function areAllCardsAnswered() {
     const cards = vocabularyByChapter[currentChapter];
@@ -3361,6 +3418,7 @@ window.addEventListener('beforeunload', () => {
         autoNextType
     }));
 });
+
 </script>
 
 </body>
