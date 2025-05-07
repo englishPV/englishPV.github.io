@@ -390,6 +390,7 @@
         border-radius: 0 4px 4px 0;
         cursor: pointer;
     }
+
     body.dark-mode .search-btn {
     background-color: #34495e; /* Darker background for dark mode */
     color: white;
@@ -406,6 +407,9 @@ body.dark-mode #auto-next-type-select {
 }
 
 /* Make sure the settings button also updates in dark mode */
+body.dark-mode .hamburger-menu {
+    opacity: 0.2;
+}
 body.dark-mode .settings-btn {
     background-color: #34495e;
     color: white;
@@ -560,7 +564,7 @@ body.dark-mode .settings-btn {
 /* Search preview dropdown */
 .search-preview {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 100%;
     left: 0;
     width: 100%;
@@ -607,9 +611,190 @@ body.dark-mode .settings-btn {
     color: #ecf0f1;
     border-color: #34495e;
 }
+/* Style du bouton hamburger */
+.hamburger-menu {
+    position: absolute;
+    top: 20px;
+    right: 535px;
+    left: auto;
+    transform: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Make sure the menu stays within viewport bounds */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        top: 200px;
+    }
+}
+
+.hamburger-icon {
+width: 20px;
+height: 16px;
+position: relative;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.hamburger-icon span {
+display: block;
+height: 2px;
+width: 100%;
+background-color: white;
+border-radius: 2px;
+transition: all 0.3s ease;
+}
+
+/* Style du menu latéral */
+.sidebar-menu {
+position: fixed;
+top: 0;
+right: -300px;
+width: 280px;
+height: 100%;
+background-color: var(--card-bg);
+box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+z-index: 1000;
+transition: right 0.3s ease;
+overflow-y: auto;
+padding: 20px;
+}
+
+.sidebar-menu.active {
+right: 0;
+}
+
+.sidebar-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+padding-bottom: 10px;
+border-bottom: 1px solid var(--button-bg);
+}
+
+.sidebar-header h3 {
+margin: 0;
+color: var(--primary-color);
+}
+
+.close-menu {
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: var(--text-color);
+}
+
+.sidebar-section {
+margin-bottom: 30px;
+}
+
+.sidebar-section h4 {
+margin-bottom: 15px;
+color: var(--secondary-color);
+}
+
+.sidebar-btn {
+display: block;
+width: 100%;
+padding: 10px 15px;
+margin-bottom: 10px;
+background-color: var(--button-bg);
+color: var(--button-text);
+border: none;
+border-radius: 5px;
+text-align: left;
+cursor: pointer;
+font-weight: 600;
+transition: all 0.2s ease;
+}
+
+.sidebar-btn:hover {
+opacity: 0.9;
+}
+
+.sidebar-btn.active {
+background-color: var(--primary-color);
+color: white;
+}
+
+/* Overlay pour fermer le menu en cliquant ailleurs */
+.sidebar-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+z-index: 999;
+display: none;
+}
+
+.sidebar-overlay.active {
+display: block;
+}
+
+/* Masquer les contrôles originaux lorsque le menu est implémenté */
+.mode-controls, .chapters {
+display: none;
+}
+
+/* Adaptation en dark mode */
+body.dark-mode .sidebar-menu {
+background-color: var(--card-bg);
+}
+
+body.dark-mode .close-menu {
+color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+.sidebar-menu {
+width: 260px;
+}
+}
     </style>
 </head>
 <body>
+  <!-- Ajout du bouton hamburger à la carte -->
+
+<!-- Ajout du menu déroulant -->
+<div class="sidebar-menu" id="sidebar-menu">
+<div class="sidebar-header">
+<h3>Navigation</h3>
+<button class="close-menu" id="close-menu">&times;</button>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-section">
+<h4>Chapitres</h4>
+<div class="sidebar-chapters">
+<button class="sidebar-btn chapter-sidebar-btn active" data-chapter="1">Democracy</button>
+<button class="sidebar-btn chapter-sidebar-btn" data-chapter="2">Genetics</button>
+<button class="sidebar-btn chapter-sidebar-btn" data-chapter="3">Immigration</button>
+<button class="sidebar-btn chapter-sidebar-btn" data-chapter="4">International tensions</button>
+<button class="sidebar-btn chapter-sidebar-btn" data-chapter="5">Unemployment</button>
+</div>
+</div>
+<div class="sidebar-section">
+<h4>Affichage</h4>
+<button class="sidebar-btn" id="theme-toggle-sidebar">Mode Sombre</button>
+<button class="sidebar-btn" id="raw-toggle-sidebar">Mode Raw</button>
+<button class="sidebar-btn" id="settings-toggle-sidebar">Paramètres</button>
+</div>
+</div>
+</div>
     <div class="container">
         <h1>Flash Cards Français-Anglais</h1>
         <p class="subtitle">Traduisez le mot ou cliquez sur la carte pour voir la traduction</p>
@@ -681,6 +866,14 @@ body.dark-mode .settings-btn {
                 </div>
                 <div class="success-rate" id="success-rate"></div>
             </div>
+            <div class="hamburger-menu" id="hamburger-menu">
+  <div class="hamburger-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
         </div>
         
         <div class="validation-container">
@@ -730,6 +923,118 @@ body.dark-mode .settings-btn {
     <div class="toast" id="toast-message"></div>
     
     <script>
+      // Code à ajouter au script existant
+document.addEventListener('DOMContentLoaded', function() {
+// Éléments du menu hamburger
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const sidebarMenu = document.getElementById('sidebar-menu');
+const closeMenu = document.getElementById('close-menu');
+const themeToggleSidebar = document.getElementById('theme-toggle-sidebar');
+const rawToggleSidebar = document.getElementById('raw-toggle-sidebar');
+const settingsToggleSidebar = document.getElementById('settings-toggle-sidebar');
+const chapterSidebarBtns = document.querySelectorAll('.chapter-sidebar-btn');
+
+// Créer l'overlay pour fermer le menu
+const overlay = document.createElement('div');
+overlay.className = 'sidebar-overlay';
+document.body.appendChild(overlay);
+
+// Fonction pour ouvrir le menu
+function openMenu() {
+sidebarMenu.classList.add('active');
+overlay.classList.add('active');
+}
+
+// Fonction pour fermer le menu
+function closeMenuFunc() {
+sidebarMenu.classList.remove('active');
+overlay.classList.remove('active');
+}
+
+// Event listeners pour le menu
+hamburgerMenu.addEventListener('click', openMenu);
+closeMenu.addEventListener('click', closeMenuFunc);
+overlay.addEventListener('click', closeMenuFunc);
+
+// Synchroniser les boutons du menu avec les boutons originaux
+themeToggleSidebar.addEventListener('click', function() {
+document.getElementById('theme-toggle').click();
+updateThemeButtonText();
+});
+
+rawToggleSidebar.addEventListener('click', function() {
+document.getElementById('raw-toggle').click();
+updateRawButtonText();
+});
+
+settingsToggleSidebar.addEventListener('click', function() {
+document.getElementById('settings-toggle').click();
+});
+
+// Gestion des chapitres depuis le menu latéral
+chapterSidebarBtns.forEach(btn => {
+btn.addEventListener('click', function() {
+const chapterNumber = this.getAttribute('data-chapter');
+const originalButton = document.querySelector(`.chapter-btn[data-chapter="${chapterNumber}"]`);
+
+if (originalButton) {
+originalButton.click();
+
+// Mettre à jour l'état actif dans le menu latéral
+chapterSidebarBtns.forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+
+closeMenuFunc(); // Fermer le menu après avoir sélectionné un chapitre
+}
+});
+});
+
+// Fonction pour mettre à jour le texte du bouton thème
+function updateThemeButtonText() {
+const isDarkMode = document.body.classList.contains('dark-mode');
+themeToggleSidebar.textContent = isDarkMode ? 'Mode Clair' : 'Mode Sombre';
+}
+
+// Fonction pour mettre à jour le texte du bouton raw
+function updateRawButtonText() {
+const isRawMode = document.getElementById('raw-content').style.display === 'block';
+rawToggleSidebar.textContent = isRawMode ? 'Mode Normal' : 'Mode Raw';
+}
+
+// Observer les changements de mode pour mettre à jour les boutons du menu latéral
+const themeToggle = document.getElementById('theme-toggle');
+const rawToggle = document.getElementById('raw-toggle');
+
+themeToggle.addEventListener('click', updateThemeButtonText);
+rawToggle.addEventListener('click', updateRawButtonText);
+
+// Initialiser les textes des boutons
+updateThemeButtonText();
+updateRawButtonText();
+
+// Synchroniser l'état actif des chapitres
+function updateActiveChapter() {
+const activeChapter = document.querySelector('.chapter-btn.active');
+if (activeChapter) {
+const chapterNumber = activeChapter.getAttribute('data-chapter');
+chapterSidebarBtns.forEach(btn => {
+if (btn.getAttribute('data-chapter') === chapterNumber) {
+btn.classList.add('active');
+} else {
+btn.classList.remove('active');
+}
+});
+}
+}
+
+// Mettre à jour l'état actif initial
+updateActiveChapter();
+
+// Observer les changements de chapitre
+document.querySelectorAll('.chapter-btn').forEach(btn => {
+btn.addEventListener('click', updateActiveChapter);
+});
+});
       const showFeedbackToggle = document.getElementById('show-feedback-toggle');
 const feedbackBarContainer = document.querySelector('.feedback-bar-container');
 
