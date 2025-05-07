@@ -779,29 +779,38 @@ width: 260px;
   <!-- Ajout du bouton hamburger à la carte -->
 
 <!-- Ajout du menu déroulant -->
+<!-- Then, add the buttons to the sidebar menu -->
 <div class="sidebar-menu" id="sidebar-menu">
-<div class="sidebar-header">
-<h3>Navigation</h3>
-<button class="close-menu" id="close-menu">&times;</button>
-</div>
-<div class="sidebar-content">
-<div class="sidebar-section">
-<h4>Chapitres</h4>
-<div class="sidebar-chapters">
-<button class="sidebar-btn chapter-sidebar-btn active" data-chapter="1">Democracy</button>
-<button class="sidebar-btn chapter-sidebar-btn" data-chapter="2">Genetics</button>
-<button class="sidebar-btn chapter-sidebar-btn" data-chapter="3">Immigration</button>
-<button class="sidebar-btn chapter-sidebar-btn" data-chapter="4">International tensions</button>
-<button class="sidebar-btn chapter-sidebar-btn" data-chapter="5">Unemployment</button>
-</div>
-</div>
-<div class="sidebar-section">
-<h4>Affichage</h4>
-<button class="sidebar-btn" id="theme-toggle-sidebar">Mode Sombre</button>
-<button class="sidebar-btn" id="raw-toggle-sidebar">Mode Raw</button>
-<button class="sidebar-btn" id="settings-toggle-sidebar">Paramètres</button>
-</div>
-</div>
+  <div class="sidebar-header">
+    <h3>Navigation</h3>
+    <button class="close-menu" id="close-menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+    <div class="sidebar-section">
+      <h4>Chapitres</h4>
+      <div class="sidebar-chapters">
+        <button class="sidebar-btn chapter-sidebar-btn active" data-chapter="1">Democracy</button>
+        <button class="sidebar-btn chapter-sidebar-btn" data-chapter="2">Genetics</button>
+        <button class="sidebar-btn chapter-sidebar-btn" data-chapter="3">Immigration</button>
+        <button class="sidebar-btn chapter-sidebar-btn" data-chapter="4">International tensions</button>
+        <button class="sidebar-btn chapter-sidebar-btn" data-chapter="5">Unemployment</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h4>Affichage</h4>
+      <button class="sidebar-btn" id="theme-toggle-sidebar">Mode Sombre</button>
+      <button class="sidebar-btn" id="raw-toggle-sidebar">Mode Raw</button>
+      <button class="sidebar-btn" id="settings-toggle-sidebar">Paramètres</button>
+    </div>
+    <!-- Add new section for save, load, reset buttons -->
+    <div class="sidebar-section">
+      <h4>Données</h4>
+      <button class="sidebar-btn" id="save-btn" style="background-color: var(--save-button-bg); color: white;">Sauvegarder</button>
+      <input type="file" id="load-input" class="load-input" accept=".json" style="display: none;">
+      <button class="sidebar-btn" id="load-btn" style="background-color: var(--load-button-bg); color: white;">Charger</button>
+      <button class="sidebar-btn" id="reset-btn" style="background-color: #e74c3c; color: white;">Réinitialiser</button>
+    </div>
+  </div>
 </div>
     <div class="container">
 
@@ -906,15 +915,7 @@ width: 260px;
             <button class="btn" id="random-btn">Aléatoire</button>
             <button class="btn" id="next-btn">Suivant</button>
         </div>
-        
-        <div class="save-load-controls">
-            <button class="save-btn" id="save-btn">Sauvegarder</button>
-            <input type="file" id="load-input" class="load-input" accept=".json">
-            <button class="load-btn" id="load-btn">Charger</button>
-        </div>
-        <div class="reset-container" style="text-align: center; margin-top: 15px;">
-            <button class="btn" id="reset-btn" style="background-color: #e74c3c;">Réinitialiser</button>
-        </div>
+  
         
         <div class="info">
             <span id="current-card">0</span>/<span id="total-cards">0</span>
