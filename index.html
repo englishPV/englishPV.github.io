@@ -612,12 +612,12 @@ body.dark-mode .settings-btn {
     border-color: #34495e;
 }
 /* Style du bouton hamburger */
+/* Updated hamburger menu positioning */
 .hamburger-menu {
     position: absolute;
-    top: 20px;
-    right: 535px;
-    left: auto;
-    transform: none;
+    top: 10%;
+    left: 20px; /* Move more to the left */
+    transform: translateY(-50%); /* Center vertically */
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -630,13 +630,21 @@ body.dark-mode .settings-btn {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Make sure the menu stays within viewport bounds */
-@media (max-width: 768px) {
+/* Ensure visibility in landscape mode */
+@media (orientation: landscape) {
     .hamburger-menu {
-        top: 200px;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
     }
 }
 
+/* Additional responsiveness for smaller screens */
+@media (max-width: 600px) {
+    .hamburger-menu {
+        left: 10px; /* Even more to the left on smaller screens */
+    }
+}
 .hamburger-icon {
 width: 20px;
 height: 16px;
@@ -796,9 +804,7 @@ width: 260px;
 </div>
 </div>
     <div class="container">
-        <h1>Flash Cards Français-Anglais</h1>
-        <p class="subtitle">Traduisez le mot ou cliquez sur la carte pour voir la traduction</p>
-        
+
         <div class="mode-controls">
             <button class="mode-btn" id="theme-toggle">Mode Sombre</button>
             <button class="mode-btn" id="raw-toggle">Mode Raw</button>
