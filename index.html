@@ -975,45 +975,46 @@
         }
         
         function handleAnswer(isCorrect) {
-            if (appState.currentDeck.length === 0) return;
-            const card = appState.currentDeck[appState.currentIndex];
-            appState.isCardRevealedByClick = false; 
-            
-            let currentScoreIndex = scoreLevels.indexOf(card.score);
-            if (currentScoreIndex === -1) { 
-                card.score = 50;
-                currentScoreIndex = scoreLevels.indexOf(50);
-            }
+    if (appState.currentDeck.length === 0) return;
+    const card = appState.currentDeck[appState.currentIndex];
+    appState.isCardRevealedByClick = false; 
+    
+    let currentScoreIndex = scoreLevels.indexOf(card.score);
+    if (currentScoreIndex === -1) { 
+        card.score = 50;
+        currentScoreIndex = scoreLevels.indexOf(50);
+    }
 
-            if (isCorrect) {
-                messageAreaEl.textContent = 'Bonne réponse !';
-                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-emerald-500 dark:text-emerald-400';
-                if (currentScoreIndex < scoreLevels.length - 1) {
-                    card.score = scoreLevels[currentScoreIndex + 1];
-                }
-            } else {
-                messageAreaEl.textContent = `Incorrect.`; 
-                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
-                if (currentScoreIndex > 0) {
-                    card.score = scoreLevels[currentScoreIndex - 1];
-                }
-                cardEnglishWordEl.classList.remove('hidden'); 
-            }
-            
-            const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
-            if (masterCardIndex !== -1) {
-                appState.allCards[masterCardIndex].score = card.score;
-            }
-
-            cardScoreEl.textContent = `${card.score}%`;
-            flashcardContainerEl.classList.remove(...allPossibleColorClasses);
-            const colorCls = getCardColorClasses(card.score);
-            flashcardContainerEl.classList.add(...colorCls.split(' '));
-
-            answerInputEl.disabled = true;
-            submitAnswerButtonEl.classList.add('hidden');
-            appState.readyToAdvanceOnClick = true; // Card is now ready to be advanced by click
+    if (isCorrect) {
+        messageAreaEl.textContent = 'Bonne réponse !';
+        messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-emerald-500 dark:text-emerald-400';
+        if (currentScoreIndex < scoreLevels.length - 1) {
+            card.score = scoreLevels[currentScoreIndex + 1];
         }
+    } else {
+        messageAreaEl.textContent = `Incorrect.`; 
+        messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
+        if (currentScoreIndex > 0) {
+            card.score = scoreLevels[currentScoreIndex - 1];
+        }
+        cardEnglishWordEl.classList.remove('hidden'); 
+    }
+    
+    const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
+    if (masterCardIndex !== -1) {
+        appState.allCards[masterCardIndex].score = card.score;
+    }
+
+    cardScoreEl.textContent = `${card.score}%`;
+    flashcardContainerEl.classList.remove(...allPossibleColorClasses);
+    const colorCls = getCardColorClasses(card.score);
+    flashcardContainerEl.classList.add(...colorCls.split(' '));
+
+    answerInputEl.disabled = true;
+    submitAnswerButtonEl.classList.add('hidden');
+    appState.readyToAdvanceOnClick = true; // Card is now ready to be advanced by click
+}
+
 
         function nextCard() {
             appState.currentIndex++;
@@ -1205,21 +1206,102 @@
             }
         });
 
-        submitAnswerButtonEl.addEventListener('click', () => {
-            if (answerInputEl.disabled) return; 
-            const userAnswer = answerInputEl.value.trim().toLowerCase();
-            if (!userAnswer) return; 
-            const correctAnswer = appState.currentDeck[appState.currentIndex].english.trim().toLowerCase();
-            handleAnswer(userAnswer === correctAnswer);
-        });
+       submitAnswerButtonEl.addEventListener('click', () => {
+    if (answerInputEl.disabled) return; 
+    const userAnswer = answerInputEl.value.trim().toLowerCase();
+    if (!userAnswer) return; 
+    function validateAnswer(userAnswer, correctAnswerFull) {
+    // Normalize inputs (remove extra spaces, lowercase)
+    const userNormalized = userAnswer.replace(/\s+/g, ' ').trim().toLowerCase();
+    const correctNormalized = correctAnswerFull.replace(/\s+/g, ' ').trim().toLowerCase();
+    
+    // Direct match check
+    if (userNormalized === correctNormalized) {
+        return true;
+    }
+    
+    // Handle alternatives separated by '/'
+    if (correctNormalized.includes('/')) {
+        const alternatives = correctNormalized.split('/').map(alt => alt.trim());
+        for (const alt of alternatives) {
+            if (userNormalized === alt) {
+                return true;
+            }
+            
+            // Check if user entered one alternative that's part of a multiple choice
+            if (alt.includes(userNormalized) && userNormalized.length > 3) {
+                return true;
+            }
+        }
+    }
+    
+    // Handle missing articles (a, the) and small differences
+    const userWords = userNormalized.split(/\s+/);
+    const correctWords = correctNormalized.split(/\s+/);
+    
+    // Missing articles
+    const articlesToIgnore = ['a', 'an', 'the'];
+    const userMainWords = userWords.filter(word => !articlesToIgnore.includes(word));
+    const correctMainWords = correctWords.filter(word => !articlesToIgnore.includes(word));
+    
+    // Compare without articles
+    if (userMainWords.join(' ') === correctMainWords.join(' ')) {
+        return true;
+    }
+    
+    // Handle hyphenation differences
+    const userNoHyphen = userNormalized.replace(/-/g, ' ');
+    const correctNoHyphen = correctNormalized.replace(/-/g, ' ');
+    if (userNoHyphen === correctNoHyphen) {
+        return true;
+    }
+    function calculateSimilarity(str1, str2) {
+    if (str1.length === 0) return str2.length === 0 ? 1 : 0;
+    if (str2.length === 0) return 0;
+    
+    const matrix = Array(str1.length + 1).fill().map(() => Array(str2.length + 1).fill(0));
+    
+    // Initialize first row and column
+    for (let i = 0; i <= str1.length; i++) matrix[i][0] = i;
+    for (let j = 0; j <= str2.length; j++) matrix[0][j] = j;
+    
+    // Fill matrix
+    for (let i = 1; i <= str1.length; i++) {
+        for (let j = 1; j <= str2.length; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            matrix[i][j] = Math.min(
+                matrix[i - 1][j] + 1,      // deletion
+                matrix[i][j - 1] + 1,      // insertion
+                matrix[i - 1][j - 1] + cost // substitution
+            );
+        }
+    }
+    
+    // Calculate similarity as 1 - normalized distance
+    const maxLen = Math.max(str1.length, str2.length);
+    return maxLen === 0 ? 1 : 1 - (matrix[str1.length][str2.length] / maxLen);
+}
+    // Calculate similarity - allow small errors
+    const similarity = calculateSimilarity(userNormalized, correctNormalized);
+    if (similarity > 0.85) { // 85% similarity threshold
+        return true;
+    }
+    
+    return false;
+}
+    const correctAnswerFull = appState.currentDeck[appState.currentIndex].english.trim().toLowerCase();
+    const isCorrect = validateAnswer(userAnswer, correctAnswerFull);
+    
+    handleAnswer(isCorrect);
+});
         
         // nextCardButtonEl event listener removed
 
         answerInputEl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !submitAnswerButtonEl.disabled && !submitAnswerButtonEl.classList.contains('hidden')) {
-                submitAnswerButtonEl.click();
-            }
-        });
+    if (e.key === 'Enter' && !submitAnswerButtonEl.disabled && !submitAnswerButtonEl.classList.contains('hidden')) {
+        submitAnswerButtonEl.click();
+    }
+});
 
         burgerButtonEl.addEventListener('click', () => toggleMenu(true));
         closeMenuButtonEl.addEventListener('click', () => toggleMenu(false));
@@ -1269,8 +1351,10 @@
             loadDeckForChapter(appState.currentChapter); 
             startTimer();
             renderTimer(); 
+            
+            
         }
-
+toggleDarkMode();
         initializeApp();
 
     </script>
