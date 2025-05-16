@@ -1297,12 +1297,29 @@
         
         // nextCardButtonEl event listener removed
 
-        answerInputEl.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !submitAnswerButtonEl.disabled && !submitAnswerButtonEl.classList.contains('hidden')) {
-        submitAnswerButtonEl.click();
+        answerInputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!cardEnglishWordEl.classList.contains('hidden') || appState.readyToAdvanceOnClick) {
+            nextCard();
+        } else {
+            submitAnswerButtonEl.click();
+        }
     }
 });
-
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.activeElement !== answerInputEl) {
+        e.preventDefault();
+        // If card is ready to advance or answer is revealed, go to next card
+        if (appState.readyToAdvanceOnClick) {
+            nextCard();
+        } 
+        // If card not revealed yet, reveal it
+        else if (appState.currentDeck.length > 0 && cardEnglishWordEl.classList.contains('hidden')) {
+            flashcardContainerEl.click();
+        }
+    }
+});
         burgerButtonEl.addEventListener('click', () => toggleMenu(true));
         closeMenuButtonEl.addEventListener('click', () => toggleMenu(false));
         darkModeToggleEl.addEventListener('click', toggleDarkMode);
