@@ -6,51 +6,66 @@
     <title>Cartes Mémoire Avancées</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&family=Creepster&family=Orbitron:wght@400;700&family=Merienda:wght@400;700&family=Press+Start+2P&family=Kalam:wght@300;400;700&family=Pacifico&family=Bungee+Inline&family=Monoton&family=Audiowide&family=Geostar+Fill&family=Sacramento&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+        /* Base styles are now primarily handled by Tailwind and body classes */
+        :root {
+            --grid-color: rgba(100, 255, 218, 0.07); /* Default Sci-Fi/Cyberpunk grid color */
+            --pastel-color-light-1: #E6E6FA; /* Lavender */
+            --pastel-color-light-2: #D8BFD8; /* Thistle */
+            --pastel-color-dark-1: #5F4B8B; /* Dark Lavender */
+            --pastel-color-dark-2: #9A7FB0; /* Medium Purple */
         }
+
         .timer-font {
             font-family: 'Roboto Mono', monospace;
         }
-        .glassmorphism {
+        .glassmorphism { /* Base for cards, specific colors applied via JS */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            /* border color is handled by light/dark specific neutral classes or general card colors */
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, color 0.3s, font-family 0.3s;
         }
         .light-mode-card-neutral {
-            background: rgba(255, 255, 255, 0.75); /* Plus opaque pour mode clair */
-            border: 1px solid rgba(0, 0, 0, 0.08); /* Bordure subtile pour mode clair */
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: #374151;
         }
         .dark-mode-card-neutral {
-            background: rgba(55, 65, 81, 0.6); /* Gris neutre pour mode sombre */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(55, 65, 81, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f3f4f6;
         }
 
-        .dark .glassmorphism-menu {
-             background: rgba(17, 24, 39, 0.85); 
-             backdrop-filter: blur(10px);
+        /* Menu styling */
+        .glassmorphism-menu {
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid;
+            transition: background-color 0.3s, border-color 0.3s;
         }
+        body.light-mode .glassmorphism-menu {
+            background: rgba(255, 255, 255, 0.9); /* More opaque */
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .glassmorphism-menu {
+             background: rgba(17, 24, 39, 0.92);  /* More opaque */
+             border-color: rgba(255, 255, 255, 0.1);
+        }
+
         .card-translation {
-            color: #2563eb; /* blue-600 */
+            color: #2563eb;
         }
-        .search-results-container::-webkit-scrollbar {
-            width: 8px;
+        body.dark-mode .card-translation {
+            color: #60a5fa;
         }
-        .search-results-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
+
         .search-results-container::-webkit-scrollbar-thumb {
             background-color: rgba(156, 163, 175, 0.5);
             border-radius: 10px;
             border: 2px solid transparent;
             background-clip: content-box;
         }
-        .dark .search-results-container::-webkit-scrollbar-thumb {
+        body.dark-mode .search-results-container::-webkit-scrollbar-thumb {
             background-color: rgba(75, 85, 99, 0.7);
         }
         .search-results-container {
@@ -66,93 +81,727 @@
             transition: transform 0.3s ease-in;
         }
         .chapter-button-active {
-            background-color: #F59E0B; 
-            color: white;
+            background-color: #F59E0B;
+            color: white !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
         }
-        .dark .chapter-button-active {
-            background-color: #FBBF24; 
-            color: #1f2937;
+        body.dark-mode .chapter-button-active {
+            background-color: #FBBF24;
+            color: #1f2937 !important;
         }
-        
-        .dark .card-translation {
-    color: #60a5fa; /* blue-400 for better visibility in dark mode */
-}
 
-body.light-mode {
-    background-color: #f8fafc; /* slate-50 for light mode */
-    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(224, 242, 254, 0.4));
-    color: #1e293b; /* slate-800 */
-}
+        body {
+             transition: background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s;
+        }
+        body.light-mode {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        body.dark-mode {
+            background-color: #111827;
+            color: #f9fafb;
+        }
 
-body.dark-mode {
-    background-color: #0f172a; /* slate-900 for dark mode */
-    background-image: linear-gradient(to bottom right, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
-    color: #f1f5f9; /* slate-100 */
-}
+        body.light-mode input[type="text"],
+        body.light-mode select {
+            background-color: #ffffff;
+            color: #111827;
+            border-color: #d1d5db;
+        }
+        body.light-mode input[type="text"]::placeholder {
+            color: #6b7280;
+        }
+
+        body.dark-mode input[type="text"],
+        body.dark-mode select {
+            background-color: #1f2937;
+            color: #f9fafb;
+            border-color: #4b5563;
+        }
+       body.dark-mode input[type="text"]::placeholder {
+            color: #9ca3af;
+        }
+        body.dark-mode select option {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        body.dark-mode select {
+             color: #f9fafb !important;
+        }
+        body.light-mode select {
+            color: #111827 !important;
+        }
+
+        body.light-mode #burger-button {
+            background-color: rgba(255, 255, 255, 0.85);
+            color: #374151;
+        }
+         body.dark-mode #burger-button {
+            background-color: rgba(30, 41, 59, 0.85);
+            color: #e5e7eb;
+        }
+
+        body.light-mode .chapter-button-default {
+            background-color: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        body.dark-mode .chapter-button-default {
+            background-color: #374151;
+            color: #f3f4f6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        body.light-mode #card-score {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #374151;
+        }
+        body.dark-mode #card-score {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+        }
+        body.light-mode .bg-white\/50 {
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly more opaque */
+        }
+        body.dark-mode .bg-white\/50 {
+            background-color: rgba(30, 41, 59, 0.8); /* Slightly more opaque */
+        }
+        body.light-mode .bg-gray-300 {
+            background-color: #e5e7eb;
+        }
+        body.dark-mode .bg-gray-700 {
+             background-color: #374151;
+        }
+
+        /* --- THEME SPECIFIC STYLES AND ANIMATIONS --- */
+
+        /* Spooky Theme Animations */
+        @keyframes batFlight {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25% { transform: translate(15px, -12px) scale(1.1) rotate(10deg); }
+            50% { transform: translate(5px, -25px) scale(1.2) rotate(-5deg); }
+            75% { transform: translate(-10px, -12px) scale(1.1) rotate(5deg); }
+        }
+        .bat {
+            position: absolute;
+            width: 40px; height: 28px; /* Slightly larger */
+            /* SVG Bat by Heroicons (MIT License) - color changed */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF6600'%3E%3Cpath d='M12.75 12.75L9 15l3.75 2.25M12.75 12.75L15 15l-3.75 2.25M12.75 12.75V6.341A4.494 4.494 0 0015.56 4.56a4.5 4.5 0 00-5.12 0A4.494 4.494 0 0012.75 6.341zM4.53 12.075A4.5 4.5 0 003 15.341V21a.75.75 0 001.085.67L12 18.083l7.915 3.587A.75.70 0 0021 21v-5.659a4.5 4.5 0 00-1.53-3.266l-.001-.001A5.235 5.235 0 0012 6.696a5.235 5.235 0 00-7.469 5.379z' /%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: batFlight 4s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: -1;
+        }
+        body.theme-spooky .bat { opacity: 0.5; }
+        .bat1 { top: 10%; left: 15%; animation-delay: 0s; }
+        .bat2 { top: 30%; left: 80%; animation-delay: 1.5s; }
+        .bat3 { top: 60%; left: 5%;  animation-delay: 2.8s; }
+        .bat4 { top: 80%; left: 70%; animation-delay: 0.8s; }
+
+        /* Ocean Theme Animations */
+        @keyframes riseBubble {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+        }
+         @keyframes wavyLines {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+        .bubble {
+            position: absolute;
+            background-color: rgba(173, 216, 230, 0.25);
+            border-radius: 50%;
+            animation: riseBubble 7s linear infinite;
+            opacity: 0;
+            z-index: -1;
+        }
+        body.theme-ocean .bubble { opacity: 0.1; }
+        body.theme-ocean {
+             background-image:
+                linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), /* Dark overlay for dark mode */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 50 Q 25 25 50 50 Q 75 75 100 50 T 100 50' stroke='%234682B4' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+             background-size: 200px 200px;
+             animation: wavyLines 15s linear infinite;
+        }
+         body.theme-ocean.dark-mode {
+             background-image:
+                linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 50 Q 25 25 50 50 Q 75 75 100 50 T 100 50' stroke='%2320B2AA' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+         }
 
 
-.dark .timer-font {
-    background-color: rgba(30, 41, 59, 0.7) !important;
-}
+        /* Sci-Fi Grid */
+        .sci-fi-grid-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        body.theme-sci-fi .sci-fi-grid-overlay, body.theme-cyberpunk .sci-fi-grid-overlay, body.theme-galaxy .sci-fi-grid-overlay {
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 35px 35px; /* Slightly smaller grid */
+            opacity: 1;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-10%); }
+            100% { transform: translateY(110%); }
+        }
+        .scanline-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1; opacity: 0;
+        }
+        body.theme-cyberpunk .scanline-overlay {
+            opacity: 0.1;
+            background: linear-gradient(transparent 50%, rgba(0,0,0,0.2) 50%);
+            background-size: 100% 4px;
+            animation: scanline 0.2s linear infinite;
+        }
+        @keyframes flowingLines {
+            0% { background-position: 0 0; }
+            100% { background-position: 200% 200%; }
+        }
+         body.theme-sci-fi {
+             background-image:
+                linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 100 V0 H100' stroke='%2300f5d4' fill='none' opacity='0.1'/%3E%3Cpath d='M0 0 V100 H100' stroke='%2300f5d4' fill='none' opacity='0.1'/%3E%3C/svg%3E");
+             background-size: 150px 150px;
+             animation: flowingLines 20s linear infinite;
+         }
+          body.theme-sci-fi.dark-mode {
+              background-image:
+                 linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 100 V0 H100' stroke='%2300f5d4' fill='none' opacity='0.05'/%3E%3Cpath d='M0 0 V100 H100' stroke='%2300f5d4' fill='none' opacity='0.05'/%3E%3C/svg%3E");
+          }
 
-/* Progress bar container in dark mode */
-.dark .bg-white\/50 {
-    background-color: rgba(30, 41, 59, 0.7) !important;
-}
 
-/* Search bar in dark mode */
-.dark #search-bar {
-    background-color: #1e293b !important;
-    color: #f1f5f9;
-    border-color: #475569;
-}
+        /* Candy Theme Particles */
+        @keyframes drift {
+            0% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(20px) rotate(360deg); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: -1;
+            animation: drift 10s linear infinite;
+        }
+        body.theme-candy .particle { opacity: 0.6; }
 
-/* Answer input in dark mode */
-.dark #answer-input {
-    background-color: #1e293b !important;
-    color: #f1f5f9;
-    border-color: #475569;
-}
+        /* Pastel Theme - Evolutive Gradient */
+        @keyframes pastelGradientFlowLight {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+         @keyframes pastelGradientFlowDark {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        body.theme-pastel.light-mode {
+            background: linear-gradient(to right, var(--pastel-color-light-1), var(--pastel-color-light-2), var(--pastel-color-light-1));
+            background-size: 200% 100%;
+            animation: pastelGradientFlowLight 20s linear infinite;
+        }
+        body.theme-pastel.dark-mode {
+            background: linear-gradient(to right, var(--pastel-color-dark-1), var(--pastel-color-dark-2), var(--pastel-color-dark-1));
+            background-size: 200% 100%;
+            animation: pastelGradientFlowDark 20s linear infinite;
+        }
 
-/* Reset options dropdown in dark mode */
-.dark #reset-options {
-    background-color: #1e293b !important;
-    color: #f1f5f9 !important;
-}
 
-/* Hamburger button in dark mode */
-.dark #burger-button {
-    background-color: rgba(30, 41, 59, 0.8) !important;
-}
+        /* Forest Theme - Wind Effect (Leaf Particles) */
+         @keyframes leafFall {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translate(calc(var(--wind-x) * 100vw), 100vh) rotate(720deg); opacity: 0; }
+        }
+         @keyframes sway {
+             0%, 100% { transform: rotate(0deg); }
+             50% { transform: rotate(1deg); }
+         }
+        .leaf {
+            position: absolute;
+            width: 20px; height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238FBC8F'%3E%3Cpath d='M12.75 12.75l-.75.75v3.75m-.75 0H9M7.5 21h6m3-3l-3.75-3.75M17.25 19.5L21 15.75M14.25 12L18 8.25M15.75 4.5L19.5 8.25M19.5 4.5L15.75 8.25M12.75 12.75L9 9M15 15l-3.75 3.75M17.25 19.5L13.5 15.75M19.5 15.75L15.75 19.5M4.5 19.5L8.25 15.75M6 9l3.75 3.75M4.5 15.75L8.25 19.5M9 15l-3.75 3.75M4.5 4.5L8.25 8.25M12 12l-3.75-3.75M4.5 8.25L8.25 4.5' /%3E%3C/svg%3E"); /* Simple leaf SVG */
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: leafFall var(--fall-duration) linear infinite;
+            opacity: 0;
+            z-index: -1;
+            --wind-x: 0; /* CSS variable for horizontal wind influence */
+            --fall-duration: 10s;
+        }
+         body.theme-forest .leaf { opacity: 0.6; }
+         body.theme-forest {
+             background-image:
+                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), /* Dark overlay for dark mode */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%2338761D' fill-opacity='0.2'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20-5-5-5 5L11 0zm22 17l5 20-5-5-5 5L33 17zm22 34l5 20-5-5-5 5L55 51zm22 17l5 20-5-5-5 5L77 68z'/%3E%3C/g%3E%3C/svg%3E");
+             background-size: 150px 150px;
+             animation: sway 20s ease-in-out infinite; /* Subtle background sway */
+         }
+          body.theme-forest.dark-mode {
+              background-image:
+                 linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%231A4314' fill-opacity='0.3'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20-5-5-5 5L11 0zm22 17l5 20-5-5-5 5L33 17zm22 34l5 20-5-5-5 5L55 51zm22 17l5 20-5-5-5 5L77 68z'/%3E%3C/g%3E%3C/svg%3E")
+          }
 
-/* Fix for chapter buttons in dark mode */
-.dark .bg-white {
-    background-color: #334155 !important;
-}
 
-/* Make sure text in all dropdowns is visible in both modes */
-select option {
-    color: #000000;
-}
-.dark select {
-    color: #f1f5f9 !important;
-}
+        /* Galaxy Theme - Starfield */
+        @keyframes twinkling {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+         @keyframes slowPan {
+             0% { background-position: 0% 0%; }
+             100% { background-position: 100% 100%; }
+         }
+        .star {
+            position: absolute;
+            width: var(--star-size); height: var(--star-size);
+            background-color: var(--star-color);
+            border-radius: 50%;
+            animation: twinkling var(--twinkle-duration) ease-in-out infinite;
+            opacity: 0;
+            z-index: -1;
+        }
+        body.theme-galaxy .star { opacity: 0.7; }
+         body.theme-galaxy {
+             background-image:
+                 radial-gradient(ellipse at bottom, #2A0A5A 0%, #0A0A2A 70%),
+                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23E0E0FF' fill-opacity='0.05'/%3E%3Ccircle cx='50' cy='150' r='40' fill='%23C4C4FF' fill-opacity='0.03'/%3E%3Ccircle cx='150' cy='50' r='60' fill='%23A8A8FF' fill-opacity='0.04'/%3E%3C/svg%3E"); /* Nebulas */
+             background-size: cover, 400px 400px;
+             animation: slowPan 60s linear infinite;
+         }
+          body.theme-galaxy.dark-mode {
+              background-image:
+                radial-gradient(ellipse at bottom, #2A0A5A 0%, #0A0A2A 70%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23E0E0FF' fill-opacity='0.03'/%3E%3Ccircle cx='50' cy='150' r='40' fill='%23C4C4FF' fill-opacity='0.02'/%3E%3Ccircle cx='150' cy='50' r='60' fill='%23A8A8FF' fill-opacity='0.025'/%3E%3C/svg%3E");
+          }
+
+
+        /* Steampunk Theme - Gears */
+         @keyframes rotateGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .gear {
+            position: absolute;
+            width: var(--gear-size); height: var(--gear-size);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23B87333'%3E%3Cpath fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.75.75h4.5a.75.75 0 000-1.5h-3.75V6z' clip-rule='evenodd' /%3E%3C/svg%3E"); /* Simple gear SVG */
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: rotateGear var(--gear-speed) linear infinite;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        body.theme-steampunk .gear { opacity: 0.3; }
+         body.theme-steampunk {
+             background-image:
+                 linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
+                 url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%238B4513\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M0 40L40 0V0h-.01L0 40zm40 0L0 0V0h.01L40 40z\'/%3E%3C/g%3E%3C/svg%3E");
+             background-size: 100px 100px;
+         }
+          body.theme-steampunk.dark-mode {
+              background-image:
+                  linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                  url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23D2B48C\' fill-opacity=\'0.08\'%3E%3Cpath d=\'M0 40L40 0V0h-.01L0 40zm40 0L0 0V0h.01L40 40z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+        /* Underwater Cave Theme - Light Rays */
+        @keyframes lightRay {
+            0% { transform: translate(0, 0) rotate(10deg); opacity: 0.1; }
+            50% { opacity: 0.3; }
+            100% { transform: translate(50px, 100px) rotate(15deg); opacity: 0.1; }
+        }
+         @keyframes caustics {
+             0% { background-position: 0 0; }
+             100% { background-position: 200% 200%; }
+         }
+        .light-ray {
+            position: absolute;
+            width: 5px; height: 150vh;
+            background: linear-gradient(to bottom, rgba(173, 216, 230, 0.05), rgba(173, 216, 230, 0.2));
+            animation: lightRay 15s ease-in-out infinite alternate;
+            transform-origin: top;
+            opacity: 0;
+            z-index: -1;
+        }
+        body.theme-underwater-cave .light-ray { opacity: 0.1; }
+         body.theme-underwater-cave {
+             background-image:
+                 radial-gradient(ellipse at bottom, #003366 0%, #001F3F 70%),
+                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M0 100 Q 50 50 100 100 Q 150 150 200 100 T 200 100' stroke='%23ADD8E6' stroke-width='3' fill='none' opacity='0.15'/%3E%3C/svg%3E"); /* Caustic-like pattern */
+             background-size: cover, 300px 300px;
+             animation: caustics 30s linear infinite;
+         }
+          body.theme-underwater-cave.dark-mode {
+              background-image:
+                  radial-gradient(ellipse at bottom, #003366 0%, #001F3F 70%),
+                  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M0 100 Q 50 50 100 100 Q 150 150 200 100 T 200 100' stroke='%2320B2AA' stroke-width='3' fill='none' opacity='0.1'/%3E%3C/svg%3E");
+          }
+
+
+        /* Desert Oasis Theme - Heat Haze */
+        @keyframes heatHaze {
+            0% { filter: blur(0px); transform: translateY(0); }
+            50% { filter: blur(2px); transform: translateY(-5px); }
+            100% { filter: blur(0px); transform: translateY(0); }
+        }
+         @keyframes sandDrift {
+             0% { transform: translateX(0); opacity: 0; }
+             20% { opacity: 0.5; }
+             100% { transform: translateX(50vw); opacity: 0; }
+         }
+        body.theme-desert-oasis #flashcard-container { animation: heatHaze 3s ease-in-out infinite; }
+        .sand-particle {
+             position: absolute;
+             width: 2px; height: 2px;
+             background-color: var(--sand-color);
+             border-radius: 50%;
+             animation: sandDrift var(--drift-duration) linear infinite;
+             opacity: 0;
+             z-index: -1;
+             --sand-color: #F4A460;
+             --drift-duration: 10s;
+        }
+         body.theme-desert-oasis .sand-particle { opacity: 0.5; }
+         body.theme-desert-oasis {
+             background-image:
+                 radial-gradient(ellipse at top, #8B4513 0%, #3A241C 70%),
+                 url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23D2B48C\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E"); /* Sand texture */
+             background-size: cover, 50px 50px;
+         }
+          body.theme-desert-oasis.dark-mode {
+               background-image:
+                  radial-gradient(ellipse at top, #8B4513 0%, #3A241C 70%),
+                  url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23F0E68C\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+        /* Ice/Crystal Theme - Shimmer */
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+         @keyframes iceFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+         }
+        body.theme-ice-crystal .glassmorphism { animation: shimmer 4s ease-in-out infinite; }
+        .ice-particle {
+            position: absolute;
+            width: var(--ice-size); height: var(--ice-size);
+            background-color: var(--ice-color);
+            opacity: 0;
+            z-index: -1;
+            animation: iceFall var(--fall-duration) linear infinite;
+            --ice-size: 5px;
+            --ice-color: rgba(224, 255, 255, 0.5);
+            --fall-duration: 10s;
+        }
+         body.theme-ice-crystal .ice-particle { opacity: 0.7; }
+         body.theme-ice-crystal {
+             background-image:
+                 linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
+                 url("data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ADD8E6\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zm2 2h-1L6 0h1v2zm-2 2h1L2 6h-1v-2zm2 0h1L4 6h-1v-2z\'/%3E%3C/g%3E%3C/svg%3E");
+             background-size: cover, 30px 30px;
+         }
+          body.theme-ice-crystal.dark-mode {
+              background-image:
+                  linear-gradient(rgba(0,0,128,0.05), rgba(0,0,128,0.05)),
+                  url("data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000080\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zm2 2h-1L6 0h1v2zm-2 2h1L2 6h-1v-2zm2 0h1L4 6h-1v-2z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+        /* Volcano/Inferno Theme - Embers */
+        @keyframes emberFloat {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translate(calc(var(--ember-x) * 100vw), -100vh) scale(1.5); opacity: 0; }
+        }
+         @keyframes heatWave {
+             0%, 100% { transform: scaleY(1); }
+             50% { transform: scaleY(1.01); }
+         }
+        .ember {
+            position: absolute;
+            width: 5px; height: 5px;
+            background-color: var(--ember-color);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--ember-color);
+            animation: emberFloat var(--ember-duration) linear infinite;
+            opacity: 0;
+            z-index: -1;
+            --ember-x: 0;
+            --ember-color: #FF4500; /* Default OrangeRed */
+            --ember-duration: 8s;
+        }
+        body.theme-volcano-inferno .ember { opacity: 0.5; }
+         body.theme-volcano-inferno {
+             background-image:
+                 radial-gradient(ellipse at top, #8B0000 0%, #4A0404 70%),
+                 url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23FF8C00\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E"); /* Lava texture */
+             background-size: cover, 50px 50px;
+             animation: heatWave 5s ease-in-out infinite alternate;
+         }
+          body.theme-volcano-inferno.dark-mode {
+               background-image:
+                   radial-gradient(ellipse at top, #8B0000 0%, #4A0404 70%),
+                   url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23FFD700\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+        /* Japanese Garden Theme - Cherry Blossoms */
+         @keyframes blossomFall {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            100% { transform: translate(calc(var(--blossom-x) * 100vw), 100vh) rotate(720deg); opacity: 0; }
+        }
+         @keyframes waterRipple {
+             0% { background-position: 0 0; }
+             100% { background-position: 100% 100%; }
+         }
+        .blossom {
+            position: absolute;
+            width: 15px; height: 15px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFB6C1'%3E%3Cpath fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm1.5 10.75a.75.75 0 00-1.5 0v3.75a.75.75 0 001.5 0v-3.75z' clip-rule='evenodd' /%3E%3C/svg%3E"); /* Simple blossom SVG */
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: blossomFall var(--fall-duration) linear infinite;
+            opacity: 0;
+            z-index: -1;
+            --blossom-x: 0;
+            --fall-duration: 12s;
+        }
+         body.theme-japanese-garden .blossom { opacity: 0.7; }
+         body.theme-japanese-garden {
+             background-image:
+                 url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%2390EE90\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E"), /* Garden texture */
+                 url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 50 Q 25 60 50 50 Q 75 40 100 50 T 100 50\' stroke='%234682B4' stroke-width='1' fill='none' opacity='0.1'/%3E%3C/svg%3E"); /* Water ripple */
+             background-size: 50px 50px, 200px 200px;
+             background-position: center center, 0 0;
+             background-repeat: repeat, repeat;
+             animation: waterRipple 40s linear infinite;
+         }
+          body.theme-japanese-garden.dark-mode {
+              background-image:
+                  url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23778899\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 10C8.75 10 10 8.75 10 0V0h1L10 9.99zM10 0C1.25 0 0 1.25 0 10V0h1L10 1.01z\'/%3E%3C/g%3E%3C/svg%3E"),
+                  url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 50 Q 25 60 50 50 Q 75 40 100 50 T 100 50\' stroke='%232F4F4F' stroke-width='1' fill='none' opacity='0.05'/%3E%3C/svg%3E");
+          }
+
+
+         /* Doodle/Sketchbook Theme - Sketchy Lines */
+         @keyframes sketchyLineDraw {
+            0% { stroke-dashoffset: var(--line-length); }
+            100% { stroke-dashoffset: 0; }
+         }
+         .sketchy-line {
+            position: absolute;
+            stroke-dasharray: var(--line-length);
+            stroke-dashoffset: 0;
+            animation: sketchyLineDraw var(--line-speed) linear infinite alternate;
+            opacity: 0.3;
+            z-index: -1;
+            fill: none;
+            stroke-width: 1px;
+            stroke: var(--line-color);
+         }
+         body.theme-doodle-sketchbook .sketchy-line { opacity: 0.3; }
+         body.theme-doodle-sketchbook {
+             background-image:
+                 url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23AAAAAA\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h1v1H0V0zm2 0h1v1H2V0zm2 0h1v1H4V0zm2 0h1v1H6V0zm2 0h1v1H8V0zm0 2h1v1H8V2zm0 2h1v1H8V4zm0 2h1v1H8V6zm0 2h1v1H8V8zm-2 0h1v1H6V8zm-2 0h1v1H4V8zm-2 0h1v1H2V8zm-2 0h1v1H0V8zm0-2h1v1H0V6zm0-2h1v1H0V4zm0-2h1v1H0V2z\'/%3E%3C/g%3E%3C/svg%3E");
+         }
+          body.theme-doodle-sketchbook.dark-mode {
+               background-image:
+                   url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23555555\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h1v1H0V0zm2 0h1v1H2V0zm2 0h1v1H4V0zm2 0h1v1H6V0zm2 0h1v1H8V0zm0 2h1v1H8V2zm0 2h1v1H8V4zm0 2h1v1H8V6zm0 2h1v1H8V8zm-2 0h1v1H6V8zm-2 0h1v1H4V8zm-2 0h1v1H2V8zm-2 0h1v1H0V8zm0-2h1v1H0V6zm0-2h1v1H0V4zm0-2h1v1H0V2z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+         /* Pixel Art Theme - Pixelation */
+         body.theme-pixel-art {
+            image-rendering: pixelated; /* Helps with pixel art scaling */
+            image-rendering: crisp-edges;
+         }
+         body.theme-pixel-art #flashcard-container,
+         body.theme-pixel-art .glassmorphism-menu,
+         body.theme-pixel-art button,
+         body.theme-pixel-art input,
+         body.theme-pixel-art select,
+         body.theme-pixel-art .chapter-button-default,
+         body.theme-pixel-art .chapter-button-active,
+         body.theme-pixel-art #card-score,
+         body.theme-pixel-art .bg-white\/50 {
+            border-radius: 0 !important; /* No rounded corners */
+            box-shadow: none !important;
+            border: 2px solid; /* Pixelated border */
+            outline: none;
+         }
+         body.theme-pixel-art button:hover,
+         body.theme-pixel-art input:focus,
+         body.theme-pixel-art select:focus {
+             box-shadow: 4px 4px 0px 0px var(--pixel-accent-color) !important; /* Pixelated shadow on hover/focus */
+         }
+         body.theme-pixel-art .chapter-button-active {
+             box-shadow: 4px 4px 0px 0px var(--pixel-active-color) !important;
+         }
+         body.theme-pixel-art #card-score {
+              box-shadow: 2px 2px 0px 0px var(--pixel-score-color) !important;
+         }
+         @keyframes pixelDrift {
+             0% { transform: translate(0, 0); }
+             100% { transform: translate(10px, 10px); }
+         }
+         .pixel-sprite {
+             position: absolute;
+             width: var(--sprite-size); height: var(--sprite-size);
+             background-color: var(--sprite-color);
+             animation: pixelDrift var(--drift-speed) linear infinite alternate;
+             opacity: 0.5;
+             z-index: -1;
+             image-rendering: pixelated;
+         }
+         body.theme-pixel-art .pixel-sprite { opacity: 0.5; }
+         body.theme-pixel-art {
+             background-image:
+                 url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23008080\' fill-opacity=\'0.3\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h5v5H0V0zm5 5h5v5H5V5z\'/%3E%3C/g%3E%3C/svg%3E");
+         }
+          body.theme-pixel-art.dark-mode {
+               background-image:
+                   url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' viewBox=\'0 0 10 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23333333\' fill-opacity=\'0.5\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h5v5H0V0zm5 5h5v5H5V5z\'/%3E%3C/g%3E%3C/svg%3E");
+          }
+
+
+        /* Minimalist Theme - Subtle Lines */
+        .minimal-line {
+            position: absolute;
+            width: 100%; height: 1px;
+            background-color: rgba(100, 100, 100, 0.1);
+            z-index: -1;
+        }
+         body.theme-minimalist.dark-mode .minimal-line { background-color: rgba(150, 150, 150, 0.08); }
+         @keyframes minimalShift {
+             0% { transform: translateY(0); }
+             100% { transform: translateY(10px); }
+         }
+         body.theme-minimalist .minimal-line { animation: minimalShift 30s linear infinite alternate; }
+
+
+        /* Gradient Theme - Animated Background Gradient */
+        @keyframes animatedGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        body.theme-gradient {
+            background: linear-gradient(-45deg, var(--gradient-color-1), var(--gradient-color-2), var(--gradient-color-3), var(--gradient-color-4));
+            background-size: 400% 400%;
+            animation: animatedGradient 15s ease infinite;
+        }
+
+
+        /* Y2K Theme - Glitch Effect */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+         @keyframes neonPulse {
+             0%, 100% { text-shadow: 0 0 5px var(--neon-color), 0 0 10px var(--neon-color); }
+             50% { text-shadow: 0 0 10px var(--neon-color), 0 0 20px var(--neon-color); }
+         }
+         body.theme-y2k #flashcard-container,
+         body.theme-y2k #timer,
+         body.theme-y2k .chapter-button-active {
+             animation: glitch 0.5s infinite alternate;
+         }
+         body.theme-y2k {
+            font-family: 'Orbitron', sans-serif; /* Y2K feel */
+            --neon-color: #00FFFF;
+         }
+          body.theme-y2k.dark-mode { --neon-color: #FF00FF; }
+         body.theme-y2k #timer, body.theme-y2k .chapter-button-active {
+             animation: neonPulse 2s ease-in-out infinite alternate;
+             color: var(--neon-color);
+             background-color: rgba(0,0,0,0.5);
+             border: 1px solid var(--neon-color);
+         }
+         body.theme-y2k .chapter-button-active {
+             background-color: var(--neon-color) !important;
+             color: #000 !important;
+             text-shadow: none !important;
+             box-shadow: 0 0 10px var(--neon-color);
+         }
+         body.theme-y2k .glassmorphism {
+             border: 2px solid var(--neon-color);
+             box-shadow: 0 0 15px var(--neon-color);
+         }
+          body.theme-y2k input[type="text"],
+          body.theme-y2k select {
+              border: 1px solid var(--neon-color);
+              box-shadow: 0 0 5px var(--neon-color);
+              background-color: rgba(0,0,0,0.3);
+              color: var(--neon-color);
+          }
+          body.theme-y2k input[type="text"]::placeholder {
+              color: rgba(0, 255, 255, 0.6);
+          }
+          body.theme-y2k.dark-mode input[type="text"]::placeholder {
+              color: rgba(255, 0, 255, 0.6);
+          }
+
+
+        /* Terminal Theme - Matrix Rain */
+        @keyframes matrixFall {
+            0% { transform: translateY(-100%); opacity: 0.8; }
+            100% { transform: translateY(100vh); opacity: 0.1; }
+        }
+        .matrix-char {
+            position: absolute;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            color: #00FF41;
+            opacity: 0;
+            animation: matrixFall var(--fall-duration) linear infinite;
+            pointer-events: none;
+        }
+        body.theme-terminal .matrix-char { opacity: 0.8; }
+
+
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-4 overflow-x-hidden">
+<body class="flex flex-col items-center justify-center min-h-screen p-4 overflow-x-hidden">
+    <div id="animated-bg-elements" class="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div class="sci-fi-grid-overlay"></div>
+        <div class="scanline-overlay"></div>
+    </div>
 
-    <button id="burger-button" class="fixed top-4 left-4 z-30 p-2 bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm rounded-md shadow-lg text-lg">
+
+    <button id="burger-button" class="fixed top-4 left-4 z-30 p-2 backdrop-blur-sm rounded-md shadow-lg text-lg">
         <i class="fas fa-bars"></i>
     </button>
 
-    <div id="sidebar-menu" class="fixed top-0 left-0 h-full w-72 sm:w-80 bg-white/90 dark:bg-gray-900/90 glassmorphism-menu shadow-2xl p-6 z-40 menu-slide-out overflow-y-auto">
+    <div id="sidebar-menu" class="fixed top-0 left-0 h-full w-72 sm:w-80 glassmorphism-menu shadow-2xl p-6 z-40 menu-slide-out overflow-y-auto">
         <button id="close-menu-button" class="absolute top-4 right-4 text-xl p-1 hover:text-red-500 transition-colors">
             <i class="fas fa-times"></i>
         </button>
         <h2 class="text-2xl font-semibold mb-6">Menu</h2>
-        
+
         <div class="mb-4">
-            <input type="text" id="search-bar" placeholder="Rechercher une carte..." class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-emerald-500 outline-none placeholder-gray-400 dark:placeholder-gray-500">
+            <input type="text" id="search-bar" placeholder="Rechercher une carte..." class="w-full p-2 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-sm sm:text-base">
             <div id="search-results-container" class="mt-2 max-h-32 overflow-y-auto text-sm">
                 </div>
         </div>
@@ -165,8 +814,8 @@ select option {
 
         <div class="mb-4 flex items-center justify-between">
             <label for="dark-mode-toggle" class="text-lg">Mode Sombre</label>
-            <button id="dark-mode-toggle" class="p-2 rounded-md bg-gray-200 dark:bg-gray-700">
-                <i class="fas fa-moon"></i> </button>
+            <button id="dark-mode-toggle" class="p-2 rounded-md"> <i class="fas fa-moon"></i>
+            </button>
         </div>
 
         <div class="mb-4 space-y-2">
@@ -179,45 +828,43 @@ select option {
 
         <div>
             <h3 class="text-lg font-medium mb-2">Réinitialiser</h3>
-            <select id="reset-options" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 mb-2">
-                </select>
+            <select id="reset-options" class="w-full p-2 border rounded-md mb-2">
+            </select>
             <button id="reset-data-button" class="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"><i class="fas fa-undo mr-2"></i>Réinitialiser Sélection</button>
         </div>
     </div>
-    
-    <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-3 sm:space-y-4">
-        <div id="timer" class="timer-font text-xl sm:text-2xl p-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-md shadow">00:00:00</div>
 
-        <div class="w-full p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-md shadow">
+    <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-3 sm:space-y-4 relative z-10"> <div id="timer" class="timer-font text-xl sm:text-2xl p-2 bg-white/50 backdrop-blur-sm rounded-md shadow">00:00:00</div>
+
+        <div class="w-full p-1 bg-white/50 backdrop-blur-sm rounded-md shadow">
             <div class="flex justify-between text-xs sm:text-sm mb-1 px-1">
                 <span id="progress-text">Cartes vues: 0 / 0</span>
                 <span id="progress-percentage">0%</span>
             </div>
-            <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2.5 sm:h-3">
-                <div id="progress-bar-fill" class="bg-emerald-500 h-2.5 sm:h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            <div class="w-full bg-gray-300 rounded-full h-2.5 sm:h-3"> <div id="progress-bar-fill" class="bg-emerald-500 h-2.5 sm:h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
             </div>
         </div>
 
         <div id="chapter-buttons-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full">
             </div>
 
-        <div id="flashcard-container" class="w-full h-80 sm:h-96 p-6 rounded-xl shadow-xl flex flex-col justify-between items-center text-center cursor-pointer transition-colors duration-300 ease-in-out glassmorphism">
+        <div id="flashcard-container" class="w-full h-80 sm:h-96 p-6 rounded-xl shadow-xl flex flex-col justify-between items-center text-center cursor-pointer glassmorphism">
             <div class="w-full flex justify-end">
-                <span id="card-score" class="text-lg sm:text-xl font-bold px-3 py-1 rounded-lg bg-black/10 dark:bg-white/20">50%</span>
+                <span id="card-score" class="text-lg sm:text-xl font-bold px-3 py-1 rounded-lg">50%</span>
             </div>
             <div id="card-content" class="flex-grow flex flex-col justify-center items-center">
                 <p id="card-french-word" class="text-2xl sm:text-3xl md:text-4xl font-semibold"></p>
                 <p id="card-english-word" class="text-xl sm:text-2xl md:text-3xl font-medium card-translation hidden"></p>
             </div>
-            <div class="h-6"> 
+            <div class="h-6">
                 </div>
         </div>
-        
+
         <div id="message-area" class="w-full text-center h-6 text-sm font-medium">
              </div>
 
-        <div class="w-full flex flex-col sm:flex-row items-center gap-2 p-3 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-lg shadow">
-            <input type="text" id="answer-input" placeholder="Votre réponse en anglais..." class="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-emerald-500 outline-none text-sm sm:text-base placeholder-gray-400 dark:placeholder-gray-500">
+        <div class="w-full flex flex-col sm:flex-row items-center gap-2 p-3 bg-white/50 backdrop-blur-sm rounded-lg shadow">
+            <input type="text" id="answer-input" placeholder="Votre réponse en anglais..." class="flex-grow p-3 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-sm sm:text-base">
             <button id="submit-answer-button" class="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md transition-colors text-sm sm:text-base">
                 Valider
             </button>
@@ -235,14 +882,14 @@ select option {
             elapsedSeconds: 0,
             darkMode: false,
             seenCountInSession: 0,
-            isCardRevealedByClick: false, 
-            readyToAdvanceOnClick: false, // True if card can be advanced by clicking on it
+            isCardRevealedByClick: false,
+            readyToAdvanceOnClick: false,
+            currentTheme: 'default'
         };
 
         // --- INITIAL DATA (Sample) ---
         const initialCardsData = [
-  // Chapter 1: Democracy
-  { id: '0', french: "monarchie", english: "monarchy", chapter: 'Democracy', score: 50 },
+          { id: '0', french: "monarchie", english: "monarchy", chapter: 'Democracy', score: 50 },
   { id: '1', french: "monarque de droit divin", english: "a monarch by divine right", chapter: 'Democracy', score: 50 },
   { id: '2', french: "souverain", english: "sovereign", chapter: 'Democracy', score: 50 },
   { id: '3', french: "aristocratie", english: "aristocracy", chapter: 'Democracy', score: 50 },
@@ -755,45 +1402,222 @@ select option {
   { id: '502', french: "retraité", english: "a pensioner, an old age pensioner, a retiree (US)", chapter: 'Unemployment', score: 50 },
   { id: '503', french: "retraite", english: "retirement", chapter: 'Unemployment', score: 50 },
   { id: '504', french: "partir en pré-retraite", english: "to take early retirement", chapter: 'Unemployment', score: 50 },
-  { id: '505', french: "âge de la retraite", english: "retirement age", chapter: 'Unemployment', score: 50 }
+  { id: '505', french: "âge de la retraite", english: "retirement age", chapter: 'Unemployment', score: 50 },
+  { id: '506', french: "bien réussir à l'école", english: "to do well at school", chapter: 'Education', score: 50 },
+  { id: '507', french: "lire l'anglais couramment", english: "to read English fluently", chapter: 'Education', score: 50 },
+{ id: '508', french: "être bon en sport", english: "to be good at sports", chapter: 'Education', score: 50 },
+{ id: '509', french: "faire l'école buissonnière", english: "to play truant", chapter: 'Education', score: 50 },
+{ id: '510', french: "absentéisme", english: "truancy", chapter: 'Education', score: 50 },
+{ id: '511', french: "suivre un cours d'anglais", english: "to take a class in English", chapter: 'Education', score: 50 },
+{ id: '512', french: "donner du travail à la maison", english: "to set homework", chapter: 'Education', score: 50 },
+{ id: '513', french: "rendre un travail", english: "to hand in a piece of work", chapter: 'Education', score: 50 },
+{ id: '514', french: "les subtilités de la langue anglaise", english: "the intricacies of the English language", chapter: 'Education', score: 50 },
+{ id: '515', french: "se lancer", english: "to get started", chapter: 'Education', score: 50 },
+{ id: '516', french: "se conformer à une règle", english: "to obey a rule", chapter: 'Education', score: 50 },
+{ id: '517', french: "obéir à (qqn)", english: "to obey (sone)", chapter: 'Education', score: 50 },
+{ id: '518', french: "avoir des difficultés en maths", english: "to have difficulty with maths", chapter: 'Education', score: 50 },
+{ id: '519', french: "donner un coup de main à (qqn)", english: "to give (sone) a hand", chapter: 'Education', score: 50 },
+{ id: '520', french: "obtenir un diplôme", english: "to graduate", chapter: 'Education', score: 50 },
+{ id: '521', french: "une salle de classe", english: "a classroom", chapter: 'Education', score: 50 },
+{ id: '522', french: "une leçon", english: "a class", chapter: 'Education', score: 50 },
+{ id: '523', french: "rattraper un cours loupé", english: "to catch up a missed lesson", chapter: 'Education', score: 50 },
+{ id: '524', french: "évaluer", english: "to assess, appraise", chapter: 'Education', score: 50 },
+{ id: '525', french: "le programme scolaire", english: "the school curriculum", chapter: 'Education', score: 50 },
+{ id: '526', french: "étudiant de premier cycle", english: "undergraduate", chapter: 'Education', score: 50 },
+{ id: '527', french: "indiscipliné", english: "unruly", chapter: 'Education', score: 50 },
+{ id: '528', french: "incontrôlable", english: "unmanageable", chapter: 'Education', score: 50 },
+{ id: '529', french: "bâcler ses devoirs", english: "to dash off one's work", chapter: 'Education', score: 50 },
+{ id: '530', french: "obtenir une bonne note", english: "to get a good mark", chapter: 'Education', score: 50 },
+{ id: '531', french: "tricher sur son voisin", english: "to eye over one's neighbour's work", chapter: 'Education', score: 50 },
+{ id: '532', french: "principal, directeur (école)", english: "headmaster", chapter: 'Education', score: 50 },
+{ id: '533', french: "élève doué", english: "gifted pupil", chapter: 'Education', score: 50 },
+{ id: '534', french: "réussir un examen haut la main", english: "to pass a test with flying colors", chapter: 'Education', score: 50 },
+{ id: '535', french: "une matière (scolaire)", english: "a (school) subject", chapter: 'Education', score: 50 },
+{ id: '536', french: "une pause de 20 minutes", english: "a 20-minute break", chapter: 'Education', score: 50 },
+{ id: '537', french: "une heure de cours", english: "a teaching-hour", chapter: 'Education', score: 50 },
+{ id: '538', french: "passer dans la classe supérieure", english: "to pass the next grade", chapter: 'Education', score: 50 },
+{ id: '539', french: "travail de paperasse", english: "paperwork", chapter: 'Education', score: 50 },
+{ id: '540', french: "passer un examen", english: "to take an exam", chapter: 'Education', score: 50 },
+{ id: '541', french: "examen blanc", english: "mock exam", chapter: 'Education', score: 50 },
+{ id: '542', french: "se préparer à un examen", english: "to prepare for an exam", chapter: 'Education', score: 50 },
+{ id: '543', french: "échouer à un examen", english: "to flunk a test", chapter: 'Education', score: 50 },
+{ id: '544', french: "recaler (qqn)", english: "to flunk (sone)", chapter: 'Education', score: 50 },
+{ id: '545', french: "être reçu à un examen avec mention", english: "to pass a degree with distinction", chapter: 'Education', score: 50 },
+{ id: '546', french: "abandonner l'école", english: "to drop out of school", chapter: 'Education', score: 50 },
+{ id: '547', french: "un élève décrocheur", english: "a dropout", chapter: 'Education', score: 50 },
+{ id: '548', french: "obtenir une bourse", english: "to get a scholarship", chapter: 'Education', score: 50 },
+{ id: '549', french: "entrer en fac de médecine", english: "to go to a medical school", chapter: 'Education', score: 50 },
+{ id: '550', french: "faire des études de médecine", english: "to study medicine", chapter: 'Education', score: 50 },
+{ id: '551', french: "remettre un évènement à plus tard", english: "to put off an event", chapter: 'Education', score: 50 },
+{ id: '552', french: "sortie scolaire", english: "school trip", chapter: 'Education', score: 50 },
+{ id: '553', french: "faire des recherches sur (qqch)", english: "to do research on (sthg)", chapter: 'Education', score: 50 },
+{ id: '554', french: "cour d'école", english: "schoolyard", chapter: 'Education', score: 50 },
+{ id: '555', french: "un élève de terminale", english: "[UK] a sixth-former", chapter: 'Education', score: 50 },
+{ id: '556', french: "méticuleux", english: "painstaking", chapter: 'Education', score: 50 },
+{ id: '557', french: "sécher un cours", english: "to skip a lesson", chapter: 'Education', score: 50 },
+{ id: '558', french: "se voir accorder la possibilité de [...]", english: "to be provided with an opportunity to [...]", chapter: 'Education', score: 50 },
+{ id: '559', french: "tricher", english: "to cheat", chapter: 'Education', score: 50 },
+{ id: '560', french: "un tricheur", english: "a cheater", chapter: 'Education', score: 50 },
+{ id: '561', french: "être renvoyé", english: "to be expelled", chapter: 'Education', score: 50 },
+{ id: '562', french: "rouler sur un examen", english: "to sail through an exam", chapter: 'Education', score: 50 },
+{id: '563', french: 'sauce (tomate)', english: 'dressing', chapter: 'Thanksgiving', score: 50},
+{id: '564', french: 'chuckle', english: 'laughter', chapter: 'Thanksgiving', score: 50},
+{id: '565', french: 'to gather', english: 'to get together', chapter: 'Thanksgiving', score: 50},
+{id: '566', french: 'a feast', english: 'a banquet', chapter: 'Thanksgiving', score: 50},
+{id: '567', french: 'to reach accross', english: 'to make efforts to join', chapter: 'Thanksgiving', score: 50},
+{id: '568', french: 'one another', english: 'each other', chapter: 'Thanksgiving', score: 50},
+{id: '569', french: 'to winnow away', english: 'to filter out and remove', chapter: 'Thanksgiving', score: 50},
+{id: '570', french: 'widely viewed as', english: 'largely regarded as', chapter: 'Thanksgiving', score: 50},
+{id: '571', french: 'twice', english: 'two times', chapter: 'Thanksgiving', score: 50},
+{id: '572', french: 'to provide', english: 'to give', chapter: 'Thanksgiving', score: 50},
+{id: '573', french: 'the bulk of', english: 'the biggest part of', chapter: 'Thanksgiving', score: 50},
+{id: '574', french: 'to depict', english: 'to describe', chapter: 'Thanksgiving', score: 50},
+{id: '575', french: 'to feature', english: 'to represent, show', chapter: 'Thanksgiving', score: 50},
+{id: '576', french: 'subservient', english: 'submissive, docile', chapter: 'Thanksgiving', score: 50},
+{id: '577', french: 'pilgrims', english: 'migrants arriving in America from England in 17th', chapter: 'Thanksgiving', score: 50},
+{id: '578', french: 'to outnumber', english: 'to surpass in number', chapter: 'Thanksgiving', score: 50},
+{id: '579', french: 'to crouch', english: 'almost to sit on the floor', chapter: 'Thanksgiving', score: 50},
+{id: '580', french: 'a harvest', english: 'a crop', chapter: 'Thanksgiving', score: 50},
+{id: '581', french: 'likely', english: 'probably', chapter: 'Thanksgiving', score: 50},
+{id: '582', french: 'a deed', english: 'an [bad] action', chapter: 'Thanksgiving', score: 50},
+{id: '583', french: 'settlers', english: 'colons', chapter: 'Thanksgiving', score: 50},
+{id: '584', french: 'in retaliation for', english: 'in revenge for', chapter: 'Thanksgiving', score: 50},
+{id: '585', french: 'to broker', english: 'to organize, negotiate', chapter: 'Thanksgiving', score: 50},
+{id: '586', french: 'to grab', english: 'to seize', chapter: 'Thanksgiving', score: 50},
+{id: '587', french: 'gauzy', english: 'transparent', chapter: 'Thanksgiving', score: 50},
+{id: '588', french: 'willfully', english: 'deliberately', chapter: 'Thanksgiving', score: 50},
+{id: '589', french: 'How [s.one] would have it', english: 'What [s.one] would like to believe', chapter: 'Thanksgiving', score: 50},
+{id: '590', french: 'druthers', english: 'inclination, penchant', chapter: 'Thanksgiving', score: 50},
+{id: '591', french: 'blissfully', english: 'ecstatically', chapter: 'Thanksgiving', score: 50},
+{id: '592', french: 'bleached out', english: 'washed out', chapter: 'Thanksgiving', score: 50},
+{id: '593', french: 'to abid', english: 'to respect', chapter: 'Thanksgiving', score: 50},
+{id: '594', french: 'altérer', english: 'alter', chapter: 'Thanksgiving', score: 50},
+{id: '595', french: 'apprentissage en continu', english: 'lifelong learning', chapter: 'Thanksgiving', score: 50},
+{id: '596', french: 'malaise', english: 'general feeling of discomfort', chapter: 'Business', score: 50},
+{id: '597', french: 'stagflation', english: 'period of slow economic growth and high unemployment', chapter: 'Business', score: 50},
+{id: '598', french: 'aftermath', english: 'the consequences of a significant unpleasant event', chapter: 'Business', score: 50},
+{id: '599', french: 'hyperinflation', english: 'extremely high and accelerating inflation', chapter: 'Business', score: 50},
+{id: '600', french: 'third-world countries', english: 'countries with lower economic development', chapter: 'Business', score: 50},
+{id: '601', french: 'martial law', english: 'military control over civilian functions of government', chapter: 'Business', score: 50},
+{id: '602', french: 'gleaming', english: 'shining brightly, describe something polished or new', chapter: 'Business', score: 50},
+{id: '603', french: 'suburban area', english: 'residential area on the outskirts of the a city', chapter: 'Business', score: 50},
+{id: '604', french: 'stagnation', english: 'lack of activity, growth, and development', chapter: 'Business', score: 50},
+{id: '605', french: 'dispirited', english: 'having lost emthusiasm and hope', chapter: 'Business', score: 50},
+{id: '606', french: 'fatalistic', english: 'believing that events are inevitable', chapter: 'Business', score: 50},
+{id: '607', french: 'hollowed out', english: 'destroyed or weakened from within', chapter: 'Business', score: 50},
+{id: '608', french: 'brimming', english: 'filled to the point of overflowing (with positive emotions and energy)', chapter: 'Business', score: 50},
+{id: '609', french: 'rabais, ristourne', english: 'discount', chapter: 'Business', score: 50},
+{id: '610', french: 'chaîne de montage', english: 'assembly line', chapter: 'Business', score: 50},
+{id: '611', french: 'payer comptant', english: 'to pay cash', chapter: 'Business', score: 50},
+{id: '612', french: "pénurie de main d'oeuvre", 'english': 'labor shortage', chapter: 'Business', score: 50},
+{id: '613', french: 'productivité', english: 'productivity', chapter: 'Business', score: 50},
+{id: '614', french: 'soumettre sa candidature', english: 'to apply', chapter: 'Business', score: 50},
+{id: '615', french: 'racheter', english: 'to buy out', chapter: 'Business', score: 50},
+{id: '616', french: 'licencier', english: 'to lay off', chapter: 'Business', score: 50},
+{id: '617', french: 'se mettre en grève', english: 'to go on strike', chapter: 'Business', score: 50},
+{id: '618', french: 'service client', english: 'customer service', chapter: 'Business', score: 50},
+{id: '619', french: 'représentant syndical', english: 'union representative', chapter: 'Business', score: 50},
+{id: '620', french: 'commerćant', english: 'shopkeeper', chapter: 'Business', score: 50},
+{id: '621', french: 'virer, mettre à la porte', english: 'to fire', chapter: 'Business', score: 50},
+{id: '622', french: 'se mettre à son compte', english: "to set up one's business", 'chapter': 'Business', score: 50},
+{id: '623', french: 'démissionner', english: 'to resign', chapter: 'Business', score: 50},
+{id: '624', french: 'en sureffectif', english: 'overstaffed', chapter: 'Business', score: 50},
+{id: '625', french: 'contrat à durée indéterminée', english: 'permanent contract', chapter: 'Business', score: 50},
+{id: '626', french: 'équipe de nuit', english: 'night shift', chapter: 'Business', score: 50},
+{id: '627', french: 'service, département', english: 'department', chapter: 'Business', score: 50},
+{id: '628', french: 'refondre, réorganiser', english: 'to revamp', chapter: 'Business', score: 50},
+{id: '629', french: 'concurrent', english: 'competitor', chapter: 'Business', score: 50},
+{id: '630', french: 'fusion', english: 'merger', chapter: 'Business', score: 50},
+{id: '631', french: 'faire faillite', english: 'to go bankrupt, bust', chapter: 'Business', score: 50},
+{id: '632', french: 'embaucher', english: 'to hire, take on', chapter: 'Business', score: 50},
+{id: '633', french: 'fiche de paie', english: 'pay slip', chapter: 'Business', score: 50},
+{id: '634', french: 'faire des heures supplémentaires', english: 'work overtime', chapter: 'Business', score: 50},
+{id: '635', french: 'mettre la clé sous la porte', english: 'to go out of business, close up shop', chapter: 'Business', score: 50},
+{id: '636', french: 'fait main', english: 'handmade', chapter: 'Business', score: 50},
+{id: '637', french: 'artisan', english: 'craftsman', chapter: 'Business', score: 50},
+{id: '638', french: 'ouvrier qualifié', english: 'skilled worker', chapter: 'Business', score: 50},
+{id: '639', french: 'entreprise', english: 'business', chapter: 'Business', score: 50},
+{id: '640', french: 'plein emploi', english: 'full employment', chapter: 'Business', score: 50},
+{id: '641', french: 'un maire', english: 'a mayor', chapter: 'Politique', score: 50},
+{id: '642', french: 'homme politique', english: 'politician', chapter: 'Politique', score: 50},
+{id: '643', french: "s'assurer une majorité", 'english': 'to secure a majority', chapter: 'Politique', score: 50},
+{id: '644', french: 'déclencher des élections anticipées', english: 'to call an early election', chapter: 'Politique', score: 50},
+{id: '645', french: '(UK) les éléctions législatives', english: '(UK) the general election', chapter: 'Politique', score: 50},
+{id: '646', french: '(US) les éléctions présidentielles', english: '(US) the general election', chapter: 'Politique', score: 50},
+{id: '647', french: 'les grands partis', english: 'mainstream parties', chapter: 'Politique', score: 50},
+{id: '648', french: 'premier ministre', english: 'Prime Minister', chapter: 'Politique', score: 50},
+{id: '649', french: "le ministre de l'économie et des finances", 'english': '(UK) the Chancellor of the Exchequer', chapter: 'Politique', score: 50},
+{id: '650', french: 'remaniement ministériel', english: 'Cabinet reshuffle', chapter: 'Politique', score: 50},
+{id: '651', french: 'ministre des Affaires étrangères', english: 'Foreign minister', chapter: 'Politique', score: 50},
+{id: '652', french: 'pronncer un discours', english: 'to deliver a speech', chapter: 'Politique', score: 50},
+{id: '653', french: 'une dictature', english: 'a dictatorship', chapter: 'Politique', score: 50},
+{id: '654', french: 'museler, baîlloner', english: 'to gag, muzzle', chapter: 'Politique', score: 50},
+{id: '655', french: 'société civile', english: 'civil society', chapter: 'Politique', score: 50},
+{id: '656', french: '(UK) syndicats', english: '(UK) trade unions', chapter: 'Politique', score: 50},
+{id: '657', french: '(US) syndicats', english: '(US) labor unions', chapter: 'Politique', score: 50},
+{id: '658', french: 'élections de mi-mandat', english: 'mid-term elections', chapter: 'Politique', score: 50},
+{id: '659', french: '"minisre ""frondeur"""', english: 'rebellious minister', chapter: 'Politique', score: 50},
+{id: '660', french: 'démissionner', english: 'resign, step down', chapter: 'Politique', score: 50},
+{id: '661', french: 'officier en tant que', english: 'to serve as', chapter: 'Politique', score: 50},
+{id: '662', french: 'opposer son veto à (qqch)', english: 'to veto (sthg)', chapter: 'Politique', score: 50},
+{id: '663', french: 'un projet de loi', english: 'a bill', chapter: 'Politique', score: 50},
+{id: '664', french: 'un groupe de réflexion', english: 'a think-tank', chapter: 'Politique', score: 50},
+{id: '665', french: '(UK) un ministre', english: '(UK) a Cabinet member', chapter: 'Politique', score: 50},
+{id: '666', french: 'un directeur de cabinet', english: 'a chief of staff', chapter: 'Politique', score: 50},
+{id: '667', french: 'impôts locaux', english: 'local taxes', chapter: 'Politique', score: 50},
+{id: '668', french: 'cote de popularité', english: 'approval ratings', chapter: 'Politique', score: 50},
+{id: '669', french: 'se présenter à une éléction', english: 'to run for election [office]', chapter: 'Politique', score: 50},
+{id: '670', french: 'prêter serment', english: 'to take the oath, be sworn in', chapter: 'Politique', score: 50},
+{id: '671', french: 'rendre homage à (qqn)', english: 'to pay tribute to (sone)', chapter: 'Politique', score: 50},
+{id: '672', french: 'dirigeant', english: 'political leader', chapter: 'Politique', score: 50},
+{id: '673', french: 'élection truquée', english: 'rigged election', chapter: 'Politique', score: 50},
+{id: '674', french: 'les allocations', english: 'social benefits', chapter: 'Politique', score: 50},
+{id: '675', french: 'revaloriser', english: 'to scale up, raise, increase', chapter: 'Politique', score: 50},
+{id: '676', french: "l'allocation familliale", 'english': 'the family allowance', chapter: 'Politique', score: 50},
+{id: '677', french: 'le gel de la production', english: 'the production freeze', chapter: 'Politique', score: 50},
+{id: '678', french: 'un bras de fer', english: 'a tug of war', chapter: 'Politique', score: 50},
+{id: '679', french: 'chancelant', english: 'teetering, wavering', chapter: 'Politique', score: 50},
+{id: '680', french: 'tailored', english: 'customized', chapter: 'Politique', score: 50},
+{id: '681', french: 'rote memorisation', english: 'repetition-based learning', chapter: 'Politique', score: 50},
+{id: '682', french: 'impoverished', english: 'cash-strapped', chapter: 'Politique', score: 50},
+{id: '683', french: 'unencumbered', english: 'unburdened', chapter: 'Politique', score: 50},
+{id: '684', french: 'inquisitiveness', english: 'interest, curiosity', chapter: 'Politique', score: 50},
+{id: '685', french: 'substantially', english: 'notably, significatly', chapter: 'Politique', score: 50},
+{id: '686', french: 'authoritarian', english: 'dictatorial, strict', chapter: 'Politique', score: 50},
+{id: '687', french: 'minimally supervised', english: 'lightly monitored', chapter: 'Politique', 'score': 50}
 
-];
-        
-        
-        const chapters = [
+        ];
+
+        const chapters = [ 
     { name: 'Democracy', emoji: '🏛️' },
-
-
-{ name: 'Genetics', emoji: '🧬' },
-
-
-{ name: 'Immigration', emoji: '✈️' },
-
-
-{ name: 'International Tensions', emoji: '🌍' },
-
-
-{ name: 'Unemployment', emoji: '📉' }
+    { name: 'Genetics', emoji: '🧬' },
+    { name: 'Immigration', emoji: '✈️' },
+    { name: 'International Tensions', emoji: '🌍' },
+    { name: 'Unemployment', emoji: '📉' },
+    { name: 'Thanksgiving', emoji: '🦃' },
+    { name: 'Business', emoji: '💼' },
+    { name: 'Politique', emoji: '🗳️' },
+    { name: 'Education', emoji: '🎓' }
 ];
         const scoreLevels = [0, 16, 33, 50, 66, 84, 100];
 
         // --- UI SELECTORS ---
+        const animatedBgElementsContainer = document.getElementById('animated-bg-elements');
         const timerEl = document.getElementById('timer');
         const progressTextEl = document.getElementById('progress-text');
         const progressPercentageEl = document.getElementById('progress-percentage');
         const progressBarFillEl = document.getElementById('progress-bar-fill');
         const chapterButtonsContainerEl = document.getElementById('chapter-buttons-container');
         const menuChaptersContainerEl = document.getElementById('menu-chapters');
-        
+
         const flashcardContainerEl = document.getElementById('flashcard-container');
         const cardScoreEl = document.getElementById('card-score');
         const cardFrenchWordEl = document.getElementById('card-french-word');
         const cardEnglishWordEl = document.getElementById('card-english-word');
-        
+
         const messageAreaEl = document.getElementById('message-area');
         const answerInputEl = document.getElementById('answer-input');
         const submitAnswerButtonEl = document.getElementById('submit-answer-button');
-        // const nextCardButtonEl = document.getElementById('next-card-button'); // Supprimé
 
         const burgerButtonEl = document.getElementById('burger-button');
         const sidebarMenuEl = document.getElementById('sidebar-menu');
@@ -805,6 +1629,534 @@ select option {
         const loadDataInputEl = document.getElementById('load-data-input');
         const resetOptionsEl = document.getElementById('reset-options');
         const resetDataButtonEl = document.getElementById('reset-data-button');
+        let themeSelectorEl;
+
+        // --- THEME APPLICATION ---
+        function applyTheme(themeName) {
+            appState.currentTheme = themeName;
+
+            // Reset body classes and styles
+            document.body.className = '';
+            document.body.classList.add(appState.darkMode ? 'dark-mode' : 'light-mode');
+            document.body.classList.add('flex', 'flex-col', 'items-center', 'justify-center', 'min-h-screen', 'p-4', 'overflow-x-hidden');
+            document.body.style.transition = 'background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s';
+
+            // Clear previously theme-set inline styles from elements
+            const themedElements = document.querySelectorAll('[data-themed-style]');
+            themedElements.forEach(el => {
+                el.removeAttribute('style');
+                el.removeAttribute('data-themed-style');
+            });
+            document.body.removeAttribute('style'); // Clear body inline styles first
+            // Re-apply base transition after clearing inline styles
+            document.body.style.transition = 'background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s';
+
+            // Reset animated background elements visibility and theme-specific body classes
+            document.body.classList.remove('theme-spooky', 'theme-ocean', 'theme-sci-fi', 'theme-candy', 'theme-cyberpunk',
+                                            'theme-pastel', 'theme-forest', 'theme-galaxy', 'theme-steampunk',
+                                            'theme-underwater-cave', 'theme-desert-oasis', 'theme-ice-crystal',
+                                            'theme-volcano-inferno', 'theme-japanese-garden', 'theme-doodle-sketchbook',
+                                            'theme-pixel-art', 'theme-minimalist', 'theme-gradient', 'theme-y2k',
+                                            'theme-terminal'); // Added terminal class
+            clearAnimatedParticles('all'); // Clear any dynamic particles like bubbles or candy
+
+            let mainFont = "'Inter', sans-serif";
+            let cardFont = mainFont;
+            let buttonFont = mainFont;
+            let inputFont = mainFont;
+
+            // Helper to apply font to a list of elements
+            const applyFontToElements = (font, elements) => {
+                elements.forEach(el => { if (el) el.style.fontFamily = font; });
+            };
+
+            // Helper to set CSS variable for themes that use it (e.g. sci-fi grid color)
+            const setCssVar = (varName, value) => document.documentElement.style.setProperty(varName, value);
+
+            // Remove any theme-specific animations from body
+            document.body.style.animation = '';
+
+
+            switch(themeName) {
+                case 'default':
+                    // Base styles are handled by body.light-mode / body.dark-mode
+                    break;
+                case 'monochrome':
+                    mainFont = cardFont = buttonFont = inputFont = "'Roboto Mono', monospace";
+                    document.body.style.backgroundImage = 'none';
+                    document.body.style.backgroundColor = appState.darkMode ? '#222222' : '#dddddd';
+                    document.body.style.color = appState.darkMode ? '#bbbbbb' : '#444444';
+                    break;
+                case 'pastel':
+                    mainFont = cardFont = buttonFont = inputFont = "'Merienda', cursive";
+                    setCssVar('--pastel-color-light-1', '#E6E6FA'); setCssVar('--pastel-color-light-2', '#D8BFD8');
+                    setCssVar('--pastel-color-dark-1', '#5F4B8B'); setCssVar('--pastel-color-dark-2', '#9A7FB0');
+                    document.body.classList.add('theme-pastel');
+                    // Animation handled by CSS class
+                    break;
+                case 'vibrant':
+                    mainFont = cardFont = buttonFont = inputFont = "'Orbitron', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#0D0221' : '#F0F8FF';
+                    document.body.style.color = appState.darkMode ? '#FF00E6' : '#FF1493';
+                    document.body.style.backgroundImage = appState.darkMode ?
+                        'radial-gradient(circle, rgba(255,0,230,0.3) 0%, rgba(13,2,33,0.9) 70%)' :
+                        'radial-gradient(circle, rgba(255,20,147,0.2) 0%, rgba(240,248,255,0.8) 70%)';
+                    break;
+                case 'terminal':
+                    mainFont = cardFont = buttonFont = inputFont = "'Roboto Mono', monospace";
+                    document.body.style.backgroundColor = '#0A0F0D';
+                    document.body.style.backgroundImage = 'none'; // Background handled by matrix particles
+                    document.body.style.color = '#00FF41';
+                    document.body.classList.add('theme-terminal');
+                    createAnimatedParticles(100, 'matrix-char'); // Create matrix rain
+                    break;
+                case 'spooky':
+                    mainFont = cardFont = buttonFont = inputFont = "'Creepster', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#0d0208' : '#1a120b';
+                    document.body.style.color = appState.darkMode ? '#e57028' : '#ffA500';
+                    document.body.style.backgroundImage = appState.darkMode ?
+                        'radial-gradient(ellipse at bottom, #36003D 0%, #0D0208 80%)' :
+                        'radial-gradient(ellipse at bottom, #5c3d2e 0%, #1a120b 80%)';
+                    document.body.classList.add('theme-spooky');
+                    createAnimatedParticles(4, 'bat');
+                    break;
+                case 'ocean':
+                    mainFont = cardFont = buttonFont = inputFont = "'Poppins', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#003B46' : '#E0FFFF';
+                    document.body.style.color = appState.darkMode ? '#C4DFE6' : '#07575B';
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-ocean');
+                    createAnimatedParticles(15, 'bubble');
+                    break;
+                case 'sci-fi':
+                    mainFont = cardFont = buttonFont = inputFont = "'Orbitron', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#03071e' : '#e9ecef';
+                    document.body.style.color = appState.darkMode ? '#00f5d4' : '#03045e';
+                    setCssVar('--grid-color', appState.darkMode ? 'rgba(0, 245, 212, 0.1)' : 'rgba(3, 4, 94, 0.1)');
+                    document.body.classList.add('theme-sci-fi');
+                    // Background image and animation handled by CSS class
+                    break;
+                case 'forest':
+                    mainFont = cardFont = buttonFont = inputFont = "'Merienda', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#1A4314' : '#F0FFF0';
+                    document.body.style.color = appState.darkMode ? '#B4CDA1' : '#2E8B57';
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-forest');
+                    createAnimatedParticles(25, 'leaf');
+                    break;
+                 case 'vintage':
+                    mainFont = cardFont = buttonFont = inputFont = "'Times New Roman', Times, serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#4b3832' : '#f5e8d7';
+                    document.body.style.color = appState.darkMode ? '#d4c8b0' : '#5a3d2b';
+                    document.body.style.backgroundImage = appState.darkMode ?
+                        'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url("data:image/svg+xml,%3Csvg width=\'52\' height=\'26\' viewBox=\'0 0 52 26\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z\' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                        : 'url("data:image/svg+xml,%3Csvg width=\'52\' height=\'26\' viewBox=\'0 0 52 26\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill-rule=\'evenodd\'%3E%3Cg fill=\'%238B4513\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z\' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")';
+                    break;
+                case 'candy':
+                    mainFont = cardFont = buttonFont = inputFont = "'Pacifico', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#4A0D4A' : '#FFD1DC'; // Dark magenta, Bubblegum pink
+                    document.body.style.color = appState.darkMode ? '#FFF0F5' : '#800080'; // Lavender blush, Purple
+                    document.body.style.backgroundImage = appState.darkMode ?
+                        'repeating-linear-gradient(45deg, #5D1A5D, #5D1A5D 10px, #4A0D4A 10px, #4A0D4A 20px)' : // Dark stripes
+                        'repeating-linear-gradient(45deg, #FFC0CB, #FFC0CB 10px, #FFB6C1 10px, #FFB6C1 20px)'; // Pink stripes
+                    document.body.classList.add('theme-candy');
+                    createAnimatedParticles(20, 'candy');
+                    break;
+                case 'retro':
+                    mainFont = cardFont = buttonFont = inputFont = "'Press Start 2P', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#000000' : '#2222DD'; // Black, NES Blue
+                    document.body.style.color = appState.darkMode ? '#00FF00' : '#FFFFFF'; // Green, White
+                    document.body.style.backgroundImage = appState.darkMode ?
+                        'url("data:image/svg+xml,%3Csvg width=\'8\' height=\'8\' viewBox=\'0 0 8 8\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h4v4H0V0zm4 4h4v4H4V4z\' fill=\'%23333333\' fill-opacity=\'0.5\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")'
+                        : 'url("data:image/svg+xml,%3Csvg width=\'8\' height=\'8\' viewBox=\'0 0 8 8\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h4v4H0V0zm4 4h4v4H4V4z\' fill=\'%23000088\' fill-opacity=\'0.5\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")';
+                    break;
+                case 'cyberpunk':
+                    mainFont = cardFont = buttonFont = inputFont = "'Audiowide', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#0c0c1c' : '#1a1a2e'; // Very dark blue
+                    document.body.style.color = appState.darkMode ? '#ff00ff' : '#00ffff'; // Magenta, Cyan
+                    setCssVar('--grid-color', appState.darkMode ? 'rgba(255, 0, 255, 0.1)' : 'rgba(0, 255, 255, 0.1)');
+                    document.body.classList.add('theme-cyberpunk');
+                    break;
+                case 'chalkboard':
+                    mainFont = cardFont = buttonFont = inputFont = "'Kalam', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#2E4030' : '#3A523A'; // Dark Green Chalkboard
+                    document.body.style.color = '#FFFFFF'; // Chalk White
+                    document.body.style.backgroundImage = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEaSURBVHhe7dAxAQAgEMCg+yemtGgBHEBHnl253f1YAQAAAAAAAAAAAAAAAAAAAACAeQ4fzwvKO4RxFXEcfQkHj6CO4zjyEvYJ3nAcR17CO8ETjuPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgoOI7jyCs4KDgO48grOCg4juPIKzgouI4jryC/4KLiOM68gsAAAAAAAAAAAAAAAAAAAAAADALnuoA2aL+x+0AAAAASUVORK5CYII=")'; // Subtle texture
+                    break;
+                case 'geometric':
+                    mainFont = cardFont = buttonFont = inputFont = "'Poppins', sans-serif"; // Clean sans-serif
+                    document.body.style.backgroundColor = appState.darkMode ? '#2C3E50' : '#ECF0F1'; // Dark Slate Blue, Clouds White
+                    document.body.style.color = appState.darkMode ? '#ECF0F1' : '#2C3E50';
+                    document.body.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'' + (appState.darkMode ? '%2334495E' : '%23BDC3C7') + '\'/%3E%3Cpolygon points=\'0,100 50,0 100,100\' fill=\'' + (appState.darkMode ? '%231ABC9C' : '%232ECC71') + '\'/%3E%3Ccircle cx=\'25\' cy=\'75\' r=\'15\' fill=\'' + (appState.darkMode ? '%23E67E22' : '%23F1C40F') + '\'/%3E%3Crect x=\'60\' y=\'60\' width=\'30\' height=\'30\' fill=\'' + (appState.darkMode ? '%239B59B6' : '%233498DB') + '\'/%3E%3C/svg%3E")';
+                    document.body.style.backgroundSize = '300px 300px';
+                    break;
+                case 'galaxy':
+                    mainFont = cardFont = buttonFont = inputFont = "'Orbitron', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#0A0A2A' : '#1A1A40'; // Deep Space Blues
+                    document.body.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF'; // Pale Star Colors
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-galaxy');
+                    setCssVar('--grid-color', appState.darkMode ? 'rgba(224, 224, 255, 0.05)' : 'rgba(204, 204, 255, 0.07)');
+                    createAnimatedParticles(100, 'star');
+                    break;
+                case 'steampunk':
+                    mainFont = cardFont = buttonFont = inputFont = "'Roboto Mono', monospace";
+                    document.body.style.backgroundColor = appState.darkMode ? '#2A1A0A' : '#F5F5DC'; // Dark Brown, Beige
+                    document.body.style.color = appState.darkMode ? '#D2B48C' : '#8B4513'; // Tan, SaddleBrown
+                    // Background image handled by CSS class
+                     document.body.classList.add('theme-steampunk');
+                     createAnimatedParticles(10, 'gear');
+                    break;
+                 case 'underwater-cave':
+                    mainFont = cardFont = buttonFont = inputFont = "'Poppins', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#001F3F' : '#1E3A8A'; // Dark Blue, Deeper Blue
+                    document.body.style.color = appState.darkMode ? '#ADD8E6' : '#B0C4DE'; // Light Blue, LightSlateGray
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-underwater-cave');
+                    createAnimatedParticles(8, 'light-ray');
+                    createAnimatedParticles(10, 'bubble'); // Bubbles also fit here
+                    break;
+                 case 'desert-oasis':
+                    mainFont = cardFont = buttonFont = inputFont = "'Merienda', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#3A241C' : '#F4A460'; // Dark Sienna, SandyBrown
+                    document.body.style.color = appState.darkMode ? '#F0E68C' : '#A0522D'; // Khaki, Sienna
+                    // Background image handled by CSS class
+                    document.body.classList.add('theme-desert-oasis');
+                    createAnimatedParticles(30, 'sand-particle'); // Add sand particles
+                    // Heat haze animation is applied directly to the card
+                    break;
+                case 'ice-crystal':
+                    mainFont = cardFont = buttonFont = inputFont = "'Poppins', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#0A3D62' : '#B0E0E6'; // Cerulean, PowderBlue
+                    document.body.style.color = appState.darkMode ? '#E0FFFF' : '#000080'; // LightCyan, Navy
+                     // Background image handled by CSS class
+                    document.body.classList.add('theme-ice-crystal');
+                    createAnimatedParticles(20, 'ice-particle'); // Add ice particles
+                    // Shimmer animation is applied directly to the card
+                    break;
+                case 'volcano-inferno':
+                    mainFont = cardFont = buttonFont = inputFont = "'Creepster', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#4A0404' : '#FF4500'; // Dark Red, OrangeRed
+                    document.body.style.color = appState.darkMode ? '#FFD700' : '#8B0000'; // Gold, DarkRed
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-volcano-inferno');
+                    createAnimatedParticles(20, 'ember');
+                    break;
+                case 'japanese-garden':
+                    mainFont = cardFont = buttonFont = inputFont = "'Kalam', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#2F4F4F' : '#F0FFF0'; // DarkSlateGray, Honeydew
+                    document.body.style.color = appState.darkMode ? '#C0C0C0' : '#556B2F'; // Silver, DarkOliveGreen
+                    // Background image and animation handled by CSS class
+                    document.body.classList.add('theme-japanese-garden');
+                    createAnimatedParticles(30, 'blossom');
+                    break;
+                 case 'doodle-sketchbook':
+                    mainFont = cardFont = buttonFont = inputFont = "'Kalam', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#1A1A1A' : '#F5F5DC'; // Dark Gray, Beige
+                    document.body.style.color = appState.darkMode ? '#E0E0E0' : '#333333'; // Light Gray, Dark Gray
+                     // Background image handled by CSS class
+                    document.body.classList.add('theme-doodle-sketchbook');
+                    // Sketchy lines could be SVG overlays or drawn on a canvas
+                    // For simplicity, we'll rely on font and background texture here.
+                    break;
+                 case 'pixel-art':
+                    mainFont = cardFont = buttonFont = inputFont = "'Press Start 2P', cursive";
+                    document.body.style.backgroundColor = appState.darkMode ? '#000000' : '#00B0F0'; // Black, Light Blue
+                    document.body.style.color = appState.darkMode ? '#00FF00' : '#FFFF00'; // Green, Yellow
+                     // Background image handled by CSS class
+                    document.body.classList.add('theme-pixel-art');
+                    setCssVar('--pixel-accent-color', appState.darkMode ? '#FFFF00' : '#FF00FF');
+                    setCssVar('--pixel-active-color', appState.darkMode ? '#FF00FF' : '#00FF00');
+                    setCssVar('--pixel-score-color', appState.darkMode ? '#00FFFF' : '#FF0000');
+                    createAnimatedParticles(10, 'pixel-sprite'); // Add pixel sprites
+                    break;
+                case 'minimalist':
+                    mainFont = cardFont = buttonFont = inputFont = "'Inter', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#1A1A1A' : '#FFFFFF';
+                    document.body.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                    document.body.style.backgroundImage = 'none';
+                    document.body.classList.add('theme-minimalist');
+                    createAnimatedParticles(15, 'minimal-line');
+                    break;
+                 case 'gradient':
+                    mainFont = cardFont = buttonFont = inputFont = "'Poppins', sans-serif";
+                    document.body.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                    setCssVar('--gradient-color-1', appState.darkMode ? '#1A2A6C' : '#83a4d4'); // Dark Blue/Purple, Light Blue/Purple
+                    setCssVar('--gradient-color-2', appState.darkMode ? '#B21F1F' : '#b6fbff'); // Dark Red, Very Light Blue
+                    setCssVar('--gradient-color-3', appState.darkMode ? '#F12711' : '#83a4d4'); // Bright Red/Orange, Light Blue/Purple
+                    setCssVar('--gradient-color-4', appState.darkMode ? '#F5AF19' : '#b6fbff'); // Gold, Very Light Blue
+                    document.body.classList.add('theme-gradient');
+                    // Animation handled by CSS class
+                    break;
+                case 'y2k':
+                    mainFont = cardFont = buttonFont = inputFont = "'Orbitron', sans-serif";
+                    document.body.style.backgroundColor = appState.darkMode ? '#000033' : '#CCFFFF'; // Dark Blue, Cyan
+                    document.body.style.color = appState.darkMode ? '#00FFFF' : '#000080'; // Cyan, Navy
+                     document.body.style.backgroundImage = appState.darkMode ?
+                        'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%2300FFFF\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'10\' cy=\'10\' r=\'10\'/%3E%3C/g%3E%3C/svg%3E")' :
+                         'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000080\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'10\' cy=\'10\' r=\'10\'/%3E%3C/g%3E%3C/svg%3E")';
+                    document.body.classList.add('theme-y2k');
+                    // Glitch and Neon Pulse animations handled by CSS classes
+                    break;
+            }
+
+            // Apply fonts
+            document.body.style.fontFamily = mainFont;
+            const elementsToFont = [
+                timerEl, answerInputEl, searchBarEl, resetOptionsEl, submitAnswerButtonEl,
+                saveDataButtonEl, (loadDataInputEl.labels ? loadDataInputEl.labels[0] : null), resetDataButtonEl,
+                burgerButtonEl, closeMenuButtonEl, cardFrenchWordEl, cardEnglishWordEl,
+                progressTextEl, progressPercentageEl, messageAreaEl
+            ];
+            applyFontToElements(mainFont, elementsToFont); // Apply main font to most text elements
+
+            // Apply specific fonts to cards and buttons if defined by theme
+            if (cardFont !== mainFont) {
+                 applyFontToElements(cardFont, [cardFrenchWordEl, cardEnglishWordEl]);
+            }
+            if (buttonFont !== mainFont) {
+                const allButtons = document.querySelectorAll('button, label[for="load-data-input"]'); // Select all button-like elements
+                applyFontToElements(buttonFont, Array.from(allButtons));
+            }
+             if (inputFont !== mainFont) {
+                applyFontToElements(inputFont, [answerInputEl, searchBarEl, resetOptionsEl]);
+            }
+
+
+            localStorage.setItem('flashcardAppTheme', themeName);
+            renderCard();
+            updateActiveChapterButtonStates();
+        }
+
+        function createAnimatedParticles(count, type) {
+            clearAnimatedParticles(type); // Clear existing particles of this type
+
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '-1';
+                particle.style.opacity = '0';
+
+                if (type === 'bubble') {
+                    const size = Math.random() * 20 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.bottom = `-${size}px`; // Start below viewport
+                    particle.style.backgroundColor = appState.darkMode ? 'rgba(173, 216, 230, 0.15)' : 'rgba(173, 216, 230, 0.25)';
+                    particle.style.borderRadius = '50%';
+                    particle.style.animation = `riseBubble ${Math.random() * 3 + 7}s linear infinite`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    particle.classList.add('bubble');
+                } else if (type === 'candy') {
+                    const size = Math.random() * 15 + 5;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.bottom = `-${size}px`;
+                    const colors = appState.darkMode ? ['#FF69B4', '#9370DB', '#87CEFA', '#FFD700'] : ['#FFC0CB', '#ADFF2F', '#FFFFE0', '#ADD8E6', '#FFB6C1']; // Darker/Brighter for dark mode
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '0'; // Circles or squares
+                    particle.style.animation = `drift ${Math.random() * 5 + 8}s linear infinite`;
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.classList.add('particle'); // General particle class for candy
+                } else if (type === 'bat') {
+                     const size = Math.random() * 20 + 30;
+                     particle.style.width = `${size}px`;
+                     particle.style.height = `${size * 0.7}px`; // Maintain aspect ratio
+                     particle.style.top = `${Math.random() * 80}%`;
+                     particle.style.left = `${Math.random() * 100}%`;
+                     particle.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${appState.darkMode ? '%23E57028' : '%23FF6600'}'%3E%3Cpath d='M12.75 12.75L9 15l3.75 2.25M12.75 12.75L15 15l-3.75 2.25M12.75 12.75V6.341A4.494 4.494 0 0015.56 4.56a4.5 4.5 0 00-5.12 0A4.494 4.494 0 0012.75 6.341zM4.53 12.075A4.5 4.5 0 003 15.341V21a.75.75 0 001.085.67L12 18.083l7.915 3.587A.75.75 0 0021 21v-5.659a4.5 4.5 0 00-1.53-3.266l-.001-.001A5.235 5.235 0 0012 6.696a5.235 5.235 0 00-7.469 5.379z' /%3E%3C/svg%3E")`;
+                     particle.style.backgroundSize = 'contain';
+                     particle.style.backgroundRepeat = 'no-repeat';
+                     particle.style.animation = `batFlight ${Math.random() * 3 + 4}s ease-in-out infinite`;
+                     particle.style.animationDelay = `${Math.random() * 4}s`;
+                     particle.classList.add('bat');
+                } else if (type === 'leaf') {
+                    const size = Math.random() * 15 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `-${size}px`; // Start above viewport
+                    particle.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${appState.darkMode ? '%23B4CDA1' : '%232E8B57'}'%3E%3Cpath d='M12.75 12.75l-.75.75v3.75m-.75 0H9M7.5 21h6m3-3l-3.75-3.75M17.25 19.5L21 15.75M14.25 12L18 8.25M15.75 4.5L19.5 8.25M19.5 4.5L15.75 8.25M12.75 12.75L9 9M15 15l-3.75 3.75M17.25 19.5L13.5 15.75M19.5 15.75L15.75 19.5M4.5 19.5L8.25 15.75M6 9l3.75 3.75M4.5 15.75L8.25 19.5M9 15l-3.75 3.75M4.5 4.5L8.25 8.25M12 12l-3.75-3.75M4.5 8.25L8.25 4.5' /%3E%3C/svg%3E")`;
+                    particle.style.backgroundSize = 'contain';
+                    particle.style.backgroundRepeat = 'no-repeat';
+                    particle.style.animation = `leafFall var(--fall-duration) linear infinite`;
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.style.setProperty('--fall-duration', `${Math.random() * 5 + 10}s`);
+                    particle.style.setProperty('--wind-x', `${(Math.random() - 0.5) * 0.2}`); // Subtle horizontal drift
+                    particle.classList.add('leaf');
+                } else if (type === 'star') {
+                    const size = Math.random() * 2 + 1;
+                    particle.style.setProperty('--star-size', `${size}px`);
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
+                    particle.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
+                    particle.style.borderRadius = '50%';
+                    particle.style.animation = `twinkling var(--twinkle-duration) ease-in-out infinite`;
+                    particle.style.setProperty('--twinkle-duration', `${Math.random() * 2 + 3}s`);
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    particle.classList.add('star');
+                 } else if (type === 'gear') {
+                    const size = Math.random() * 40 + 30;
+                    particle.style.setProperty('--gear-size', `${size}px`);
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${appState.darkMode ? '%23D2B48C' : '%238B4513'}'%3E%3Cpath fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.75.75h4.5a.75.75 0 000-1.5h-3.75V6z' clip-rule='evenodd' /%3E%3C/svg%3E")`;
+                    particle.style.backgroundSize = 'contain';
+                    particle.style.backgroundRepeat = 'no-repeat';
+                    particle.style.animation = `rotateGear var(--gear-speed) linear infinite`;
+                    particle.style.setProperty('--gear-speed', `${Math.random() * 10 + 15}s`); // Slower rotation
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.style.opacity = '0.2'; // More subtle
+                    particle.classList.add('gear');
+                 } else if (type === 'light-ray') {
+                    const width = Math.random() * 5 + 3;
+                    particle.style.width = `${width}px`;
+                    particle.style.height = '150vh';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = '-50vh'; // Start above viewport
+                    particle.style.background = appState.darkMode ?
+                        'linear-gradient(to bottom, rgba(173, 216, 230, 0.03), rgba(173, 216, 230, 0.1))' :
+                        'linear-gradient(to bottom, rgba(30, 58, 138, 0.05), rgba(30, 58, 138, 0.2))';
+                    particle.style.animation = `lightRay ${Math.random() * 5 + 12}s ease-in-out infinite alternate;`;
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.style.transformOrigin = 'top';
+                    particle.classList.add('light-ray');
+                 } else if (type === 'ember') {
+                    const size = Math.random() * 4 + 3;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.bottom = `-${size}px`; // Start below viewport
+                    const emberColors = appState.darkMode ? ['#FFD700', '#FFB347', '#FF8C00'] : ['#FF4500', '#FF6347', '#FF7F50']; // Gold/Orange for dark, Red/Orange for light
+                    particle.style.setProperty('--ember-color', emberColors[Math.floor(Math.random() * emberColors.length)]);
+                    particle.style.borderRadius = '50%';
+                    particle.style.boxShadow = `0 0 ${size*1.5}px var(--ember-color)`;
+                    particle.style.animation = `emberFloat var(--ember-duration) linear infinite`;
+                    particle.style.setProperty('--ember-duration', `${Math.random() * 5 + 8}s`);
+                    particle.style.setProperty('--ember-x', `${(Math.random() - 0.5) * 0.3}`); // Subtle horizontal drift
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.classList.add('ember');
+                 } else if (type === 'blossom') {
+                    const size = Math.random() * 10 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `-${size}px`; // Start above viewport
+                    const blossomColor = appState.darkMode ? '%23FFC0CB' : '%23FFB6C1'; // Pink
+                    particle.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${blossomColor}'%3E%3Cpath fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm1.5 10.75a.75.75 0 00-1.5 0v3.75a.75.75 0 001.5 0v-3.75z' clip-rule='evenodd' /%3E%3C/svg%3E")`;
+                    particle.style.backgroundSize = 'contain';
+                    particle.style.backgroundRepeat = 'no-repeat';
+                    particle.style.animation = `blossomFall var(--fall-duration) linear infinite`;
+                    particle.style.setProperty('--fall-duration', `${Math.random() * 7 + 12}s`);
+                    particle.style.setProperty('--blossom-x', `${(Math.random() - 0.5) * 0.1}`); // Subtle horizontal drift
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.classList.add('blossom');
+                 } else if (type === 'minimal-line') {
+                    const delay = Math.random() * 5;
+                    particle.style.width = '100%';
+                    particle.style.height = '1px';
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.left = '0';
+                    particle.style.backgroundColor = appState.darkMode ? 'rgba(150, 150, 150, 0.08)' : 'rgba(100, 100, 100, 0.1)';
+                    particle.style.animation = `minimalShift 30s linear infinite alternate`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.opacity = '1';
+                    particle.classList.add('minimal-line');
+                 } else if (type === 'pixel-sprite') {
+                     const size = Math.random() * 10 + 5;
+                     particle.style.setProperty('--sprite-size', `${size}px`);
+                     particle.style.top = `${Math.random() * 100}%`;
+                     particle.style.left = `${Math.random() * 100}%`;
+                     const spriteColors = appState.darkMode ? ['#00FF00', '#FFFF00', '#FF00FF'] : ['#000000', '#333333', '#666666'];
+                     particle.style.setProperty('--sprite-color', spriteColors[Math.floor(Math.random() * spriteColors.length)]);
+                     particle.style.animation = `pixelDrift var(--drift-speed) linear infinite alternate`;
+                     particle.style.setProperty('--drift-speed', `${Math.random() * 5 + 5}s`);
+                     particle.style.animationDelay = `${Math.random() * 10}s`;
+                     particle.classList.add('pixel-sprite');
+                 } else if (type === 'matrix-char') {
+                     const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                     const char = chars[Math.floor(Math.random() * chars.length)];
+                     particle.textContent = char;
+                     particle.style.left = `${Math.random() * 100}%`;
+                     particle.style.top = `-${Math.random() * 20}vh`; // Start above viewport
+                     particle.style.animation = `matrixFall var(--fall-duration) linear infinite`;
+                     particle.style.setProperty('--fall-duration', `${Math.random() * 5 + 5}s`);
+                     particle.style.animationDelay = `${Math.random() * 10}s`;
+                     particle.classList.add('matrix-char');
+                 }
+                animatedBgElementsContainer.appendChild(particle);
+            }
+        }
+
+        function clearAnimatedParticles(type = 'all') {
+            let selector = '.particle, .bubble, .bat, .leaf, .star, .gear, .light-ray, .ember, .blossom, .minimal-line, .pixel-sprite, .matrix-char'; // Add all particle types here
+            if (type !== 'all') {
+                 selector = `.${type}`;
+            }
+
+            const existingParticles = animatedBgElementsContainer.querySelectorAll(selector);
+            existingParticles.forEach(p => p.remove());
+
+             // Ensure sci-fi grid and scanline overlays are handled separately if needed
+             if (type === 'all' || type === 'sci-fi-grid') {
+                 const grid = animatedBgElementsContainer.querySelector('.sci-fi-grid-overlay');
+                 if (grid) grid.style.opacity = '0';
+             }
+             if (type === 'all' || type === 'scanline') {
+                 const scanline = animatedBgElementsContainer.querySelector('.scanline-overlay');
+                 if (scanline) scanline.style.opacity = '0';
+             }
+        }
+
+
+        function addThemesMenu() {
+            const themesSection = document.createElement('div');
+            themesSection.className = 'mb-4';
+            themesSection.innerHTML = `
+                <h3 class="text-lg font-medium mb-2">Thèmes</h3>
+                <select id="theme-selector" class="w-full p-2 border rounded-md mb-2">
+                    <option value="default">Défaut</option>
+                    <option value="monochrome">Monochrome</option>
+                    <option value="pastel">Pastel (Évolutif)</option>
+                    <option value="vibrant">Vibrant</option>
+                    <option value="terminal">Terminal (Matrix)</option>
+                    <option value="spooky">Effrayant</option>
+                    <option value="ocean">Océan (Vagues)</option>
+                    <option value="sci-fi">Sci-Fi (Lignes)</option>
+                    <option value="forest">Forêt (Vent)</option>
+                    <option value="vintage">Vintage</option>
+                    <option value="candy">Bonbon</option>
+                    <option value="retro">Rétro (8-bit)</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="chalkboard">Tableau Noir</option>
+                    <option value="geometric">Géométrique</option>
+                    <option value="galaxy">Galaxie (Étoiles)</option>
+                    <option value="steampunk">Steampunk (Engrenages)</option>
+                    <option value="underwater-cave">Grotte Sous-Marine (Lumière)</option>
+                    <option value="desert-oasis">Oasis Désertique (Sable)</option>
+                    <option value="ice-crystal">Glace & Cristal (Chute)</option>
+                    <option value="volcano-inferno">Volcan & Enfer (Braises)</option>
+                    <option value="japanese-garden">Jardin Japonais (Fleurs)</option>
+                    <option value="doodle-sketchbook">Gribouillage</option>
+                    <option value="pixel-art">Pixel Art (Sprites)</option>
+                    <option value="minimalist">Épuré (Lignes)</option>
+                    <option value="gradient">Dégradé Animé</option>
+                    <option value="y2k">Y2K (Glitch)</option>
+                </select>
+            `;
+
+            const darkModeToggleDiv = darkModeToggleEl.closest('div');
+            darkModeToggleDiv.parentNode.insertBefore(themesSection, darkModeToggleDiv.nextSibling);
+
+            themeSelectorEl = document.getElementById('theme-selector');
+            themeSelectorEl.addEventListener('change', (e) => {
+                applyTheme(e.target.value);
+            });
+        }
 
         // --- RENDER FUNCTIONS ---
         function renderTimer() {
@@ -817,47 +2169,50 @@ select option {
         function renderProgressBar() {
             const totalCardsInDeck = appState.currentDeck.length;
             const viewedCount = Math.min(appState.currentIndex +1, totalCardsInDeck);
-            
+
             if (totalCardsInDeck === 0) {
                 progressTextEl.textContent = 'Cartes vues: 0 / 0';
                 progressPercentageEl.textContent = '0%';
                 progressBarFillEl.style.width = '0%';
                 return;
             }
-            
+
             const percentage = Math.round((viewedCount / totalCardsInDeck) * 100);
             progressTextEl.textContent = `Cartes vues: ${viewedCount} / ${totalCardsInDeck}`;
             progressPercentageEl.textContent = `${percentage}%`;
             progressBarFillEl.style.width = `${percentage}%`;
         }
-        
+
         function getCardColorClasses(score) {
-    // Mode clair: augmenter le contraste pour une meilleure lisibilité
-    if (score === 0) return 'bg-red-500/80 text-white dark:bg-red-700/60';
-    if (score === 16) return 'bg-red-400/80 text-white dark:bg-red-600/60';
-    if (score === 33) return 'bg-orange-400/80 text-white dark:bg-orange-600/60';
-    if (score === 50) return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
-    if (score === 66) return 'bg-lime-400/80 text-black dark:bg-lime-700/60';
-    if (score === 84) return 'bg-green-500/80 text-white dark:bg-green-600/60';
-    if (score === 100) return 'bg-emerald-600/80 text-white dark:bg-emerald-600/60';
-    return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
-}
-        
+            if (score === 0) return 'bg-red-500/80 text-white dark:bg-red-800/70 dark:text-red-100';
+            if (score === 16) return 'bg-red-400/80 text-white dark:bg-red-700/70 dark:text-red-100';
+            if (score === 33) return 'bg-orange-400/80 text-neutral-800 dark:bg-orange-600/70 dark:text-orange-100';
+            if (score === 50) return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
+            if (score === 66) return 'bg-lime-400/80 text-neutral-800 dark:bg-lime-700/70 dark:text-lime-100';
+            if (score === 84) return 'bg-green-500/80 text-white dark:bg-green-600/70 dark:text-green-100';
+            if (score === 100) return 'bg-emerald-600/80 text-white dark:bg-emerald-700/70 dark:text-emerald-100';
+            return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
+        }
+
         const allPossibleColorClasses = [
-    'bg-red-500/80', 'bg-red-400/80', 'bg-orange-400/80', 'bg-lime-400/80', 'bg-green-500/80', 'bg-emerald-600/80',
-    'text-white', 'text-black',
-    'dark:bg-red-700/60', 'dark:bg-red-600/60', 'dark:bg-orange-600/60', 
-    'light-mode-card-neutral', 'dark-mode-card-neutral',
-    'dark:bg-lime-700/60', 'dark:bg-green-600/60', 'dark:bg-emerald-600/60'
-];
+            'bg-red-500/80', 'text-white', 'dark:bg-red-800/70', 'dark:text-red-100',
+            'bg-red-400/80', 'dark:bg-red-700/70',
+            'bg-orange-400/80', 'text-neutral-800', 'dark:bg-orange-600/70', 'dark:text-orange-100',
+            'light-mode-card-neutral', 'dark-mode-card-neutral',
+            'bg-lime-400/80', 'text-neutral-800', 'dark:bg-lime-700/70', 'dark:text-lime-100',
+            'bg-green-500/80', 'dark:bg-green-600/70', 'dark:text-green-100',
+            'bg-emerald-600/80', 'dark:bg-emerald-700/70', 'dark:text-emerald-100'
+        ];
 
         function renderCard() {
             messageAreaEl.textContent = '';
             answerInputEl.value = '';
             appState.isCardRevealedByClick = false;
-            appState.readyToAdvanceOnClick = false; // Important: reset for new card
-            
+            appState.readyToAdvanceOnClick = false;
+
             flashcardContainerEl.classList.remove(...allPossibleColorClasses);
+            flashcardContainerEl.removeAttribute('style');
+            flashcardContainerEl.classList.remove('theme-desert-oasis', 'theme-ice-crystal', 'theme-y2k'); // Remove theme-specific animation classes
 
             if (appState.currentDeck.length === 0 || appState.currentIndex >= appState.currentDeck.length) {
                 flashcardContainerEl.classList.add(appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral');
@@ -868,8 +2223,6 @@ select option {
                 answerInputEl.disabled = true;
                 submitAnswerButtonEl.disabled = true;
                 submitAnswerButtonEl.classList.add('hidden');
-                // nextCardButtonEl was here, now removed
-                // If no cards, user can select a chapter or load data.
                 return;
             }
 
@@ -878,57 +2231,148 @@ select option {
             cardEnglishWordEl.textContent = card.english;
             cardEnglishWordEl.classList.add('hidden');
             cardScoreEl.textContent = `${card.score}%`;
-            
+
             const colorCls = getCardColorClasses(card.score);
             flashcardContainerEl.classList.add(...colorCls.split(' '));
-            
+
             answerInputEl.disabled = false;
             submitAnswerButtonEl.disabled = false;
             submitAnswerButtonEl.classList.remove('hidden');
             submitAnswerButtonEl.textContent = 'Valider';
-            // nextCardButtonEl was here, now removed
             answerInputEl.focus();
             renderProgressBar();
+
+            // Apply theme specific styles to the card
+            let cardFontForTheme = document.body.style.fontFamily || "'Inter', sans-serif"; // Default to body font
+
+            // Theme-specific overrides for the card container
+            if (appState.currentTheme === 'spooky') {
+                flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(30, 10, 40, 0.85)' : 'rgba(50, 30, 60, 0.85)';
+                flashcardContainerEl.style.borderColor = appState.darkMode ? '#FF4500' : '#8A2BE2';
+                flashcardContainerEl.style.color = appState.darkMode ? '#FF8C00' : '#FFD700';
+                cardFontForTheme = "'Creepster', cursive";
+            } else if (appState.currentTheme === 'terminal') {
+                 flashcardContainerEl.style.backgroundColor = 'rgba(0, 20, 0, 0.8)';
+                 flashcardContainerEl.style.borderColor = 'rgba(0, 255, 0, 0.7)';
+                 flashcardContainerEl.style.color = '#00FF41';
+                 cardFontForTheme = "'Roboto Mono', monospace";
+            } else if (appState.currentTheme === 'ocean') {
+                flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 70, 88, 0.75)' : 'rgba(135, 206, 250, 0.75)';
+                flashcardContainerEl.style.borderColor = appState.darkMode ? '#20B2AA' : '#4682B4';
+                flashcardContainerEl.style.color = appState.darkMode ? '#AFEEEE' : '#005A6C';
+                cardFontForTheme = "'Poppins', sans-serif";
+            } else if (appState.currentTheme === 'sci-fi') {
+                flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(200, 210, 220, 0.8)';
+                flashcardContainerEl.style.borderColor = '#64FFDA';
+                flashcardContainerEl.style.color = appState.darkMode ? '#94a3b8' : '#0f172a';
+                cardFontForTheme = "'Orbitron', sans-serif";
+            } else if (appState.currentTheme === 'cyberpunk') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(200, 210, 220, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#F0F' : '#0FF';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#94a3b8' : '#0f172a';
+                 flashcardContainerEl.style.boxShadow = `0 0 15px ${appState.darkMode ? '#F0F3' : '#0FF3'}`;
+                 cardFontForTheme = "'Audiowide', cursive";
+            } else if (appState.currentTheme === 'candy') {
+                flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(128, 0, 128, 0.7)' : 'rgba(255, 182, 193, 0.8)'; // Purple, LightPink
+                flashcardContainerEl.style.borderColor = appState.darkMode ? '#FF69B4' : '#FF1493'; // HotPink, DeepPink
+                flashcardContainerEl.style.color = appState.darkMode ? '#FFFACD' : '#4B0082'; // LemonChiffon, Indigo
+                cardFontForTheme = "'Pacifico', cursive";
+            } else if (appState.currentTheme === 'retro') {
+                flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(20,20,20,0.9)' : 'rgba(100,100,100,0.9)';
+                flashcardContainerEl.style.borderColor = appState.darkMode ? '#0F0' : '#AAA';
+                flashcardContainerEl.style.color = appState.darkMode ? '#0F0' : '#FFF';
+                cardFontForTheme = "'Press Start 2P', cursive";
+            } else if (appState.currentTheme === 'chalkboard') {
+                flashcardContainerEl.style.backgroundColor = 'rgba(50, 70, 50, 0.8)';
+                flashcardContainerEl.style.border = '5px solid #D2B48C'; // Tan "wooden" frame
+                flashcardContainerEl.style.color = '#FFFDD0'; // Cream "chalk"
+                flashcardContainerEl.style.boxShadow = 'inset 0 0 10px rgba(0,0,0,0.3)';
+                cardFontForTheme = "'Kalam', cursive";
+            } else if (appState.currentTheme === 'galaxy') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(40, 40, 80, 0.7)' : 'rgba(60, 60, 100, 0.7)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
+                 cardFontForTheme = "'Orbitron', sans-serif";
+            } else if (appState.currentTheme === 'steampunk') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(80, 50, 30, 0.8)' : 'rgba(245, 245, 220, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#D2B48C' : '#8B4513';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#D2B48C' : '#8B4513';
+                 cardFontForTheme = "'Roboto Mono', monospace";
+            } else if (appState.currentTheme === 'underwater-cave') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 40, 80, 0.75)' : 'rgba(30, 58, 138, 0.75)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#20B2AA' : '#4682B4';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#ADD8E6' : '#B0C4DE';
+                 cardFontForTheme = "'Poppins', sans-serif";
+            } else if (appState.currentTheme === 'desert-oasis') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(58, 36, 28, 0.8)' : 'rgba(244, 164, 96, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#F0E68C' : '#A0522D';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#F0E68C' : '#A0522D';
+                 flashcardContainerEl.classList.add('theme-desert-oasis'); // Add class for heat haze animation
+                 cardFontForTheme = "'Merienda', cursive";
+            } else if (appState.currentTheme === 'ice-crystal') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(10, 61, 98, 0.8)' : 'rgba(176, 224, 230, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0FFFF' : '#000080';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#E0FFFF' : '#000080';
+                 flashcardContainerEl.classList.add('theme-ice-crystal'); // Add class for shimmer animation
+                 cardFontForTheme = "'Poppins', sans-serif";
+            } else if (appState.currentTheme === 'volcano-inferno') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(74, 4, 4, 0.8)' : 'rgba(255, 69, 0, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#FFD700' : '#8B0000';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#FFD700' : '#8B0000';
+                 cardFontForTheme = "'Creepster', cursive";
+            } else if (appState.currentTheme === 'japanese-garden') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(47, 79, 79, 0.8)' : 'rgba(240, 255, 240, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#C0C0C0' : '#556B2F';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#C0C0C0' : '#556B2F';
+                 cardFontForTheme = "'Kalam', cursive";
+            } else if (appState.currentTheme === 'doodle-sketchbook') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(26, 26, 26, 0.8)' : 'rgba(245, 245, 220, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0E0' : '#333333';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                 cardFontForTheme = "'Kalam', cursive";
+            } else if (appState.currentTheme === 'pixel-art') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? '#111' : '#EEE';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#0F0' : '#000';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#0F0' : '#000';
+                 cardFontForTheme = "'Press Start 2P', cursive";
+            } else if (appState.currentTheme === 'minimalist') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(26, 26, 26, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#555' : '#DDD';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                 cardFontForTheme = "'Inter', sans-serif";
+            } else if (appState.currentTheme === 'gradient') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(30, 30, 60, 0.8)' : 'rgba(200, 220, 255, 0.8)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#B21F1F' : '#83a4d4';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                 cardFontForTheme = "'Poppins', sans-serif";
+            } else if (appState.currentTheme === 'y2k') {
+                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 0, 51, 0.9)' : 'rgba(204, 255, 255, 0.9)';
+                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#00FFFF' : '#000080';
+                 flashcardContainerEl.style.color = appState.darkMode ? '#00FFFF' : '#000080';
+                 flashcardContainerEl.classList.add('theme-y2k');
+                 cardFontForTheme = "'Orbitron', sans-serif";
+            }
+
+
+            cardFrenchWordEl.style.fontFamily = cardFontForTheme;
+            cardEnglishWordEl.style.fontFamily = cardFontForTheme;
         }
 
         function renderChapterButtons() {
             chapterButtonsContainerEl.innerHTML = '';
-            menuChaptersContainerEl.innerHTML = ''; 
-            
+            menuChaptersContainerEl.innerHTML = '';
+
             const createButton = (chapter, isMenuButton = false, isAllButton = false) => {
                 const button = document.createElement('button');
                 button.innerHTML = isAllButton ? `📚 Tout` : `${chapter.emoji} ${chapter.name}`;
                 button.classList.add('p-2', 'sm:p-3', 'rounded-lg', 'shadow', 'font-medium', 'text-xs', 'sm:text-sm', 'transition-all', 'duration-200', 'ease-in-out', 'hover:opacity-80', 'w-full', 'truncate');
-                // Default light mode button style
-                button.classList.add('bg-white', 'text-slate-700');
-                // Dark mode specific styling for default state
-                if (appState.darkMode) {
-                    button.classList.remove('bg-white', 'text-slate-700');
-                    button.classList.add('dark:bg-slate-700', 'dark:text-slate-200');
-                }
-
 
                 const chapterIdentifier = isAllButton ? 'Tout' : chapter.name;
-                if (appState.currentChapter === chapterIdentifier) {
-                    button.classList.add('chapter-button-active');
-                     // Remove default styles if active, as active styles handle both modes
-                    button.classList.remove('bg-white', 'text-slate-700', 'dark:bg-slate-700', 'dark:text-slate-200');
-                } else {
-                    button.classList.remove('chapter-button-active');
-                     // Ensure correct default styles based on mode if not active
-                    if (appState.darkMode) {
-                        button.classList.remove('bg-white', 'text-slate-700'); // remove light mode defaults
-                        button.classList.add('dark:bg-slate-700', 'dark:text-slate-200');
-                    } else {
-                        button.classList.remove('dark:bg-slate-700', 'dark:text-slate-200'); // remove dark mode defaults
-                        button.classList.add('bg-white', 'text-slate-700');
-                    }
-                }
-                
+
                 button.addEventListener('click', () => {
                     appState.currentChapter = chapterIdentifier;
                     loadDeckForChapter(chapterIdentifier);
-                    if (isMenuButton) toggleMenu(false); 
+                    if (isMenuButton) toggleMenu(false);
                     updateActiveChapterButtonStates();
                 });
                 return button;
@@ -944,41 +2388,105 @@ select option {
                 chapterButtonsContainerEl.appendChild(createButton(chapter));
                 menuChaptersContainerEl.appendChild(createButton(chapter, true));
             });
+            updateActiveChapterButtonStates();
         }
-        
+
         function updateActiveChapterButtonStates() {
-    const updateButtons = (container) => {
-        Array.from(container.children).forEach(button => {
-            const buttonText = button.innerHTML;
-            const isAllButton = buttonText.includes("📚 Tout");
-            let buttonChapterName = '';
-            if (isAllButton) {
-                buttonChapterName = 'Tout';
-            } else {
-                const nameMatch = buttonText.match(/[A-Za-zÀ-ÿ]+(?=\s*$|<\/button>)/);
-                if (nameMatch) buttonChapterName = nameMatch[0];
-                else { 
-                   const chapterObj = chapters.find(ch => buttonText.includes(ch.name));
-                   if(chapterObj) buttonChapterName = chapterObj.name;
-                }
-            }
+            const updateButtons = (container) => {
+                Array.from(container.children).forEach(button => {
+                    const buttonText = button.innerHTML;
+                    const isAllButton = buttonText.includes("📚 Tout");
+                    let buttonChapterName = '';
+                    if (isAllButton) {
+                        buttonChapterName = 'Tout';
+                    } else {
+                       const chapterObj = chapters.find(ch => buttonText.includes(ch.name));
+                       if(chapterObj) buttonChapterName = chapterObj.name;
+                    }
+                    button.classList.remove('chapter-button-active', 'chapter-button-default', 'bg-white', 'text-slate-700', 'dark:bg-slate-700', 'dark:text-slate-200');
+                    button.removeAttribute('style');
+                    button.classList.remove('theme-pixel-art'); // Remove pixel art specific class
 
-            button.classList.remove('chapter-button-active', 'bg-white', 'text-slate-700', 'dark:bg-slate-700', 'dark:text-slate-200');
+                    if (buttonChapterName === appState.currentChapter) {
+                        button.classList.add('chapter-button-active');
+                    } else {
+                        button.classList.add('chapter-button-default');
+                    }
 
-            if (buttonChapterName === appState.currentChapter) {
-                button.classList.add('chapter-button-active');
-            } else {
-                if (appState.darkMode) {
-                    button.classList.add('dark:bg-slate-700', 'dark:text-slate-200');
-                } else {
-                    button.classList.add('bg-white', 'text-slate-700');
-                }
-            }
-        });
-    };
-    updateButtons(chapterButtonsContainerEl);
-    updateButtons(menuChaptersContainerEl);
-}
+                    let buttonFontFamily = document.body.style.fontFamily || "'Inter', sans-serif";
+
+                    // Theme-specific overrides for chapter buttons
+                    if (appState.currentTheme === 'terminal') {
+                         if (buttonChapterName === appState.currentChapter) {
+                            button.style.backgroundColor = '#39FF14';
+                            button.style.color = '#0C0C0C';
+                         } else {
+                            button.style.backgroundColor = 'rgba(0, 25, 0, 0.8)';
+                            button.style.color = '#39FF14';
+                            button.style.borderColor = 'rgba(0, 180, 0, 0.7)';
+                         }
+                         buttonFontFamily = "'Roboto Mono', monospace";
+                    } else if (appState.currentTheme === 'spooky') {
+                        if (buttonChapterName === appState.currentChapter) {
+                            button.style.backgroundColor = '#FF6600';
+                            button.style.color = '#1A092A';
+                        } else {
+                            button.style.backgroundColor = appState.darkMode ? 'rgba(60, 20, 80, 0.7)' : 'rgba(80, 50, 100, 0.7)';
+                            button.style.color = '#FFD700';
+                        }
+                        buttonFontFamily = "'Creepster', cursive";
+                    } else if (appState.currentTheme === 'candy') {
+                         if (buttonChapterName === appState.currentChapter) {
+                            button.style.backgroundColor = appState.darkMode ? '#FF69B4' : '#FF1493'; // HotPink / DeepPink
+                            button.style.color = appState.darkMode ? '#4B0082' : '#FFF0F5';
+                         } else {
+                            button.style.backgroundColor = appState.darkMode ? 'rgba(128,0,128,0.6)' : 'rgba(255,182,193,0.7)';
+                            button.style.color = appState.darkMode ? '#FFFACD' : '#800080';
+                         }
+                         button.style.borderRadius = '20px'; // Rounded like candy
+                         button.style.border = '2px dashed #FFF';
+                         buttonFontFamily = "'Pacifico', cursive";
+                    } else if (appState.currentTheme === 'retro') {
+                        if (buttonChapterName === appState.currentChapter) {
+                            button.style.backgroundColor = appState.darkMode ? '#0F0' : '#FFF';
+                            button.style.color = '#000';
+                        } else {
+                            button.style.backgroundColor = appState.darkMode ? '#333' : '#5555CC';
+                            button.style.color = appState.darkMode ? '#CCC' : '#FFF';
+                        }
+                        button.style.border = `2px solid ${appState.darkMode ? '#555' : '#000'}`;
+                        button.style.boxShadow = 'none';
+                        buttonFontFamily = "'Press Start 2P', cursive";
+                    } else if (appState.currentTheme === 'pixel-art') {
+                         button.classList.add('theme-pixel-art');
+                         if (buttonChapterName === appState.currentChapter) {
+                             button.style.backgroundColor = appState.darkMode ? '#00FF00' : '#FFFF00';
+                             button.style.color = appState.darkMode ? '#000000' : '#000000';
+                             button.style.borderColor = appState.darkMode ? '#FFFF00' : '#00FF00';
+                         } else {
+                             button.style.backgroundColor = appState.darkMode ? '#333333' : '#AAAAAA';
+                             button.style.color = appState.darkMode ? '#CCCCCC' : '#333333';
+                             button.style.borderColor = appState.darkMode ? '#CCCCCC' : '#333333';
+                         }
+                          buttonFontFamily = "'Press Start 2P', cursive";
+                    } else if (appState.currentTheme === 'y2k') {
+                         if (buttonChapterName === appState.currentChapter) {
+                             button.style.backgroundColor = appState.darkMode ? '#00FFFF' : '#000080';
+                             button.style.color = appState.darkMode ? '#000080' : '#00FFFF';
+                         } else {
+                            button.style.backgroundColor = appState.darkMode ? 'rgba(0,0,80,0.7)' : 'rgba(0,255,255,0.7)';
+                            button.style.color = appState.darkMode ? '#00FFFF' : '#000080';
+                         }
+                         button.style.border = `2px solid ${appState.darkMode ? '#00FFFF' : '#000080'}`;
+                         buttonFontFamily = "'Orbitron', sans-serif";
+                    }
+                    // Add more theme button styles here
+                    button.style.fontFamily = buttonFontFamily;
+                });
+            };
+            updateButtons(chapterButtonsContainerEl);
+            updateButtons(menuChaptersContainerEl);
+        }
 
 
         function renderResetOptions() {
@@ -1009,7 +2517,7 @@ select option {
             }
             appState.currentIndex = 0;
             appState.seenCountInSession = 0;
-            shuffleAndSortDeck(); 
+            shuffleAndSortDeck();
             updateActiveChapterButtonStates();
         }
 
@@ -1023,78 +2531,197 @@ select option {
         function shuffleAndSortDeck() {
             let cardsToProcess;
             if (appState.currentChapter === 'Tout') {
-                // Create a new array from allCards to avoid modifying it directly if it's used elsewhere as a reference
                 cardsToProcess = [...appState.allCards];
             } else {
                 cardsToProcess = appState.allCards.filter(card => card.chapter === appState.currentChapter);
             }
-            
+
             shuffleArray(cardsToProcess);
             cardsToProcess.sort((a, b) => a.score - b.score);
-            
+
             appState.currentDeck = cardsToProcess;
             appState.currentIndex = 0;
-            appState.seenCountInSession = 0; 
-            renderCard(); // This will reset readyToAdvanceOnClick
-            renderProgressBar(); 
+            appState.seenCountInSession = 0;
+            renderCard();
+            renderProgressBar();
         }
-        
+
         function handleAnswer(isCorrect) {
-    if (appState.currentDeck.length === 0) return;
-    const card = appState.currentDeck[appState.currentIndex];
-    appState.isCardRevealedByClick = false; 
-    
-    let currentScoreIndex = scoreLevels.indexOf(card.score);
-    if (currentScoreIndex === -1) { 
-        card.score = 50;
-        currentScoreIndex = scoreLevels.indexOf(50);
-    }
+            if (appState.currentDeck.length === 0) return;
+            const card = appState.currentDeck[appState.currentIndex];
+            appState.isCardRevealedByClick = false;
 
-    if (isCorrect) {
-        messageAreaEl.textContent = 'Bonne réponse !';
-        messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-emerald-500 dark:text-emerald-400';
-        if (currentScoreIndex < scoreLevels.length - 1) {
-            card.score = scoreLevels[currentScoreIndex + 1];
+            let currentScoreIndex = scoreLevels.indexOf(card.score);
+            if (currentScoreIndex === -1) {
+                card.score = 50;
+                currentScoreIndex = scoreLevels.indexOf(50);
+            }
+
+            if (isCorrect) {
+                messageAreaEl.textContent = 'Bonne réponse !';
+                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-emerald-500 dark:text-emerald-400';
+                if (currentScoreIndex < scoreLevels.length - 1) {
+                    card.score = scoreLevels[currentScoreIndex + 1];
+                }
+            } else {
+                messageAreaEl.textContent = `Incorrect.`;
+                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
+                if (currentScoreIndex > 0) {
+                    card.score = scoreLevels[currentScoreIndex - 1];
+                }
+                cardEnglishWordEl.classList.remove('hidden');
+            }
+
+            const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
+            if (masterCardIndex !== -1) {
+                appState.allCards[masterCardIndex].score = card.score;
+            }
+
+            cardScoreEl.textContent = `${card.score}%`;
+            flashcardContainerEl.classList.remove(...allPossibleColorClasses);
+            flashcardContainerEl.removeAttribute('style');
+            flashcardContainerEl.classList.remove('theme-desert-oasis', 'theme-ice-crystal', 'theme-y2k'); // Remove theme-specific animation classes
+
+
+            const colorCls = getCardColorClasses(card.score);
+            flashcardContainerEl.classList.add(...colorCls.split(' '));
+
+            // Re-apply specific theme overrides for the card
+            if (appState.currentTheme !== 'default') {
+                let cardFontForTheme = document.body.style.fontFamily || "'Inter', sans-serif";
+                 if (appState.currentTheme === 'spooky') {
+                    flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(30, 10, 40, 0.85)' : 'rgba(50, 30, 60, 0.85)';
+                    flashcardContainerEl.style.borderColor = appState.darkMode ? '#FF4500' : '#8A2BE2';
+                    flashcardContainerEl.style.color = appState.darkMode ? '#FF8C00' : '#FFD700';
+                    cardFontForTheme = "'Creepster', cursive";
+                } else if (appState.currentTheme === 'terminal') {
+                     flashcardContainerEl.style.backgroundColor = 'rgba(0, 20, 0, 0.8)';
+                     flashcardContainerEl.style.borderColor = 'rgba(0, 255, 0, 0.7)';
+                     flashcardContainerEl.style.color = '#00FF41';
+                     cardFontForTheme = "'Roboto Mono', monospace";
+                } else if (appState.currentTheme === 'ocean') {
+                    flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 70, 88, 0.75)' : 'rgba(135, 206, 250, 0.75)';
+                    flashcardContainerEl.style.borderColor = appState.darkMode ? '#20B2AA' : '#4682B4';
+                    flashcardContainerEl.style.color = appState.darkMode ? '#AFEEEE' : '#005A6C';
+                    cardFontForTheme = "'Poppins', sans-serif";
+                } else if (appState.currentTheme === 'sci-fi') {
+                    flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(200, 210, 220, 0.8)';
+                    flashcardContainerEl.style.borderColor = '#64FFDA';
+                    flashcardContainerEl.style.color = appState.darkMode ? '#94a3b8' : '#0f172a';
+                    cardFontForTheme = "'Orbitron', sans-serif";
+                } else if (appState.currentTheme === 'cyberpunk') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(200, 210, 220, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#F0F' : '#0FF';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#94a3b8' : '#0f172a';
+                     flashcardContainerEl.style.boxShadow = `0 0 15px ${appState.darkMode ? '#F0F3' : '#0FF3'}`;
+                     cardFontForTheme = "'Audiowide', cursive";
+                } else if (appState.currentTheme === 'candy') {
+                    flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(128, 0, 128, 0.7)' : 'rgba(255, 182, 193, 0.8)';
+                    flashcardContainerEl.style.borderColor = appState.darkMode ? '#FF69B4' : '#FF1493';
+                    flashcardContainerEl.style.color = appState.darkMode ? '#FFFACD' : '#4B0082';
+                    cardFontForTheme = "'Pacifico', cursive";
+                } else if (appState.currentTheme === 'retro') {
+                    flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(20,20,20,0.9)' : 'rgba(100,100,100,0.9)';
+                    flashcardContainerEl.style.borderColor = appState.darkMode ? '#0F0' : '#AAA';
+                    flashcardContainerEl.style.color = appState.darkMode ? '#0F0' : '#FFF';
+                    cardFontForTheme = "'Press Start 2P', cursive";
+                } else if (appState.currentTheme === 'chalkboard') {
+                    flashcardContainerEl.style.backgroundColor = 'rgba(50, 70, 50, 0.8)';
+                    flashcardContainerEl.style.border = '5px solid #D2B48C';
+                    flashcardContainerEl.style.color = '#FFFDD0';
+                    flashcardContainerEl.style.boxShadow = 'inset 0 0 10px rgba(0,0,0,0.3)';
+                    cardFontForTheme = "'Kalam', cursive";
+                } else if (appState.currentTheme === 'galaxy') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(40, 40, 80, 0.7)' : 'rgba(60, 60, 100, 0.7)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
+                     cardFontForTheme = "'Orbitron', sans-serif";
+                } else if (appState.currentTheme === 'steampunk') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(80, 50, 30, 0.8)' : 'rgba(245, 245, 220, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#D2B48C' : '#8B4513';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#D2B48C' : '#8B4513';
+                     cardFontForTheme = "'Roboto Mono', monospace";
+                } else if (appState.currentTheme === 'underwater-cave') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 40, 80, 0.75)' : 'rgba(30, 58, 138, 0.75)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#20B2AA' : '#4682B4';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#ADD8E6' : '#B0C4DE';
+                     cardFontForTheme = "'Poppins', sans-serif";
+                } else if (appState.currentTheme === 'desert-oasis') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(58, 36, 28, 0.8)' : 'rgba(244, 164, 96, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#F0E68C' : '#A0522D';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#F0E68C' : '#A0522D';
+                     flashcardContainerEl.classList.add('theme-desert-oasis');
+                     cardFontForTheme = "'Merienda', cursive";
+                } else if (appState.currentTheme === 'ice-crystal') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(10, 61, 98, 0.8)' : 'rgba(176, 224, 230, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0FFFF' : '#000080';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#E0FFFF' : '#000080';
+                     flashcardContainerEl.classList.add('theme-ice-crystal');
+                     cardFontForTheme = "'Poppins', sans-serif";
+                } else if (appState.currentTheme === 'volcano-inferno') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(74, 4, 4, 0.8)' : 'rgba(255, 69, 0, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#FFD700' : '#8B0000';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#FFD700' : '#8B0000';
+                     cardFontForTheme = "'Creepster', cursive";
+                } else if (appState.currentTheme === 'japanese-garden') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(47, 79, 79, 0.8)' : 'rgba(240, 255, 240, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#C0C0C0' : '#556B2F';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#C0C0C0' : '#556B2F';
+                     cardFontForTheme = "'Kalam', cursive";
+                } else if (appState.currentTheme === 'doodle-sketchbook') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(26, 26, 26, 0.8)' : 'rgba(245, 245, 220, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0E0' : '#333333';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                     cardFontForTheme = "'Kalam', cursive";
+                } else if (appState.currentTheme === 'pixel-art') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? '#111' : '#EEE';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#0F0' : '#000';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#0F0' : '#000';
+                     cardFontForTheme = "'Press Start 2P', cursive";
+                } else if (appState.currentTheme === 'minimalist') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(26, 26, 26, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#555' : '#DDD';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                     cardFontForTheme = "'Inter', sans-serif";
+                } else if (appState.currentTheme === 'gradient') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(30, 30, 60, 0.8)' : 'rgba(200, 220, 255, 0.8)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#B21F1F' : '#83a4d4';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#E0E0E0' : '#333333';
+                     cardFontForTheme = "'Poppins', sans-serif";
+                } else if (appState.currentTheme === 'y2k') {
+                     flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(0, 0, 51, 0.9)' : 'rgba(204, 255, 255, 0.9)';
+                     flashcardContainerEl.style.borderColor = appState.darkMode ? '#00FFFF' : '#000080';
+                     flashcardContainerEl.style.color = appState.darkMode ? '#00FFFF' : '#000080';
+                     flashcardContainerEl.classList.add('theme-y2k');
+                     cardFontForTheme = "'Orbitron', sans-serif";
+                }
+
+
+                cardFrenchWordEl.style.fontFamily = cardFontForTheme;
+                cardEnglishWordEl.style.fontFamily = cardFontForTheme;
+            }
+
+
+            answerInputEl.disabled = true;
+            submitAnswerButtonEl.classList.add('hidden');
+            appState.readyToAdvanceOnClick = true;
         }
-    } else {
-        messageAreaEl.textContent = `Incorrect.`; 
-        messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
-        if (currentScoreIndex > 0) {
-            card.score = scoreLevels[currentScoreIndex - 1];
-        }
-        cardEnglishWordEl.classList.remove('hidden'); 
-    }
-    
-    const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
-    if (masterCardIndex !== -1) {
-        appState.allCards[masterCardIndex].score = card.score;
-    }
-
-    cardScoreEl.textContent = `${card.score}%`;
-    flashcardContainerEl.classList.remove(...allPossibleColorClasses);
-    const colorCls = getCardColorClasses(card.score);
-    flashcardContainerEl.classList.add(...colorCls.split(' '));
-
-    answerInputEl.disabled = true;
-    submitAnswerButtonEl.classList.add('hidden');
-    appState.readyToAdvanceOnClick = true; // Card is now ready to be advanced by click
-}
 
 
         function nextCard() {
             appState.currentIndex++;
             appState.seenCountInSession++;
-            messageAreaEl.textContent = ''; 
+            messageAreaEl.textContent = '';
 
             if (appState.currentIndex >= appState.currentDeck.length) {
                 messageAreaEl.textContent = 'Fin du paquet ! Réorganisation...';
                 messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-sky-500 dark:text-sky-400';
-                
-                setTimeout(() => { 
+
+                setTimeout(() => {
                     shuffleAndSortDeck();
-                }, 1500);
+                }, 50); // Reduced delay to 50ms
             } else {
-                renderCard(); // This will reset readyToAdvanceOnClick for the new card
+                renderCard();
             }
             renderProgressBar();
         }
@@ -1110,29 +2737,29 @@ select option {
         }
 
         function toggleDarkMode() {
-    appState.darkMode = !appState.darkMode;
-    
-    // Update document classes
-    document.documentElement.classList.toggle('dark', appState.darkMode);
-    document.body.classList.toggle('dark-mode', appState.darkMode);
-    document.body.classList.toggle('light-mode', !appState.darkMode);
-    
-    // Update toggle button
-    darkModeToggleEl.innerHTML = appState.darkMode ? 
-        '<i class="fas fa-sun"></i>' : 
-        '<i class="fas fa-moon"></i>';
-    
-    localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
-    renderCard();
-    updateActiveChapterButtonStates();
-}
+            appState.darkMode = !appState.darkMode;
+
+            document.documentElement.classList.toggle('dark', appState.darkMode);
+
+            document.body.classList.toggle('dark-mode', appState.darkMode);
+            document.body.classList.toggle('light-mode', !appState.darkMode);
+
+            darkModeToggleEl.innerHTML = appState.darkMode ?
+                '<i class="fas fa-sun"></i>' :
+                '<i class="fas fa-moon"></i>';
+
+            localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
+
+            applyTheme(appState.currentTheme);
+        }
 
         function saveData() {
             const dataToSave = {
                 allCards: appState.allCards,
                 elapsedSeconds: appState.elapsedSeconds,
                 currentChapter: appState.currentChapter,
-                darkMode: appState.darkMode
+                darkMode: appState.darkMode,
+                currentTheme: appState.currentTheme
             };
             const jsonData = JSON.stringify(dataToSave);
             const blob = new Blob([jsonData], { type: 'application/json' });
@@ -1162,21 +2789,26 @@ select option {
                         });
                         appState.elapsedSeconds = loadedData.elapsedSeconds || 0;
                         appState.currentChapter = loadedData.currentChapter || 'Tout';
-                        
-                        // Load and apply dark mode state from file
+
                         if (typeof loadedData.darkMode === 'boolean') {
                             appState.darkMode = loadedData.darkMode;
-                        } else { // Fallback to localStorage or default if not in file
+                        } else {
                             const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
                             appState.darkMode = savedDarkModePreference === 'true';
                         }
                         document.documentElement.classList.toggle('dark', appState.darkMode);
+                        document.body.classList.toggle('dark-mode', appState.darkMode);
+                        document.body.classList.toggle('light-mode', !appState.darkMode);
                         darkModeToggleEl.innerHTML = appState.darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-                        localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode)); // Update localStorage
-                        
+                        localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
+
+                        appState.currentTheme = loadedData.currentTheme || 'default';
+                        if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+                        applyTheme(appState.currentTheme);
+
                         renderTimer();
-                        loadDeckForChapter(appState.currentChapter); 
-                        renderChapterButtons(); // This will now use the correct appState.darkMode
+                        loadDeckForChapter(appState.currentChapter);
+                        renderChapterButtons();
                         renderResetOptions();
                         messageAreaEl.textContent = 'Données chargées !';
                         messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-green-500 dark:text-green-400';
@@ -1185,7 +2817,7 @@ select option {
                         messageAreaEl.textContent = 'Erreur lors du chargement des données.';
                         messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
                     } finally {
-                        loadDataInputEl.value = ''; 
+                        loadDataInputEl.value = '';
                         setTimeout(() => messageAreaEl.textContent = '', 2000);
                     }
                 };
@@ -1200,18 +2832,18 @@ select option {
 
             appState.allCards.forEach(card => {
                 if (chapterToReset === 'Tout' || card.chapter === chapterToReset) {
-                    card.score = 50; 
+                    card.score = 50;
                 }
             });
-            
+
             if (chapterToReset === 'Tout' || chapterToReset === appState.currentChapter) {
                  loadDeckForChapter(appState.currentChapter);
-            } else { 
+            } else {
                 if (appState.currentDeck.length > 0 && appState.currentIndex < appState.currentDeck.length) {
                     const currentCardInAllCards = appState.allCards.find(c => c.id === appState.currentDeck[appState.currentIndex].id);
                     if (currentCardInAllCards) {
-                        appState.currentDeck[appState.currentIndex].score = currentCardInAllCards.score; 
-                        renderCard(); 
+                        appState.currentDeck[appState.currentIndex].score = currentCardInAllCards.score;
+                        renderCard();
                     }
                 }
             }
@@ -1219,30 +2851,35 @@ select option {
             messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-orange-500 dark:text-yellow-400';
             setTimeout(() => messageAreaEl.textContent = '', 3000);
         }
-        
+
         function filterCardsForSearch(query) {
             searchResultsContainerEl.innerHTML = '';
             if (!query.trim()) return;
 
             const lowerQuery = query.toLowerCase();
-            const matchedCards = appState.allCards.filter(card => 
-                card.french.toLowerCase().includes(lowerQuery) || 
+            const matchedCards = appState.allCards.filter(card =>
+                card.french.toLowerCase().includes(lowerQuery) ||
                 card.english.toLowerCase().includes(lowerQuery)
-            ).slice(0, 5); 
+            ).slice(0, 5);
 
             if (matchedCards.length === 0) {
-                searchResultsContainerEl.innerHTML = '<p class="p-2 text-gray-500 dark:text-gray-400">Aucun résultat</p>';
+                searchResultsContainerEl.innerHTML = '<p class="p-2">Aucun résultat</p>';
                 return;
             }
 
             matchedCards.forEach(card => {
                 const item = document.createElement('div');
-                item.classList.add('p-2', 'hover:bg-gray-200', 'dark:hover:bg-gray-700', 'cursor-pointer', 'rounded');
+                item.classList.add('p-2', 'cursor-pointer', 'rounded');
+                if (appState.darkMode) {
+                    item.classList.add('hover:bg-gray-700');
+                } else {
+                    item.classList.add('hover:bg-gray-200');
+                }
                 item.textContent = `${card.french} - ${card.english} (${card.chapter})`;
                 item.addEventListener('click', () => {
                     appState.currentChapter = card.chapter;
-                    loadDeckForChapter(card.chapter); 
-                    
+                    loadDeckForChapter(card.chapter);
+
                     const cardIndexInNewDeck = appState.currentDeck.findIndex(c => c.id === card.id);
                     if (cardIndexInNewDeck !== -1) {
                         appState.currentIndex = cardIndexInNewDeck;
@@ -1251,7 +2888,7 @@ select option {
                     }
                     renderCard();
                     renderProgressBar();
-                    toggleMenu(false); 
+                    toggleMenu(false);
                     searchBarEl.value = '';
                     searchResultsContainerEl.innerHTML = '';
                     updateActiveChapterButtonStates();
@@ -1263,137 +2900,87 @@ select option {
         // --- EVENT LISTENERS ---
         flashcardContainerEl.addEventListener('click', () => {
             if (appState.currentDeck.length === 0) return;
-
-            // If the card is ready to be advanced (either after revealing or after an answer)
             if (appState.readyToAdvanceOnClick) {
                 nextCard();
-                return; 
+                return;
             }
-
-            // Otherwise, this is the first click on a fresh card (answer not yet visible), so reveal the answer.
             if (cardEnglishWordEl.classList.contains('hidden')) {
                 cardEnglishWordEl.classList.remove('hidden');
-                appState.isCardRevealedByClick = true; 
-                appState.readyToAdvanceOnClick = true;  
-                answerInputEl.disabled = true;          
-                submitAnswerButtonEl.classList.add('hidden'); 
+                appState.isCardRevealedByClick = true;
+                appState.readyToAdvanceOnClick = true;
+                answerInputEl.disabled = true;
+                submitAnswerButtonEl.classList.add('hidden');
             }
         });
 
        submitAnswerButtonEl.addEventListener('click', () => {
-    if (answerInputEl.disabled) return; 
-    const userAnswer = answerInputEl.value.trim().toLowerCase();
-    if (!userAnswer) return; 
-    function validateAnswer(userAnswer, correctAnswerFull) {
-    // Normalize inputs (remove extra spaces, lowercase)
-    const userNormalized = userAnswer.replace(/\s+/g, ' ').trim().toLowerCase();
-    const correctNormalized = correctAnswerFull.replace(/\s+/g, ' ').trim().toLowerCase();
-    
-    // Direct match check
-    if (userNormalized === correctNormalized) {
-        return true;
-    }
-    
-    // Handle alternatives separated by '/'
-    if (correctNormalized.includes('/')) {
-        const alternatives = correctNormalized.split('/').map(alt => alt.trim());
-        for (const alt of alternatives) {
-            if (userNormalized === alt) {
-                return true;
+            if (answerInputEl.disabled) return;
+            const userAnswer = answerInputEl.value.trim().toLowerCase();
+            if (!userAnswer) return;
+
+            function validateAnswer(userAnswer, correctAnswerFull) {
+                const userNormalized = userAnswer.replace(/\s+/g, ' ').trim().toLowerCase();
+                const correctNormalized = correctAnswerFull.replace(/\s+/g, ' ').trim().toLowerCase();
+                if (userNormalized === correctNormalized) return true;
+                if (correctNormalized.includes('/')) {
+                    const alternatives = correctNormalized.split('/').map(alt => alt.trim());
+                    if (alternatives.includes(userNormalized)) return true;
+                }
+                const articlesToIgnore = ['a', 'an', 'the', 'un', 'une', 'des', 'le', 'la', 'les', "l'"];
+                const userMainWords = userNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
+                const correctMainWords = correctNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
+                if (userMainWords === correctMainWords && userMainWords.length > 0) return true;
+
+                const userNoHyphen = userNormalized.replace(/-/g, ' ');
+                const correctNoHyphen = correctNormalized.replace(/-/g, ' ');
+                if (userNoHyphen === correctNoHyphen) return true;
+
+                function calculateSimilarity(str1, str2) {
+                    if (!str1 || !str2) return 0;
+                    const matrix = Array(str1.length + 1).fill(null).map(() => Array(str2.length + 1).fill(null));
+                    for (let i = 0; i <= str1.length; i += 1) matrix[i][0] = i;
+                    for (let j = 0; j <= str2.length; j += 1) matrix[0][j] = j;
+                    for (let i = 1; i <= str1.length; i += 1) {
+                        for (let j = 1; j <= str2.length; j += 1) {
+                            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                            matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
+                        }
+                    }
+                    const maxLen = Math.max(str1.length, str2.length);
+                    return maxLen === 0 ? 1 : 1 - (matrix[str1.length][str2.length] / maxLen);
+                }
+                const similarity = calculateSimilarity(userNormalized, correctNormalized);
+                return similarity > 0.85;
             }
-            
-            // Check if user entered one alternative that's part of a multiple choice
-            if (alt.includes(userNormalized) && userNormalized.length > 3) {
-                return true;
-            }
-        }
-    }
-    
-    // Handle missing articles (a, the) and small differences
-    const userWords = userNormalized.split(/\s+/);
-    const correctWords = correctNormalized.split(/\s+/);
-    
-    // Missing articles
-    const articlesToIgnore = ['a', 'an', 'the'];
-    const userMainWords = userWords.filter(word => !articlesToIgnore.includes(word));
-    const correctMainWords = correctWords.filter(word => !articlesToIgnore.includes(word));
-    
-    // Compare without articles
-    if (userMainWords.join(' ') === correctMainWords.join(' ')) {
-        return true;
-    }
-    
-    // Handle hyphenation differences
-    const userNoHyphen = userNormalized.replace(/-/g, ' ');
-    const correctNoHyphen = correctNormalized.replace(/-/g, ' ');
-    if (userNoHyphen === correctNoHyphen) {
-        return true;
-    }
-    function calculateSimilarity(str1, str2) {
-    if (str1.length === 0) return str2.length === 0 ? 1 : 0;
-    if (str2.length === 0) return 0;
-    
-    const matrix = Array(str1.length + 1).fill().map(() => Array(str2.length + 1).fill(0));
-    
-    // Initialize first row and column
-    for (let i = 0; i <= str1.length; i++) matrix[i][0] = i;
-    for (let j = 0; j <= str2.length; j++) matrix[0][j] = j;
-    
-    // Fill matrix
-    for (let i = 1; i <= str1.length; i++) {
-        for (let j = 1; j <= str2.length; j++) {
-            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-            matrix[i][j] = Math.min(
-                matrix[i - 1][j] + 1,      // deletion
-                matrix[i][j - 1] + 1,      // insertion
-                matrix[i - 1][j - 1] + cost // substitution
-            );
-        }
-    }
-    
-    // Calculate similarity as 1 - normalized distance
-    const maxLen = Math.max(str1.length, str2.length);
-    return maxLen === 0 ? 1 : 1 - (matrix[str1.length][str2.length] / maxLen);
-}
-    // Calculate similarity - allow small errors
-    const similarity = calculateSimilarity(userNormalized, correctNormalized);
-    if (similarity > 0.85) { // 85% similarity threshold
-        return true;
-    }
-    
-    return false;
-}
-    const correctAnswerFull = appState.currentDeck[appState.currentIndex].english.trim().toLowerCase();
-    const isCorrect = validateAnswer(userAnswer, correctAnswerFull);
-    
-    handleAnswer(isCorrect);
-});
-        
-        // nextCardButtonEl event listener removed
+            const correctAnswerFull = appState.currentDeck[appState.currentIndex].english.trim();
+            const isCorrect = validateAnswer(userAnswer, correctAnswerFull.toLowerCase());
+            handleAnswer(isCorrect);
+        });
 
         answerInputEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        if (!cardEnglishWordEl.classList.contains('hidden') || appState.readyToAdvanceOnClick) {
-            nextCard();
-        } else {
-            submitAnswerButtonEl.click();
-        }
-    }
-});
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.activeElement !== answerInputEl) {
-        e.preventDefault();
-        // If card is ready to advance or answer is revealed, go to next card
-        if (appState.readyToAdvanceOnClick) {
-            nextCard();
-        } 
-        // If card not revealed yet, reveal it
-        else if (appState.currentDeck.length > 0 && cardEnglishWordEl.classList.contains('hidden')) {
-            flashcardContainerEl.click();
-        }
-    }
-});
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!answerInputEl.disabled) {
+                    submitAnswerButtonEl.click();
+                }
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement !== answerInputEl && document.activeElement !== searchBarEl) {
+                e.preventDefault();
+                if (appState.readyToAdvanceOnClick) {
+                    nextCard();
+                }
+                else if (appState.currentDeck.length > 0 && cardEnglishWordEl.classList.contains('hidden')) {
+                    cardEnglishWordEl.classList.remove('hidden');
+                    appState.isCardRevealedByClick = true;
+                    appState.readyToAdvanceOnClick = true;
+                    answerInputEl.disabled = true;
+                    submitAnswerButtonEl.classList.add('hidden');
+                }
+            }
+        });
         burgerButtonEl.addEventListener('click', () => toggleMenu(true));
         closeMenuButtonEl.addEventListener('click', () => toggleMenu(false));
         darkModeToggleEl.addEventListener('click', toggleDarkMode);
@@ -1404,21 +2991,27 @@ document.addEventListener('keydown', (e) => {
 
         // --- INITIALIZATION ---
         function initializeApp() {
-    // Load dark mode preference from localStorage first
-    const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
-    appState.darkMode = savedDarkModePreference === 'true';
+            const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
+            appState.darkMode = savedDarkModePreference === 'true';
 
-    // Apply the appropriate mode classes to both document and body
-    document.documentElement.classList.toggle('dark', appState.darkMode);
-    document.body.classList.toggle('dark-mode', appState.darkMode);
-    document.body.classList.toggle('light-mode', !appState.darkMode);
-    
-    darkModeToggleEl.innerHTML = appState.darkMode ? 
-        '<i class="fas fa-sun"></i>' : 
-        '<i class="fas fa-moon"></i>';
-        
-            // Load other app data (potentially from a different localStorage key if needed for versioning)
-            const savedDataRaw = localStorage.getItem('flashcardAppData_v2'); 
+            document.documentElement.classList.toggle('dark', appState.darkMode);
+            document.body.classList.toggle('dark-mode', appState.darkMode);
+            document.body.classList.toggle('light-mode', !appState.darkMode);
+            document.body.classList.add('flex', 'flex-col', 'items-center', 'justify-center', 'min-h-screen', 'p-4', 'overflow-x-hidden');
+            document.body.style.transition = 'background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s';
+
+
+            darkModeToggleEl.innerHTML = appState.darkMode ?
+                '<i class="fas fa-sun"></i>' :
+                '<i class="fas fa-moon"></i>';
+
+            addThemesMenu();
+
+            const savedTheme = localStorage.getItem('flashcardAppTheme') || 'default';
+            appState.currentTheme = savedTheme;
+            if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+
+            const savedDataRaw = localStorage.getItem('flashcardAppData_v4'); // Incremented version for new theme save structure
             if (savedDataRaw) {
                 try {
                     const savedData = JSON.parse(savedDataRaw);
@@ -1428,30 +3021,35 @@ document.addEventListener('keydown', (e) => {
                     });
                     appState.elapsedSeconds = savedData.elapsedSeconds || 0;
                     appState.currentChapter = savedData.currentChapter || 'Tout';
-                    // Dark mode from file overrides localStorage if present and valid
-                    if (typeof savedData.darkMode === 'boolean') { 
+
+                    if (typeof savedData.darkMode === 'boolean') {
                         appState.darkMode = savedData.darkMode;
                         document.documentElement.classList.toggle('dark', appState.darkMode);
+                        document.body.classList.toggle('dark-mode', appState.darkMode);
+                        document.body.classList.toggle('light-mode', !appState.darkMode);
                         darkModeToggleEl.innerHTML = appState.darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-                        localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode)); // Update localStorage
+                        localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
                     }
+                    appState.currentTheme = savedData.currentTheme || 'default';
+                    if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+
                 } catch (e) {
                     console.warn("Could not parse saved app data, using defaults.", e);
-                    appState.allCards = initialCardsData.map(c => ({...c})); 
+                    appState.allCards = initialCardsData.map(c => ({...c}));
                 }
             } else {
-                 appState.allCards = initialCardsData.map(c => ({...c})); 
+                 appState.allCards = initialCardsData.map(c => ({...c}));
             }
-            
-            renderChapterButtons(); // Must be called after darkMode state is set
+
+            applyTheme(appState.currentTheme);
+
+            renderChapterButtons();
             renderResetOptions();
-            loadDeckForChapter(appState.currentChapter); 
+            loadDeckForChapter(appState.currentChapter);
             startTimer();
-            renderTimer(); 
-            
-            
+            renderTimer();
         }
-toggleDarkMode();
+
         initializeApp();
 
     </script>
