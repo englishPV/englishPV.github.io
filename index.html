@@ -73,6 +73,70 @@
             background-color: #FBBF24; 
             color: #1f2937;
         }
+        
+        .dark .card-translation {
+    color: #60a5fa; /* blue-400 for better visibility in dark mode */
+}
+
+body.light-mode {
+    background-color: #f8fafc; /* slate-50 for light mode */
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(224, 242, 254, 0.4));
+    color: #1e293b; /* slate-800 */
+}
+
+body.dark-mode {
+    background-color: #0f172a; /* slate-900 for dark mode */
+    background-image: linear-gradient(to bottom right, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+    color: #f1f5f9; /* slate-100 */
+}
+
+
+.dark .timer-font {
+    background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+/* Progress bar container in dark mode */
+.dark .bg-white\/50 {
+    background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+/* Search bar in dark mode */
+.dark #search-bar {
+    background-color: #1e293b !important;
+    color: #f1f5f9;
+    border-color: #475569;
+}
+
+/* Answer input in dark mode */
+.dark #answer-input {
+    background-color: #1e293b !important;
+    color: #f1f5f9;
+    border-color: #475569;
+}
+
+/* Reset options dropdown in dark mode */
+.dark #reset-options {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+/* Hamburger button in dark mode */
+.dark #burger-button {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+/* Fix for chapter buttons in dark mode */
+.dark .bg-white {
+    background-color: #334155 !important;
+}
+
+/* Make sure text in all dropdowns is visible in both modes */
+select option {
+    color: #000000;
+}
+.dark select {
+    color: #f1f5f9 !important;
+}
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-4 overflow-x-hidden">
@@ -692,6 +756,7 @@
   { id: '503', french: "retraite", english: "retirement", chapter: 'Unemployment', score: 50 },
   { id: '504', french: "partir en pré-retraite", english: "to take early retirement", chapter: 'Unemployment', score: 50 },
   { id: '505', french: "âge de la retraite", english: "retirement age", chapter: 'Unemployment', score: 50 }
+
 ];
         
         
@@ -1045,13 +1110,22 @@
         }
 
         function toggleDarkMode() {
-            appState.darkMode = !appState.darkMode;
-            document.documentElement.classList.toggle('dark', appState.darkMode);
-            darkModeToggleEl.innerHTML = appState.darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
-            renderCard(); 
-            updateActiveChapterButtonStates(); // Re-render buttons to apply correct dark/light styles
-        }
+    appState.darkMode = !appState.darkMode;
+    
+    // Update document classes
+    document.documentElement.classList.toggle('dark', appState.darkMode);
+    document.body.classList.toggle('dark-mode', appState.darkMode);
+    document.body.classList.toggle('light-mode', !appState.darkMode);
+    
+    // Update toggle button
+    darkModeToggleEl.innerHTML = appState.darkMode ? 
+        '<i class="fas fa-sun"></i>' : 
+        '<i class="fas fa-moon"></i>';
+    
+    localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
+    renderCard();
+    updateActiveChapterButtonStates();
+}
 
         function saveData() {
             const dataToSave = {
@@ -1330,13 +1404,19 @@ document.addEventListener('keydown', (e) => {
 
         // --- INITIALIZATION ---
         function initializeApp() {
-            // Load dark mode preference from localStorage first
-            const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
-            appState.darkMode = savedDarkModePreference === 'true'; // Convert string to boolean
+    // Load dark mode preference from localStorage first
+    const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
+    appState.darkMode = savedDarkModePreference === 'true';
 
-            document.documentElement.classList.toggle('dark', appState.darkMode);
-            darkModeToggleEl.innerHTML = appState.darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            
+    // Apply the appropriate mode classes to both document and body
+    document.documentElement.classList.toggle('dark', appState.darkMode);
+    document.body.classList.toggle('dark-mode', appState.darkMode);
+    document.body.classList.toggle('light-mode', !appState.darkMode);
+    
+    darkModeToggleEl.innerHTML = appState.darkMode ? 
+        '<i class="fas fa-sun"></i>' : 
+        '<i class="fas fa-moon"></i>';
+        
             // Load other app data (potentially from a different localStorage key if needed for versioning)
             const savedDataRaw = localStorage.getItem('flashcardAppData_v2'); 
             if (savedDataRaw) {
