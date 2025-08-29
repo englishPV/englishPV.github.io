@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Cartes Mémoire Avancées</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&family=Orbitron:wght@400;700&family=Merienda:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles are now primarily handled by Tailwind and body classes */
         :root {
-            --grid-color: rgba(100, 255, 218, 0.07); /* Default Sci-Fi/Cyberpunk grid color */
-            --pastel-color-light-1: #E6E6FA; /* Lavender */
-            --pastel-color-light-2: #D8BFD8; /* Thistle */
-            --pastel-color-dark-1: #5F4B8B; /* Dark Lavender */
-            --pastel-color-dark-2: #9A7FB0; /* Medium Purple */
+            --grid-color: rgba(100, 255, 218, 0.07);
+            --pastel-color-light-1: #E6E6FA;
+            --pastel-color-light-2: #D8BFD8;
+            --pastel-color-dark-1: #5F4B8B;
+            --pastel-color-dark-2: #9A7FB0;
         }
 
-        .glassmorphism { /* Base for cards, specific colors applied via JS */
+        .glassmorphism {
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
@@ -32,7 +33,6 @@
             color: #f3f4f6;
         }
 
-        /* Menu styling */
         .glassmorphism-menu {
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -40,20 +40,16 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
         body.light-mode .glassmorphism-menu {
-            background: rgba(255, 255, 255, 0.9); /* More opaque */
+            background: rgba(255, 255, 255, 0.9);
             border-color: rgba(0, 0, 0, 0.1);
         }
         body.dark-mode .glassmorphism-menu {
-             background: rgba(17, 24, 39, 0.92);  /* More opaque */
-             border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(17, 24, 39, 0.92);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .card-translation {
-            color: #2563eb;
-        }
-        body.dark-mode .card-translation {
-            color: #60a5fa;
-        }
+        .card-translation { color: #2563eb; }
+        body.dark-mode .card-translation { color: #60a5fa; }
 
         .search-results-container::-webkit-scrollbar-thumb {
             background-color: rgba(156, 163, 175, 0.5);
@@ -68,14 +64,11 @@
             scrollbar-width: thin;
             scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
         }
-        .menu-slide-in {
-            transform: translateX(0%);
-            transition: transform 0.3s ease-out;
-        }
-        .menu-slide-out {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in;
-        }
+
+        .menu-slide-in { transform: translateX(0%); transition: transform 0.3s ease-out; }
+        .menu-slide-out { transform: translateX(-100%); transition: transform 0.3s ease-in; }
+        #sidebar-menu { will-change: transform; }
+
         .chapter-button-active {
             background-color: #F59E0B;
             color: white !important;
@@ -87,17 +80,9 @@
             color: #1f2937 !important;
         }
 
-        body {
-             transition: background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s;
-        }
-        body.light-mode {
-            background-color: #f3f4f6;
-            color: #111827;
-        }
-        body.dark-mode {
-            background-color: #111827;
-            color: #f9fafb;
-        }
+        body { transition: background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s; }
+        body.light-mode { background-color: #f3f4f6; color: #111827; }
+        body.dark-mode { background-color: #111827; color: #f9fafb; }
 
         body.light-mode input[type="text"],
         body.light-mode select {
@@ -105,9 +90,7 @@
             color: #111827;
             border-color: #d1d5db;
         }
-        body.light-mode input[type="text"]::placeholder {
-            color: #6b7280;
-        }
+        body.light-mode input[type="text"]::placeholder { color: #6b7280; }
 
         body.dark-mode input[type="text"],
         body.dark-mode select {
@@ -115,28 +98,13 @@
             color: #f9fafb;
             border-color: #4b5563;
         }
-       body.dark-mode input[type="text"]::placeholder {
-            color: #9ca3af;
-        }
-        body.dark-mode select option {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
-        body.dark-mode select {
-             color: #f9fafb !important;
-        }
-        body.light-mode select {
-            color: #111827 !important;
-        }
+        body.dark-mode input[type="text"]::placeholder { color: #9ca3af; }
+        body.dark-mode select option { background-color: #1f2937; color: #f9fafb; }
+        body.dark-mode select { color: #f9fafb !important; }
+        body.light-mode select { color: #111827 !important; }
 
-        body.light-mode #burger-button {
-            background-color: rgba(255, 255, 255, 0.85);
-            color: #374151;
-        }
-         body.dark-mode #burger-button {
-            background-color: rgba(30, 41, 59, 0.85);
-            color: #e5e7eb;
-        }
+        body.light-mode #burger-button { background-color: rgba(255, 255, 255, 0.85); color: #374151; }
+        body.dark-mode #burger-button { background-color: rgba(30, 41, 59, 0.85); color: #e5e7eb; }
 
         body.light-mode .chapter-button-default {
             background-color: #ffffff;
@@ -149,56 +117,24 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        body.light-mode #card-score {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: #374151;
-        }
-        body.dark-mode #card-score {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #e5e7eb;
-        }
-        body.light-mode .bg-white\/50 {
-            background-color: rgba(255, 255, 255, 0.8); /* Slightly more opaque */
-        }
-        body.dark-mode .bg-white\/50 {
-            background-color: rgba(30, 41, 59, 0.8); /* Slightly more opaque */
-        }
-        body.light-mode .bg-gray-300 {
-            background-color: #e5e7eb;
-        }
-        body.dark-mode .bg-gray-700 {
-             background-color: #374151;
-        }
+        body.light-mode #card-score { background-color: rgba(0, 0, 0, 0.05); color: #374151; }
+        body.dark-mode #card-score { background-color: rgba(255, 255, 255, 0.1); color: #e5e7eb; }
+        body.light-mode .bg-white\/50 { background-color: rgba(255, 255, 255, 0.8); }
+        body.dark-mode .bg-white\/50 { background-color: rgba(30, 41, 59, 0.8); }
+        body.light-mode .bg-gray-300 { background-color: #e5e7eb; }
+        body.dark-mode .bg-gray-700 { background-color: #374151; }
 
         /* --- THEME SPECIFIC STYLES AND ANIMATIONS --- */
-
-        /* Sci-Fi Grid */
         .sci-fi-grid-overlay {
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.5s;
+            pointer-events: none; z-index: -1;
+            opacity: 0; transition: opacity 0.5s;
         }
-        body.theme-galaxy .sci-fi-grid-overlay {
-            background-image:
-                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-            background-size: 35px 35px; /* Slightly smaller grid */
-            opacity: 1;
-        }
+        
 
-        /* Pastel Theme - Evolutive Gradient */
-        @keyframes pastelGradientFlowLight {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-         @keyframes pastelGradientFlowDark {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
+        @keyframes pastelGradientFlowLight { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        @keyframes pastelGradientFlowDark  { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         body.theme-pastel.light-mode {
             background: linear-gradient(to right, var(--pastel-color-light-1), var(--pastel-color-light-2), var(--pastel-color-light-1));
             background-size: 200% 100%;
@@ -210,37 +146,27 @@
             animation: pastelGradientFlowDark 20s linear infinite;
         }
 
-        /* Galaxy Theme - Starfield */
         @keyframes twinkling {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
-         @keyframes slowPan {
-             0% { background-position: 0% 0%; }
-             100% { background-position: 100% 100%; }
-         }
+        
         .star {
-            position: absolute;
-            width: var(--star-size); height: var(--star-size);
-            background-color: var(--star-color);
-            border-radius: 50%;
-            animation: twinkling var(--twinkle-duration) ease-in-out infinite;
-            opacity: 0;
-            z-index: -1;
-        }
-        body.theme-galaxy .star { opacity: 0.7; }
-         body.theme-galaxy {
-             background-image:
-                 radial-gradient(ellipse at bottom, #2A0A5A 0%, #0A0A2A 70%),
-                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23E0E0FF' fill-opacity='0.05'/%3E%3Ccircle cx='50' cy='150' r='40' fill='%23C4C4FF' fill-opacity='0.03'/%3E%3Ccircle cx='150' cy='50' r='60' fill='%23A8A8FF' fill-opacity='0.04'/%3E%3C/svg%3E"); /* Nebulas */
-             background-size: cover, 400px 400px;
-             animation: slowPan 60s linear infinite;
-         }
-          body.theme-galaxy.dark-mode {
-              background-image:
-                radial-gradient(ellipse at bottom, #2A0A5A 0%, #0A0A2A 70%),
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23E0E0FF' fill-opacity='0.03'/%3E%3Ccircle cx='50' cy='150' r='40' fill='%23C4C4FF' fill-opacity='0.02'/%3E%3Ccircle cx='150' cy='50' r='60' fill='%23A8A8FF' fill-opacity='0.025'/%3E%3C/svg%3E");
-          }
+    position: absolute;
+    width: var(--star-size); height: var(--star-size);
+    background-color: var(--star-color);
+    border-radius: 50%;
+    opacity: 0.7;
+    z-index: -1;
+    transition: opacity 0.8s ease;
+}
+        
+
+        /* Respect du “prefers-reduced-motion” */
+        @media (prefers-reduced-motion: reduce) {
+    body.theme-pastel { animation: none !important; }
+    .star { transition: none !important; }
+}
     </style>
 </head>
 <body class="flex flex-col items-center justify-start min-h-screen p-4 overflow-x-hidden pt-20">
@@ -260,46 +186,51 @@
 
         <div class="mb-4">
             <input type="text" id="search-bar" placeholder="Rechercher une carte..." class="w-full p-2 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-sm sm:text-base">
-            <div id="search-results-container" class="mt-2 max-h-32 overflow-y-auto text-sm">
-                </div>
+            <div id="search-results-container" class="search-results-container mt-2 max-h-32 overflow-y-auto text-sm"></div>
         </div>
 
         <div class="mb-4">
-            <h3 class="text-lg font-medium mb-2">Chapitres</h3>
-            <div id="menu-chapters" class="space-y-2">
-                </div>
-        </div>
+    <h3 id="chapters-title" class="text-lg font-medium mb-2">Chapitres</h3>
+    <div id="menu-chapters" class="space-y-2"></div>
+</div>
 
-        <div class="mb-4 flex items-center justify-between">
-            <label for="dark-mode-toggle" class="text-lg">Mode Sombre</label>
-            <button id="dark-mode-toggle" class="p-2 rounded-md"> <i class="fas fa-moon"></i>
-            </button>
-        </div>
+<div class="mb-4 flex items-center justify-between">
+    <label id="dark-mode-label" for="dark-mode-toggle" class="text-lg">Mode Sombre</label>
+    <button id="dark-mode-toggle" class="p-2 rounded-md"><i class="fas fa-moon"></i></button>
+</div>
 
-        <div class="mb-4 space-y-2">
-            <button id="save-data-button" class="w-full p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors"><i class="fas fa-save mr-2"></i>Sauvegarder</button>
-            <label class="w-full p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center">
-                <i class="fas fa-upload mr-2"></i>Charger
-                <input type="file" id="load-data-input" accept=".json" class="hidden">
-            </label>
-        </div>
+<div class="mb-4 space-y-2">
+    <button id="save-data-button" class="w-full p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors"><i class="fas fa-save mr-2"></i>Sauvegarder</button>
+    <label id="load-data-label" class="w-full p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center">
+        <i class="fas fa-upload mr-2"></i><span id="load-data-label-text">Charger</span>
+        <input type="file" id="load-data-input" accept=".json" class="hidden">
+    </label>
+</div>
 
-        <div>
-            <h3 class="text-lg font-medium mb-2">Réinitialiser</h3>
-            <select id="reset-options" class="w-full p-2 border rounded-md mb-2">
-            </select>
-            <button id="reset-data-button" class="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"><i class="fas fa-undo mr-2"></i>Réinitialiser Sélection</button>
-        </div>
+<div>
+    <h3 id="reset-title" class="text-lg font-medium mb-2">Réinitialiser</h3>
+    <select id="reset-options" class="w-full p-2 border rounded-md mb-2"></select>
+    <button id="reset-data-button" class="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"><i class="fas fa-undo mr-2"></i>Réinitialiser Sélection</button>
+</div>
+
+<!-- NEW: Reverse mode button -->
+<div class="mt-6">
+    <button id="reverse-mode-button" class="w-full p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md transition-colors">
+        <i class="fas fa-exchange-alt mr-2"></i>Inverser FR ↔ EN
+    </button>
+</div>
     </div>
 
-    <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-3 sm:space-y-4 relative z-10"> <div id="timer" class="font-mono text-xl sm:text-2xl p-2 bg-white/50 backdrop-blur-sm rounded-md shadow">00:00:00</div>
+    <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-3 sm:space-y-4 relative z-10">
+        <div id="timer" class="font-mono text-xl sm:text-2xl p-2 bg-white/50 backdrop-blur-sm rounded-md shadow">00:00:00</div>
 
         <div class="w-full p-1 bg-white/50 backdrop-blur-sm rounded-md shadow">
             <div class="flex justify-between text-xs sm:text-sm mb-1 px-1">
                 <span id="progress-text">Cartes vues: 0 / 0</span>
                 <span id="progress-percentage">0%</span>
             </div>
-            <div class="w-full bg-gray-300 rounded-full h-2.5 sm:h-3"> <div id="progress-bar-fill" class="bg-emerald-500 h-2.5 sm:h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            <div class="w-full bg-gray-300 rounded-full h-2.5 sm:h-3">
+                <div id="progress-bar-fill" class="bg-emerald-500 h-2.5 sm:h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
             </div>
         </div>
 
@@ -311,12 +242,10 @@
                 <p id="card-french-word" class="text-2xl sm:text-3xl md:text-4xl font-semibold"></p>
                 <p id="card-english-word" class="text-xl sm:text-2xl md:text-3xl font-medium card-translation hidden"></p>
             </div>
-            <div class="h-6">
-                </div>
+            <div class="h-6"></div>
         </div>
 
-        <div id="message-area" class="w-full text-center h-6 text-sm font-medium">
-             </div>
+        <div id="message-area" class="w-full text-center h-6 text-sm font-medium"></div>
 
         <div class="w-full flex flex-col sm:flex-row items-center gap-2 p-3 bg-white/50 backdrop-blur-sm rounded-lg shadow">
             <input type="text" id="answer-input" placeholder="Votre réponse en anglais..." class="flex-grow p-3 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-base" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -324,24 +253,97 @@
                 Valider
             </button>
         </div>
-         </div>
+    </div>
 
     <script>
         // --- APPLICATION STATE ---
         let appState = {
-            allCards: [],
-            currentDeck: [],
-            currentIndex: 0,
-            currentChapter: 'Tout',
-            timerInterval: null,
-            elapsedSeconds: 0,
-            darkMode: false,
-            seenCountInSession: 0,
-            isCardRevealedByClick: false,
-            readyToAdvanceOnClick: false,
-            currentTheme: 'default'
-        };
-
+    allCards: [],
+    currentDeck: [],
+    currentIndex: 0,
+    currentChapter: 'Tout',
+    timerInterval: null,
+    elapsedSeconds: 0,
+    darkMode: false,
+    seenCountInSession: 0,
+    isCardRevealedByClick: false,
+    readyToAdvanceOnClick: false,
+    currentTheme: 'default',
+    searchIndex: null,
+    reverseMode: false,
+    uiLang: 'fr' // NEW: langue de l’interface
+};
+const i18n = {
+  fr: {
+    searchPlaceholder: 'Rechercher une carte...',
+    chapters: 'Chapitres',
+    darkMode: 'Mode Sombre',
+    save: 'Sauvegarder',
+    load: 'Charger',
+    reset: 'Réinitialiser',
+    resetSelection: 'Réinitialiser Sélection',
+    reverseButton: 'Inverser FR ↔ EN',
+    themes: 'Thèmes',
+    themeDefault: 'Défaut',
+    themePastel: 'Pastel (Évolutif)',
+    themeGalaxy: 'Galaxie (Étoiles)',
+    all: 'Tout',
+    cardsViewed: 'Cartes vues',
+    answerPlaceholder_en: 'Votre réponse en anglais...',
+    answerPlaceholder_fr: 'Votre réponse en français...',
+    noCard: 'Aucune carte à afficher.',
+    correct: 'Bonne réponse !',
+    incorrect: 'Incorrect.',
+    endOfDeck: 'Fin du paquet ! Réorganisation...',
+    noResult: 'Aucun résultat',
+    dataSaved: 'Données sauvegardées !',
+    dataLoaded: 'Données chargées !',
+    dataLoadError: 'Erreur lors du chargement des données.',
+    resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser les scores pour "{chapter}" ? Cette action est irréversible.',
+    resetDone: 'Scores pour "{chapter}" réinitialisés.',
+    submit: 'Valider'
+  },
+  en: {
+    searchPlaceholder: 'Search for a card...',
+    chapters: 'Chapters',
+    darkMode: 'Dark mode',
+    save: 'Save',
+    load: 'Load',
+    reset: 'Reset',
+    resetSelection: 'Reset selection',
+    reverseButton: 'Reverse FR ↔ EN',
+    themes: 'Themes',
+    themeDefault: 'Default',
+    themePastel: 'Pastel (Animated)',
+    themeGalaxy: 'Galaxy (Stars)',
+    all: 'All',
+    cardsViewed: 'Cards viewed',
+    answerPlaceholder_en: 'Your answer in English...',
+    answerPlaceholder_fr: 'Your answer in French...',
+    noCard: 'No card to display.',
+    correct: 'Correct!',
+    incorrect: 'Incorrect.',
+    endOfDeck: 'End of deck! Reorganizing...',
+    noResult: 'No results',
+    dataSaved: 'Data saved!',
+    dataLoaded: 'Data loaded!',
+    dataLoadError: 'Error while loading data.',
+    resetConfirm: 'Are you sure you want to reset scores for "{chapter}"? This action is irreversible.',
+    resetDone: 'Scores for "{chapter}" reset.',
+    submit: 'Submit'
+  }
+};
+function t(key) {
+  const lang = appState.uiLang || 'fr';
+  return (i18n[lang] && i18n[lang][key]) || key;
+}
+function tr(key, vars = {}) {
+  let s = t(key);
+  Object.keys(vars).forEach(k => {
+    s = s.replace(new RegExp(`\\{${k}\\}`, 'g'), vars[k]);
+  });
+  return s;
+}
         // --- INITIAL DATA (Sample) ---
         // The vocabulary data has been excluded as requested.
         const initialCardsData = [
@@ -1084,135 +1086,186 @@
         const saveDataButtonEl = document.getElementById('save-data-button');
         const loadDataInputEl = document.getElementById('load-data-input');
         const resetOptionsEl = document.getElementById('reset-options');
-        const resetDataButtonEl = document.getElementById('reset-data-button');
-        let themeSelectorEl;
-
+const resetDataButtonEl = document.getElementById('reset-data-button');
+const reverseModeButtonEl = document.getElementById('reverse-mode-button'); // NEW
+let themeSelectorEl;
         // --- THEME APPLICATION ---
+
+        // Applique les styles liés au thème pour la carte et les polices (appelé quand le thème ou le mode sombre changent)
+        function applyCardThemeStyles() {
+    // Réinit des styles inline spécifiques à la carte
+    flashcardContainerEl.style.backgroundColor = '';
+    flashcardContainerEl.style.borderColor = '';
+    flashcardContainerEl.style.color = '';
+
+    // Fonts (pastel ne change plus de police; galaxy supprimé)
+    let mainFont = "'Inter', sans-serif";
+    let cardFont = mainFont;
+    let timerFont = "'Roboto Mono', monospace";
+
+    document.body.style.fontFamily = mainFont;
+    cardFrenchWordEl.style.fontFamily = cardFont;
+    cardEnglishWordEl.style.fontFamily = cardFont;
+    timerEl.style.fontFamily = timerFont;
+}
+        function updateUIForReverseMode() {
+    // Bascule la langue UI (FR par défaut, EN en mode inversé)
+    appState.uiLang = appState.reverseMode ? 'en' : 'fr';
+
+    // Placeholder selon la langue de réponse attendue
+    const placeholderKey = appState.reverseMode ? 'answerPlaceholder_fr' : 'answerPlaceholder_en';
+    answerInputEl.placeholder = t(placeholderKey);
+
+    // Indication de couleur
+    cardEnglishWordEl.classList.toggle('card-translation', !appState.reverseMode);
+    cardFrenchWordEl.classList.toggle('card-translation', appState.reverseMode);
+
+    // Libellé du bouton inverse
+    if (reverseModeButtonEl) {
+        reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
+    }
+
+    // Applique les textes localisés
+    updateLocalizedStaticTexts();
+    // MAJ du label de progression
+    renderProgressBar();
+}
         function applyTheme(themeName) {
-            appState.currentTheme = themeName;
+    const setCssVar = (varName, value) => document.documentElement.style.setProperty(varName, value);
 
-            // Reset body classes and styles to ensure a clean slate for the theme
-            document.body.className = '';
-            document.body.classList.add(appState.darkMode ? 'dark-mode' : 'light-mode');
-            document.body.classList.add('flex', 'flex-col', 'items-center', 'justify-start', 'min-h-screen', 'p-4', 'overflow-x-hidden', 'pt-20');
+    appState.currentTheme = themeName;
 
-            document.body.removeAttribute('style'); // Clear body inline styles first
-            // Re-apply base transition after clearing inline styles
-            document.body.style.transition = 'background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s';
+    document.body.classList.remove('theme-pastel');
+    if (themeName === 'pastel') document.body.classList.add('theme-pastel');
 
-            // Reset animated background elements visibility and theme-specific body classes
-            document.body.classList.remove('theme-pastel', 'theme-galaxy');
-            clearAnimatedParticles('all'); // Clear any dynamic particles
+    if (themeName === 'pastel') {
+        setCssVar('--pastel-color-light-1', '#E6E6FA');
+        setCssVar('--pastel-color-light-2', '#D8BFD8');
+        setCssVar('--pastel-color-dark-1', '#5F4B8B');
+        setCssVar('--pastel-color-dark-2', '#9A7FB0');
+    }
 
-            let mainFont = "'Inter', sans-serif";
-            let cardFont = mainFont;
-            let timerFont = "'Roboto Mono', monospace";
+    // Étoiles uniquement en "default" + dark, + boucle scintillement
+    clearAnimatedParticles('star');
+    stopStarTwinkleLoop();
+    if (themeName === 'default' && appState.darkMode) {
+        createAnimatedParticles(100, 'star');
+        startStarTwinkleLoop();
+    }
 
-            // Helper to apply font to a list of elements
-            const applyFontToElements = (font, elements) => {
-                elements.forEach(el => { if (el) el.style.fontFamily = font; });
-            };
-
-            // Helper to set CSS variable for themes that use it
-            const setCssVar = (varName, value) => document.documentElement.style.setProperty(varName, value);
-
-            // Remove any theme-specific animations from body
-            document.body.style.animation = '';
-
-            switch(themeName) {
-                case 'default':
-                    // Base styles are handled by body.light-mode / body.dark-mode
-                    break;
-                case 'pastel':
-                    mainFont = cardFont = "'Merienda', cursive";
-                    setCssVar('--pastel-color-light-1', '#E6E6FA'); setCssVar('--pastel-color-light-2', '#D8BFD8');
-                    setCssVar('--pastel-color-dark-1', '#5F4B8B'); setCssVar('--pastel-color-dark-2', '#9A7FB0');
-                    document.body.classList.add('theme-pastel');
-                    // Animation handled by CSS class
-                    break;
-                case 'galaxy':
-                    mainFont = cardFont = timerFont = "'Orbitron', sans-serif";
-                    document.body.style.backgroundColor = appState.darkMode ? '#0A0A2A' : '#1A1A40'; // Deep Space Blues
-                    document.body.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF'; // Pale Star Colors
-                    // Background image and animation handled by CSS class
-                    document.body.classList.add('theme-galaxy');
-                    setCssVar('--grid-color', appState.darkMode ? 'rgba(224, 224, 255, 0.05)' : 'rgba(204, 204, 255, 0.07)');
-                    createAnimatedParticles(100, 'star');
-                    break;
-            }
-
-            // Apply fonts
-            document.body.style.fontFamily = mainFont;
-            const elementsToFont = [
-                answerInputEl, searchBarEl, resetOptionsEl, submitAnswerButtonEl,
-                saveDataButtonEl, (loadDataInputEl.labels ? loadDataInputEl.labels[0] : null), resetDataButtonEl,
-                burgerButtonEl, closeMenuButtonEl, progressTextEl, progressPercentageEl, messageAreaEl
-            ];
-            applyFontToElements(mainFont, elementsToFont);
-            applyFontToElements(cardFont, [cardFrenchWordEl, cardEnglishWordEl]);
-            applyFontToElements(timerFont, [timerEl]);
-
-            localStorage.setItem('flashcardAppTheme', themeName);
-            renderCard(false);
-            updateActiveChapterButtonStates();
-        }
-
+    applyCardThemeStyles();
+    localStorage.setItem('flashcardAppTheme', themeName);
+    renderCard(false);
+    updateActiveChapterButtonStates();
+}
 
         function createAnimatedParticles(count, type) {
-            clearAnimatedParticles(type); // Clear existing particles of this type
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
 
-            for (let i = 0; i < count; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.pointerEvents = 'none';
-                particle.style.zIndex = '-1';
-                particle.style.opacity = '0';
+    clearAnimatedParticles(type);
+    for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'absolute';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '-1';
+        particle.style.opacity = '0.7';
 
-                if (type === 'star') {
-                    const size = Math.random() * 2 + 1;
-                    particle.style.setProperty('--star-size', `${size}px`);
-                    particle.style.top = `${Math.random() * 100}%`;
-                    particle.style.left = `${Math.random() * 100}%`;
-                    const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
-                    particle.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
-                    particle.style.borderRadius = '50%';
-                    particle.style.animation = `twinkling var(--twinkle-duration) ease-in-out infinite`;
-                    particle.style.setProperty('--twinkle-duration', `${Math.random() * 2 + 3}s`);
-                    particle.style.animationDelay = `${Math.random() * 5}s`;
-                    particle.classList.add('star');
-                 }
-                animatedBgElementsContainer.appendChild(particle);
-            }
+        if (type === 'star') {
+            const size = Math.random() * 2 + 1;
+            particle.style.setProperty('--star-size', `${size}px`);
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.left = `${Math.random() * 100}%`;
+            const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
+            particle.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
+            particle.style.borderRadius = '50%';
+            particle.classList.add('star');
         }
+        animatedBgElementsContainer.appendChild(particle);
+    }
+}
 
+        let starTwinkleTimer = null;
+
+function startStarTwinkleLoop() {
+    // Respecte prefers-reduced-motion
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    stopStarTwinkleLoop();
+    const TICK_MIN = 600;   // ms
+    const TICK_VAR = 900;   // ms (aléatoire ajouté)
+    const OPACITY_VISIBLE = 0.7;
+
+    const tick = () => {
+        const stars = animatedBgElementsContainer.querySelectorAll('.star');
+        if (!stars.length) {
+            starTwinkleTimer = setTimeout(tick, 1000);
+            return;
+        }
+        // Repositionner ~12% des étoiles par tick
+        const perTick = Math.max(1, Math.floor(stars.length * 0.12));
+        for (let k = 0; k < perTick; k++) {
+            const idx = Math.floor(Math.random() * stars.length);
+            const star = stars[idx];
+            if (!star) continue;
+
+            // Fade out
+            star.style.opacity = '0';
+
+            // Reposition après un petit délai (le temps du fade)
+            const delay = 150 + Math.random() * 300;
+            setTimeout(() => {
+                // nouvelle position/couleur/taille
+                const size = Math.random() * 2 + 1;
+                star.style.setProperty('--star-size', `${size}px`);
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
+                star.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
+
+                // Fade in
+                star.style.opacity = String(OPACITY_VISIBLE);
+            }, delay);
+        }
+        // Prochain tick à intervalle aléatoire
+        starTwinkleTimer = setTimeout(tick, TICK_MIN + Math.random() * TICK_VAR);
+    };
+
+    tick();
+}
+
+function stopStarTwinkleLoop() {
+    if (starTwinkleTimer) {
+        clearTimeout(starTwinkleTimer);
+        starTwinkleTimer = null;
+    }
+}
         function clearAnimatedParticles(type = 'all') {
-            let selector = '.star';
-            if (type !== 'all') {
-                 selector = `.${type}`;
-            }
+    let selector = '.star';
+    if (type !== 'all') selector = `.${type}`;
+    const existingParticles = animatedBgElementsContainer.querySelectorAll(selector);
+    existingParticles.forEach(p => p.remove());
 
-            const existingParticles = animatedBgElementsContainer.querySelectorAll(selector);
-            existingParticles.forEach(p => p.remove());
-
-             // Ensure sci-fi grid is handled separately if needed
-             if (type === 'all' || type === 'sci-fi-grid') {
-                 const grid = animatedBgElementsContainer.querySelector('.sci-fi-grid-overlay');
-                 if (grid) grid.style.opacity = '0';
-             }
-        }
-
+    if (type === 'all' || type === 'star') {
+        stopStarTwinkleLoop();
+    }
+    if (type === 'all' || type === 'sci-fi-grid') {
+        const grid = animatedBgElementsContainer.querySelector('.sci-fi-grid-overlay');
+        if (grid) grid.style.opacity = '0';
+    }
+}
 
         function addThemesMenu() {
             const themesSection = document.createElement('div');
             themesSection.className = 'mb-4';
             themesSection.innerHTML = `
-                <h3 class="text-lg font-medium mb-2">Thèmes</h3>
-                <select id="theme-selector" class="w-full p-2 border rounded-md mb-2">
-                    <option value="default">Défaut</option>
-                    <option value="pastel">Pastel (Évolutif)</option>
-                    <option value="galaxy">Galaxie (Étoiles)</option>
-                </select>
-            `;
+    <h3 id="themes-title" class="text-lg font-medium mb-2">${t('themes')}</h3>
+    <select id="theme-selector" class="w-full p-2 border rounded-md mb-2">
+        <option value="default">${t('themeDefault')}</option>
+        <option value="pastel">${t('themePastel')}</option>
+    </select>
+`;
 
             const darkModeToggleDiv = darkModeToggleEl.closest('div');
             darkModeToggleDiv.parentNode.insertBefore(themesSection, darkModeToggleDiv.nextSibling);
@@ -1224,6 +1277,45 @@
         }
 
         // --- RENDER FUNCTIONS ---
+        
+        function updateLocalizedStaticTexts() {
+  // Placeholders/labels/titres
+  searchBarEl.placeholder = t('searchPlaceholder');
+  const chaptersTitleEl = document.getElementById('chapters-title');
+  if (chaptersTitleEl) chaptersTitleEl.textContent = t('chapters');
+  const darkModeLabelEl = document.getElementById('dark-mode-label');
+  if (darkModeLabelEl) darkModeLabelEl.textContent = t('darkMode');
+
+  // Boutons + label de chargement
+  if (saveDataButtonEl) saveDataButtonEl.innerHTML = `<i class="fas fa-save mr-2"></i>${t('save')}`;
+  const loadLabelTextEl = document.getElementById('load-data-label-text');
+  if (loadLabelTextEl) loadLabelTextEl.textContent = t('load');
+
+  const resetTitleEl = document.getElementById('reset-title');
+  if (resetTitleEl) resetTitleEl.textContent = t('reset');
+  if (resetDataButtonEl) resetDataButtonEl.innerHTML = `<i class="fas fa-undo mr-2"></i>${t('resetSelection')}`;
+
+  if (reverseModeButtonEl) {
+    reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
+  }
+
+  // Thèmes
+  const themesTitleEl = document.getElementById('themes-title');
+  if (themesTitleEl) themesTitleEl.textContent = t('themes');
+ if (themeSelectorEl) {
+  Array.from(themeSelectorEl.options).forEach(opt => {
+    if (opt.value === 'default') opt.textContent = t('themeDefault');
+    if (opt.value === 'pastel') opt.textContent = t('themePastel');
+  });
+}
+
+  // Bouton de validation
+  submitAnswerButtonEl.textContent = t('submit');
+
+  // Re-rendre les chapitres + options de reset (pour “Tout/All”)
+  renderChapterButtons();
+  renderResetOptions();
+}
         function renderTimer() {
             const hours = Math.floor(appState.elapsedSeconds / 3600).toString().padStart(2, '0');
             const minutes = Math.floor((appState.elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
@@ -1233,17 +1325,17 @@
 
         function renderProgressBar() {
             const totalCardsInDeck = appState.currentDeck.length;
-            const viewedCount = Math.min(appState.currentIndex +1, totalCardsInDeck);
+            const viewedCount = Math.min(appState.currentIndex + 1, totalCardsInDeck);
 
             if (totalCardsInDeck === 0) {
-                progressTextEl.textContent = 'Cartes vues: 0 / 0';
+    progressTextEl.textContent = `${t('cardsViewed')}: 0 / 0`;
                 progressPercentageEl.textContent = '0%';
                 progressBarFillEl.style.width = '0%';
                 return;
             }
 
             const percentage = Math.round((viewedCount / totalCardsInDeck) * 100);
-            progressTextEl.textContent = `Cartes vues: ${viewedCount} / ${totalCardsInDeck}`;
+            progressTextEl.textContent = `${t('cardsViewed')}: ${viewedCount} / ${totalCardsInDeck}`;
             progressPercentageEl.textContent = `${percentage}%`;
             progressBarFillEl.style.width = `${percentage}%`;
         }
@@ -1259,15 +1351,15 @@
             return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
         }
 
-        const allPossibleColorClasses = [
-            'bg-red-500/80', 'text-white', 'dark:bg-red-800/70', 'dark:text-red-100',
-            'bg-red-400/80', 'dark:bg-red-700/70',
-            'bg-orange-400/80', 'text-neutral-800', 'dark:bg-orange-600/70', 'dark:text-orange-100',
-            'light-mode-card-neutral', 'dark-mode-card-neutral',
-            'bg-lime-400/80', 'text-neutral-800', 'dark:bg-lime-700/70', 'dark:text-lime-100',
-            'bg-green-500/80', 'text-white', 'dark:bg-green-600/70', 'dark:text-green-100',
-            'bg-emerald-600/80', 'dark:bg-emerald-700/70', 'dark:text-emerald-100'
-        ];
+        // Optimisation: ne retire/ajoute que les classes de couleur nécessaires
+        let lastCardColorClass = '';
+        function applyScoreClass(newCls) {
+            if (lastCardColorClass) {
+                flashcardContainerEl.classList.remove(...lastCardColorClass.split(' '));
+            }
+            flashcardContainerEl.classList.add(...newCls.split(' '));
+            lastCardColorClass = newCls;
+        }
 
         function renderCard(focusOnInput = true) {
             messageAreaEl.textContent = '';
@@ -1275,12 +1367,9 @@
             appState.isCardRevealedByClick = false;
             appState.readyToAdvanceOnClick = false;
 
-            flashcardContainerEl.classList.remove(...allPossibleColorClasses);
-            flashcardContainerEl.removeAttribute('style');
-
             if (appState.currentDeck.length === 0 || appState.currentIndex >= appState.currentDeck.length) {
-                flashcardContainerEl.classList.add(appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral');
-                cardFrenchWordEl.textContent = 'Aucune carte à afficher.';
+                applyScoreClass(appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral');
+                cardFrenchWordEl.textContent = t('noCard');
                 cardEnglishWordEl.textContent = '';
                 cardEnglishWordEl.classList.add('hidden');
                 cardScoreEl.textContent = 'N/A';
@@ -1292,82 +1381,64 @@
 
             const card = appState.currentDeck[appState.currentIndex];
             cardFrenchWordEl.textContent = card.french;
-            cardEnglishWordEl.textContent = card.english;
-            cardEnglishWordEl.classList.add('hidden');
+cardEnglishWordEl.textContent = card.english;
+
+const promptEl = appState.reverseMode ? cardEnglishWordEl : cardFrenchWordEl;
+const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+
+promptEl.classList.remove('hidden');
+translationEl.classList.add('hidden');
             cardScoreEl.textContent = `${card.score}%`;
 
             const colorCls = getCardColorClasses(card.score);
-            flashcardContainerEl.classList.add(...colorCls.split(' '));
+            applyScoreClass(colorCls);
 
             answerInputEl.disabled = false;
             submitAnswerButtonEl.disabled = false;
             submitAnswerButtonEl.classList.remove('hidden');
-            submitAnswerButtonEl.textContent = 'Valider';
-            if (focusOnInput) {
-                  answerInputEl.focus({ preventScroll: true });
-              }
+            submitAnswerButtonEl.textContent = t('submit');
+            if (focusOnInput) answerInputEl.focus({ preventScroll: true });
+
             renderProgressBar();
-
-            // Apply theme specific styles to the card
-            let cardFontForTheme = document.body.style.fontFamily || "'Inter', sans-serif"; // Default to body font
-
-            // Theme-specific overrides for the card container
-            if (appState.currentTheme === 'galaxy') {
-                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(40, 40, 80, 0.7)' : 'rgba(60, 60, 100, 0.7)';
-                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
-                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
-                 cardFontForTheme = "'Orbitron', sans-serif";
-            } else if (appState.currentTheme === 'pastel') {
-                cardFontForTheme = "'Merienda', cursive";
-            }
-
-            cardFrenchWordEl.style.fontFamily = cardFontForTheme;
-            cardEnglishWordEl.style.fontFamily = cardFontForTheme;
         }
-
 
         function renderChapterButtons() {
             menuChaptersContainerEl.innerHTML = '';
+            const frag = document.createDocumentFragment();
 
             const createButton = (chapter, isMenuButton = false, isAllButton = false) => {
                 const button = document.createElement('button');
-                button.innerHTML = isAllButton ? `📚 Tout` : `${chapter.emoji} ${chapter.name}`;
-                button.classList.add('p-2', 'sm:p-3', 'rounded-lg', 'shadow', 'font-medium', 'text-xs', 'sm:text-sm', 'transition-all', 'duration-200', 'ease-in-out', 'hover:opacity-80', 'w-full', 'truncate');
-
                 const chapterIdentifier = isAllButton ? 'Tout' : chapter.name;
+                button.dataset.chapter = chapterIdentifier;
+                button.innerHTML = isAllButton ? `📚 ${t('all')}` : `${chapter.emoji} ${chapter.name}`;
+                button.classList.add(
+                    'p-2', 'sm:p-3', 'rounded-lg', 'shadow', 'font-medium',
+                    'text-xs', 'sm:text-sm', 'transition-all', 'duration-200',
+                    'ease-in-out', 'hover:opacity-80', 'w-full', 'truncate'
+                );
 
                 button.addEventListener('click', () => {
                     appState.currentChapter = chapterIdentifier;
                     loadDeckForChapter(chapterIdentifier);
-                    if (isMenuButton) toggleMenu(false); // Close menu after selection
+                    if (isMenuButton) toggleMenu(false);
                     updateActiveChapterButtonStates();
                 });
                 return button;
             };
 
             const allButtonMenu = createButton(null, true, true);
-            menuChaptersContainerEl.appendChild(allButtonMenu);
+            frag.appendChild(allButtonMenu);
+            chapters.forEach(chapter => frag.appendChild(createButton(chapter, true)));
+            menuChaptersContainerEl.appendChild(frag);
 
-            chapters.forEach(chapter => {
-                menuChaptersContainerEl.appendChild(createButton(chapter, true));
-            });
             updateActiveChapterButtonStates();
         }
 
         function updateActiveChapterButtonStates() {
             const updateButtons = (container) => {
                 Array.from(container.children).forEach(button => {
-                    const buttonText = button.innerHTML;
-                    const isAllButton = buttonText.includes("📚 Tout");
-                    let buttonChapterName = '';
-                    if (isAllButton) {
-                        buttonChapterName = 'Tout';
-                    } else {
-                       const chapterObj = chapters.find(ch => buttonText.includes(ch.name));
-                       if(chapterObj) buttonChapterName = chapterObj.name;
-                    }
+                    const buttonChapterName = button.dataset.chapter;
                     button.classList.remove('chapter-button-active', 'chapter-button-default');
-                    button.removeAttribute('style');
 
                     if (buttonChapterName === appState.currentChapter) {
                         button.classList.add('chapter-button-active');
@@ -1375,19 +1446,15 @@
                         button.classList.add('chapter-button-default');
                     }
 
-                    let buttonFontFamily = document.body.style.fontFamily || "'Inter', sans-serif";
-                    if (appState.currentTheme === 'galaxy') buttonFontFamily = "'Orbitron', sans-serif";
-                    if (appState.currentTheme === 'pastel') buttonFontFamily = "'Merienda', cursive";
-
-                    button.style.fontFamily = buttonFontFamily;
+                    const buttonFontFamily = getComputedStyle(document.body).fontFamily;
+button.style.fontFamily = buttonFontFamily;
                 });
             };
             updateButtons(menuChaptersContainerEl);
         }
 
-
         function renderResetOptions() {
-            resetOptionsEl.innerHTML = '<option value="Tout">Tout</option>';
+            resetOptionsEl.innerHTML = `<option value="Tout">${t('all')}</option>`;
             chapters.forEach(chapter => {
                 const option = document.createElement('option');
                 option.value = chapter.name;
@@ -1455,13 +1522,13 @@
             }
 
             if (isCorrect) {
-                messageAreaEl.textContent = 'Bonne réponse !';
+                messageAreaEl.textContent = t('correct');
                 messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-emerald-500 dark:text-emerald-400';
                 if (currentScoreIndex < scoreLevels.length - 1) {
                     card.score = scoreLevels[currentScoreIndex + 1];
                 }
             } else {
-                messageAreaEl.textContent = `Incorrect.`;
+                messageAreaEl.textContent = t('incorrect');
                 messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
                 if (currentScoreIndex > 0) {
                     card.score = scoreLevels[currentScoreIndex - 1];
@@ -1475,31 +1542,14 @@
             }
 
             cardScoreEl.textContent = `${card.score}%`;
-            flashcardContainerEl.classList.remove(...allPossibleColorClasses);
-            flashcardContainerEl.removeAttribute('style');
 
             const colorCls = getCardColorClasses(card.score);
-            flashcardContainerEl.classList.add(...colorCls.split(' '));
-
-            // Re-apply specific theme overrides for the card
-            let cardFontForTheme = document.body.style.fontFamily || "'Inter', sans-serif";
-             if (appState.currentTheme === 'galaxy') {
-                 flashcardContainerEl.style.backgroundColor = appState.darkMode ? 'rgba(40, 40, 80, 0.7)' : 'rgba(60, 60, 100, 0.7)';
-                 flashcardContainerEl.style.borderColor = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
-                 flashcardContainerEl.style.color = appState.darkMode ? '#E0E0FF' : '#CCCCFF';
-                 cardFontForTheme = "'Orbitron', sans-serif";
-            } else if (appState.currentTheme === 'pastel') {
-                cardFontForTheme = "'Merienda', cursive";
-            }
-
-            cardFrenchWordEl.style.fontFamily = cardFontForTheme;
-            cardEnglishWordEl.style.fontFamily = cardFontForTheme;
+            applyScoreClass(colorCls);
 
             answerInputEl.disabled = true;
             submitAnswerButtonEl.classList.add('hidden');
             appState.readyToAdvanceOnClick = true;
         }
-
 
         function nextCard() {
             appState.currentIndex++;
@@ -1507,12 +1557,9 @@
             messageAreaEl.textContent = '';
 
             if (appState.currentIndex >= appState.currentDeck.length) {
-                messageAreaEl.textContent = 'Fin du paquet ! Réorganisation...';
+                messageAreaEl.textContent = t('endOfDeck');
                 messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-sky-500 dark:text-sky-400';
-
-                setTimeout(() => {
-                    shuffleAndSortDeck();
-                }, 50); // Reduced delay to 50ms
+                requestAnimationFrame(() => shuffleAndSortDeck());
             } else {
                 renderCard();
             }
@@ -1541,12 +1588,13 @@
 
         function saveData() {
             const dataToSave = {
-                allCards: appState.allCards,
-                elapsedSeconds: appState.elapsedSeconds,
-                currentChapter: appState.currentChapter,
-                darkMode: appState.darkMode,
-                currentTheme: appState.currentTheme
-            };
+    allCards: appState.allCards,
+    elapsedSeconds: appState.elapsedSeconds,
+    currentChapter: appState.currentChapter,
+    darkMode: appState.darkMode,
+    currentTheme: appState.currentTheme,
+    reverseMode: appState.reverseMode // NEW
+};
             const jsonData = JSON.stringify(dataToSave);
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1557,7 +1605,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            messageAreaEl.textContent = 'Données sauvegardées !';
+            messageAreaEl.textContent = t('dataSaved');
             messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-green-500 dark:text-green-400';
             setTimeout(() => messageAreaEl.textContent = '', 2000);
         }
@@ -1571,7 +1619,7 @@
                         const loadedData = JSON.parse(e.target.result);
                         appState.allCards = (loadedData.allCards || initialCardsData).map(c => {
                             const score = scoreLevels.includes(c.score) ? c.score : 50;
-                            return {...c, score: score};
+                            return { ...c, score };
                         });
                         appState.elapsedSeconds = loadedData.elapsedSeconds || 0;
                         appState.currentChapter = loadedData.currentChapter || 'Tout';
@@ -1589,18 +1637,24 @@
                         localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
 
                         appState.currentTheme = loadedData.currentTheme || 'default';
-                        if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
-                        applyTheme(appState.currentTheme);
+if (appState.currentTheme === 'galaxy') appState.currentTheme = 'default'; // migration
+if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+applyTheme(appState.currentTheme);
 
-                        renderTimer();
-                        loadDeckForChapter(appState.currentChapter);
-                        renderChapterButtons();
-                        renderResetOptions();
-                        messageAreaEl.textContent = 'Données chargées !';
+// NEW: restore reverseMode and update UI accordingly
+appState.reverseMode = !!loadedData.reverseMode;
+updateUIForReverseMode();
+
+buildSearchIndex();
+renderTimer();
+loadDeckForChapter(appState.currentChapter);
+renderChapterButtons();
+renderResetOptions();
+                        messageAreaEl.textContent = t('dataLoaded');
                         messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-green-500 dark:text-green-400';
                     } catch (error) {
                         console.error('Error loading data:', error);
-                        messageAreaEl.textContent = 'Erreur lors du chargement des données.';
+                        messageAreaEl.textContent = t('dataLoadError');
                         messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
                     } finally {
                         loadDataInputEl.value = '';
@@ -1613,7 +1667,7 @@
 
         function resetData() {
             const chapterToReset = resetOptionsEl.value;
-            const confirmReset = confirm(`Êtes-vous sûr de vouloir réinitialiser les scores pour "${chapterToReset}" ? Cette action est irréversible.`);
+            const confirmReset = confirm(tr('resetConfirm', { chapter: chapterToReset }));
             if (!confirmReset) return;
 
             appState.allCards.forEach(card => {
@@ -1623,56 +1677,62 @@
             });
 
             if (chapterToReset === 'Tout' || chapterToReset === appState.currentChapter) {
-                 loadDeckForChapter(appState.currentChapter);
+                loadDeckForChapter(appState.currentChapter);
             } else {
                 if (appState.currentDeck.length > 0 && appState.currentIndex < appState.currentDeck.length) {
                     const currentCardInNewDeck = appState.currentDeck[appState.currentIndex];
                     const masterCardIndex = appState.allCards.findIndex(c => c.id === currentCardInNewDeck.id);
-                     if (masterCardIndex !== -1) {
+                    if (masterCardIndex !== -1) {
                         appState.currentDeck[appState.currentIndex].score = appState.allCards[masterCardIndex].score;
                         renderCard();
                     }
                 }
             }
-            messageAreaEl.textContent = `Scores pour "${chapterToReset}" réinitialisés.`;
+            messageAreaEl.textContent = tr('resetDone', { chapter: chapterToReset });
             messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-orange-500 dark:text-yellow-400';
             setTimeout(() => messageAreaEl.textContent = '', 3000);
         }
 
+        // --- RECHERCHE: index + debounce ---
+        function buildSearchIndex() {
+            appState.searchIndex = appState.allCards.map(c => ({
+                id: c.id,
+                french_lc: c.french.toLowerCase(),
+                english_lc: c.english.toLowerCase(),
+                chapter: c.chapter,
+                ref: c
+            }));
+        }
+
         function filterCardsForSearch(query) {
             searchResultsContainerEl.innerHTML = '';
-            if (!query.trim()) return;
+            const q = query.trim().toLowerCase();
+            if (!q) return;
 
-            const lowerQuery = query.toLowerCase();
-            const matchedCards = appState.allCards.filter(card =>
-                card.french.toLowerCase().includes(lowerQuery) ||
-                card.english.toLowerCase().includes(lowerQuery)
-            ).slice(0, 5);
-
-            if (matchedCards.length === 0) {
-                searchResultsContainerEl.innerHTML = '<p class="p-2">Aucun résultat</p>';
-                return;
+            const results = [];
+            const idx = appState.searchIndex || [];
+            for (let i = 0; i < idx.length && results.length < 5; i++) {
+                const c = idx[i];
+                if (c.french_lc.includes(q) || c.english_lc.includes(q)) {
+                    results.push(c.ref);
+                }
             }
 
-            matchedCards.forEach(card => {
+            if (results.length === 0) {
+    searchResultsContainerEl.innerHTML = `<p class="p-2">${t('noResult')}</p>`;
+    return;
+}
+
+            const frag = document.createDocumentFragment();
+            for (const card of results) {
                 const item = document.createElement('div');
-                item.classList.add('p-2', 'cursor-pointer', 'rounded');
-                if (appState.darkMode) {
-                    item.classList.add('hover:bg-gray-700');
-                } else {
-                    item.classList.add('hover:bg-gray-200');
-                }
+                item.className = `p-2 cursor-pointer rounded ${appState.darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`;
                 item.textContent = `${card.french} - ${card.english} (${card.chapter})`;
                 item.addEventListener('click', () => {
                     appState.currentChapter = card.chapter;
                     loadDeckForChapter(card.chapter);
-
-                    const cardIndexInNewDeck = appState.currentDeck.findIndex(c => c.id === card.id);
-                    if (cardIndexInNewDeck !== -1) {
-                        appState.currentIndex = cardIndexInNewDeck;
-                    } else {
-                        appState.currentIndex = 0;
-                    }
+                    const idxInDeck = appState.currentDeck.findIndex(c => c.id === card.id);
+                    appState.currentIndex = idxInDeck !== -1 ? idxInDeck : 0;
                     renderCard(false);
                     renderProgressBar();
                     toggleMenu(false);
@@ -1680,27 +1740,29 @@
                     searchResultsContainerEl.innerHTML = '';
                     updateActiveChapterButtonStates();
                 });
-                searchResultsContainerEl.appendChild(item);
-            });
+                frag.appendChild(item);
+            }
+            searchResultsContainerEl.appendChild(frag);
         }
 
         // --- EVENT LISTENERS ---
         flashcardContainerEl.addEventListener('click', () => {
-            if (appState.currentDeck.length === 0) return;
-            if (appState.readyToAdvanceOnClick) {
-                nextCard();
-                return;
-            }
-            if (cardEnglishWordEl.classList.contains('hidden')) {
-                cardEnglishWordEl.classList.remove('hidden');
-                appState.isCardRevealedByClick = true;
-                appState.readyToAdvanceOnClick = true;
-                answerInputEl.disabled = true;
-                submitAnswerButtonEl.classList.add('hidden');
-            }
-        });
+    if (appState.currentDeck.length === 0) return;
+    if (appState.readyToAdvanceOnClick) {
+        nextCard();
+        return;
+    }
+    const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+    if (translationEl.classList.contains('hidden')) {
+        translationEl.classList.remove('hidden');
+        appState.isCardRevealedByClick = true;
+        appState.readyToAdvanceOnClick = true;
+        answerInputEl.disabled = true;
+        submitAnswerButtonEl.classList.add('hidden');
+    }
+});
 
-       submitAnswerButtonEl.addEventListener('click', () => {
+        submitAnswerButtonEl.addEventListener('click', () => {
             if (answerInputEl.disabled) return;
             const userAnswer = answerInputEl.value.trim().toLowerCase();
             if (!userAnswer) return;
@@ -1708,29 +1770,49 @@
             function validateAnswer(userAnswer, correctAnswerFull) {
                 const userNormalized = userAnswer.replace(/\s+/g, ' ').trim().toLowerCase();
                 const correctNormalized = correctAnswerFull.replace(/\s+/g, ' ').trim().toLowerCase();
+
+                // Exact match
                 if (userNormalized === correctNormalized) return true;
+
+                // Alternatives "a / b"
                 if (correctNormalized.includes('/')) {
                     const alternatives = correctNormalized.split('/').map(alt => alt.trim());
                     if (alternatives.includes(userNormalized)) return true;
                 }
+
+                // Ignore articles
                 const articlesToIgnore = ['a', 'an', 'the', 'un', 'une', 'des', 'le', 'la', 'les', "l'"];
                 const userMainWords = userNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
                 const correctMainWords = correctNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
                 if (userMainWords === correctMainWords && userMainWords.length > 0) return true;
 
+                // Hyphens vs spaces
                 const userNoHyphen = userNormalized.replace(/-/g, ' ');
                 const correctNoHyphen = correctNormalized.replace(/-/g, ' ');
                 if (userNoHyphen === correctNoHyphen) return true;
 
+                // Garde-fou: évite la Levenshtein coûteuse dans les cas improbables
+                const lenDiff = Math.abs(userNormalized.length - correctNormalized.length);
+                if (userNormalized.length < 4 || lenDiff > 3) {
+                    return false;
+                }
+
+                // Similarité (Levenshtein normalisée)
                 function calculateSimilarity(str1, str2) {
                     if (!str1 || !str2) return 0;
-                    const matrix = Array(str1.length + 1).fill(null).map(() => Array(str2.length + 1).fill(null));
+                    const matrix = Array(str1.length + 1).fill(null).map(() =>
+                        Array(str2.length + 1).fill(null)
+                    );
                     for (let i = 0; i <= str1.length; i += 1) matrix[i][0] = i;
                     for (let j = 0; j <= str2.length; j += 1) matrix[0][j] = j;
                     for (let i = 1; i <= str1.length; i += 1) {
                         for (let j = 1; j <= str2.length; j += 1) {
                             const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-                            matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j - 1] + cost
+                            );
                         }
                     }
                     const maxLen = Math.max(str1.length, str2.length);
@@ -1739,7 +1821,10 @@
                 const similarity = calculateSimilarity(userNormalized, correctNormalized);
                 return similarity > 0.85;
             }
-            const correctAnswerFull = appState.currentDeck[appState.currentIndex].english.trim();
+
+            const correctAnswerFull = (appState.reverseMode
+    ? appState.currentDeck[appState.currentIndex].french
+    : appState.currentDeck[appState.currentIndex].english).trim();
             const isCorrect = validateAnswer(userAnswer, correctAnswerFull.toLowerCase());
             handleAnswer(isCorrect);
         });
@@ -1753,35 +1838,49 @@
                 }
             }
         });
+
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && document.activeElement !== answerInputEl && document.activeElement !== searchBarEl) {
-                e.preventDefault();
-                if (appState.readyToAdvanceOnClick) {
-                    nextCard();
-                }
-                else if (appState.currentDeck.length > 0 && cardEnglishWordEl.classList.contains('hidden')) {
-                    cardEnglishWordEl.classList.remove('hidden');
-                    appState.isCardRevealedByClick = true;
-                    appState.readyToAdvanceOnClick = true;
-                    answerInputEl.disabled = true;
-                    submitAnswerButtonEl.classList.add('hidden');
-                }
+    if (e.key === 'Enter' && document.activeElement !== answerInputEl && document.activeElement !== searchBarEl) {
+        e.preventDefault();
+        if (appState.readyToAdvanceOnClick) {
+            nextCard();
+        } else if (appState.currentDeck.length > 0) {
+            const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+            if (translationEl.classList.contains('hidden')) {
+                translationEl.classList.remove('hidden');
+                appState.isCardRevealedByClick = true;
+                appState.readyToAdvanceOnClick = true;
+                answerInputEl.disabled = true;
+                submitAnswerButtonEl.classList.add('hidden');
             }
-        });
+        }
+    }
+});
+        reverseModeButtonEl.addEventListener('click', () => {
+    appState.reverseMode = !appState.reverseMode;
+    updateUIForReverseMode(); // bascule la langue + placeholders + titres + boutons
+    renderCard(false);
+});
         burgerButtonEl.addEventListener('click', () => toggleMenu(true));
         closeMenuButtonEl.addEventListener('click', () => toggleMenu(false));
         darkModeToggleEl.addEventListener('click', toggleDarkMode);
         saveDataButtonEl.addEventListener('click', saveData);
         loadDataInputEl.addEventListener('change', loadData);
         resetDataButtonEl.addEventListener('click', resetData);
-        searchBarEl.addEventListener('input', (e) => filterCardsForSearch(e.target.value));
 
-        // Close the menu if a click occurs outside of it
+        // Debounce pour la recherche
+        let searchDebounceId;
+        searchBarEl.addEventListener('input', (e) => {
+            const q = e.target.value;
+            clearTimeout(searchDebounceId);
+            searchDebounceId = setTimeout(() => filterCardsForSearch(q), 150);
+        });
+
+        // Ferme le menu si clic à l'extérieur
         document.addEventListener('click', (e) => {
             const isMenuOpen = sidebarMenuEl.classList.contains('menu-slide-in');
             const isClickInsideMenu = sidebarMenuEl.contains(e.target);
             const isClickOnBurgerButton = burgerButtonEl.contains(e.target);
-
             if (isMenuOpen && !isClickInsideMenu && !isClickOnBurgerButton) {
                 toggleMenu(false);
             }
@@ -1800,20 +1899,25 @@
 
             addThemesMenu();
 
-            const savedTheme = localStorage.getItem('flashcardAppTheme') || 'default';
-            appState.currentTheme = savedTheme;
-            if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+            let savedTheme = localStorage.getItem('flashcardAppTheme') || 'default';
+// Migration: si "galaxy" était sauvegardé, revenir à "default"
+if (savedTheme === 'galaxy') savedTheme = 'default';
+appState.currentTheme = savedTheme;
+if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
 
-            // Initialize with empty data. Data is loaded via the "Charger" (Load) button.
-            appState.allCards = initialCardsData.map(c => ({...c}));
+            // Données initiales (vocabulaire à remplacer par tes données complètes si besoin)
+            appState.allCards = initialCardsData.map(c => ({ ...c }));
 
-            applyTheme(appState.currentTheme);
+            buildSearchIndex();
+applyTheme(appState.currentTheme);
+updateUIForReverseMode(); // définit uiLang en fonction de reverseMode + MAJ UI
+updateLocalizedStaticTexts(); // garantit que tout le texte statique est sync
 
-            renderChapterButtons();
-            renderResetOptions();
-            loadDeckForChapter(appState.currentChapter);
-            startTimer();
-            renderTimer();
+renderChapterButtons();
+renderResetOptions();
+loadDeckForChapter(appState.currentChapter);
+startTimer();
+renderTimer();
         }
 
         initializeApp();
