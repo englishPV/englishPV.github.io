@@ -1153,7 +1153,7 @@
             applyFontToElements(timerFont, [timerEl]);
 
             localStorage.setItem('flashcardAppTheme', themeName);
-            renderCard();
+            renderCard(false);
             updateActiveChapterButtonStates();
         }
 
@@ -1269,7 +1269,7 @@
             'bg-emerald-600/80', 'dark:bg-emerald-700/70', 'dark:text-emerald-100'
         ];
 
-        function renderCard() {
+        function renderCard(focusOnInput = true) {
             messageAreaEl.textContent = '';
             answerInputEl.value = '';
             appState.isCardRevealedByClick = false;
@@ -1303,7 +1303,9 @@
             submitAnswerButtonEl.disabled = false;
             submitAnswerButtonEl.classList.remove('hidden');
             submitAnswerButtonEl.textContent = 'Valider';
-            answerInputEl.focus({ preventScroll: true });
+            if (focusOnInput) {
+                  answerInputEl.focus({ preventScroll: true });
+              }
             renderProgressBar();
 
             // Apply theme specific styles to the card
@@ -1437,7 +1439,7 @@
             appState.currentDeck = cardsToProcess;
             appState.currentIndex = 0;
             appState.seenCountInSession = 0;
-            renderCard();
+            renderCard(false);
             renderProgressBar();
         }
 
@@ -1671,7 +1673,7 @@
                     } else {
                         appState.currentIndex = 0;
                     }
-                    renderCard();
+                    renderCard(false);
                     renderProgressBar();
                     toggleMenu(false);
                     searchBarEl.value = '';
