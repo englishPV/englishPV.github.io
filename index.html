@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Cartes Mémoire Avancées</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -2988,7 +2988,28 @@
         loadDataInputEl.addEventListener('change', loadData);
         resetDataButtonEl.addEventListener('click', resetData);
         searchBarEl.addEventListener('input', (e) => filterCardsForSearch(e.target.value));
+        
+        // Ajout : Ferme le menu si on clique en dehors
+        document.addEventListener('click', (e) => {
+            // Vérifie si le menu est ouvert
+            const isMenuOpen = sidebarMenuEl.classList.contains('menu-slide-in');
+            
+            // Vérifie si le clic a eu lieu à l'intérieur du menu
+            const isClickInsideMenu = sidebarMenuEl.contains(e.target);
 
+            // Vérifie si le clic a eu lieu sur le bouton burger lui-même
+            const isClickOnBurgerButton = burgerButtonEl.contains(e.target);
+
+            // Si le menu est ouvert ET que le clic est en dehors du menu ET en dehors du bouton burger
+            if (isMenuOpen && !isClickInsideMenu && !isClickOnBurgerButton) {
+                toggleMenu(false); // On ferme le menu
+            }
+        });
+        
+        
+        
+        
+        
         // --- INITIALIZATION ---
         function initializeApp() {
             const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
