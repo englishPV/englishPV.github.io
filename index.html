@@ -80,7 +80,7 @@
             color: #1f2937 !important;
         }
 
-        body { transition: background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s; }
+        body { transition: background-color 0.5s, color 0.5s, background-image 0.5s, font-family 0.5s; touch-action: pan-y; }
         body.light-mode { background-color: #f3f4f6; color: #111827; }
         body.dark-mode { background-color: #111827; color: #f9fafb; }
 
@@ -124,14 +124,12 @@
         body.light-mode .bg-gray-300 { background-color: #e5e7eb; }
         body.dark-mode .bg-gray-700 { background-color: #374151; }
 
-        /* --- THEME SPECIFIC STYLES AND ANIMATIONS --- */
         .sci-fi-grid-overlay {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none; z-index: -1;
             opacity: 0; transition: opacity 0.5s;
         }
-        
 
         @keyframes pastelGradientFlowLight { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         @keyframes pastelGradientFlowDark  { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
@@ -150,23 +148,21 @@
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
-        
-        .star {
-    position: absolute;
-    width: var(--star-size); height: var(--star-size);
-    background-color: var(--star-color);
-    border-radius: 50%;
-    opacity: 0.7;
-    z-index: -1;
-    transition: opacity 0.8s ease;
-}
-        
 
-        /* Respect du “prefers-reduced-motion” */
+        .star {
+            position: absolute;
+            width: var(--star-size); height: var(--star-size);
+            background-color: var(--star-color);
+            border-radius: 50%;
+            opacity: 0.7;
+            z-index: -1;
+            transition: opacity 0.8s ease;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-    body.theme-pastel { animation: none !important; }
-    .star { transition: none !important; }
-}
+            body.theme-pastel { animation: none !important; }
+            .star { transition: none !important; }
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start min-h-screen p-4 overflow-x-hidden pt-20">
@@ -190,38 +186,41 @@
         </div>
 
         <div class="mb-4">
-    <h3 id="chapters-title" class="text-lg font-medium mb-2">Chapitres</h3>
-    <div id="menu-chapters" class="space-y-2"></div>
-</div>
+            <h3 id="chapters-title" class="text-lg font-medium mb-2">Chapitres</h3>
+            <div id="menu-chapters" class="space-y-2"></div>
+        </div>
 
-<div class="mb-4 flex items-center justify-between">
-    <label id="dark-mode-label" for="dark-mode-toggle" class="text-lg">Mode Sombre</label>
-    <button id="dark-mode-toggle" class="p-2 rounded-md"><i class="fas fa-moon"></i></button>
-</div>
+        <div class="mb-4 flex items-center justify-between">
+            <label id="dark-mode-label" for="dark-mode-toggle" class="text-lg">Mode Sombre</label>
+            <button id="dark-mode-toggle" class="p-2 rounded-md"><i class="fas fa-moon"></i></button>
+        </div>
 
-<div class="mb-4 space-y-2">
-    <button id="save-data-button" class="w-full p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors"><i class="fas fa-save mr-2"></i>Sauvegarder</button>
-    <label id="load-data-label" class="w-full p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center">
-        <i class="fas fa-upload mr-2"></i><span id="load-data-label-text">Charger</span>
-        <input type="file" id="load-data-input" accept=".json" class="hidden">
-    </label>
-</div>
+        <div class="mb-4 space-y-2">
+            <button id="save-data-button" class="w-full p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors"><i class="fas fa-save mr-2"></i>Sauvegarder</button>
+            <label id="load-data-label" class="w-full p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center">
+                <i class="fas fa-upload mr-2"></i><span id="load-data-label-text">Charger</span>
+                <input type="file" id="load-data-input" accept=".json" class="hidden">
+            </label>
+        </div>
 
-<div>
-    <h3 id="reset-title" class="text-lg font-medium mb-2">Réinitialiser</h3>
-    <select id="reset-options" class="w-full p-2 border rounded-md mb-2"></select>
-    <button id="reset-data-button" class="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"><i class="fas fa-undo mr-2"></i>Réinitialiser Sélection</button>
-</div>
+        <div>
+            <h3 id="reset-title" class="text-lg font-medium mb-2">Réinitialiser</h3>
+            <select id="reset-options" class="w-full p-2 border rounded-md mb-2"></select>
+            <button id="reset-data-button" class="w-full p-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"><i class="fas fa-undo mr-2"></i>Réinitialiser Sélection</button>
+        </div>
 
-<!-- NEW: Reverse mode button -->
-<div class="mt-6">
-    <button id="reverse-mode-button" class="w-full p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md transition-colors">
-        <i class="fas fa-exchange-alt mr-2"></i>Inverser FR ↔ EN
-    </button>
-</div>
+        <div class="mt-6">
+            <button id="reverse-mode-button" class="w-full p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md transition-colors">
+                <i class="fas fa-exchange-alt mr-2"></i>Inverser FR ↔ EN
+            </button>
+        </div>
     </div>
 
     <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-3 sm:space-y-4 relative z-10">
+        <!-- Étiquette discrète du chapitre actuel -->
+        <div id="current-chapter-label"
+     class="text-[11px] sm:text-xs uppercase tracking-wide text-amber-600 dark:text-amber-600 opacity-100 select-none -mb-1">
+</div>
         <div id="timer" class="font-mono text-xl sm:text-2xl p-2 bg-white/50 backdrop-blur-sm rounded-md shadow">00:00:00</div>
 
         <div class="w-full p-1 bg-white/50 backdrop-blur-sm rounded-md shadow">
@@ -258,101 +257,101 @@
     <script>
         // --- APPLICATION STATE ---
         let appState = {
-    allCards: [],
-    currentDeck: [],
-    currentIndex: 0,
-    currentChapter: 'Tout',
-    timerInterval: null,
-    elapsedSeconds: 0,
-    darkMode: false,
-    seenCountInSession: 0,
-    isCardRevealedByClick: false,
-    readyToAdvanceOnClick: false,
-    currentTheme: 'default',
-    searchIndex: null,
-    reverseMode: false,
-    uiLang: 'fr' // NEW: langue de l’interface
-};
-const i18n = {
-  fr: {
-    searchPlaceholder: 'Rechercher une carte...',
-    chapters: 'Chapitres',
-    darkMode: 'Mode Sombre',
-    save: 'Sauvegarder',
-    load: 'Charger',
-    reset: 'Réinitialiser',
-    resetSelection: 'Réinitialiser Sélection',
-    reverseButton: 'Inverser FR ↔ EN',
-    themes: 'Thèmes',
-    themeDefault: 'Défaut',
-    themePastel: 'Pastel (Évolutif)',
-    themeGalaxy: 'Galaxie (Étoiles)',
-    all: 'Tout',
-    cardsViewed: 'Cartes vues',
-    answerPlaceholder_en: 'Votre réponse en anglais...',
-    answerPlaceholder_fr: 'Votre réponse en français...',
-    noCard: 'Aucune carte à afficher.',
-    correct: 'Bonne réponse !',
-    incorrect: 'Incorrect.',
-    endOfDeck: 'Fin du paquet ! Réorganisation...',
-    noResult: 'Aucun résultat',
-    dataSaved: 'Données sauvegardées !',
-    dataLoaded: 'Données chargées !',
-    dataLoadError: 'Erreur lors du chargement des données.',
-    resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser les scores pour "{chapter}" ? Cette action est irréversible.',
-    resetDone: 'Scores pour "{chapter}" réinitialisés.',
-    submit: 'Valider'
-  },
-  en: {
-    searchPlaceholder: 'Search for a card...',
-    chapters: 'Chapters',
-    darkMode: 'Dark mode',
-    save: 'Save',
-    load: 'Load',
-    reset: 'Reset',
-    resetSelection: 'Reset selection',
-    reverseButton: 'Reverse FR ↔ EN',
-    themes: 'Themes',
-    themeDefault: 'Default',
-    themePastel: 'Pastel (Animated)',
-    themeGalaxy: 'Galaxy (Stars)',
-    all: 'All',
-    cardsViewed: 'Cards viewed',
-    answerPlaceholder_en: 'Your answer in English...',
-    answerPlaceholder_fr: 'Your answer in French...',
-    noCard: 'No card to display.',
-    correct: 'Correct!',
-    incorrect: 'Incorrect.',
-    endOfDeck: 'End of deck! Reorganizing...',
-    noResult: 'No results',
-    dataSaved: 'Data saved!',
-    dataLoaded: 'Data loaded!',
-    dataLoadError: 'Error while loading data.',
-    resetConfirm: 'Are you sure you want to reset scores for "{chapter}"? This action is irreversible.',
-    resetDone: 'Scores for "{chapter}" reset.',
-    submit: 'Submit'
-  }
-};
-function t(key) {
-  const lang = appState.uiLang || 'fr';
-  return (i18n[lang] && i18n[lang][key]) || key;
-}
-function tr(key, vars = {}) {
-  let s = t(key);
-  Object.keys(vars).forEach(k => {
-    s = s.replace(new RegExp(`\\{${k}\\}`, 'g'), vars[k]);
-  });
-  return s;
-}
+            allCards: [],
+            currentDeck: [],
+            currentIndex: 0,
+            currentChapter: 'Tout',
+            timerInterval: null,
+            elapsedSeconds: 0,
+            darkMode: false,
+            seenCountInSession: 0,
+            isCardRevealedByClick: false,
+            readyToAdvanceOnClick: false,
+            currentTheme: 'default',
+            searchIndex: null,
+            reverseMode: false,
+            uiLang: 'fr'
+        };
+        const i18n = {
+          fr: {
+            searchPlaceholder: 'Rechercher une carte...',
+            chapters: 'Chapitres',
+            darkMode: 'Mode Sombre',
+            save: 'Sauvegarder',
+            load: 'Charger',
+            reset: 'Réinitialiser',
+            resetSelection: 'Réinitialiser Sélection',
+            reverseButton: 'Inverser FR ↔ EN',
+            themes: 'Thèmes',
+            themeDefault: 'Défaut',
+            themePastel: 'Pastel (Évolutif)',
+            themeGalaxy: 'Galaxie (Étoiles)',
+            all: 'Tout',
+            cardsViewed: 'Cartes vues',
+            answerPlaceholder_en: 'Votre réponse en anglais...',
+            answerPlaceholder_fr: 'Votre réponse en français...',
+            noCard: 'Aucune carte à afficher.',
+            correct: 'Bonne réponse !',
+            incorrect: 'Incorrect.',
+            endOfDeck: 'Fin du paquet ! Réorganisation...',
+            noResult: 'Aucun résultat',
+            dataSaved: 'Données sauvegardées !',
+            dataLoaded: 'Données chargées !',
+            dataLoadError: 'Erreur lors du chargement des données.',
+            resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser les scores pour "{chapter}" ? Cette action est irréversible.',
+            resetDone: 'Scores pour "{chapter}" réinitialisés.',
+            submit: 'Valider'
+          },
+          en: {
+            searchPlaceholder: 'Search for a card...',
+            chapters: 'Chapters',
+            darkMode: 'Dark mode',
+            save: 'Save',
+            load: 'Load',
+            reset: 'Reset',
+            resetSelection: 'Reset selection',
+            reverseButton: 'Reverse FR ↔ EN',
+            themes: 'Themes',
+            themeDefault: 'Default',
+            themePastel: 'Pastel (Animated)',
+            themeGalaxy: 'Galaxy (Stars)',
+            all: 'All',
+            cardsViewed: 'Cards viewed',
+            answerPlaceholder_en: 'Your answer in English...',
+            answerPlaceholder_fr: 'Your answer in French...',
+            noCard: 'No card to display.',
+            correct: 'Correct!',
+            incorrect: 'Incorrect.',
+            endOfDeck: 'End of deck! Reorganizing...',
+            noResult: 'No results',
+            dataSaved: 'Data saved!',
+            dataLoaded: 'Data loaded!',
+            dataLoadError: 'Error while loading data.',
+            resetConfirm: 'Are you sure you want to reset scores for "{chapter}"? This action is irreversible.',
+            resetDone: 'Scores for "{chapter}" reset.',
+            submit: 'Submit'
+          }
+        };
+        function t(key) {
+          const lang = appState.uiLang || 'fr';
+          return (i18n[lang] && i18n[lang][key]) || key;
+        }
+        function tr(key, vars = {}) {
+          let s = t(key);
+          Object.keys(vars).forEach(k => {
+            s = s.replace(new RegExp(`\\{${k}\\}`, 'g'), vars[k]);
+          });
+          return s;
+        }
+
         // --- INITIAL DATA (Sample) ---
-        // The vocabulary data has been excluded as requested.
         const initialCardsData = [
-           { id: '0', french: "monarchie", english: "monarchy", chapter: 'Democracy', score: 50 },
-  { id: '1', french: "monarque de droit divin", english: "a monarch by divine right", chapter: 'Democracy', score: 50 },
-  { id: '2', french: "souverain", english: "sovereign", chapter: 'Democracy', score: 50 },
-  { id: '3', french: "aristocratie", english: "aristocracy", chapter: 'Democracy', score: 50 },
-  { id: '4', french: "oligarchie", english: "oligarchy", chapter: 'Democracy', score: 50 },
-  { id: '5', french: "dictateur", english: "a dictator", chapter: 'Democracy', score: 50 },
+          { id: '0', french: "monarchie", english: "monarchy", chapter: 'Democracy', score: 50 },
+          { id: '1', french: "monarque de droit divin", english: "a monarch by divine right", chapter: 'Democracy', score: 50 },
+          { id: '2', french: "souverain", english: "sovereign", chapter: 'Democracy', score: 50 },
+          { id: '3', french: "aristocratie", english: "aristocracy", chapter: 'Democracy', score: 50 },
+          { id: '4', french: "oligarchie", english: "oligarchy", chapter: 'Democracy', score: 50 },
+            { id: '5', french: "dictateur", english: "a dictator", chapter: 'Democracy', score: 50 },
   { id: '6', french: "dictature", english: "dictatorship", chapter: 'Democracy', score: 50 },
   { id: '7', french: "autoritaire", english: "authoritarian", chapter: 'Democracy', score: 50 },
   { id: '8', french: "autoritarisme", english: "authoritarianism", chapter: 'Democracy', score: 50 },
@@ -1043,8 +1042,8 @@ function tr(key, vars = {}) {
 {id: '685', french: 'substantially', english: 'notably, significatly', chapter: 'Politique', score: 50},
 {id: '686', french: 'authoritarian', english: 'dictatorial, strict', chapter: 'Politique', score: 50},
 {id: '687', french: 'minimally supervised', english: 'lightly monitored', chapter: 'Politique', 'score': 50}
-
-
+        
+        
         ];
 
         const chapters = [
@@ -1086,187 +1085,166 @@ function tr(key, vars = {}) {
         const saveDataButtonEl = document.getElementById('save-data-button');
         const loadDataInputEl = document.getElementById('load-data-input');
         const resetOptionsEl = document.getElementById('reset-options');
-const resetDataButtonEl = document.getElementById('reset-data-button');
-const reverseModeButtonEl = document.getElementById('reverse-mode-button'); // NEW
-let themeSelectorEl;
+        const resetDataButtonEl = document.getElementById('reset-data-button');
+        const reverseModeButtonEl = document.getElementById('reverse-mode-button');
+        const currentChapterLabelEl = document.getElementById('current-chapter-label');
+        let themeSelectorEl;
+
         // --- THEME APPLICATION ---
-
-        // Applique les styles liés au thème pour la carte et les polices (appelé quand le thème ou le mode sombre changent)
         function applyCardThemeStyles() {
-    // Réinit des styles inline spécifiques à la carte
-    flashcardContainerEl.style.backgroundColor = '';
-    flashcardContainerEl.style.borderColor = '';
-    flashcardContainerEl.style.color = '';
+            flashcardContainerEl.style.backgroundColor = '';
+            flashcardContainerEl.style.borderColor = '';
+            flashcardContainerEl.style.color = '';
 
-    // Fonts (pastel ne change plus de police; galaxy supprimé)
-    let mainFont = "'Inter', sans-serif";
-    let cardFont = mainFont;
-    let timerFont = "'Roboto Mono', monospace";
+            let mainFont = "'Inter', sans-serif";
+            let cardFont = mainFont;
+            let timerFont = "'Roboto Mono', monospace";
 
-    document.body.style.fontFamily = mainFont;
-    cardFrenchWordEl.style.fontFamily = cardFont;
-    cardEnglishWordEl.style.fontFamily = cardFont;
-    timerEl.style.fontFamily = timerFont;
-}
+            document.body.style.fontFamily = mainFont;
+            cardFrenchWordEl.style.fontFamily = cardFont;
+            cardEnglishWordEl.style.fontFamily = cardFont;
+            timerEl.style.fontFamily = timerFont;
+        }
+
         function updateUIForReverseMode() {
-    // Bascule la langue UI (FR par défaut, EN en mode inversé)
-    appState.uiLang = appState.reverseMode ? 'en' : 'fr';
+            appState.uiLang = appState.reverseMode ? 'en' : 'fr';
+            const placeholderKey = appState.reverseMode ? 'answerPlaceholder_fr' : 'answerPlaceholder_en';
+            answerInputEl.placeholder = t(placeholderKey);
 
-    // Placeholder selon la langue de réponse attendue
-    const placeholderKey = appState.reverseMode ? 'answerPlaceholder_fr' : 'answerPlaceholder_en';
-    answerInputEl.placeholder = t(placeholderKey);
+            cardEnglishWordEl.classList.toggle('card-translation', !appState.reverseMode);
+            cardFrenchWordEl.classList.toggle('card-translation', appState.reverseMode);
 
-    // Indication de couleur
-    cardEnglishWordEl.classList.toggle('card-translation', !appState.reverseMode);
-    cardFrenchWordEl.classList.toggle('card-translation', appState.reverseMode);
+            if (reverseModeButtonEl) {
+                reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
+            }
 
-    // Libellé du bouton inverse
-    if (reverseModeButtonEl) {
-        reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
-    }
+            updateLocalizedStaticTexts();
+            renderProgressBar();
+        }
 
-    // Applique les textes localisés
-    updateLocalizedStaticTexts();
-    // MAJ du label de progression
-    renderProgressBar();
-}
         function applyTheme(themeName) {
-    const setCssVar = (varName, value) => document.documentElement.style.setProperty(varName, value);
+            const setCssVar = (varName, value) => document.documentElement.style.setProperty(varName, value);
+            appState.currentTheme = themeName;
 
-    appState.currentTheme = themeName;
+            document.body.classList.remove('theme-pastel');
+            if (themeName === 'pastel') document.body.classList.add('theme-pastel');
 
-    document.body.classList.remove('theme-pastel');
-    if (themeName === 'pastel') document.body.classList.add('theme-pastel');
+            if (themeName === 'pastel') {
+                setCssVar('--pastel-color-light-1', '#E6E6FA');
+                setCssVar('--pastel-color-light-2', '#D8BFD8');
+                setCssVar('--pastel-color-dark-1', '#5F4B8B');
+                setCssVar('--pastel-color-dark-2', '#9A7FB0');
+            }
 
-    if (themeName === 'pastel') {
-        setCssVar('--pastel-color-light-1', '#E6E6FA');
-        setCssVar('--pastel-color-light-2', '#D8BFD8');
-        setCssVar('--pastel-color-dark-1', '#5F4B8B');
-        setCssVar('--pastel-color-dark-2', '#9A7FB0');
-    }
+            clearAnimatedParticles('star');
+            stopStarTwinkleLoop();
+            if (themeName === 'default' && appState.darkMode) {
+                createAnimatedParticles(100, 'star');
+                startStarTwinkleLoop();
+            }
 
-    // Étoiles uniquement en "default" + dark, + boucle scintillement
-    clearAnimatedParticles('star');
-    stopStarTwinkleLoop();
-    if (themeName === 'default' && appState.darkMode) {
-        createAnimatedParticles(100, 'star');
-        startStarTwinkleLoop();
-    }
-
-    applyCardThemeStyles();
-    localStorage.setItem('flashcardAppTheme', themeName);
-    renderCard(false);
-    updateActiveChapterButtonStates();
-}
+            applyCardThemeStyles();
+            localStorage.setItem('flashcardAppTheme', themeName);
+            renderCard(false);
+            updateActiveChapterButtonStates();
+        }
 
         function createAnimatedParticles(count, type) {
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduce) return;
 
-    clearAnimatedParticles(type);
-    for (let i = 0; i < count; i++) {
-        const particle = document.createElement('div');
-        particle.style.position = 'absolute';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '-1';
-        particle.style.opacity = '0.7';
+            clearAnimatedParticles(type);
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '-1';
+                particle.style.opacity = '0.7';
 
-        if (type === 'star') {
-            const size = Math.random() * 2 + 1;
-            particle.style.setProperty('--star-size', `${size}px`);
-            particle.style.top = `${Math.random() * 100}%`;
-            particle.style.left = `${Math.random() * 100}%`;
-            const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
-            particle.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
-            particle.style.borderRadius = '50%';
-            particle.classList.add('star');
+                if (type === 'star') {
+                    const size = Math.random() * 2 + 1;
+                    particle.style.setProperty('--star-size', `${size}px`);
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
+                    particle.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
+                    particle.style.borderRadius = '50%';
+                    particle.classList.add('star');
+                }
+                animatedBgElementsContainer.appendChild(particle);
+            }
         }
-        animatedBgElementsContainer.appendChild(particle);
-    }
-}
 
         let starTwinkleTimer = null;
+        function startStarTwinkleLoop() {
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduce) return;
 
-function startStarTwinkleLoop() {
-    // Respecte prefers-reduced-motion
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
+            stopStarTwinkleLoop();
+            const TICK_MIN = 600;
+            const TICK_VAR = 900;
+            const OPACITY_VISIBLE = 0.7;
 
-    stopStarTwinkleLoop();
-    const TICK_MIN = 600;   // ms
-    const TICK_VAR = 900;   // ms (aléatoire ajouté)
-    const OPACITY_VISIBLE = 0.7;
+            const tick = () => {
+                const stars = animatedBgElementsContainer.querySelectorAll('.star');
+                if (!stars.length) {
+                    starTwinkleTimer = setTimeout(tick, 1000);
+                    return;
+                }
+                const perTick = Math.max(1, Math.floor(stars.length * 0.12));
+                for (let k = 0; k < perTick; k++) {
+                    const idx = Math.floor(Math.random() * stars.length);
+                    const star = stars[idx];
+                    if (!star) continue;
 
-    const tick = () => {
-        const stars = animatedBgElementsContainer.querySelectorAll('.star');
-        if (!stars.length) {
-            starTwinkleTimer = setTimeout(tick, 1000);
-            return;
+                    star.style.opacity = '0';
+                    const delay = 150 + Math.random() * 300;
+                    setTimeout(() => {
+                        const size = Math.random() * 2 + 1;
+                        star.style.setProperty('--star-size', `${size}px`);
+                        star.style.top = `${Math.random() * 100}%`;
+                        star.style.left = `${Math.random() * 100}%`;
+                        const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
+                        star.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
+                        star.style.opacity = String(OPACITY_VISIBLE);
+                    }, delay);
+                }
+                starTwinkleTimer = setTimeout(tick, TICK_MIN + Math.random() * TICK_VAR);
+            };
+
+            tick();
         }
-        // Repositionner ~12% des étoiles par tick
-        const perTick = Math.max(1, Math.floor(stars.length * 0.12));
-        for (let k = 0; k < perTick; k++) {
-            const idx = Math.floor(Math.random() * stars.length);
-            const star = stars[idx];
-            if (!star) continue;
-
-            // Fade out
-            star.style.opacity = '0';
-
-            // Reposition après un petit délai (le temps du fade)
-            const delay = 150 + Math.random() * 300;
-            setTimeout(() => {
-                // nouvelle position/couleur/taille
-                const size = Math.random() * 2 + 1;
-                star.style.setProperty('--star-size', `${size}px`);
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.left = `${Math.random() * 100}%`;
-                const starColors = appState.darkMode ? ['#E0E0FF', '#C4C4FF', '#A8A8FF'] : ['#CCCCFF', '#B0B0FF', '#9494FF'];
-                star.style.setProperty('--star-color', starColors[Math.floor(Math.random() * starColors.length)]);
-
-                // Fade in
-                star.style.opacity = String(OPACITY_VISIBLE);
-            }, delay);
+        function stopStarTwinkleLoop() {
+            if (starTwinkleTimer) {
+                clearTimeout(starTwinkleTimer);
+                starTwinkleTimer = null;
+            }
         }
-        // Prochain tick à intervalle aléatoire
-        starTwinkleTimer = setTimeout(tick, TICK_MIN + Math.random() * TICK_VAR);
-    };
-
-    tick();
-}
-
-function stopStarTwinkleLoop() {
-    if (starTwinkleTimer) {
-        clearTimeout(starTwinkleTimer);
-        starTwinkleTimer = null;
-    }
-}
         function clearAnimatedParticles(type = 'all') {
-    let selector = '.star';
-    if (type !== 'all') selector = `.${type}`;
-    const existingParticles = animatedBgElementsContainer.querySelectorAll(selector);
-    existingParticles.forEach(p => p.remove());
+            let selector = '.star';
+            if (type !== 'all') selector = `.${type}`;
+            const existingParticles = animatedBgElementsContainer.querySelectorAll(selector);
+            existingParticles.forEach(p => p.remove());
 
-    if (type === 'all' || type === 'star') {
-        stopStarTwinkleLoop();
-    }
-    if (type === 'all' || type === 'sci-fi-grid') {
-        const grid = animatedBgElementsContainer.querySelector('.sci-fi-grid-overlay');
-        if (grid) grid.style.opacity = '0';
-    }
-}
+            if (type === 'all' || type === 'star') {
+                stopStarTwinkleLoop();
+            }
+            if (type === 'all' || type === 'sci-fi-grid') {
+                const grid = animatedBgElementsContainer.querySelector('.sci-fi-grid-overlay');
+                if (grid) grid.style.opacity = '0';
+            }
+        }
 
         function addThemesMenu() {
             const themesSection = document.createElement('div');
             themesSection.className = 'mb-4';
             themesSection.innerHTML = `
-    <h3 id="themes-title" class="text-lg font-medium mb-2">${t('themes')}</h3>
-    <select id="theme-selector" class="w-full p-2 border rounded-md mb-2">
-        <option value="default">${t('themeDefault')}</option>
-        <option value="pastel">${t('themePastel')}</option>
-    </select>
-`;
-
+                <h3 id="themes-title" class="text-lg font-medium mb-2">${t('themes')}</h3>
+                <select id="theme-selector" class="w-full p-2 border rounded-md mb-2">
+                    <option value="default">${t('themeDefault')}</option>
+                    <option value="pastel">${t('themePastel')}</option>
+                </select>
+            `;
             const darkModeToggleDiv = darkModeToggleEl.closest('div');
             darkModeToggleDiv.parentNode.insertBefore(themesSection, darkModeToggleDiv.nextSibling);
 
@@ -1277,45 +1255,48 @@ function stopStarTwinkleLoop() {
         }
 
         // --- RENDER FUNCTIONS ---
-        
+        function renderCurrentChapterLabel() {
+            if (!currentChapterLabelEl) return;
+            const ch = appState.currentChapter;
+            const label = (ch === 'Tout') ? t('all') : ch;
+            currentChapterLabelEl.textContent = label;
+        }
+
         function updateLocalizedStaticTexts() {
-  // Placeholders/labels/titres
-  searchBarEl.placeholder = t('searchPlaceholder');
-  const chaptersTitleEl = document.getElementById('chapters-title');
-  if (chaptersTitleEl) chaptersTitleEl.textContent = t('chapters');
-  const darkModeLabelEl = document.getElementById('dark-mode-label');
-  if (darkModeLabelEl) darkModeLabelEl.textContent = t('darkMode');
+          searchBarEl.placeholder = t('searchPlaceholder');
+          const chaptersTitleEl = document.getElementById('chapters-title');
+          if (chaptersTitleEl) chaptersTitleEl.textContent = t('chapters');
+          const darkModeLabelEl = document.getElementById('dark-mode-label');
+          if (darkModeLabelEl) darkModeLabelEl.textContent = t('darkMode');
 
-  // Boutons + label de chargement
-  if (saveDataButtonEl) saveDataButtonEl.innerHTML = `<i class="fas fa-save mr-2"></i>${t('save')}`;
-  const loadLabelTextEl = document.getElementById('load-data-label-text');
-  if (loadLabelTextEl) loadLabelTextEl.textContent = t('load');
+          if (saveDataButtonEl) saveDataButtonEl.innerHTML = `<i class="fas fa-save mr-2"></i>${t('save')}`;
+          const loadLabelTextEl = document.getElementById('load-data-label-text');
+          if (loadLabelTextEl) loadLabelTextEl.textContent = t('load');
 
-  const resetTitleEl = document.getElementById('reset-title');
-  if (resetTitleEl) resetTitleEl.textContent = t('reset');
-  if (resetDataButtonEl) resetDataButtonEl.innerHTML = `<i class="fas fa-undo mr-2"></i>${t('resetSelection')}`;
+          const resetTitleEl = document.getElementById('reset-title');
+          if (resetTitleEl) resetTitleEl.textContent = t('reset');
+          if (resetDataButtonEl) resetDataButtonEl.innerHTML = `<i class="fas fa-undo mr-2"></i>${t('resetSelection')}`;
 
-  if (reverseModeButtonEl) {
-    reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
-  }
+          if (reverseModeButtonEl) {
+            reverseModeButtonEl.innerHTML = `<i class="fas fa-exchange-alt mr-2"></i>${t('reverseButton')}`;
+          }
 
-  // Thèmes
-  const themesTitleEl = document.getElementById('themes-title');
-  if (themesTitleEl) themesTitleEl.textContent = t('themes');
- if (themeSelectorEl) {
-  Array.from(themeSelectorEl.options).forEach(opt => {
-    if (opt.value === 'default') opt.textContent = t('themeDefault');
-    if (opt.value === 'pastel') opt.textContent = t('themePastel');
-  });
-}
+          const themesTitleEl = document.getElementById('themes-title');
+          if (themesTitleEl) themesTitleEl.textContent = t('themes');
+          if (themeSelectorEl) {
+            Array.from(themeSelectorEl.options).forEach(opt => {
+              if (opt.value === 'default') opt.textContent = t('themeDefault');
+              if (opt.value === 'pastel') opt.textContent = t('themePastel');
+            });
+          }
 
-  // Bouton de validation
-  submitAnswerButtonEl.textContent = t('submit');
+          submitAnswerButtonEl.textContent = t('submit');
 
-  // Re-rendre les chapitres + options de reset (pour “Tout/All”)
-  renderChapterButtons();
-  renderResetOptions();
-}
+          renderChapterButtons();
+          renderResetOptions();
+          renderCurrentChapterLabel(); // MAJ label chapitre
+        }
+
         function renderTimer() {
             const hours = Math.floor(appState.elapsedSeconds / 3600).toString().padStart(2, '0');
             const minutes = Math.floor((appState.elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
@@ -1328,7 +1309,7 @@ function stopStarTwinkleLoop() {
             const viewedCount = Math.min(appState.currentIndex + 1, totalCardsInDeck);
 
             if (totalCardsInDeck === 0) {
-    progressTextEl.textContent = `${t('cardsViewed')}: 0 / 0`;
+                progressTextEl.textContent = `${t('cardsViewed')}: 0 / 0`;
                 progressPercentageEl.textContent = '0%';
                 progressBarFillEl.style.width = '0%';
                 return;
@@ -1351,7 +1332,6 @@ function stopStarTwinkleLoop() {
             return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
         }
 
-        // Optimisation: ne retire/ajoute que les classes de couleur nécessaires
         let lastCardColorClass = '';
         function applyScoreClass(newCls) {
             if (lastCardColorClass) {
@@ -1381,13 +1361,13 @@ function stopStarTwinkleLoop() {
 
             const card = appState.currentDeck[appState.currentIndex];
             cardFrenchWordEl.textContent = card.french;
-cardEnglishWordEl.textContent = card.english;
+            cardEnglishWordEl.textContent = card.english;
 
-const promptEl = appState.reverseMode ? cardEnglishWordEl : cardFrenchWordEl;
-const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+            const promptEl = appState.reverseMode ? cardEnglishWordEl : cardFrenchWordEl;
+            const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
 
-promptEl.classList.remove('hidden');
-translationEl.classList.add('hidden');
+            promptEl.classList.remove('hidden');
+            translationEl.classList.add('hidden');
             cardScoreEl.textContent = `${card.score}%`;
 
             const colorCls = getCardColorClasses(card.score);
@@ -1420,6 +1400,7 @@ translationEl.classList.add('hidden');
                 button.addEventListener('click', () => {
                     appState.currentChapter = chapterIdentifier;
                     loadDeckForChapter(chapterIdentifier);
+                    renderCurrentChapterLabel();
                     if (isMenuButton) toggleMenu(false);
                     updateActiveChapterButtonStates();
                 });
@@ -1447,7 +1428,7 @@ translationEl.classList.add('hidden');
                     }
 
                     const buttonFontFamily = getComputedStyle(document.body).fontFamily;
-button.style.fontFamily = buttonFontFamily;
+                    button.style.fontFamily = buttonFontFamily;
                 });
             };
             updateButtons(menuChaptersContainerEl);
@@ -1482,6 +1463,7 @@ button.style.fontFamily = buttonFontFamily;
             appState.currentIndex = 0;
             appState.seenCountInSession = 0;
             shuffleAndSortDeck();
+            renderCurrentChapterLabel();
             updateActiveChapterButtonStates();
         }
 
@@ -1528,15 +1510,14 @@ button.style.fontFamily = buttonFontFamily;
                     card.score = scoreLevels[currentScoreIndex + 1];
                 }
             } else {
-    messageAreaEl.textContent = t('incorrect');
-    messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
-    if (currentScoreIndex > 0) {
-        card.score = scoreLevels[currentScoreIndex - 1];
-    }
-    // Affiche la bonne traduction selon le mode
-    const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
-    translationEl.classList.remove('hidden');
-}
+                messageAreaEl.textContent = t('incorrect');
+                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
+                if (currentScoreIndex > 0) {
+                    card.score = scoreLevels[currentScoreIndex - 1];
+                }
+                const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+                translationEl.classList.remove('hidden');
+            }
 
             const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
             if (masterCardIndex !== -1) {
@@ -1544,7 +1525,6 @@ button.style.fontFamily = buttonFontFamily;
             }
 
             cardScoreEl.textContent = `${card.score}%`;
-
             const colorCls = getCardColorClasses(card.score);
             applyScoreClass(colorCls);
 
@@ -1590,13 +1570,13 @@ button.style.fontFamily = buttonFontFamily;
 
         function saveData() {
             const dataToSave = {
-    allCards: appState.allCards,
-    elapsedSeconds: appState.elapsedSeconds,
-    currentChapter: appState.currentChapter,
-    darkMode: appState.darkMode,
-    currentTheme: appState.currentTheme,
-    reverseMode: appState.reverseMode // NEW
-};
+                allCards: appState.allCards,
+                elapsedSeconds: appState.elapsedSeconds,
+                currentChapter: appState.currentChapter,
+                darkMode: appState.darkMode,
+                currentTheme: appState.currentTheme,
+                reverseMode: appState.reverseMode
+            };
             const jsonData = JSON.stringify(dataToSave);
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1639,19 +1619,20 @@ button.style.fontFamily = buttonFontFamily;
                         localStorage.setItem('flashcardAppDarkMode', String(appState.darkMode));
 
                         appState.currentTheme = loadedData.currentTheme || 'default';
-if (appState.currentTheme === 'galaxy') appState.currentTheme = 'default'; // migration
-if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
-applyTheme(appState.currentTheme);
+                        if (appState.currentTheme === 'galaxy') appState.currentTheme = 'default';
+                        if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+                        applyTheme(appState.currentTheme);
 
-// NEW: restore reverseMode and update UI accordingly
-appState.reverseMode = !!loadedData.reverseMode;
-updateUIForReverseMode();
+                        appState.reverseMode = !!loadedData.reverseMode;
+                        updateUIForReverseMode();
 
-buildSearchIndex();
-renderTimer();
-loadDeckForChapter(appState.currentChapter);
-renderChapterButtons();
-renderResetOptions();
+                        buildSearchIndex();
+                        renderTimer();
+                        loadDeckForChapter(appState.currentChapter);
+                        renderChapterButtons();
+                        renderResetOptions();
+                        renderCurrentChapterLabel();
+
                         messageAreaEl.textContent = t('dataLoaded');
                         messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-green-500 dark:text-green-400';
                     } catch (error) {
@@ -1721,9 +1702,9 @@ renderResetOptions();
             }
 
             if (results.length === 0) {
-    searchResultsContainerEl.innerHTML = `<p class="p-2">${t('noResult')}</p>`;
-    return;
-}
+                searchResultsContainerEl.innerHTML = `<p class="p-2">${t('noResult')}</p>`;
+                return;
+            }
 
             const frag = document.createDocumentFragment();
             for (const card of results) {
@@ -1741,6 +1722,7 @@ renderResetOptions();
                     searchBarEl.value = '';
                     searchResultsContainerEl.innerHTML = '';
                     updateActiveChapterButtonStates();
+                    renderCurrentChapterLabel();
                 });
                 frag.appendChild(item);
             }
@@ -1749,20 +1731,20 @@ renderResetOptions();
 
         // --- EVENT LISTENERS ---
         flashcardContainerEl.addEventListener('click', () => {
-    if (appState.currentDeck.length === 0) return;
-    if (appState.readyToAdvanceOnClick) {
-        nextCard();
-        return;
-    }
-    const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
-    if (translationEl.classList.contains('hidden')) {
-        translationEl.classList.remove('hidden');
-        appState.isCardRevealedByClick = true;
-        appState.readyToAdvanceOnClick = true;
-        answerInputEl.disabled = true;
-        submitAnswerButtonEl.classList.add('hidden');
-    }
-});
+            if (appState.currentDeck.length === 0) return;
+            if (appState.readyToAdvanceOnClick) {
+                nextCard();
+                return;
+            }
+            const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+            if (translationEl.classList.contains('hidden')) {
+                translationEl.classList.remove('hidden');
+                appState.isCardRevealedByClick = true;
+                appState.readyToAdvanceOnClick = true;
+                answerInputEl.disabled = true;
+                submitAnswerButtonEl.classList.add('hidden');
+            }
+        });
 
         submitAnswerButtonEl.addEventListener('click', () => {
             if (answerInputEl.disabled) return;
@@ -1773,33 +1755,27 @@ renderResetOptions();
                 const userNormalized = userAnswer.replace(/\s+/g, ' ').trim().toLowerCase();
                 const correctNormalized = correctAnswerFull.replace(/\s+/g, ' ').trim().toLowerCase();
 
-                // Exact match
                 if (userNormalized === correctNormalized) return true;
 
-                // Alternatives "a / b"
                 if (correctNormalized.includes('/')) {
                     const alternatives = correctNormalized.split('/').map(alt => alt.trim());
                     if (alternatives.includes(userNormalized)) return true;
                 }
 
-                // Ignore articles
                 const articlesToIgnore = ['a', 'an', 'the', 'un', 'une', 'des', 'le', 'la', 'les', "l'"];
                 const userMainWords = userNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
                 const correctMainWords = correctNormalized.split(/\s+/).filter(word => !articlesToIgnore.includes(word)).join(' ');
                 if (userMainWords === correctMainWords && userMainWords.length > 0) return true;
 
-                // Hyphens vs spaces
                 const userNoHyphen = userNormalized.replace(/-/g, ' ');
                 const correctNoHyphen = correctNormalized.replace(/-/g, ' ');
                 if (userNoHyphen === correctNoHyphen) return true;
 
-                // Garde-fou: évite la Levenshtein coûteuse dans les cas improbables
                 const lenDiff = Math.abs(userNormalized.length - correctNormalized.length);
                 if (userNormalized.length < 4 || lenDiff > 3) {
                     return false;
                 }
 
-                // Similarité (Levenshtein normalisée)
                 function calculateSimilarity(str1, str2) {
                     if (!str1 || !str2) return 0;
                     const matrix = Array(str1.length + 1).fill(null).map(() =>
@@ -1825,8 +1801,8 @@ renderResetOptions();
             }
 
             const correctAnswerFull = (appState.reverseMode
-    ? appState.currentDeck[appState.currentIndex].french
-    : appState.currentDeck[appState.currentIndex].english).trim();
+                ? appState.currentDeck[appState.currentIndex].french
+                : appState.currentDeck[appState.currentIndex].english).trim();
             const isCorrect = validateAnswer(userAnswer, correctAnswerFull.toLowerCase());
             handleAnswer(isCorrect);
         });
@@ -1842,27 +1818,30 @@ renderResetOptions();
         });
 
         document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.activeElement !== answerInputEl && document.activeElement !== searchBarEl) {
-        e.preventDefault();
-        if (appState.readyToAdvanceOnClick) {
-            nextCard();
-        } else if (appState.currentDeck.length > 0) {
-            const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
-            if (translationEl.classList.contains('hidden')) {
-                translationEl.classList.remove('hidden');
-                appState.isCardRevealedByClick = true;
-                appState.readyToAdvanceOnClick = true;
-                answerInputEl.disabled = true;
-                submitAnswerButtonEl.classList.add('hidden');
+            if (e.key === 'Enter' && document.activeElement !== answerInputEl && document.activeElement !== searchBarEl) {
+                e.preventDefault();
+                if (appState.readyToAdvanceOnClick) {
+                    nextCard();
+                } else if (appState.currentDeck.length > 0) {
+                    const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+                    if (translationEl.classList.contains('hidden')) {
+                        translationEl.classList.remove('hidden');
+                        appState.isCardRevealedByClick = true;
+                        appState.readyToAdvanceOnClick = true;
+                        answerInputEl.disabled = true;
+                        submitAnswerButtonEl.classList.add('hidden');
+                    }
+                }
             }
-        }
-    }
-});
+        });
+
         reverseModeButtonEl.addEventListener('click', () => {
-    appState.reverseMode = !appState.reverseMode;
-    updateUIForReverseMode(); // bascule la langue + placeholders + titres + boutons
-    renderCard(false);
-});
+            appState.reverseMode = !appState.reverseMode;
+            updateUIForReverseMode();
+            renderCard(false);
+            renderCurrentChapterLabel();
+        });
+
         burgerButtonEl.addEventListener('click', () => toggleMenu(true));
         closeMenuButtonEl.addEventListener('click', () => toggleMenu(false));
         darkModeToggleEl.addEventListener('click', toggleDarkMode);
@@ -1888,6 +1867,53 @@ renderResetOptions();
             }
         });
 
+        // --- SWIPE MOBILE: ouvrir/fermer le menu ---
+let touchStartX = null;
+let touchStartY = null;
+
+const SWIPE_OPEN_MIN = 90;  // px à parcourir vers la droite pour ouvrir
+const SWIPE_CLOSE_MIN = 70; // px à parcourir vers la gauche pour fermer
+
+function isSmallScreen() {
+  return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+}
+
+function onTouchStart(e) {
+  if (!isSmallScreen() || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+}
+
+function onTouchEnd(e) {
+  if (!isSmallScreen() || touchStartX === null || e.changedTouches.length !== 1) {
+    touchStartX = touchStartY = null;
+    return;
+  }
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
+  const isHorizontal = absDx > absDy && absDx > 50;
+  const isMenuOpen = sidebarMenuEl.classList.contains('menu-slide-in');
+
+  if (isHorizontal) {
+    if (dx > 0 && absDx >= SWIPE_OPEN_MIN && !isMenuOpen) {
+      // Swipe droite: ouvrir
+      toggleMenu(true);
+    } else if (dx < 0 && absDx >= SWIPE_CLOSE_MIN && isMenuOpen) {
+      // Swipe gauche: fermer
+      toggleMenu(false);
+    }
+  }
+
+  touchStartX = touchStartY = null;
+}
+
+document.addEventListener('touchstart', onTouchStart, { passive: true });
+document.addEventListener('touchend', onTouchEnd, { passive: true });
+
         // --- INITIALIZATION ---
         function initializeApp() {
             const savedDarkModePreference = localStorage.getItem('flashcardAppDarkMode');
@@ -1902,28 +1928,27 @@ renderResetOptions();
             addThemesMenu();
 
             let savedTheme = localStorage.getItem('flashcardAppTheme') || 'default';
-// Migration: si "galaxy" était sauvegardé, revenir à "default"
-if (savedTheme === 'galaxy') savedTheme = 'default';
-appState.currentTheme = savedTheme;
-if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
+            if (savedTheme === 'galaxy') savedTheme = 'default';
+            appState.currentTheme = savedTheme;
+            if (themeSelectorEl) themeSelectorEl.value = appState.currentTheme;
 
-            // Données initiales (vocabulaire à remplacer par tes données complètes si besoin)
             appState.allCards = initialCardsData.map(c => ({ ...c }));
 
             buildSearchIndex();
-applyTheme(appState.currentTheme);
-updateUIForReverseMode(); // définit uiLang en fonction de reverseMode + MAJ UI
-updateLocalizedStaticTexts(); // garantit que tout le texte statique est sync
+            applyTheme(appState.currentTheme);
+            updateUIForReverseMode();
+            updateLocalizedStaticTexts();
 
-renderChapterButtons();
-renderResetOptions();
-loadDeckForChapter(appState.currentChapter);
-startTimer();
-renderTimer();
+            renderChapterButtons();
+            renderResetOptions();
+            loadDeckForChapter(appState.currentChapter);
+            renderCurrentChapterLabel();
+
+            startTimer();
+            renderTimer();
         }
 
         initializeApp();
-
     </script>
 </body>
 </html>
