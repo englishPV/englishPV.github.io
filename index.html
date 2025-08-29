@@ -1528,13 +1528,15 @@ button.style.fontFamily = buttonFontFamily;
                     card.score = scoreLevels[currentScoreIndex + 1];
                 }
             } else {
-                messageAreaEl.textContent = t('incorrect');
-                messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
-                if (currentScoreIndex > 0) {
-                    card.score = scoreLevels[currentScoreIndex - 1];
-                }
-                cardEnglishWordEl.classList.remove('hidden');
-            }
+    messageAreaEl.textContent = t('incorrect');
+    messageAreaEl.className = 'w-full text-center h-6 text-sm font-medium text-red-500 dark:text-red-400';
+    if (currentScoreIndex > 0) {
+        card.score = scoreLevels[currentScoreIndex - 1];
+    }
+    // Affiche la bonne traduction selon le mode
+    const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
+    translationEl.classList.remove('hidden');
+}
 
             const masterCardIndex = appState.allCards.findIndex(c => c.id === card.id);
             if (masterCardIndex !== -1) {
