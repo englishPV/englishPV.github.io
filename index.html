@@ -2238,7 +2238,7 @@
             submitAnswerButtonEl.disabled = false;
             submitAnswerButtonEl.classList.remove('hidden');
             submitAnswerButtonEl.textContent = 'Valider';
-            answerInputEl.focus();
+            answerInputEl.focus({ preventScroll: true });
             renderProgressBar();
 
             // Apply theme specific styles to the card
