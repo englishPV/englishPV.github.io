@@ -3005,6 +3005,19 @@
                 toggleMenu(false); // On ferme le menu
             }
         });
+        // Ajout : Fait défiler la vue pour garder la carte visible lorsque le clavier apparaît sur mobile
+        answerInputEl.addEventListener('focus', () => {
+            // On utilise un petit délai pour s'assurer que le clavier est bien apparu
+            // et que la taille de la fenêtre a été recalculée par le navigateur.
+            setTimeout(() => {
+                const mainContentArea = document.getElementById('main-content-area');
+                if (mainContentArea) {
+                    // Fait défiler la page pour que le HAUT de notre zone de contenu
+                    // soit aligné avec le HAUT de la zone visible.
+                    mainContentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300); // 300ms est une valeur sûre qui fonctionne sur la plupart des appareils.
+        });
         
         
         
