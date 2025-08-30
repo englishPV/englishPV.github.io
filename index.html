@@ -1676,6 +1676,14 @@
             const confirmReset = confirm(tr('resetConfirm', { chapter: chapterToReset }));
             if (!confirmReset) return;
 
+            // ### MODIFICATION START ###
+            // If it's a full reset (all chapters), reset the timer as well.
+            if (chapterToReset === 'Tout') {
+                appState.elapsedSeconds = 0;
+                renderTimer(); // Update the display immediately
+            }
+            // ### MODIFICATION END ###
+
             appState.allCards.forEach(card => {
                 if (chapterToReset === 'Tout' || card.chapter === chapterToReset) {
                     card.score = 50;
@@ -1700,6 +1708,7 @@
 
             autoSave(); // MODIFIED: auto-save after reset
         }
+
 
         // --- RECHERCHE: index + debounce ---
         function buildSearchIndex() {
