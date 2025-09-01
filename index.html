@@ -1047,6 +1047,7 @@
 
     ];
 
+
         const chapters = [
             { name: 'Democracy', emoji: '🏛️' },
             { name: 'Genetics', emoji: '🧬' },
@@ -1059,6 +1060,30 @@
             { name: 'Education', emoji: '🎓' }
         ];
         const scoreLevels = [0, 16, 33, 50, 66, 84, 100];
+
+        // ADDED: score spécial pour "révélée non répondue"
+        const REVEALED_UNANSWERED_SCORE = 49.999; // ADDED
+
+        // ADDED: format d'affichage du score (49.999 => 50%)
+        function formatScoreDisplay(score) { // ADDED
+            return score === REVEALED_UNANSWERED_SCORE ? '50%' : `${Math.round(score)}%`;
+        }
+
+        // ADDED: marquer une carte comme "révélée sans réponse" (49.999)
+        function markRevealedWithoutAnswer() { // ADDED
+            const card = appState.currentDeck[appState.currentIndex];
+            if (!card) return;
+
+            if (card.score === 50) {
+                card.score = REVEALED_UNANSWERED_SCORE;
+
+                const masterIdx = appState.allCards.findIndex(c => c.id === card.id);
+                if (masterIdx !== -1) appState.allCards[masterIdx].score = REVEALED_UNANSWERED_SCORE;
+
+                cardScoreEl.textContent = formatScoreDisplay(card.score);
+                applyScoreClass(getCardColorClasses(card.score));
+            }
+        }
 
         // --- UI SELECTORS ---
         const animatedBgElementsContainer = document.getElementById('animated-bg-elements');
@@ -1330,7 +1355,7 @@
             if (score === 0) return 'bg-red-500/80 text-white dark:bg-red-800/70 dark:text-red-100';
             if (score === 16) return 'bg-red-400/80 text-white dark:bg-red-700/70 dark:text-red-100';
             if (score === 33) return 'bg-orange-400/80 text-neutral-800 dark:bg-orange-600/70 dark:text-orange-100';
-            if (score === 50) return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral';
+            if (score === 50 || score === REVEALED_UNANSWERED_SCORE) return appState.darkMode ? 'dark-mode-card-neutral' : 'light-mode-card-neutral'; // MODIFIED
             if (score === 66) return 'bg-lime-400/80 text-neutral-800 dark:bg-lime-700/70 dark:text-lime-100';
             if (score === 84) return 'bg-green-500/80 text-white dark:bg-green-600/70 dark:text-green-100';
             if (score === 100) return 'bg-emerald-600/80 text-white dark:bg-emerald-700/70 dark:text-emerald-100';
@@ -1373,7 +1398,7 @@
 
             promptEl.classList.remove('hidden');
             translationEl.classList.add('hidden');
-            cardScoreEl.textContent = `${card.score}%`;
+            cardScoreEl.textContent = formatScoreDisplay(card.score); // MODIFIED
 
             const colorCls = getCardColorClasses(card.score);
             applyScoreClass(colorCls);
@@ -1505,7 +1530,7 @@
 
             let currentScoreIndex = scoreLevels.indexOf(card.score);
             if (currentScoreIndex === -1) {
-                card.score = 50;
+                card.score = 50; // REMETTRE AU PALIER STANDARD SI 49.999
                 currentScoreIndex = scoreLevels.indexOf(50);
             }
 
@@ -1530,7 +1555,7 @@
                 appState.allCards[masterCardIndex].score = card.score;
             }
 
-            cardScoreEl.textContent = `${card.score}%`;
+            cardScoreEl.textContent = formatScoreDisplay(card.score); // MODIFIED
             const colorCls = getCardColorClasses(card.score);
             applyScoreClass(colorCls);
 
@@ -1621,8 +1646,9 @@
             try {
                 const loadedData = JSON.parse(savedDataString);
                 
-                appState.allCards = (loadedData.allCards || initialCardsData).map(c => {
-                    const score = scoreLevels.includes(c.score) ? c.score : 50;
+                const allowedScores = new Set([...scoreLevels, REVEALED_UNANSWERED_SCORE]); // ADDED
+                appState.allCards = (loadedData.allCards || initialCardsData).map(c => { // MODIFIED
+                    const score = allowedScores.has(c.score) ? c.score : 50;
                     return { ...c, score };
                 });
                 appState.elapsedSeconds = loadedData.elapsedSeconds || 0;
@@ -1774,6 +1800,7 @@
             const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
             if (translationEl.classList.contains('hidden')) {
                 translationEl.classList.remove('hidden');
+                markRevealedWithoutAnswer(); // ADDED
                 appState.isCardRevealedByClick = true;
                 appState.readyToAdvanceOnClick = true;
                 answerInputEl.disabled = true;
@@ -1862,6 +1889,7 @@
                     const translationEl = appState.reverseMode ? cardFrenchWordEl : cardEnglishWordEl;
                     if (translationEl.classList.contains('hidden')) {
                         translationEl.classList.remove('hidden');
+                        markRevealedWithoutAnswer(); // ADDED
                         appState.isCardRevealedByClick = true;
                         appState.readyToAdvanceOnClick = true;
                         answerInputEl.disabled = true;
