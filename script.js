@@ -462,6 +462,38 @@ function saveData(){
   }catch(e){} 
 }
 function autoSave(){ clearTimeout(saveT); saveT=setTimeout(saveData,250); }
+{
+  const existingById = new Map((S.allCards || []).map(c => [String(c.id), c]));
+  let added = 0, updated = 0;
+
+  for (const raw of flashcardData) {
+    // id stable (soit fourni dans data.js, soit dérivé chapter+french)
+    const id = String(raw.id ?? `${raw.chapter}::${raw.french ?? raw.fr}`);
+    const incoming = upgradeCardModel({ ...raw, id });
+
+    const prev = existingById.get(id);
+    if (prev) {
+      // On garde les stats locales, on met à jour le contenu
+      prev.french  = incoming.french  ?? incoming.fr ?? prev.french;
+      prev.english = incoming.english ?? incoming.en ?? prev.english;
+      prev.chapter = incoming.chapter ?? prev.chapter;
+      updated++;
+    } else {
+      existingById.set(id, incoming);
+      added++;
+    }
+  }
+
+  // Option (décommenter si tu veux retirer les cartes supprimées de data.js)
+  // const keep = new Set(flashcardData.map(x => String(x.id ?? `${x.chapter}::${x.french ?? x.fr}`)));
+  // for (const id of [...existingById.keys()]) if (!keep.has(id)) existingById.delete(id);
+
+  S.allCards = Array.from(existingById.values());
+  S.availableChapters = ['Tout', ...Array.from(new Set(S.allCards.map(c => c.chapter)))];
+
+  if (added > 0) showMsg(`${added} nouveaux mots ajoutés ✨`, 'text-emerald-600', 3500);
+  autoSave();
+}
 function loadData(){
   const s=localStorage.getItem('flashcardAppData'); if(!s) return false;
   try{
