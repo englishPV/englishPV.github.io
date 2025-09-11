@@ -149,35 +149,33 @@ const maintenantEnMs = () => Date.now();
 const minutesEnMs = (m) => m * 60 * 1000;
 const joursEnMs = (d) => d * 24 * 60 * 60 * 1000;
 const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
-const dateISO = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dateISO = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const on = (element, event, handler) => element.addEventListener(event, handler);
 
 function afficherMessage(texte, classeCss, duree = 1600) {
-    elementsDOM.zoneMessage.textContent = texte;
-    elementsDOM.zoneMessage.className = `w-full text-center h-6 text-sm font-medium ${classeCss || ''}`;
-    if (duree) {
-        setTimeout(() => {
-            if (elementsDOM.zoneMessage.textContent === texte) {
-                elementsDOM.zoneMessage.textContent = '';
-            }
-        }, duree);
-    }
+  elementsDOM.zoneMessage.textContent = texte;
+  elementsDOM.zoneMessage.className = `w-full text-center h-6 text-sm font-medium ${classeCss || ''}`;
+  if (duree) {
+    setTimeout(() => {
+      if (elementsDOM.zoneMessage.textContent === texte) elementsDOM.zoneMessage.textContent = '';
+    }, duree);
+  }
 }
 
 function mettreAJourMinuteur() {
-    const s = etatApplication.secondesEcoulees;
-    const h = String(Math.floor(s / 3600)).padStart(2, '0');
-    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-    const sec = String(s % 60).padStart(2, '0');
-    elementsDOM.minuteur.textContent = `${h}:${m}:${sec}`;
+  const s = etatApplication.secondesEcoulees;
+  const h = String(Math.floor(s / 3600)).padStart(2, '0');
+  const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+  const sec = String(s % 60).padStart(2, '0');
+  elementsDOM.minuteur.textContent = `${h}:${m}:${sec}`;
 }
-
 function formaterIntervalle(ms) {
-    if (ms < 60000) return `${Math.max(1, Math.round(ms / 10000) * 10)}s`;
-    if (ms < 3600000) return `${Math.round(ms / 60000)}m`;
-    if (ms < 86400000) return `${Math.round(ms / 3600000)}h`;
-    const jours = Math.round(ms / 86400000);
-    return jours < 30 ? `${jours}j` : `${Math.round(jours / 30)}mo`;
+  if (ms < 60000) return `${Math.max(1, Math.round(ms / 10000) * 10)}s`;
+  if (ms < 3600000) return `${Math.round(ms / 60000)}m`;
+  if (ms < 86400000) return `${Math.round(ms / 3600000)}h`;
+  const jours = Math.round(ms / 86400000);
+  return jours < 30 ? `${jours}j` : `${Math.round(jours / 30)}mo`;
 }
 
 function mettreAJourBarreProgression() {
@@ -233,10 +231,10 @@ function calculerOverduenessRelative(carte, maintenant) {
 }
 
 function obtenirCleNote(carte) {
-    if (parametresSRS.proprieteCleNote && carte[parametresSRS.proprieteCleNote]) {
-        return String(carte[parametresSRS.proprieteCleNote]);
-    }
-    return `${(carte.french || '').toLowerCase()}::${(carte.english || '').toLowerCase()}`;
+  if (parametresSRS.proprieteCleNote && carte[parametresSRS.proprieteCleNote]) {
+    return String(carte[parametresSRS.proprieteCleNote]);
+  }
+  return `${(carte.french || '').toLowerCase()}::${(carte.english || '').toLowerCase()}`;
 }
 
 function finDeJourneeMs() {
@@ -613,18 +611,18 @@ function trouverTousLesChapitres() {
 }
 
 function afficherBoutonsChapitres() {
-    const fragment = document.createDocumentFragment();
-    for (const nom of etatApplication.chapitresDisponibles) {
-        const bouton = document.createElement('button');
-        bouton.dataset.chapter = nom;
-        const emoji = nom === 'Tout' ? '📚' : (CHAPTER_EMOJIS[nom] || '📘');
-        bouton.innerHTML = `${emoji} ${nom}`;
-        bouton.className = 'p-2 sm:p-3 rounded-lg shadow font-medium text-xs sm:text-sm transition-all duration-200 ease-in-out hover:opacity-80 w-full truncate chapter-button-default';
-        fragment.appendChild(bouton);
-    }
-    elementsDOM.listeChapitresMenu.innerHTML = '';
-    elementsDOM.listeChapitresMenu.appendChild(fragment);
-    mettreAJourBoutonsChapitreActif();
+  const fragment = document.createDocumentFragment();
+  for (const nom of etatApplication.chapitresDisponibles) {
+    const bouton = document.createElement('button');
+    bouton.dataset.chapter = nom;
+    const emoji = nom === 'Tout' ? '📚' : (CHAPTER_EMOJIS[nom] || '📘');
+    bouton.innerHTML = `${emoji} ${nom}`;
+    bouton.className = 'p-2 sm:p-3 rounded-lg shadow font-medium text-xs sm:text-sm transition-all duration-200 ease-in-out hover:opacity-80 w-full truncate chapter-button-default';
+    fragment.appendChild(bouton);
+  }
+  elementsDOM.listeChapitresMenu.innerHTML = '';
+  elementsDOM.listeChapitresMenu.appendChild(fragment);
+  mettreAJourBoutonsChapitreActif();
 }
 
 function mettreAJourBoutonsChapitreActif() {
@@ -635,7 +633,9 @@ function mettreAJourBoutonsChapitreActif() {
 }
 
 function afficherOptionsDeReset() {
-    elementsDOM.selecteurReset.innerHTML = etatApplication.chapitresDisponibles.map(n => `<option value="${n}">${n}</option>`).join('');
+  elementsDOM.selecteurReset.innerHTML = etatApplication.chapitresDisponibles
+    .map(n => `<option value="${n}">${n}</option>`)
+    .join('');
 }
 
 
@@ -644,11 +644,13 @@ function afficherOptionsDeReset() {
 // ===================================================================================
 
 function mettreAJourScoreCarteUI(nouveauPct, ancienPct) {
-    const aUnAncienScore = Number.isFinite(ancienPct);
-    const delta = aUnAncienScore ? (nouveauPct - ancienPct) : null;
-    const signe = (delta != null) ? (delta >= 0 ? '+' : '−') : '';
-    const abs = (delta != null) ? Math.abs(delta) : null;
-    elementsDOM.scoreCarte.textContent = aUnAncienScore ? `${nouveauPct}% (${signe}${abs})` : `${nouveauPct}%`;
+  const aUnAncienScore = Number.isFinite(ancienPct);
+  const delta = aUnAncienScore ? (nouveauPct - ancienPct) : null;
+  const signe = (delta != null) ? (delta >= 0 ? '+' : '−') : '';
+  const abs = (delta != null) ? Math.abs(delta) : null;
+  elementsDOM.scoreCarte.textContent = aUnAncienScore
+    ? `${nouveauPct}% (${signe}${abs})`
+    : `${nouveauPct}%`;
 }
 
 function afficherCarte(mettreFocus = true) {
