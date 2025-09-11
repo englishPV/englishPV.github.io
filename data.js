@@ -1,6 +1,6 @@
 // Fichier: data.js
 
-const CD="Democracy", CG="Genetics", CI="Immigration", CIT="Relations internationales", CU="Travail", CR="Crime";
+const CD = "Democracy", CG = "Genetics", CI = "Immigration", CIT = "Relations internationales", CU = "Travail", CR = "Crime";
 
 export const CHAPTER_EMOJIS = {
   [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️',
@@ -789,11 +789,15 @@ const cardsRawText = `
 `;
 
 // On transforme le texte brut en un tableau d'objets utilisable
-export const flashcardData = cardsRawText.trim().split('\n').map(l => {
-  const parts = l.split('|');
-  if (parts.length === 4) {
-    const [id, f, e, c] = parts;
-    return { id: id.trim(), french: f.trim(), english: e.trim(), chapter: c.trim() };
-  }
-  return null; // Gère les lignes vides ou mal formatées
-}).filter(Boolean); // Retire les entrées nulles
+export const flashcardData = cardsRawText
+  .trim()
+  .split(/\r?\n/)
+  .map(l => {
+    const parts = l.split('|');
+    if (parts.length === 4) {
+      const [id, f, e, c] = parts;
+      return { id: id.trim(), french: f.trim(), english: e.trim(), chapter: c.trim() };
+    }
+    return null;
+  })
+  .filter(Boolean);
