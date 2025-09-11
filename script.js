@@ -623,14 +623,28 @@ function loadNextCard() {
         return;
     }
 
-    // On vide la saisie ici (nouvelle carte uniquement)
+    // Nouvelle carte: réinitialiser la saisie
     els.answerInput.value = '';
-    els.submitAnswerButton.disabled = false;
     els.answerInput.disabled = false;
+    els.submitAnswerButton.disabled = false;
 
     const card = App.cards.get(id);
     App.session.recentlyShown.push(id);
     renderCard(card);
+
+    // Focus + sélection automatique de la barre d’entrée
+    try {
+        els.answerInput.focus({ preventScroll: true });
+        els.answerInput.select();
+    } catch {}
+    // Fallback à la frame suivante (pour être sûr que la sélection s’affiche)
+    requestAnimationFrame(() => {
+        try {
+            els.answerInput.focus({ preventScroll: true });
+            els.answerInput.select();
+        } catch {}
+    });
+
     updateProgress();
 }
 function renderSessionDone() {
