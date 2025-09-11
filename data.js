@@ -1,3 +1,5 @@
+// Fichier: data.js
+
 // Catégories déclarées (pour supporter ${...} dans les données)
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="Relations internationales", CU="Travail", CR="Crime";
 
@@ -698,94 +700,94 @@ const cardsRawText = `
 687|minimally supervised|lightly monitored|Politique
 688|crime, criminality|la criminalité|${CR}
 689|the crime rate|le taux de criminalité|${CR}
-  690|organized crime|la criminalité organisée, le grand banditisme|${CR}
-  691|white-collar crime|la criminalité en col blanc|${CR}
-  692|juvenile delinquency|la délinquance juvénile|${CR}
-  693|a juvenile delinquent, a young offender|un délinquant juvénile|${CR}
-  694|petty crime|la petite délinquance|${CR}
-  695|a crime, a felony|un crime|${CR}
-  696|to commit a crime|commettre un crime|${CR}
-  697|a criminal, a felon|un criminel|${CR}
-  698|a criminal record|un casier judiciaire|${CR}
-  699|an offense|un délit, une infraction|${CR}
-  700|a misdemeanour|une infraction (GB), un délit (US)|${CR}
-  701|an offender|un délinquant, un contrevenant|${CR}
-  702|a repeat offender, a recidivist|un récidiviste|${CR}
-  703|murder|le meurtre|${CR}
-  704|a murderer|un meurtrier|${CR}
-  705|manslaughter|homicide|${CR}
-  706|a serial killer|un tueur en série|${CR}
-  707|theft|le vol|${CR}
-  708|a thief, a robber|un voleur|${CR}
-  709|to steal a watch|voler une montre|${CR}
-  710|to rob sb of sth|voler qch à qn|${CR}
-  711|rape|le viol|${CR}
-  712|armed robbery|vol à main armée|${CR}
-  713|a burglary|un cambriolage|${CR}
-  714|to mug sb, to attack sb|agresser qn|${CR}
-  715|money-laundering|le blanchiment d’argent|${CR}
-  716|to break a law|enfreindre une loi|${CR}
-  717|lawful / unlawful|légal / illégal|${CR}
-  718|a lawbreaker|un délinquant, une personne qui enfreint la loi|${CR}
-  719|wrongdoing|des méfaits|${CR}
-  720|a wrongdoer|un malfaiteur|${CR}
-  721|to flout the law|se moquer de la loi|${CR}
-  722|a no-go area|une zone de non-droit|${CR}
-  723|to obey the law|obéir à la loi|${CR}
-  724|to abide by the law|respecter la loi|${CR}
-  725|a law-abiding citizen|un citoyen respectueux des lois|${CR}
-  726|the justice system|la justice|${CR}
-  727|a court, a court of law|un tribunal|${CR}
-  728|a judge|un juge|${CR}
-  729|a lawyer, a barrister (GB), an attorney (US)|un avocat|${CR}
-  730|the jury|le jury|${CR}
-  731|to prosecute sb|poursuivre qn (en justice)|${CR}
-  732|to bring a lawsuit against sb, sue sb|intenter un procès à qn, engager des poursuites contre qn|${CR}
-  733|the prosecutor|le procureur|${CR}
-  734|a suspect|un suspect|${CR}
-  735|to charge sb with murder|accuser, inculper qn de meurtre|${CR}
-  736|a charge|une accusation, un chef d’inculpation|${CR}
-  737|to confess to a crime|avouer un crime|${CR}
-  738|to confess to embezzling money|avouer avoir détourné de l’argent|${CR}
-  739|confession|un aveu|${CR}
-  740|a defendant|un accusé, un prévenu|${CR}
-  741|a witness / an eye witness|un témoin / un témoin oculaire|${CR}
-  742|a case|une affaire|${CR}
-  743|a trial|un procès|${CR}
-  744|to be tried, stand trial|passer en jugement, être jugé|${CR}
-  745|to await trial|être en attente de jugement|${CR}
-  746|the principle that a defendant is innocent until proven guilty|la présomption d’innocence|${CR}
-  747|forensic evidence|preuves relevées lors d’une expertise|${CR}
-  748|a culprit|un coupable|${CR}
-  749|to acquit sb|acquitter qn|${CR}
-  750|acquittal|acquittement|${CR}
-  751|to find sb guilty|condamner qn, reconnaître qn coupable|${CR}
-  752|to convict sb of rape, murder|reconnaître qn coupable de viol, meurtre|${CR}
-  753|a conviction|une condamnation|${CR}
-  754|a fine|une amende|${CR}
-  755|to fine sb for sth|condamner qn à une amende pour qch|${CR}
-  756|to be sentenced to five years’ imprisonment, five years in jail|être condamné à cinq ans de prison|${CR}
-  757|a death sentence|une condamnation à mort|${CR}
-  758|a life sentence|une condamnation à perpétuité|${CR}
-  759|a suspended sentence|une condamnation avec sursis|${CR}
-  760|to be sent to prison|être mis en prison|${CR}
-  761|to incarcerate, to imprison sb|incarcérer qn|${CR}
-  762|the incarceration rate|le taux d’incarcération|${CR}
-  763|a cell|une cellule|${CR}
-  764|a prisoner, an inmate, a detainee|un détenu, un prisonnier|${CR}
-  765|a prison officer, a prison warder (GB)|un gardien de prison|${CR}
-  766|a high-security prison|une prison de haute sécurité|${CR}
-  767|solitary confinement|l’isolement carcéral|${CR}
-  768|prison overcrowding|la surpopulation carcérale|${CR}
-  769|a miscarriage of justice|une erreur judiciaire|${CR}
-  770|to fabricate evidence|fabriquer des preuves|${CR}
-  771|to be proved innocent, to be exonerated|être innocenté|${CR}
-  772|to free, to release a prisoner|libérer, relâcher un prisonnier|${CR}
-  773|to pardon a convict|grâcier un condamné|${CR}
-  774|to parole sb|mettre qn en liberté conditionnelle|${CR}
-  775|to be on parole|être en liberté conditionnelle|${CR}
-  776|to report to the police|se présenter à la police|${CR}
-  777|an electronic tag|un bracelet de surveillance électronique|${CR}
+690|organized crime|la criminalité organisée, le grand banditisme|${CR}
+691|white-collar crime|la criminalité en col blanc|${CR}
+692|juvenile delinquency|la délinquance juvénile|${CR}
+693|a juvenile delinquent, a young offender|un délinquant juvénile|${CR}
+694|petty crime|la petite délinquance|${CR}
+695|a crime, a felony|un crime|${CR}
+696|to commit a crime|commettre un crime|${CR}
+697|a criminal, a felon|un criminel|${CR}
+698|a criminal record|un casier judiciaire|${CR}
+699|an offense|un délit, une infraction|${CR}
+700|a misdemeanour|une infraction (GB), un délit (US)|${CR}
+701|an offender|un délinquant, un contrevenant|${CR}
+702|a repeat offender, a recidivist|un récidiviste|${CR}
+703|murder|le meurtre|${CR}
+704|a murderer|un meurtrier|${CR}
+705|manslaughter|homicide|${CR}
+706|a serial killer|un tueur en série|${CR}
+707|theft|le vol|${CR}
+708|a thief, a robber|un voleur|${CR}
+709|to steal a watch|voler une montre|${CR}
+710|to rob sb of sth|voler qch à qn|${CR}
+711|rape|le viol|${CR}
+712|armed robbery|vol à main armée|${CR}
+713|a burglary|un cambriolage|${CR}
+714|to mug sb, to attack sb|agresser qn|${CR}
+715|money-laundering|le blanchiment d’argent|${CR}
+716|to break a law|enfreindre une loi|${CR}
+717|lawful / unlawful|légal / illégal|${CR}
+718|a lawbreaker|un délinquant, une personne qui enfreint la loi|${CR}
+719|wrongdoing|des méfaits|${CR}
+720|a wrongdoer|un malfaiteur|${CR}
+721|to flout the law|se moquer de la loi|${CR}
+722|a no-go area|une zone de non-droit|${CR}
+723|to obey the law|obéir à la loi|${CR}
+724|to abide by the law|respecter la loi|${CR}
+725|a law-abiding citizen|un citoyen respectueux des lois|${CR}
+726|the justice system|la justice|${CR}
+727|a court, a court of law|un tribunal|${CR}
+728|a judge|un juge|${CR}
+729|a lawyer, a barrister (GB), an attorney (US)|un avocat|${CR}
+730|the jury|le jury|${CR}
+731|to prosecute sb|poursuivre qn (en justice)|${CR}
+732|to bring a lawsuit against sb, sue sb|intenter un procès à qn, engager des poursuites contre qn|${CR}
+733|the prosecutor|le procureur|${CR}
+734|a suspect|un suspect|${CR}
+735|to charge sb with murder|accuser, inculper qn de meurtre|${CR}
+736|a charge|une accusation, un chef d’inculpation|${CR}
+737|to confess to a crime|avouer un crime|${CR}
+738|to confess to embezzling money|avouer avoir détourné de l’argent|${CR}
+739|confession|un aveu|${CR}
+740|a defendant|un accusé, un prévenu|${CR}
+741|a witness / an eye witness|un témoin / un témoin oculaire|${CR}
+742|a case|une affaire|${CR}
+743|a trial|un procès|${CR}
+744|to be tried, stand trial|passer en jugement, être jugé|${CR}
+745|to await trial|être en attente de jugement|${CR}
+746|the principle that a defendant is innocent until proven guilty|la présomption d’innocence|${CR}
+747|forensic evidence|preuves relevées lors d’une expertise|${CR}
+748|a culprit|un coupable|${CR}
+749|to acquit sb|acquitter qn|${CR}
+750|acquittal|acquittement|${CR}
+751|to find sb guilty|condamner qn, reconnaître qn coupable|${CR}
+752|to convict sb of rape, murder|reconnaître qn coupable de viol, meurtre|${CR}
+753|a conviction|une condamnation|${CR}
+754|a fine|une amende|${CR}
+755|to fine sb for sth|condamner qn à une amende pour qch|${CR}
+756|to be sentenced to five years’ imprisonment, five years in jail|être condamné à cinq ans de prison|${CR}
+757|a death sentence|une condamnation à mort|${CR}
+758|a life sentence|une condamnation à perpétuité|${CR}
+759|a suspended sentence|une condamnation avec sursis|${CR}
+760|to be sent to prison|être mis en prison|${CR}
+761|to incarcerate, to imprison sb|incarcérer qn|${CR}
+762|the incarceration rate|le taux d’incarcération|${CR}
+763|a cell|une cellule|${CR}
+764|a prisoner, an inmate, a detainee|un détenu, un prisonnier|${CR}
+765|a prison officer, a prison warder (GB)|un gardien de prison|${CR}
+766|a high-security prison|une prison de haute sécurité|${CR}
+767|solitary confinement|l’isolement carcéral|${CR}
+768|prison overcrowding|la surpopulation carcérale|${CR}
+769|a miscarriage of justice|une erreur judiciaire|${CR}
+770|to fabricate evidence|fabriquer des preuves|${CR}
+771|to be proved innocent, to be exonerated|être innocenté|${CR}
+772|to free, to release a prisoner|libérer, relâcher un prisonnier|${CR}
+773|to pardon a convict|grâcier un condamné|${CR}
+774|to parole sb|mettre qn en liberté conditionnelle|${CR}
+775|to be on parole|être en liberté conditionnelle|${CR}
+776|to report to the police|se présenter à la police|${CR}
+777|an electronic tag|un bracelet de surveillance électronique|${CR}
 `;
 
 // On transforme le texte brut en un tableau d'objets utilisable
@@ -793,3 +795,80 @@ export const flashcardData = cardsRawText.trim().split('\n').map(l => {
   const [id, f, e, c] = l.split('|');
   return { id, french: f, english: e, chapter: c };
 });
+// Fichier : fsrs-helper.js
+
+// La bibliothèque FSRS a été chargée par la balise <script> dans l'HTML.
+// Elle est maintenant disponible globalement via l'objet `window.fsrs`.
+const { FSRS, Rating } = window.fsrs;
+
+// Paramètres FSRS par défaut, alignés sur votre recherche.
+// La cible de rétention (request_retention) est le paramètre le plus important.
+const fsrs_params = {
+  request_retention: 0.9, // Cible une probabilité de rappel de 90%
+  maximum_interval: 36500,
+  w: [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61],
+};
+
+const scheduler = new FSRS(fsrs_params);
+
+/**
+ * Calcule la probabilité de rappel actuelle d'une carte (Retrievability).
+ * @param {object} card - La carte avec les propriétés FSRS (stability, last_review).
+ * @returns {number} - Une probabilité entre 0 et 1.
+ */
+export function getRetrievability(card) {
+  if (!card || card.state !== 2 /* Review */ || !card.stability || !card.last_review) {
+    return 1.0; // Les nouvelles cartes ou cartes en apprentissage ont une R de 1
+  }
+  const now = new Date();
+  const lastReviewDate = new Date(card.last_review);
+  const elapsedDays = (now.getTime() - lastReviewDate.getTime()) / (1000 * 60 * 60 * 24);
+  
+  // Formule de la courbe d'oubli de FSRS
+  const retrievability = Math.pow(1 + elapsedDays / (9 * card.stability), -1);
+  return retrievability;
+}
+
+/**
+ * Planifie la prochaine révision d'une carte en utilisant FSRS.
+ * @param {object} card - La carte à planifier.
+ * @param {number} rating - L'évaluation de l'utilisateur (1:Again, 2:Hard, 3:Good, 4:Easy).
+ * @returns {object} - La carte mise à jour avec les nouvelles valeurs FSRS.
+ */
+export function scheduleCard(card, rating) {
+    const now = new Date();
+    // FSRS attend un objet 'Card' spécifique. Nous le créons à la volée.
+    const fsrsCard = {
+        due: card.due ? new Date(card.due) : now,
+        stability: card.stability || 0,
+        difficulty: card.difficulty || 0,
+        elapsed_days: card.elapsed_days || 0,
+        scheduled_days: card.scheduled_days || 0,
+        reps: card.reps || 0,
+        lapses: card.lapses || 0,
+        state: card.state || 0, // 0:New, 1:Learning, 2:Review, 3:Relearning
+        last_review: card.last_review ? new Date(card.last_review) : null,
+    };
+
+    // La magie de FSRS opère ici
+    const scheduling_result = scheduler.repeat(fsrsCard, now);
+    
+    // FSRS retourne les états possibles pour chaque évaluation.
+    // Nous sélectionnons celui qui correspond à l'évaluation de l'utilisateur.
+    const ratingMap = { 1: Rating.Again, 2: Rating.Hard, 3: Rating.Good, 4: Rating.Easy };
+    const selected_rating = ratingMap[rating];
+    const new_card_state = scheduling_result[selected_rating];
+
+    // Mettre à jour notre objet carte avec les nouvelles valeurs
+    card.due = new_card_state.card.due;
+    card.stability = new_card_state.card.stability;
+    card.difficulty = new_card_state.card.difficulty;
+    card.elapsed_days = new_card_state.card.elapsed_days;
+    card.scheduled_days = new_card_state.card.scheduled_days;
+    card.reps = new_card_state.card.reps;
+    card.lapses = new_card_state.card.lapses;
+    card.state = new_card_state.card.state;
+    card.last_review = new_card_state.card.last_review;
+
+    return card;
+}
