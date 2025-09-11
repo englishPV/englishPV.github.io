@@ -3,31 +3,32 @@ import { flashcardData, CHAPTER_EMOJIS } from './data.js';
 // Utils & état
 const $=id=>document.getElementById(id);
 const on=(el,ev,fn,opt)=>el&&el.addEventListener(ev,fn,opt||false);
-const DAY_MS=86400000, MIN_MS=60000, HOUR_MS=3600000;
+const DAY_MS=86400000, MIN_MS=60000;
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const nowMs=()=>Date.now();
 const isoDate=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
-// SRS config (espacement adaptatif + Leitner)
-const SRS_CFG={
-  startEase:2.3, minEase:1.3, maxEase:3.5,
-  hardMult:1.2, easyBonus:1.15,
-  easeAdj:{again:-0.25,hard:-0.15,good:+0.05,easy:+0.15},
-  newStepsMin:[1,10],             // minutes (nouvelle carte)
-  relearnStepsMin:[10,1440],      // minutes (réapprentissage après oubli)
-  graduatingIvlDays:1,            // interval initial après apprentissage
-  lapseResetFactor:0.5,           // réduction d'intervalle après oubli
-  // Leitner: bornes d’intervalle par boîte (en jours)
-  boxBounds:{
-    1:{min:0.08,max:1},   // 2h -> 1j
-    2:{min:2,max:4},      // 2 -> 4j
-    3:{min:5,max:12},     // 5 -> 12j
-    4:{min:15,max:45},    // 15 -> 45j
-    5:{min:45,max:120}    // 45 -> 120j
-  }
+// NOUVEAU: Configuration alignée sur l'algorithme Anki (variante SM-2)
+const ANKI_CFG={
+  startEase: 2.50,          // Aisance initiale (correspond à 250% dans Anki)
+  minEase: 1.30,            // Plancher d'aisance minimal
+  easyBonus: 1.30,          // Multiplicateur bonus pour la réponse "Facile"
+  intervalModifier: 1.0,    // Modificateur global d'intervalle (1.0 = 100%)
+  hardIntervalFactor: 1.2,  // Facteur pour "Difficile" sur une carte en révision
+
+  // Étapes d'apprentissage (en minutes)
+  newSteps: [1, 10],        // Étapes pour les nouvelles cartes
+  relearnSteps: [10],       // Étapes après un oubli
+
+  // Intervalles de graduation (en jours)
+  graduatingInterval: 1,    // Intervalle quand une carte passe de "learning" à "review"
+  easyInterval: 4,          // Intervalle si "Facile" est choisi sur une carte "learning"
+  lapseIntervalFactor: 0.0, // Facteur de l'ancien intervalle après un oubli (0 = reset complet)
 };
 
-const GradeNames={1:'again',2:'hard',3:'good',4:'easy'};
+const Grade = { AGAIN: 1, HARD: 2, GOOD: 3, EASY: 4 };
+const GradeNames = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' };
+
 const FAST_CHAR_MS=180, AUTO_ADVANCE_MS=120;
 
 const S={
@@ -38,9 +39,8 @@ const S={
   isRevealed:false, awaitingGrade:false, awaitingAdvance:false,
   dailyHistory:{}, sessionNewShown:0, seenCountInSession:0,
   searchIndex:[],
-  adaptiveScheduler:null, // hook IA optionnel
-  // Cycle unique par chapitre
-  cycle: { chapter:'Tout', seen:{} } // seen: { [cardId]: true }
+  // La logique de cycle est conservée pour ne pas revoir une carte dans la même session
+  cycle: { chapter:'Tout', seen:{} }
 };
 
 const els={
@@ -57,7 +57,7 @@ const els={
   statsContent:$('stats-content'), sparkline:$('sparkline'), sparkPath:$('sparkline-path'), sparkFill:$('sparkline-fill'), sparkLast:$('sparkline-last'), chartLegend:$('chart-legend'), chartTitle:$('chart-title')
 };
 
-// UI helpers
+// UI helpers (inchangés)
 function showMsg(text,cls,timeout=1600){els.messageArea.textContent=text;els.messageArea.className='w-full text-center h-6 text-sm font-medium '+(cls||'');if(timeout){setTimeout(()=>{if(els.messageArea.textContent===text)els.messageArea.textContent=''},timeout)}}
 function renderTimer(){const s=S.elapsedSeconds,h=String(s/3600|0).padStart(2,'0'),m=String((s%3600)/60|0).padStart(2,'0'),sec=String(s%60).padStart(2,'0');els.timer.textContent=`${h}:${m}:${sec}`}
 function notSeenInCycleList(base){ return base.filter(c=>!S.cycle.seen[String(c.id)]) }
@@ -75,7 +75,6 @@ function setGradeBarVisible(v){els.gradeBar.classList.toggle('hidden',!v)}
 function applyNeutralCardStyle(){const el=els.flashcardContainer;el.classList.remove('light-mode-card-neutral','dark-mode-card-neutral');el.classList.add(S.darkMode?'dark-mode-card-neutral':'light-mode-card-neutral')}
 function minutesToMs(m){return m*MIN_MS} function daysToMs(d){return d*DAY_MS}
 function formatInterval(ms){if(ms<MIN_MS) return `${Math.max(1,Math.round(ms/1000/10)*10)}s`; if(ms<60*MIN_MS) return `${Math.round(ms/MIN_MS)}m`; if(ms<DAY_MS) return `${Math.round(ms/(60*MIN_MS))}h`; const d=Math.round(ms/DAY_MS); return d<30?`${d}j`:`${Math.round(d/30)}mo`}
-
 function setMenuOpen(open){
   els.sidebarMenu.classList.toggle('menu-slide-in',open);
   els.sidebarMenu.classList.toggle('menu-slide-out',!open);
@@ -84,165 +83,125 @@ function setMenuOpen(open){
   els.sidebarMenu.setAttribute('aria-hidden',String(!open));
   els.burgerButton.setAttribute('aria-expanded',String(!!open));
 }
-
 function setDarkMode(onMode){
   S.darkMode=!!onMode; document.body.classList.toggle('dark-mode',S.darkMode); document.body.classList.toggle('light-mode',!S.darkMode);
   els.darkModeToggle.innerHTML=S.darkMode?'☀':'🌙'; els.darkModeToggle.setAttribute('aria-pressed',String(S.darkMode));
   saveState();
 }
 
-// Leitner helpers
-function clampToBoxBounds(intervalDays, box){
-  const b=SRS_CFG.boxBounds[clamp(box,1,5)];
-  if(!b) return intervalDays;
-  return clamp(intervalDays, b.min, b.max);
-}
-function updateBox(prevBox, gName){
-  const delta = gName==='again'?-1 : gName==='hard'?0 : gName==='good'?1 : 2;
-  return clamp((prevBox||1)+delta,1,5);
-}
-function computeMasteryScore(c){
-  const box = Number.isFinite(c.box)?c.box:1;
-  const reps = Number.isFinite(c.reps)?c.reps:0;
-  const lapses = Number.isFinite(c.lapses)?c.lapses:0;
-  const base = 20*box + 10*Math.min(reps,5) - 15*lapses;
-  return clamp(Math.round(base),0,100);
-}
-function masteryCategory(score){
-  if(score<50) return 'À revoir souvent';
-  if(score<80) return 'En progression';
-  return 'Maîtrisé';
-}
+// SUPPRIMÉ: Les fonctions liées au système Leitner (box, masteryScore) sont retirées.
 
-// Modèle carte & scheduler
+// MODIFIÉ: Le modèle de carte est aligné sur celui d'Anki.
 function upgradeCardModel(c0){
-  const c={...c0};
-  c.ef=Number.isFinite(c.ef)?c.ef:SRS_CFG.startEase;
-  c.box=Number.isFinite(c.box)?c.box:1;
-  c.reps=Number.isFinite(c.reps)?c.reps:0;
-  c.lapses=Number.isFinite(c.lapses)?c.lapses:0;
+  const c = {...c0};
+  
+  // Champs principaux de l'algorithme Anki (SM-2)
+  c.ease = Number.isFinite(c.ease) ? c.ease : ANKI_CFG.startEase; // Facteur d'aisance (ex: 2.50)
+  c.interval = Number.isFinite(c.interval) ? c.interval : 0;     // Intervalle en jours
+  c.state = c.state || 'new';                                     // 'new', 'learning', 'review', 'relearning'
+  c.step = Number.isFinite(c.step) ? c.step : 0;                  // Index de l'étape d'apprentissage
+  
+  // Champs de statistiques Anki
+  c.lapses = Number.isFinite(c.lapses) ? c.lapses : 0;
+  c.reps = Number.isFinite(c.reps) ? c.reps : 0;
 
-  c.intervalDays=Number.isFinite(c.intervalDays)?c.intervalDays:0;
-  c.state=c.state||'new';
-  c.stepIndex=Number.isFinite(c.stepIndex)?c.stepIndex:0;
+  // Champs de suivi et de statistiques conservés de l'ancien système
+  c.nextDue = Number.isFinite(c.nextDue) ? c.nextDue : 0;
+  c.lastSeen = Number.isFinite(c.lastSeen) ? c.lastSeen : 0;
+  c.revCount = Number.isFinite(c.revCount) ? c.revCount : 0;
+  c.lastGrade = Number.isFinite(c.lastGrade) ? c.lastGrade : null;
+  c.lastScorePct = Number.isFinite(c.lastScorePct) ? c.lastScorePct : null;
+  c.totalTimeMs = Number.isFinite(c.totalTimeMs) ? c.totalTimeMs : 0;
+  c.lastLatency = Number.isFinite(c.lastLatency) ? c.lastLatency : 0;
 
-  c.revCount=Number.isFinite(c.revCount)?c.revCount:0;
-  c.okCount=Number.isFinite(c.okCount)?c.okCount:0;
-  c.totalTimeMs=Number.isFinite(c.totalTimeMs)?c.totalTimeMs:0;
-  c.lastScorePct=Number.isFinite(c.lastScorePct)?c.lastScorePct:null;
-  c.lastGrade=Number.isFinite(c.lastGrade)?c.lastGrade:null;
-  c.lastSeen=Number.isFinite(c.lastSeen)?c.lastSeen:0;
-  c.nextDue=Number.isFinite(c.nextDue)?c.nextDue:0;
-  c.lastLatency=Number.isFinite(c.lastLatency)?c.lastLatency:0;
-
-  c.masteryScore=Number.isFinite(c.masteryScore)?c.masteryScore:computeMasteryScore(c);
   return c;
 }
 
-function computeNextIntervalDaysReview(card, gName){
-  const prev = Math.max(card.intervalDays||1, 0.04);
-  if(gName==='hard')  return Math.max(1, Math.round(prev * SRS_CFG.hardMult));
-  if(gName==='good')  return Math.round(prev * (card.ef||SRS_CFG.startEase));
-  if(gName==='easy')  return Math.round(prev * ((card.ef||SRS_CFG.startEase) + 0.15));
-  return 0.25;
-}
+// NOUVEAU: Le planificateur de cartes basé sur l'algorithme SM-2 d'Anki.
+async function scheduleWithGrade(card, grade) {
+  const now = nowMs();
+  
+  // 1. Mettre à jour l'aisance
+  if (grade === Grade.AGAIN) {
+    card.ease = Math.max(ANKI_CFG.minEase, card.ease - 0.20);
+    card.lapses = (card.lapses || 0) + 1;
+  } else if (grade === Grade.HARD) {
+    card.ease = Math.max(ANKI_CFG.minEase, card.ease - 0.15);
+  } else if (grade === Grade.EASY) {
+    card.ease += 0.15;
+  }
+  // Pour "Good", l'aisance reste inchangée.
 
-async function scheduleWithGrade(card, grade){
-  const now=nowMs(); const gName=GradeNames[grade]||'good';
-  const before = {...card};
+  // 2. Traiter la carte en fonction de son état actuel
+  const state = card.state || 'new';
 
-  const deltaEase = SRS_CFG.easeAdj[gName]||0;
-  card.ef = clamp((card.ef||SRS_CFG.startEase)+deltaEase, SRS_CFG.minEase, SRS_CFG.maxEase);
-  card.box = updateBox(card.box||1, gName);
-
-  if(gName==='again'){ card.reps=0; card.lapses=(card.lapses||0)+1; }
-  else if(gName==='hard'){ card.reps = Math.max(1, (card.reps||0)); }
-  else { card.reps=(card.reps||0)+1; }
-
+  if (state === 'new' || state === 'learning') {
+    if (grade === Grade.AGAIN) {
+      card.state = 'learning';
+      card.step = 0; // Redémarre au début des étapes
+      card.nextDue = now + minutesToMs(ANKI_CFG.newSteps[0]);
+    } else if (grade === Grade.GOOD) {
+      const nextStep = (card.step || 0) + 1;
+      if (nextStep < ANKI_CFG.newSteps.length) {
+        card.state = 'learning';
+        card.step = nextStep;
+        card.nextDue = now + minutesToMs(ANKI_CFG.newSteps[nextStep]);
+      } else { // Graduation: la carte devient "review"
+        card.state = 'review';
+        card.interval = ANKI_CFG.graduatingInterval;
+        card.nextDue = now + daysToMs(card.interval);
+      }
+    } else { // HARD ou EASY
+      if (grade === Grade.EASY) { // Graduation immédiate avec un intervalle plus long
+        card.state = 'review';
+        card.interval = ANKI_CFG.easyInterval;
+        card.nextDue = now + daysToMs(card.interval);
+      } else { // HARD: répète l'étape actuelle
+        card.state = 'learning';
+        card.nextDue = now + minutesToMs(ANKI_CFG.newSteps[card.step || 0]);
+      }
+    }
+  } 
+  else if (state === 'review') {
+    if (grade === Grade.AGAIN) { // Oubli (Lapse): la carte passe en "relearning"
+      card.state = 'relearning';
+      card.step = 0;
+      card.interval = Math.max(1, Math.round(card.interval * ANKI_CFG.lapseIntervalFactor));
+      card.nextDue = now + minutesToMs(ANKI_CFG.relearnSteps[0]);
+    } else { // Révision réussie
+      let newInterval;
+      if (grade === Grade.HARD) {
+        newInterval = card.interval * ANKI_CFG.hardIntervalFactor;
+      } else if (grade === Grade.GOOD) {
+        newInterval = card.interval * card.ease;
+      } else { // EASY
+        newInterval = card.interval * card.ease * ANKI_CFG.easyBonus;
+      }
+      card.interval = Math.max(card.interval + 1, Math.round(newInterval * ANKI_CFG.intervalModifier));
+      card.nextDue = now + daysToMs(card.interval);
+    }
+  } 
+  else if (state === 'relearning') {
+    if (grade === Grade.AGAIN) { // Échec en réapprentissage
+      card.step = 0;
+      card.nextDue = now + minutesToMs(ANKI_CFG.relearnSteps[0]);
+    } else { // GOOD ou HARD: avance dans les étapes de réapprentissage
+      const nextStep = (card.step || 0) + 1;
+      if (nextStep < ANKI_CFG.relearnSteps.length) {
+        card.step = nextStep;
+        card.nextDue = now + minutesToMs(ANKI_CFG.relearnSteps[nextStep]);
+      } else { // Fin du réapprentissage: la carte redevient "review"
+        card.state = 'review';
+        card.nextDue = now + daysToMs(card.interval);
+      }
+    }
+  }
+  
   card.lastSeen = now;
-
-  if(card.state==='new' || card.state==='learning'){
-    if(gName==='again'){
-      card.state='learning';
-      card.stepIndex=0;
-      card.nextDue=now+minutesToMs(SRS_CFG.newStepsMin[0]);
-    } else if(gName==='hard'){
-      card.state='learning';
-      const idx = Math.max(0, card.stepIndex|0);
-      const step = SRS_CFG.newStepsMin[idx] ?? SRS_CFG.newStepsMin.at(-1);
-      card.stepIndex=idx;
-      card.nextDue=now+minutesToMs(step);
-    } else if(gName==='good'){
-      const nextIdx=(card.stepIndex|0)+1;
-      if(nextIdx < SRS_CFG.newStepsMin.length){
-        card.state='learning';
-        card.stepIndex=nextIdx;
-        card.nextDue=now+minutesToMs(SRS_CFG.newStepsMin[nextIdx]);
-      } else {
-        card.state='review';
-        card.intervalDays=SRS_CFG.graduatingIvlDays;
-        card.intervalDays = clampToBoxBounds(card.intervalDays, card.box);
-        card.nextDue=now+daysToMs(card.intervalDays);
-      }
-    } else if(gName==='easy'){
-      card.state='review';
-      const ivl = Math.max(1, Math.round(SRS_CFG.graduatingIvlDays * 3));
-      card.intervalDays = clampToBoxBounds(ivl, card.box);
-      card.nextDue=now+daysToMs(card.intervalDays);
-    }
-  } else if(card.state==='review'){
-    if(gName==='again'){
-      card.state='relearning';
-      card.stepIndex=0;
-      card.nextDue=now+minutesToMs(SRS_CFG.relearnStepsMin[0]);
-    } else {
-      let ivl = computeNextIntervalDaysReview(card, gName);
-      ivl = clampToBoxBounds(ivl, card.box);
-      card.intervalDays = ivl;
-      card.nextDue = now + daysToMs(ivl);
-    }
-  } else if(card.state==='relearning'){
-    if(gName==='again'){
-      card.stepIndex=0;
-      card.nextDue=now+minutesToMs(SRS_CFG.relearnStepsMin[0]);
-    } else if(gName==='hard'){
-      const idx=Math.max(0,card.stepIndex|0);
-      const step=SRS_CFG.relearnStepsMin[idx]??SRS_CFG.relearnStepsMin.at(-1);
-      card.stepIndex=idx;
-      card.nextDue=now+minutesToMs(step);
-    } else {
-      const nextIdx=(card.stepIndex|0)+1;
-      if(nextIdx < SRS_CFG.relearnStepsMin.length){
-        card.stepIndex=nextIdx;
-        card.nextDue=now+minutesToMs(SRS_CFG.relearnStepsMin[nextIdx]);
-      } else {
-        card.state='review';
-        const reduced=Math.max(1,Math.round((card.intervalDays||1)*SRS_CFG.lapseResetFactor));
-        card.intervalDays = clampToBoxBounds(reduced, card.box);
-        card.nextDue=now+daysToMs(card.intervalDays);
-      }
-    }
-  }
-
-  if (typeof S.adaptiveScheduler === 'function'){
-    try{
-      const suggest = await S.adaptiveScheduler({card, stateBefore:before, rating:gName});
-      if(suggest){
-        if(Number.isFinite(suggest.box)) card.box = clamp(suggest.box,1,5);
-        if(Number.isFinite(suggest.intervalDays) && suggest.intervalDays>0 && card.state==='review'){
-          const mixed = 0.7*(card.intervalDays||1) + 0.3*suggest.intervalDays;
-          card.intervalDays = clampToBoxBounds(mixed, card.box);
-          card.nextDue = now + daysToMs(card.intervalDays);
-        }
-      }
-    }catch(e){}
-  }
-
-  card.masteryScore = computeMasteryScore(card);
   return (card.nextDue - now);
 }
 
-// Similarité & grading auto
+// Similarité & grading auto (inchangés)
 const ARTICLES_TO_IGNORE=['a','an','the','un','une','des','le','la','les',"l'"];
 const STRIP_DIACRITICS=/[\u0300-\u036f]/g;
 const normalizeAnswer=s=>(s||'').toLowerCase().normalize('NFD').replace(STRIP_DIACRITICS,'').replace(/[_-]/g,' ').replace(/[^a-z' ]+/g,' ').replace(/\s+/g,' ').trim();
@@ -276,63 +235,53 @@ function gradeFromTyped(userInput, correctFull, latencyMs){
   return {grade:1,scorePct:scorePctFor(1,false,bestSim,msPerChar),exact:false};
 }
 
-// ——————————————————————————————————————————————
-// Construction du deck de cartes
-// ——————————————————————————————————————————————
+// NOUVEAU: Construction du deck suivant la file d'attente Anki
 function ensureCycleForCurrentChapter(){
-  if (S.cycle.chapter !== S.currentChapter){
-    S.cycle.chapter = S.currentChapter;
-    S.cycle.seen = {};
-  }
+  if (S.cycle.chapter !== S.currentChapter){ S.cycle.chapter = S.currentChapter; S.cycle.seen = {}; }
 }
 function resetCycleForCurrentChapter(){
-  S.cycle.chapter = S.currentChapter;
-  S.cycle.seen = {};
+  S.cycle.chapter = S.currentChapter; S.cycle.seen = {};
 }
 
 function buildScheduledDeck(list){
   ensureCycleForCurrentChapter();
 
   let base = [...list];
-  let unseen = base.filter(c => !S.cycle.seen[String(c.id)]);
+  let unseenInCycle = notSeenInCycleList(base);
 
   let cycleReset = false;
-  if (unseen.length === 0 && base.length > 0){
+  if (unseenInCycle.length === 0 && base.length > 0){
     resetCycleForCurrentChapter();
-    unseen = [...base];
+    unseenInCycle = [...base];
     cycleReset = true;
   }
 
   const now = nowMs();
-  const learningDue = [], reviewDue = [], learningNotDue = [], reviewNotDue = [], newCards = [];
-  for (const c of unseen) {
-    if (c.state === 'new') { newCards.push(c); continue; }
-    const due = (c.nextDue || 0) <= now;
-    if (c.state === 'learning' || c.state === 'relearning') {
-      if (due) learningDue.push(c); else learningNotDue.push(c);
-    } else { // review
-      if (due) reviewDue.push(c); else reviewNotDue.push(c);
+  const learningDue = [], reviewDue = [], newCards = [];
+
+  // 1. Classer les cartes dans les trois files d'attente
+  for (const c of unseenInCycle) {
+    if (c.state === 'new') {
+      newCards.push(c);
+      continue;
+    }
+    const isDue = (c.nextDue || 0) <= now;
+    if (isDue) {
+      if (c.state === 'learning' || c.state === 'relearning') {
+        learningDue.push(c);
+      } else if (c.state === 'review') {
+        reviewDue.push(c);
+      }
     }
   }
 
-  learningDue.sort((a,b)=>(a.nextDue||0)-(b.nextDue||0));
-  reviewDue.sort((a,b)=>{
-    const ma=(a.masteryScore||0), mb=(b.masteryScore||0);
-    if (ma!==mb) return ma-mb;
-    return (a.nextDue||0)-(b.nextDue||0);
-  });
+  // 2. Trier chaque file d'attente
+  learningDue.sort((a, b) => (a.nextDue || 0) - (b.nextDue || 0));
+  reviewDue.sort((a, b) => (a.nextDue || 0) - (b.nextDue || 0));
+  // Les nouvelles cartes sont déjà dans un ordre par défaut (pas de tri nécessaire ici)
 
-  const others = [
-    ...newCards, 
-    ...learningNotDue, 
-    ...reviewNotDue
-  ].sort((a,b)=>{
-    const ma=(a.masteryScore||0), mb=(b.masteryScore||0);
-    if (ma!==mb) return ma-mb;
-    return (a.nextDue||Infinity)-(b.nextDue||Infinity);
-  });
-
-  const deck = [...learningDue, ...reviewDue, ...others];
+  // 3. Concaténer dans l'ordre de priorité d'Anki
+  const deck = [...learningDue, ...reviewDue, ...newCards];
 
   if (cycleReset) {
     showMsg('Nouveau cycle lancé', 'text-amber-500 dark:text-amber-400', 1400);
@@ -343,7 +292,7 @@ function buildScheduledDeck(list){
 function baseListForCurrentChapter(){ return (S.currentChapter==='Tout')?[...S.allCards]:S.allCards.filter(c=>c.chapter===S.currentChapter) }
 function rebuildDeck(){ S.currentDeck=buildScheduledDeck(baseListForCurrentChapter()); S.currentIndex=0 }
 
-// Chapitres dynamiques
+// Chapitres dynamiques (inchangés)
 function computeAvailableChapters(){
   const set=new Set(S.allCards.map(c=>c.chapter));
   S.availableChapters=['Tout', ...Array.from(set).filter(Boolean).sort((a,b)=>a.localeCompare(b))];
@@ -368,7 +317,7 @@ function updateActiveChapterButtons(){
 }
 function renderResetOptions(){ els.resetOptions.innerHTML=S.availableChapters.map(n=>`<option value="${n}">${n}</option>`).join('') }
 
-// Rendu carte
+// Rendu carte (modifié pour afficher les bonnes infos)
 function updateCardScoreUI(newPct, oldPct){
   const hasOld=Number.isFinite(oldPct); const delta=hasOld?(newPct-oldPct):null; const sign=(delta!=null)?(delta>=0?'+':'−'):''; const abs=(delta!=null)?Math.abs(delta):null;
   els.cardScore.textContent=hasOld?`${newPct}% (${sign}${abs})`:`${newPct}%`;
@@ -384,14 +333,15 @@ function renderCard(focus=1){
   els.cardFrenchWord.textContent=card.french; els.cardEnglishWord.textContent=card.english; promptEl.classList.remove('hidden'); translationEl.classList.add('hidden');
 
   els.cardScore.textContent=Number.isFinite(card.lastScorePct)?`${card.lastScorePct}%`:'--%';
-  const cat = masteryCategory(card.masteryScore||0);
-  els.cardScore.title = `Maîtrise: ${card.masteryScore||0}% • Boîte: ${card.box||1} • Facilité: ${(card.ef||SRS_CFG.startEase).toFixed(2)} • ${cat}`;
+  // MODIFIÉ: L'infobulle affiche l'aisance et l'intervalle.
+  const intervalFormatted = card.state === 'review' ? formatInterval(daysToMs(card.interval || 0)) : 'Apprent.';
+  els.cardScore.title = `Aisance: ${(card.ease * 100).toFixed(0)}% • Intervalle: ${intervalFormatted} • État: ${card.state}`;
 
   if(focus) els.answerInput.focus({preventScroll:true});
   els.currentChapterLabel.textContent=S.currentChapter;
 }
 
-// Notation & enregistrement
+// Notation & enregistrement (inchangés, ils appellent les nouvelles fonctions)
 function registerOutcome(card, grade, scorePct, latencyMs){
   card.revCount=(card.revCount||0)+1; if(grade>=3) card.okCount=(card.okCount||0)+1; card.totalTimeMs=(card.totalTimeMs||0)+(latencyMs||0);
   card.lastScorePct=clamp(Math.round(scorePct),0,100); card.lastGrade=grade; card.lastLatency=latencyMs||0;
@@ -419,7 +369,7 @@ async function onGrade(grade,opts={}){
   return nextMs;
 }
 
-// Saisie & ENTER
+// Saisie & ENTER (inchangés)
 function revealTranslation(){ const trEl=S.reverseMode?els.cardFrenchWord:els.cardEnglishWord; trEl.classList.remove('hidden'); S.isRevealed=true; }
 function handleSubmitAnswer(){
   if(els.answerInput.disabled) return; if(!S.currentDeck.length) return;
@@ -440,10 +390,7 @@ function handleSubmitAnswer(){
 }
 function nextCard(){ S.seenCountInSession++; if(!S.currentDeck.length){ renderCard(); return; } S.currentIndex=0; renderCard(); renderProgressBar(); saveState(); }
 
-// --- NOUVEAU SYSTÈME DE SAUVEGARDE ET DE SYNCHRONISATION ---
-
-// Sauvegarde l'état actuel de l'application dans le localStorage.
-// Cette fonction est appelée après chaque action de l'utilisateur.
+// Sauvegarde et synchronisation (inchangés)
 function saveState() {
   try {
     const seenArray = Object.keys(S.cycle.seen || {});
@@ -462,25 +409,14 @@ function saveState() {
       cycle: { chapter: S.cycle.chapter, seen: seenArray }
     };
     localStorage.setItem('flashcardAppData', JSON.stringify(stateToSave));
-  } catch (e) {
-    console.error("Erreur lors de la sauvegarde des données:", e);
-  }
+  } catch (e) { console.error("Erreur lors de la sauvegarde des données:", e); }
 }
-
-// Charge les données, synchronise avec les nouvelles cartes, et initialise l'application.
-// C'est le point d'entrée principal au chargement de la page.
 function loadAndSyncData() {
   const savedJSON = localStorage.getItem('flashcardAppData');
   const masterData = flashcardData;
   let savedState = null;
   let addedWordsCount = 0;
-  
-  try {
-    if (savedJSON) savedState = JSON.parse(savedJSON);
-  } catch (e) {
-    console.error("Erreur lors du parsing des données sauvegardées:", e);
-  }
-
+  try { if (savedJSON) savedState = JSON.parse(savedJSON); } catch (e) { console.error("Erreur lors du parsing des données sauvegardées:", e); }
   if (!savedState || !savedState.allCards || savedState.allCards.length === 0) {
     console.log("Aucune sauvegarde valide trouvée. Initialisation à partir de zéro.");
     S.allCards = masterData.map(raw => {
@@ -490,24 +426,15 @@ function loadAndSyncData() {
     S.currentChapter = 'Tout';
   } else {
     console.log("Sauvegarde trouvée. Synchronisation avec le vocabulaire de base.");
-    
     const savedCardsMap = new Map(savedState.allCards.map(c => [String(c.id), c]));
     const masterIds = new Set();
     const finalCards = [];
-
     for (const rawCard of masterData) {
       const id = String(rawCard.id ?? `${rawCard.chapter}::${rawCard.french ?? raw.fr}`);
       masterIds.add(id);
-      
       const savedCard = savedCardsMap.get(id);
-
       if (savedCard) {
-        const updatedCard = {
-          ...savedCard,
-          french: rawCard.french ?? rawCard.fr,
-          english: rawCard.english ?? rawCard.en,
-          chapter: rawCard.chapter
-        };
+        const updatedCard = { ...savedCard, french: rawCard.french ?? rawCard.fr, english: rawCard.english ?? rawCard.en, chapter: rawCard.chapter };
         finalCards.push(upgradeCardModel(updatedCard));
       } else {
         const newCard = upgradeCardModel({ ...rawCard, id });
@@ -515,9 +442,7 @@ function loadAndSyncData() {
         addedWordsCount++;
       }
     }
-    
     S.allCards = finalCards.filter(c => masterIds.has(String(c.id)));
-    
     S.elapsedSeconds = savedState.elapsedSeconds || 0;
     S.currentChapter = savedState.currentChapter || 'Tout';
     S.darkMode = !!savedState.darkMode;
@@ -528,30 +453,20 @@ function loadAndSyncData() {
     S.dailyHistory = savedState.dailyHistory || {};
     S.sessionNewShown = savedState.sessionNewShown || 0;
     S.seenCountInSession = savedState.seenCountInSession || 0;
-    
     const cycleSeenArray = (savedState.cycle && Array.isArray(savedState.cycle.seen)) ? savedState.cycle.seen : [];
-    S.cycle = {
-      chapter: (savedState.cycle?.chapter) || S.currentChapter,
-      seen: Object.fromEntries(cycleSeenArray.map(id => [String(id), true]))
-    };
+    S.cycle = { chapter: (savedState.cycle?.chapter) || S.currentChapter, seen: Object.fromEntries(cycleSeenArray.map(id => [String(id), true])) };
   }
-  
-  if (addedWordsCount > 0) {
-    showMsg(`${addedWordsCount} nouveau(x) mot(s) ajouté(s) ✨`, 'text-emerald-500 dark:text-emerald-400', 3500);
-  }
-  
+  if (addedWordsCount > 0) { showMsg(`${addedWordsCount} nouveau(x) mot(s) ajouté(s) ✨`, 'text-emerald-500 dark:text-emerald-400', 3500); }
   document.body.classList.toggle('dark-mode', S.darkMode);
   document.body.classList.toggle('light-mode', !S.darkMode);
   els.darkModeToggle.innerHTML = S.darkMode ? '☀' : '🌙';
   if (els.themeSelector) els.themeSelector.value = S.currentTheme;
-
   buildSearchIndex();
   initUI();
-  
   saveState();
 }
 
-// Recherche & chapitres
+// Recherche & chapitres (inchangés)
 function buildSearchIndex(){ S.searchIndex=S.allCards.map(c=>({id:c.id,french_lc:c.french.toLowerCase(),english_lc:c.english.toLowerCase(),chapter:c.chapter,ref:c})) }
 function filterCardsForSearch(q){
   els.searchResultsContainer.innerHTML=''; const query=(q||'').trim().toLowerCase(); if(!query) return;
@@ -560,17 +475,14 @@ function filterCardsForSearch(q){
   const hoverCls=S.darkMode?'hover:bg-gray-700':'hover:bg-gray-200';
   els.searchResultsContainer.innerHTML=res.map(card=>`<div class="p-2 cursor-pointer rounded ${hoverCls}" data-id="${card.id}">${card.french} — ${card.english} (${card.chapter})</div>`).join('');
 }
-
 function putCardAtFront(deck, card) {
   const idStr = String(card.id);
   const rest = deck.filter(c => String(c.id) !== idStr);
   return [card, ...rest];
 }
-
 function jumpToCard(cardId, opts = {}) {
   const card = S.allCards.find(c => String(c.id) === String(cardId));
   if (!card) { showMsg('Carte introuvable', 'text-red-500', 1500); return; }
-
   const switchChapter = opts.switchChapter !== false;
   if (switchChapter && S.currentChapter !== card.chapter) {
     S.currentChapter = card.chapter;
@@ -581,25 +493,22 @@ function jumpToCard(cardId, opts = {}) {
   } else if (!S.currentDeck.length) {
     rebuildDeck();
   }
-
   const base = baseListForCurrentChapter();
   const unseen = base.filter(c=>!S.cycle.seen[String(c.id)]);
   if (S.cycle.seen[String(card.id)] && unseen.length > 0) {
     showMsg('Cette carte a déjà été vue dans ce cycle. Terminez le cycle pour la revoir.', 'text-amber-500 dark:text-amber-400', 2200);
     return;
   }
-
   S.currentDeck = putCardAtFront(S.currentDeck, card);
   S.currentIndex = 0;
   renderCard(1);
   saveState();
 }
 
-// Events
+// Events (inchangés)
 on(els.burgerButton,'click',()=>setMenuOpen(true));
 on(els.menuOverlay,'click',()=>setMenuOpen(false));
 on(els.closeMenuButton,'click',()=>setMenuOpen(false));
-
 on(els.menuChapters,'click',e=>{
   const btn=e.target.closest('button[data-chapter]'); if(!btn) return;
   const ch=btn.dataset.chapter; if(!ch||ch===S.currentChapter) { setMenuOpen(false); return; }
@@ -607,25 +516,18 @@ on(els.menuChapters,'click',e=>{
   rebuildDeck(); renderCard(0); renderProgressBar(); updateActiveChapterButtons(); els.currentChapterLabel.textContent=S.currentChapter; saveState();
   setMenuOpen(false);
 });
-
 on(els.resetDataButton,'click',()=>{
   const chapter=els.resetOptions.value||'Tout';
-  const resetOne=c=>{
-    const n=upgradeCardModel({id:c.id,french:c.french,english:c.english,chapter:c.chapter});
-    Object.assign(c,n);
-  };
+  const resetOne=c=>{ const n=upgradeCardModel({id:c.id,french:c.french,english:c.english,chapter:c.chapter}); Object.assign(c,n); };
   S.allCards.forEach(c=>{ if(chapter==='Tout'||c.chapter===chapter) resetOne(c); });
   if(chapter==='Tout'){ S.seenCountInSession=0; S.sessionNewShown=0; S.streak=0; S.maxStreak=0; S.dailyHistory={}; }
   if (chapter==='Tout' || chapter===S.currentChapter) resetCycleForCurrentChapter();
-
   rebuildDeck(); renderCard(0); renderStats(); renderSparkline(); renderProgressBar(); saveState();
   showMsg('Réinitialisé','text-orange-500 dark:text-yellow-400',1200);
 });
-
 on(els.darkModeToggle,'click',()=>setDarkMode(!S.darkMode));
 on(els.reverseModeButton,'click',()=>{S.reverseMode=!S.reverseMode; renderCard(0); saveState()});
 on(els.themeSelector,'change',()=>{S.currentTheme=els.themeSelector.value; saveState()});
-
 on(els.searchBar,'input',e=>{filterCardsForSearch(e.target.value)});
 on(els.searchResultsContainer,'click',e=>{
   const item=e.target.closest('[data-id]'); if(!item) return;
@@ -645,7 +547,6 @@ on(els.searchBar,'keydown',e=>{
     }
   }
 });
-
 on(els.flashcardContainer,'click',()=>{
   if(!S.isRevealed){
     if(!els.answerInput.value.trim()){
@@ -654,15 +555,12 @@ on(els.flashcardContainer,'click',()=>{
     }
   } else if(S.awaitingAdvance){ nextCard(); }
 });
-
 on(els.submitAnswerButton,'click',handleSubmitAnswer);
 on(els.answerInput,'input',()=>{ if(!S.answerStartAt && els.answerInput.value.trim().length>0) S.answerStartAt=Date.now(); });
-
 on(els.gradeBar,'click',e=>{
   const btn=e.target.closest('button[data-grade]'); if(!btn) return;
   const g=parseInt(btn.dataset.grade,10); if(S.awaitingGrade&&S.currentDeck.length) onGrade(g,{autoAdvance:true});
 });
-
 on(document,'keydown',e=>{
   const inField=document.activeElement===els.answerInput||document.activeElement===els.searchBar;
   if(e.key==='Enter'){ e.preventDefault(); if(S.awaitingAdvance){ nextCard(); return; } handleSubmitAnswer(); return; }
@@ -674,59 +572,43 @@ on(document,'keydown',e=>{
   if(e.key==='4'){e.preventDefault(); if(S.awaitingGrade&&S.currentDeck.length) onGrade(4,{autoAdvance:true});}
 });
 
-// Stats & sparkline
+// MODIFIÉ: Les statistiques reflètent le modèle de données d'Anki
 function renderStats(){
   const total = S.allCards.length;
-  const reviewed = S.allCards.filter(c=>(c.revCount||0)>0).length;
-  const newRemain = S.allCards.filter(c=>c.state==='new').length;
-  const dueNow = S.allCards.filter(c=>(c.state!=='new')&&(c.nextDue||0)<=nowMs()).length;
+  const newCount = S.allCards.filter(c => c.state === 'new').length;
+  const learningCount = S.allCards.filter(c => c.state === 'learning' || c.state === 'relearning').length;
+  const reviewCount = S.allCards.filter(c => c.state === 'review').length;
+  const dueNow = S.allCards.filter(c => (c.state !== 'new') && (c.nextDue || 0) <= nowMs()).length;
 
-  const totalReviews=Object.values(S.dailyHistory).reduce((s,r)=>s+(r.rev||0),0);
-  const okReviews=Object.values(S.dailyHistory).reduce((s,r)=>s+(r.ok||0),0);
-  const acc=totalReviews?Math.round(okReviews*100/totalReviews):0;
-  const timeSum=Object.values(S.dailyHistory).reduce((s,r)=>s+(r.ms||0),0);
-  const avgLatency=totalReviews?Math.round(timeSum/totalReviews):0;
-  const avgScore=(i=>i.length?Math.round(i.reduce((a,b)=>a+b,0)/i.length):0)(S.allCards.map(c=>c.lastScorePct).filter(Number.isFinite));
-  const avgInterval=(i=>i.length?Math.round(i.reduce((a,b)=>a+b,0)/i.length):0)(S.allCards.filter(c=>c.state==='review').map(c=>c.intervalDays||0));
-  const avgEase=(i=>i.length?Math.round(i.reduce((a,b)=>a+b,0)/i.length*100)/100:0)(S.allCards.map(c=>c.ef||SRS_CFG.startEase));
-  const today=isoDate(); const todayReviews=(S.dailyHistory[today]?.rev)||0;
+  const totalReviews = Object.values(S.dailyHistory).reduce((s, r) => s + (r.rev || 0), 0);
+  const okReviews = Object.values(S.dailyHistory).reduce((s, r) => s + (r.ok || 0), 0);
+  const acc = totalReviews ? Math.round(okReviews * 100 / totalReviews) : 0;
+  
+  const reviewCards = S.allCards.filter(c => c.state === 'review' && c.interval > 0);
+  const avgInterval = reviewCards.length ? Math.round(reviewCards.reduce((sum, c) => sum + c.interval, 0) / reviewCards.length) : 0;
+  const avgEase = S.allCards.length ? (S.allCards.reduce((sum, c) => sum + (c.ease || ANKI_CFG.startEase), 0) / S.allCards.length * 100).toFixed(0) : 'N/A';
+  
+  const today = isoDate();
+  const todayReviews = (S.dailyHistory[today]?.rev) || 0;
 
-  const cats = { low:0, mid:0, high:0 };
-  const boxes = {1:0,2:0,3:0,4:0,5:0};
-  for(const c of S.allCards){
-    const s=c.masteryScore||0;
-    if(s<50) cats.low++; else if(s<80) cats.mid++; else cats.high++;
-    const b=clamp(c.box||1,1,5); boxes[b]++;
-  }
-
-  const mastered=S.allCards.filter(c=>(c.masteryScore||0)>=80).length;
-  const fmt=ms=>ms<1000?`${ms}ms`:`${(ms/1000).toFixed(1)}s`;
   els.statsContent.innerHTML=`
     <div class="grid grid-cols-2 gap-y-1 gap-x-4">
       <div class="text-gray-500 dark:text-gray-400">Total de mots</div><div class="text-right font-semibold">${total}</div>
-      <div class="text-gray-500 dark:text-gray-400">Mots revus</div><div class="text-right font-semibold">${reviewed}</div>
-      <div class="text-gray-500 dark:text-gray-400">Nouvelles restantes</div><div class="text-right font-semibold">${newRemain}</div>
+      <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
+      <div class="text-gray-500 dark:text-gray-400">Nouvelles</div><div class="text-right font-semibold">${newCount}</div>
+      <div class="text-gray-500 dark:text-gray-400">En apprentissage</div><div class="text-right font-semibold">${learningCount}</div>
+      <div class="text-gray-500 dark:text-gray-400">En révision</div><div class="text-right font-semibold">${reviewCount}</div>
       <div class="text-gray-500 dark:text-gray-400">À revoir maintenant</div><div class="text-right font-semibold">${dueNow}</div>
-      <div class="text-gray-500 dark:text-gray-400">Total révisions</div><div class="text-right font-semibold">${totalReviews}</div>
-      <div class="text-gray-500 dark:text-gray-400">Précision</div><div class="text-right font-semibold">${acc}%</div>
-      <div class="text-gray-500 dark:text-gray-400">Temps moyen</div><div class="text-right font-semibold">${fmt(avgLatency)}</div>
-      <div class="text-gray-500 dark:text-gray-400">Score moyen (saisie)</div><div class="text-right font-semibold">${avgScore}%</div>
+      <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
+      <div class="text-gray-500 dark:text-gray-400">Précision (hist.)</div><div class="text-right font-semibold">${acc}%</div>
       <div class="text-gray-500 dark:text-gray-400">Intervalle moyen</div><div class="text-right font-semibold">${avgInterval}j</div>
-      <div class="text-gray-500 dark:text-gray-400">Facilité moyenne</div><div class="text-right font-semibold">${avgEase}</div>
-      <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
-      <div class="text-gray-500 dark:text-gray-400">Maîtrise faible (&lt;50)</div><div class="text-right font-semibold">${cats.low}</div>
-      <div class="text-gray-500 dark:text-gray-400">En progression (50–79)</div><div class="text-right font-semibold">${cats.mid}</div>
-      <div class="text-gray-500 dark:text-gray-400">Maîtrisés (≥80)</div><div class="text-right font-semibold">${cats.high}</div>
-      <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
-      <div class="text-gray-500 dark:text-gray-400">Boîte 1</div><div class="text-right font-semibold">${boxes[1]}</div>
-      <div class="text-gray-500 dark:text-gray-400">Boîte 2</div><div class="text-right font-semibold">${boxes[2]}</div>
-      <div class="text-gray-500 dark:text-gray-400">Boîte 3</div><div class="text-right font-semibold">${boxes[3]}</div>
-      <div class="text-gray-500 dark:text-gray-400">Boîte 4</div><div class="text-right font-semibold">${boxes[4]}</div>
-      <div class="text-gray-500 dark:text-gray-400">Boîte 5</div><div class="text-right font-semibold">${boxes[5]}</div>
+      <div class="text-gray-500 dark:text-gray-400">Aisance moyenne</div><div class="text-right font-semibold">${avgEase}%</div>
       <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
       <div class="text-gray-500 dark:text-gray-400">Révisions aujourd’hui</div><div class="text-right font-semibold">${todayReviews}</div>
     </div>`;
 }
+
+// Sparkline (inchangé)
 function daysBack(n){const a=[],t=new Date();for(let i=n-1;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);a.push(isoDate(d))}return a}
 function renderSparkline(){
   const svg=els.sparkline, path=els.sparkPath, fill=els.sparkFill, dot=els.sparkLast, legend=els.chartLegend; if(!svg||!path||!fill||!dot||!legend) return;
@@ -739,7 +621,7 @@ function renderSparkline(){
   legend.textContent=`${total14} révisions • ${acc7}%/7j`;
 }
 
-// Initialisation de l'UI (après le chargement des données)
+// Initialisation (inchangée)
 function initUI(){
   computeAvailableChapters();
   renderChapterButtons();
@@ -752,6 +634,5 @@ function initUI(){
   setInterval(()=>{S.elapsedSeconds++; renderTimer(); if(S.elapsedSeconds%15===0) saveState();},1000);
 }
 
-// --- POINT D'ENTRÉE DE L'APPLICATION ---
-// Lance le chargement, la synchronisation des données et l'initialisation de l'interface utilisateur.
+// Point d'entrée de l'application (inchangé)
 loadAndSyncData();
