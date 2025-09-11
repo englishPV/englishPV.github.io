@@ -171,6 +171,7 @@ const App = {
         byDay: {}, // 'YYYY-MM-DD' -> { studied: number, correct: number, again: number, hard: number, good: number, easy: number }
         streak: 0,
         lastStudyDay: null,
+         totalTimeMs: 0,        // <= NOUVEAU: temps total cumulé (ms)
     },
 
     // session
@@ -683,7 +684,7 @@ function updateStreakOnGrade(grade) {
 function bumpDailyStats(grade) {
     const day = todayKey();
     if (!App.stats.byDay[day]) {
-        App.stats.byDay[day] = { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0 };
+        App.stats.byDay[day] = { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 }; // + timeMs
     }
     const s = App.stats.byDay[day];
     s.studied += 1;
@@ -701,13 +702,51 @@ function bumpDailyStats(grade) {
     saveStats();
     renderStats();
 }
-function renderStats() {
-    // contenu textuel
+
+
+/* =========================
+Sauvegarde du temps (auto à la sortie)
+========================= */
+function saveSessionElapsedToStats({ updateUI = false } = {}) {
+    const start = App.session.startedAt;
+    if (!start) return;
+
+    const elapsed = nowMs() - start;                          // temps écoulé depuis le début de session
+    const already = App.session._persistedSessionMs || 0;     // déjà comptabilisé pour cette session
+    const delta = Math.max(0, elapsed - already);
+    if (delta <= 0) return;
+
+    // Marquer comme persisté pour éviter le double comptage
+    App.session._persistedSessionMs = already + delta;
+
+    // Total cumulé
+    App.stats.totalTimeMs = (App.stats.totalTimeMs || 0) + delta;
+
+    // Par jour
     const day = todayKey();
-    const s = App.stats.byDay[day] || { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0 };
+    if (!App.stats.byDay[day]) {
+        App.stats.byDay[day] = { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 };
+    }
+    App.stats.byDay[day].timeMs = (App.stats.byDay[day].timeMs || 0) + delta;
+
+    saveStats();
+
+    if (updateUI) {
+        renderStats();
+        if (els.timer) {
+            els.timer.setAttribute('title', `Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}`);
+        }
+    }
+}
+
+function renderStats() {
+    const day = todayKey();
+    const s = App.stats.byDay[day] || { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 };
+
     els.statsContent.innerHTML = `<div>Aujourd'hui: ${s.studied} cartes, ${s.correct} correctes</div>
-                                <div>Encore: ${s.again} • Difficile: ${s.hard} • Bien: ${s.good} • Facile: ${s.easy}</div>
-                                <div>Streak: ${App.stats.streak} 🔥</div>`; // <- CORRIGÉ: Template literal
+                                  <div>Temps aujourd'hui: ${formatMs(s.timeMs || 0)} • Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}</div>
+                                  <div>Encore: ${s.again} • Difficile: ${s.hard} • Bien: ${s.good} • Facile: ${s.easy}</div>
+                                  <div>Streak: ${App.stats.streak} 🔥</div>`;// <- CORRIGÉ: Template literal
 
     // sparkline 14j
     const days = [];
@@ -942,6 +981,20 @@ function flashMessage(msg, isError = false) {
 /* =========================
 Recherche
 ========================= */
+
+function setupAutoSaveOnLeave() {
+    const handler = () => saveSessionElapsedToStats({ updateUI: false });
+
+    // iOS/Safari
+    window.addEventListener('pagehide', handler);
+    // Navigate away / refresh
+    window.addEventListener('beforeunload', handler);
+    // L’onglet passe en arrière-plan
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') handler();
+    });
+}
+
 function setupSearch() {
     els.searchBar.addEventListener('input', () => {
         const q = normalizeText(els.searchBar.value);
