@@ -550,9 +550,11 @@ Affichage de carte
 ========================= */
 function renderCard(card) {
     const reverse = App.prefs.reverseMode;
+
+    // Montrer la face réponse seulement après révélation
     els.cardEnglish.classList.toggle('hidden', !App.session.revealed);
 
-    // Affichage score / libellé de note
+    // Score ou libellé de note
     if (App.session.lastScore != null) {
         els.cardScore.textContent = `${Math.round(App.session.lastScore * 100)}%`;
     } else if (App.session.lastGrade != null) {
@@ -562,6 +564,7 @@ function renderCard(card) {
         els.cardScore.textContent = '--%';
     }
 
+    // Texte FR/EN
     if (!reverse) {
         els.cardFrench.textContent = card.french;
         els.cardEnglish.textContent = card.english;
@@ -570,6 +573,7 @@ function renderCard(card) {
         els.cardEnglish.textContent = card.french;
     }
 
+    // Reset visuel carte
     const cardEl = els.flashcardContainer;
     const isDark = document.body.classList.contains('dark-mode');
     cardEl.classList.remove('flash-error');
@@ -579,18 +583,28 @@ function renderCard(card) {
     cardEl.classList.toggle('dark-mode-card-neutral', isDark);
     cardEl.classList.toggle('light-mode-card-neutral', !isDark);
 
-    // Message d'aide
-    els.messageArea.textContent = App.session.revealed
-        ? 'Appuyez sur Entrée ou cliquez la carte pour passer'
-        : 'Tapez votre réponse et appuyez Entrée (Entrée sans réponse = révéler)';
+    // Message d’aide (selon l’état)
+    if (!App.session.revealed) {
+        els.messageArea.textContent = 'Tapez votre réponse et appuyez Entrée (Entrée sans réponse = révéler)';
+    } else if (App.session.autoGraded) {
+        els.messageArea.textContent = 'Appuyez sur Entrée ou cliquez la carte pour passer';
+    } else {
+        els.messageArea.textContent = 'Encore (1) • Difficile (2) • Bien (3) • Facile (4) — ou Entrée/clic pour passer';
+    }
 
-    // saisie
-    els.answerInput.value = '';
+    // IMPORTANT: ne pas vider le champ ici (on garde la saisie visible après Entrée)
     els.answerInput.disabled = App.session.inputLocked;
     els.submitAnswerButton.disabled = App.session.inputLocked;
 
-    // barre de note visible seulement quand révélé
+    // Barre de note visible uniquement quand révélé
     els.gradeBar.classList.toggle('hidden', !App.session.revealed);
+
+    // Activer/désactiver les boutons de note
+    const allowGrading = App.session.revealed && !App.session.autoGraded;
+    els.btnAgain.disabled = !allowGrading;
+    els.btnHard.disabled = !allowGrading;
+    els.btnGood.disabled = !allowGrading;
+    els.btnEasy.disabled = !allowGrading;
 }
 function loadNextCard() {
     App.session.revealed = false;
@@ -608,6 +622,12 @@ function loadNextCard() {
         updateProgress();
         return;
     }
+
+    // On vide la saisie ici (nouvelle carte uniquement)
+    els.answerInput.value = '';
+    els.submitAnswerButton.disabled = false;
+    els.answerInput.disabled = false;
+
     const card = App.cards.get(id);
     App.session.recentlyShown.push(id);
     renderCard(card);
@@ -938,10 +958,27 @@ function setupSearch() {
     });
 }
 function jumpToCard(id) {
-    // Injecter cette carte comme prochaine
+    // Éviter que d'autres mécanismes passent avant
+    App.session.skipBuffer = []; // ne pas se faire devancer par une carte "passée"
+    App.session.recentlyShown = App.session.recentlyShown.filter(x => x !== id);
+
+    // On évite les doublons
     removeFromQueues(id);
+
+    // Si la carte était enterrée 1 min, on l'autorise à réapparaître tout de suite
+    const c = App.cards.get(id);
+    if (c) c.buriedUntil = 0;
+
+    // Forcer en tête de la file la plus prioritaire
     App.session.queueLearning.unshift(id);
+
+    // Charger maintenant
     loadNextCard();
+
+    // UI: fermer le menu et nettoyer la recherche
+    closeMenu();
+    els.searchBar.value = '';
+    els.searchResults.innerHTML = '';
 }
 
 /* =========================
@@ -1024,7 +1061,8 @@ function setupCardInteractions() {
     els.flashcardContainer.addEventListener('click', () => {
         if (!App.session.revealed) {
             revealAnswer('click');
-            App.session.pendingNext = true; // on veut forcer un passage ensuite
+            App.session.pendingNext = true; // on autorise le passage ensuite
+            renderCard(App.cards.get(App.session.currentCardId));
         } else {
             // carte déjà révélée => passer à la suivante
             App.session.pendingNext = false;
@@ -1042,17 +1080,19 @@ function setupCardInteractions() {
         const card = App.cards.get(App.session.currentCardId);
         if (!card) return;
 
-        if (!App.session.revealed) revealAnswer('gradeclick');
+        // Si la carte n'est pas révélée, on la révèle (pas d'auto-grade ici)
+        if (!App.session.revealed) {
+            revealAnswer('gradeclick');
+        }
 
-        // Si on a déjà auto-noté (après Entrée), on ne réapplique pas une 2e note.
+        // Si on a déjà auto-noté (Entrée avec texte) => on ignore, l’UI propose de passer
         if (App.session.autoGraded) {
-            loadNextCard();
             return;
         }
 
+        // Ici, on est dans le cas "révélé sans auto-grade" (donc Entrée vide ou révélation manuelle)
         applyGrade(card, g, { auto: false, showFeedback: false });
-        App.session.lastGrade = g;
-        // Passer immédiatement à la carte suivante
+        // passer immédiatement à la carte suivante
         loadNextCard();
     };
     els.btnAgain.addEventListener('click', () => onGradeBtn(1));
@@ -1066,25 +1106,36 @@ function setupCardInteractions() {
         const isTyping = targetTag === 'INPUT' || targetTag === 'TEXTAREA';
         const inputEmpty = els.answerInput.value.trim().length === 0;
 
-        // Désactiver Espace pour révéler (évite les "spoils" involontaires)
+        // Désactiver Espace (évite révélations accidentelles)
         if (e.key === KEYCODES.SPACE) {
             if (!isTyping) e.preventDefault();
             return;
         }
 
+        // Raccourcis 1/2/3/4 pour noter — seulement quand c'est possible à la souris
+        if (['1','2','3','4'].includes(e.key)) {
+            if (App.session.revealed && !App.session.autoGraded) {
+                e.preventDefault();
+                onGradeBtn(parseInt(e.key, 10));
+            }
+            return;
+        }
+
         if (e.key === KEYCODES.ENTER) {
             e.preventDefault();
+
             if (!App.session.revealed) {
                 if (!inputEmpty) {
-                    // Entrée avec texte -> on évalue et auto-note
-                    evaluateAnswer();
+                    // Entrée avec texte -> évalue et auto-note (désactive les boutons)
+                    evaluateAnswer(); // garde la saisie visible (on ne la vide pas)
                 } else {
-                    // Entrée sans texte -> on révèle et on forcera le passage
+                    // Entrée sans texte -> révèle et permet soit passer, soit noter
                     revealAnswer('enter');
                     App.session.pendingNext = true;
+                    renderCard(App.cards.get(App.session.currentCardId));
                 }
             } else {
-                // Déjà révélée -> Enter = prochaine carte (toujours)
+                // Carte déjà révélée -> Enter = prochaine carte (toujours)
                 App.session.pendingNext = false;
                 loadNextCard();
             }
