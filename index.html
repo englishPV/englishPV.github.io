@@ -87,7 +87,7 @@
 
     <div class="w-full p-1 bg-white/50 backdrop-blur-sm rounded-md shadow">
       <div class="flex justify-between text-xs sm:text-sm mb-1 px-1">
-        <span id="progress-text">Cycle: 0/0</span>
+        <span id="progress-text">Apprises: 0/0</span>
         <span id="progress-percentage"></span>
       </div>
       <div class="w-full bg-gray-300 rounded-full h-2.5 sm:h-3">
@@ -97,7 +97,7 @@
 
     <div id="flashcard-container" class="w-full min-h-[20rem] sm:min-h-[24rem] flex-grow p-6 rounded-xl shadow-xl flex flex-col justify-between items-center text-center cursor-pointer glassmorphism">
       <div class="w-full flex justify-end items-center">
-        <span id="card-score" class="text-lg sm:text-xl font-bold px-3 py-1 rounded-lg bg-white/40 dark:bg-black/20" title="Score saisie précédente">--%</span>
+        <span id="card-score" class="text-lg sm:text-xl font-bold px-3 py-1 rounded-lg bg-white/40 dark:bg-black/20" title="Probabilité de rappel">--%</span>
       </div>
       <div id="card-content" class="flex-grow flex flex-col justify-center items-center">
         <p id="card-french-word" class="text-2xl sm:text-3xl md:text-4xl font-semibold"></p>
@@ -109,11 +109,11 @@
     <div id="message-area" class="w-full text-center h-6 text-sm font-medium" role="status" aria-live="polite"></div>
 
     <div id="input-bar" class="w-full flex flex-col sm:flex-row items-center gap-2 p-3 bg-white/50 backdrop-blur-sm rounded-lg shadow">
-      <input type="text" id="answer-input" placeholder="Votre réponse en anglais..." class="flex-grow p-3 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-base" autocorrect="off" autocapitalize="off" spellcheck="false">
-      <button id="submit-answer-button" class="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md transition-colors text-sm sm:text-base">Valider</button>
+      <input type="text" id="answer-input" placeholder="Votre réponse..." class="flex-grow p-3 border rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-base" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button id="submit-answer-button" class="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md transition-colors text-sm sm:text-base">Afficher</button>
     </div>
 
-    <div id="grade-bar" class="w-full grid grid-cols-2 sm:flex sm:flex-row gap-2 hidden">
+    <div id="grade-bar" class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 hidden">
       <button id="grade-again"  data-grade="1" class="flex-1 px-4 py-2 rounded-md bg-red-500/90 hover:bg-red-600 text-white font-semibold">Encore</button>
       <button id="grade-hard"   data-grade="2" class="flex-1 px-4 py-2 rounded-md bg-amber-500/90 hover:bg-amber-600 text-white font-semibold">Difficile</button>
       <button id="grade-good"   data-grade="3" class="flex-1 px-4 py-2 rounded-md bg-emerald-500/90 hover:bg-emerald-600 text-white font-semibold">Bien</button>
@@ -121,6 +121,12 @@
     </div>
   </div>
 
+  <!-- ✅ AJOUT IMPORTANT : Chargement de la bibliothèque FSRS depuis un CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/fsrs.js@0.6.0/dist/fsrs.min.js"></script>
+  
+  <!-- Chargement de vos scripts en tant que modules -->
+  <script type="module" src="fsrs-helper.js"></script>
   <script type="module" src="script.js"></script>
+
 </body>
 </html>
