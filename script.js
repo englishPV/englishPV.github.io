@@ -88,7 +88,7 @@ function setMenuOpen(open){
 function setDarkMode(onMode){
   S.darkMode=!!onMode; document.body.classList.toggle('dark-mode',S.darkMode); document.body.classList.toggle('light-mode',!S.darkMode);
   els.darkModeToggle.innerHTML=S.darkMode?'☀':'🌙'; els.darkModeToggle.setAttribute('aria-pressed',String(S.darkMode));
-  autoSave();
+  saveState();
 }
 
 // Leitner helpers
@@ -224,7 +224,6 @@ async function scheduleWithGrade(card, grade){
     }
   }
 
-  // Hook IA optionnel
   if (typeof S.adaptiveScheduler === 'function'){
     try{
       const suggest = await S.adaptiveScheduler({card, stateBefore:before, rating:gName});
@@ -278,9 +277,7 @@ function gradeFromTyped(userInput, correctFull, latencyMs){
 }
 
 // ——————————————————————————————————————————————
-// Cycle unique: deck = cartes non vues dans le cycle
-// tri: learning/relearning dues -> review dues (faible maîtrise d'abord)
-// -> le reste (new + notDue) trié par maîtrise puis échéance
+// Construction du deck de cartes
 // ——————————————————————————————————————————————
 function ensureCycleForCurrentChapter(){
   if (S.cycle.chapter !== S.currentChapter){
@@ -301,7 +298,6 @@ function buildScheduledDeck(list){
 
   let cycleReset = false;
   if (unseen.length === 0 && base.length > 0){
-    // fin de cycle -> reset
     resetCycleForCurrentChapter();
     unseen = [...base];
     cycleReset = true;
@@ -326,7 +322,6 @@ function buildScheduledDeck(list){
     return (a.nextDue||0)-(b.nextDue||0);
   });
 
-  // Le reste: priorité aux faibles maîtrises
   const others = [
     ...newCards, 
     ...learningNotDue, 
@@ -339,7 +334,6 @@ function buildScheduledDeck(list){
 
   const deck = [...learningDue, ...reviewDue, ...others];
 
-  // Deck garanti non vide si base non vide
   if (cycleReset) {
     showMsg('Nouveau cycle lancé', 'text-amber-500 dark:text-amber-400', 1400);
   }
@@ -414,15 +408,13 @@ async function onGrade(grade,opts={}){
   registerOutcome(card,grade,scorePct,latency);
   if(preState==='new') S.sessionNewShown++;
 
-  // Marquer la carte comme "vue dans le cycle" (unicité)
   S.cycle.seen[String(card.id)] = true;
-
   updateCardScoreUI(scorePct,oldPct);
 
   const labels={1:'Encore',2:'Difficile',3:'Bien',4:'Facile'};
   if(opts.showFeedback!==false) showMsg(`${labels[grade]} — ${formatInterval(nextMs)}`, grade>=3?'text-emerald-500 dark:text-emerald-400':'text-red-500 dark:text-red-400', 1200);
 
-  rebuildDeck(); renderStats(); renderSparkline(); renderProgressBar(); autoSave();
+  rebuildDeck(); renderStats(); renderSparkline(); renderProgressBar(); saveState();
   if(opts.autoAdvance!==false){ setTimeout(nextCard, AUTO_ADVANCE_MS); } else { S.awaitingAdvance=true; setTimeout(()=>{ showMsg('ENTER pour continuer','text-sky-500 dark:text-sky-400',1400); }, 150); }
   return nextMs;
 }
@@ -446,71 +438,117 @@ function handleSubmitAnswer(){
     S.awaitingAdvance=true;
   });
 }
-function nextCard(){ S.seenCountInSession++; if(!S.currentDeck.length){ renderCard(); return; } S.currentIndex=0; renderCard(); renderProgressBar(); autoSave(); }
+function nextCard(){ S.seenCountInSession++; if(!S.currentDeck.length){ renderCard(); return; } S.currentIndex=0; renderCard(); renderProgressBar(); saveState(); }
 
-// Sauvegarde
-let saveT=null;
-function saveData(){ 
-  try{ 
-    // sérialiser seen comme tableau d’ids pour compacité
-    const seenArray = Object.keys(S.cycle.seen||{});
-    localStorage.setItem('flashcardAppData', JSON.stringify({
-      allCards:S.allCards, elapsedSeconds:S.elapsedSeconds, currentChapter:S.currentChapter, darkMode:S.darkMode, currentTheme:S.currentTheme, reverseMode:S.reverseMode,
-      streak:S.streak, maxStreak:S.maxStreak, dailyHistory:S.dailyHistory, sessionNewShown:S.sessionNewShown, seenCountInSession:S.seenCountInSession,
-      cycle:{ chapter:S.cycle.chapter, seen:seenArray }
-    })); 
-  }catch(e){} 
+// --- NOUVEAU SYSTÈME DE SAUVEGARDE ET DE SYNCHRONISATION ---
+
+// Sauvegarde l'état actuel de l'application dans le localStorage.
+// Cette fonction est appelée après chaque action de l'utilisateur.
+function saveState() {
+  try {
+    const seenArray = Object.keys(S.cycle.seen || {});
+    const stateToSave = {
+      allCards: S.allCards,
+      elapsedSeconds: S.elapsedSeconds,
+      currentChapter: S.currentChapter,
+      darkMode: S.darkMode,
+      currentTheme: S.currentTheme,
+      reverseMode: S.reverseMode,
+      streak: S.streak,
+      maxStreak: S.maxStreak,
+      dailyHistory: S.dailyHistory,
+      sessionNewShown: S.sessionNewShown,
+      seenCountInSession: S.seenCountInSession,
+      cycle: { chapter: S.cycle.chapter, seen: seenArray }
+    };
+    localStorage.setItem('flashcardAppData', JSON.stringify(stateToSave));
+  } catch (e) {
+    console.error("Erreur lors de la sauvegarde des données:", e);
+  }
 }
-function autoSave(){ clearTimeout(saveT); saveT=setTimeout(saveData,250); }
-{
-  const existingById = new Map((S.allCards || []).map(c => [String(c.id), c]));
-  let added = 0, updated = 0;
 
-  for (const raw of flashcardData) {
-    // id stable (soit fourni dans data.js, soit dérivé chapter+french)
-    const id = String(raw.id ?? `${raw.chapter}::${raw.french ?? raw.fr}`);
-    const incoming = upgradeCardModel({ ...raw, id });
-
-    const prev = existingById.get(id);
-    if (prev) {
-      // On garde les stats locales, on met à jour le contenu
-      prev.french  = incoming.french  ?? incoming.fr ?? prev.french;
-      prev.english = incoming.english ?? incoming.en ?? prev.english;
-      prev.chapter = incoming.chapter ?? prev.chapter;
-      updated++;
-    } else {
-      existingById.set(id, incoming);
-      added++;
-    }
+// Charge les données, synchronise avec les nouvelles cartes, et initialise l'application.
+// C'est le point d'entrée principal au chargement de la page.
+function loadAndSyncData() {
+  const savedJSON = localStorage.getItem('flashcardAppData');
+  const masterData = flashcardData;
+  let savedState = null;
+  let addedWordsCount = 0;
+  
+  try {
+    if (savedJSON) savedState = JSON.parse(savedJSON);
+  } catch (e) {
+    console.error("Erreur lors du parsing des données sauvegardées:", e);
   }
 
-  // Option (décommenter si tu veux retirer les cartes supprimées de data.js)
-  // const keep = new Set(flashcardData.map(x => String(x.id ?? `${x.chapter}::${x.french ?? x.fr}`)));
-  // for (const id of [...existingById.keys()]) if (!keep.has(id)) existingById.delete(id);
+  if (!savedState || !savedState.allCards || savedState.allCards.length === 0) {
+    console.log("Aucune sauvegarde valide trouvée. Initialisation à partir de zéro.");
+    S.allCards = masterData.map(raw => {
+      const id = String(raw.id ?? `${raw.chapter}::${raw.french ?? raw.fr}`);
+      return upgradeCardModel({ ...raw, id });
+    });
+    S.currentChapter = 'Tout';
+  } else {
+    console.log("Sauvegarde trouvée. Synchronisation avec le vocabulaire de base.");
+    
+    const savedCardsMap = new Map(savedState.allCards.map(c => [String(c.id), c]));
+    const masterIds = new Set();
+    const finalCards = [];
 
-  S.allCards = Array.from(existingById.values());
-  S.availableChapters = ['Tout', ...Array.from(new Set(S.allCards.map(c => c.chapter)))];
+    for (const rawCard of masterData) {
+      const id = String(rawCard.id ?? `${rawCard.chapter}::${rawCard.french ?? raw.fr}`);
+      masterIds.add(id);
+      
+      const savedCard = savedCardsMap.get(id);
 
-  if (added > 0) showMsg(`${added} nouveaux mots ajoutés ✨`, 'text-emerald-600', 3500);
-  autoSave();
-}
-function loadData(){
-  const s=localStorage.getItem('flashcardAppData'); if(!s) return false;
-  try{
-    const d=JSON.parse(s);
-    S.allCards=(d.allCards&&d.allCards.length?d.allCards:flashcardData).map(upgradeCardModel);
-    S.elapsedSeconds=d.elapsedSeconds||0; S.currentChapter=d.currentChapter||'Tout';
-    S.darkMode=!!d.darkMode; document.body.classList.toggle('dark-mode',S.darkMode); document.body.classList.toggle('light-mode',!S.darkMode);
-    els.darkModeToggle.innerHTML=S.darkMode?'☀':'🌙'; els.darkModeToggle.setAttribute('aria-pressed',String(S.darkMode));
-    S.currentTheme=d.currentTheme||'default'; els.themeSelector&&(els.themeSelector.value=S.currentTheme);
-    S.reverseMode=!!d.reverseMode; S.streak=d.streak||0; S.maxStreak=d.maxStreak||0; S.dailyHistory=d.dailyHistory||{}; S.sessionNewShown=d.sessionNewShown||0; S.seenCountInSession=d.seenCountInSession||0;
-    // Cycle
-    const cycleSeenArray = (d.cycle && Array.isArray(d.cycle.seen)) ? d.cycle.seen : [];
-    S.cycle = { chapter: (d.cycle?.chapter)||S.currentChapter, seen: Object.fromEntries(cycleSeenArray.map(id=>[String(id),true])) };
-    // recalcul maîtrise si manquante
-    S.allCards.forEach(c=>{ if(!Number.isFinite(c.masteryScore)) c.masteryScore=computeMasteryScore(c); });
-    return true;
-  }catch(e){ return false }
+      if (savedCard) {
+        const updatedCard = {
+          ...savedCard,
+          french: rawCard.french ?? rawCard.fr,
+          english: rawCard.english ?? rawCard.en,
+          chapter: rawCard.chapter
+        };
+        finalCards.push(upgradeCardModel(updatedCard));
+      } else {
+        const newCard = upgradeCardModel({ ...rawCard, id });
+        finalCards.push(newCard);
+        addedWordsCount++;
+      }
+    }
+    
+    S.allCards = finalCards.filter(c => masterIds.has(String(c.id)));
+    
+    S.elapsedSeconds = savedState.elapsedSeconds || 0;
+    S.currentChapter = savedState.currentChapter || 'Tout';
+    S.darkMode = !!savedState.darkMode;
+    S.currentTheme = savedState.currentTheme || 'default';
+    S.reverseMode = !!savedState.reverseMode;
+    S.streak = savedState.streak || 0;
+    S.maxStreak = savedState.maxStreak || 0;
+    S.dailyHistory = savedState.dailyHistory || {};
+    S.sessionNewShown = savedState.sessionNewShown || 0;
+    S.seenCountInSession = savedState.seenCountInSession || 0;
+    
+    const cycleSeenArray = (savedState.cycle && Array.isArray(savedState.cycle.seen)) ? savedState.cycle.seen : [];
+    S.cycle = {
+      chapter: (savedState.cycle?.chapter) || S.currentChapter,
+      seen: Object.fromEntries(cycleSeenArray.map(id => [String(id), true]))
+    };
+  }
+  
+  if (addedWordsCount > 0) {
+    showMsg(`${addedWordsCount} nouveau(x) mot(s) ajouté(s) ✨`, 'text-emerald-500 dark:text-emerald-400', 3500);
+  }
+  
+  document.body.classList.toggle('dark-mode', S.darkMode);
+  document.body.classList.toggle('light-mode', !S.darkMode);
+  els.darkModeToggle.innerHTML = S.darkMode ? '☀' : '🌙';
+  if (els.themeSelector) els.themeSelector.value = S.currentTheme;
+
+  buildSearchIndex();
+  initUI();
+  
+  saveState();
 }
 
 // Recherche & chapitres
@@ -523,14 +561,12 @@ function filterCardsForSearch(q){
   els.searchResultsContainer.innerHTML=res.map(card=>`<div class="p-2 cursor-pointer rounded ${hoverCls}" data-id="${card.id}">${card.french} — ${card.english} (${card.chapter})</div>`).join('');
 }
 
-// Met une carte en tête du deck en évitant les doublons
 function putCardAtFront(deck, card) {
   const idStr = String(card.id);
   const rest = deck.filter(c => String(c.id) !== idStr);
   return [card, ...rest];
 }
 
-// Saute à une carte par id (et bascule de chapitre si besoin)
 function jumpToCard(cardId, opts = {}) {
   const card = S.allCards.find(c => String(c.id) === String(cardId));
   if (!card) { showMsg('Carte introuvable', 'text-red-500', 1500); return; }
@@ -546,7 +582,6 @@ function jumpToCard(cardId, opts = {}) {
     rebuildDeck();
   }
 
-  // Respect du cycle: si déjà vue et d'autres non vues existent, on bloque le jump
   const base = baseListForCurrentChapter();
   const unseen = base.filter(c=>!S.cycle.seen[String(c.id)]);
   if (S.cycle.seen[String(card.id)] && unseen.length > 0) {
@@ -557,7 +592,7 @@ function jumpToCard(cardId, opts = {}) {
   S.currentDeck = putCardAtFront(S.currentDeck, card);
   S.currentIndex = 0;
   renderCard(1);
-  autoSave();
+  saveState();
 }
 
 // Events
@@ -568,9 +603,8 @@ on(els.closeMenuButton,'click',()=>setMenuOpen(false));
 on(els.menuChapters,'click',e=>{
   const btn=e.target.closest('button[data-chapter]'); if(!btn) return;
   const ch=btn.dataset.chapter; if(!ch||ch===S.currentChapter) { setMenuOpen(false); return; }
-  // changement de chapitre => reset du cycle + reset session
   S.currentChapter=ch; resetCycleForCurrentChapter(); S.sessionNewShown=0; S.seenCountInSession=0;
-  rebuildDeck(); renderCard(0); renderProgressBar(); updateActiveChapterButtons(); els.currentChapterLabel.textContent=S.currentChapter; autoSave();
+  rebuildDeck(); renderCard(0); renderProgressBar(); updateActiveChapterButtons(); els.currentChapterLabel.textContent=S.currentChapter; saveState();
   setMenuOpen(false);
 });
 
@@ -582,16 +616,15 @@ on(els.resetDataButton,'click',()=>{
   };
   S.allCards.forEach(c=>{ if(chapter==='Tout'||c.chapter===chapter) resetOne(c); });
   if(chapter==='Tout'){ S.seenCountInSession=0; S.sessionNewShown=0; S.streak=0; S.maxStreak=0; S.dailyHistory={}; }
-  // Reset cycle pour le chapitre choisi si c'est le courant
   if (chapter==='Tout' || chapter===S.currentChapter) resetCycleForCurrentChapter();
 
-  rebuildDeck(); renderCard(0); renderStats(); renderSparkline(); renderProgressBar(); autoSave();
+  rebuildDeck(); renderCard(0); renderStats(); renderSparkline(); renderProgressBar(); saveState();
   showMsg('Réinitialisé','text-orange-500 dark:text-yellow-400',1200);
 });
 
 on(els.darkModeToggle,'click',()=>setDarkMode(!S.darkMode));
-on(els.reverseModeButton,'click',()=>{S.reverseMode=!S.reverseMode; renderCard(0); autoSave()});
-on(els.themeSelector,'change',()=>autoSave());
+on(els.reverseModeButton,'click',()=>{S.reverseMode=!S.reverseMode; renderCard(0); saveState()});
+on(els.themeSelector,'change',()=>{S.currentTheme=els.themeSelector.value; saveState()});
 
 on(els.searchBar,'input',e=>{filterCardsForSearch(e.target.value)});
 on(els.searchResultsContainer,'click',e=>{
@@ -680,21 +713,16 @@ function renderStats(){
       <div class="text-gray-500 dark:text-gray-400">Score moyen (saisie)</div><div class="text-right font-semibold">${avgScore}%</div>
       <div class="text-gray-500 dark:text-gray-400">Intervalle moyen</div><div class="text-right font-semibold">${avgInterval}j</div>
       <div class="text-gray-500 dark:text-gray-400">Facilité moyenne</div><div class="text-right font-semibold">${avgEase}</div>
-
       <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
-
       <div class="text-gray-500 dark:text-gray-400">Maîtrise faible (&lt;50)</div><div class="text-right font-semibold">${cats.low}</div>
       <div class="text-gray-500 dark:text-gray-400">En progression (50–79)</div><div class="text-right font-semibold">${cats.mid}</div>
       <div class="text-gray-500 dark:text-gray-400">Maîtrisés (≥80)</div><div class="text-right font-semibold">${cats.high}</div>
-
       <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
-
       <div class="text-gray-500 dark:text-gray-400">Boîte 1</div><div class="text-right font-semibold">${boxes[1]}</div>
       <div class="text-gray-500 dark:text-gray-400">Boîte 2</div><div class="text-right font-semibold">${boxes[2]}</div>
       <div class="text-gray-500 dark:text-gray-400">Boîte 3</div><div class="text-right font-semibold">${boxes[3]}</div>
       <div class="text-gray-500 dark:text-gray-400">Boîte 4</div><div class="text-right font-semibold">${boxes[4]}</div>
       <div class="text-gray-500 dark:text-gray-400">Boîte 5</div><div class="text-right font-semibold">${boxes[5]}</div>
-
       <div class="col-span-2 mt-2 border-t border-gray-200 dark:border-gray-700"></div>
       <div class="text-gray-500 dark:text-gray-400">Révisions aujourd’hui</div><div class="text-right font-semibold">${todayReviews}</div>
     </div>`;
@@ -711,7 +739,7 @@ function renderSparkline(){
   legend.textContent=`${total14} révisions • ${acc7}%/7j`;
 }
 
-// Init
+// Initialisation de l'UI (après le chargement des données)
 function initUI(){
   computeAvailableChapters();
   renderChapterButtons();
@@ -719,18 +747,11 @@ function initUI(){
   rebuildDeck();
   renderCard(0);
   renderProgressBar();
-  renderStats(); renderSparkline();
-  setInterval(()=>{S.elapsedSeconds++; renderTimer(); if(S.elapsedSeconds%15===0) autoSave();},1000);
+  renderStats(); 
+  renderSparkline();
+  setInterval(()=>{S.elapsedSeconds++; renderTimer(); if(S.elapsedSeconds%15===0) saveState();},1000);
 }
 
-(()=>{
-  const loaded=loadData();
-  if(!loaded){ S.allCards=flashcardData.map(upgradeCardModel); S.currentChapter='Tout'; }
-  else { S.allCards=S.allCards.map(upgradeCardModel); }
-  buildSearchIndex();
-  computeAvailableChapters();
-  document.body.classList.toggle('dark-mode',S.darkMode);
-  document.body.classList.toggle('light-mode',!S.darkMode);
-  els.darkModeToggle.innerHTML=S.darkMode?'☀':'🌙';
-  initUI();
-})();
+// --- POINT D'ENTRÉE DE L'APPLICATION ---
+// Lance le chargement, la synchronisation des données et l'initialisation de l'interface utilisateur.
+loadAndSyncData();
