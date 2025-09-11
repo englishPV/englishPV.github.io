@@ -84,7 +84,47 @@ function setMenuOpen(open){
   els.sidebarMenu.setAttribute('aria-hidden',String(!open));
   els.burgerButton.setAttribute('aria-expanded',String(!!open));
 }
+function initializeApp() {
+  // 1. La liste de base est TOUJOURS celle du fichier data.js
+  const sourceCards = flashcardData;
 
+  // 2. On tente de charger l'état sauvegardé par l'utilisateur
+  const savedStateJSON = localStorage.getItem('srsData'); // Assurez-vous que la clé ('srsData') est correcte
+  let savedState = null;
+  if (savedStateJSON) {
+    try {
+      savedState = JSON.parse(savedStateJSON);
+    } catch (e) {
+      console.error("Erreur lors de la lecture des données sauvegardées.", e);
+    }
+  }
+
+  if (savedState && savedState.allCards) {
+    // L'utilisateur a déjà des données, on va les fusionner.
+    const savedCardMap = new Map(savedState.allCards.map(card => [card.id, card]));
+
+    const mergedCards = sourceCards.map(sourceCard => {
+      const savedProgress = savedCardMap.get(sourceCard.id);
+      if (savedProgress) {
+        // Ce mot existe et a une progression. On fusionne.
+        // On prend le mot de base (au cas où le texte a été corrigé)
+        // et on y ajoute la progression sauvegardée.
+        return { ...sourceCard, ...savedProgress };
+      } else {
+        // C'est un NOUVEAU mot ! Il n'a pas de progression sauvegardée.
+        // On le retourne tel quel, il sera initialisé comme une nouvelle carte.
+        return sourceCard;
+      }
+    });
+    
+    // On met à jour l'état global avec les cartes fusionnées et les autres paramètres sauvegardés
+    Object.assign(S, savedState, { allCards: mergedCards.map(upgradeCardModel) });
+
+  } else {
+    // Aucune donnée sauvegardée ou données corrompues : c'est la première visite.
+    // On initialise toutes les cartes à partir de la source.
+    S.allCards = sourceCards.map(c => upgradeCardModel({ ...c }));
+  }
 function setDarkMode(onMode){
   S.darkMode=!!onMode; document.body.classList.toggle('dark-mode',S.darkMode); document.body.classList.toggle('light-mode',!S.darkMode);
   els.darkModeToggle.innerHTML=S.darkMode?'☀':'🌙'; els.darkModeToggle.setAttribute('aria-pressed',String(S.darkMode));
