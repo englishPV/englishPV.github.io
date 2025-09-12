@@ -28,7 +28,6 @@ const KEYCODES = {
     SPACE: ' ',
     ESC: 'Escape',
 };
-
 /* =========================
 I18N
 ========================= */
@@ -96,11 +95,10 @@ const I18N = {
 };
 
 function t(key, params = {}) {
-    const dict = I18N[App?.prefs?.lang] || I18N.fr;
+    const dict = I18N[App.prefs?.lang] || I18N.fr;
     const base = dict[key] ?? I18N.fr[key] ?? key;
     return base.replace(/\{(\w+)\}/g, (_, k) => (params[k] != null ? String(params[k]) : ''));
 }
-
 function nowMs() {
     return Date.now();
 }
@@ -233,12 +231,12 @@ const App = {
 
     // préférences (persistées)
     prefs: {
-        darkMode: false,
-        reverseMode: false,
-        theme: 'default',
-        activeChapters: [], // multi-sélection (strings)
-        lang: 'fr', // NOUVEAU
-    },
+    darkMode: false,
+    reverseMode: false,
+    theme: 'default',
+    activeChapters: [],
+    lang: 'fr', // NOUVEAU
+},
 
     // stats (persistées)
     stats: {
@@ -341,10 +339,10 @@ function loadPersisted() {
     // NOUVEAU: rattrapage du chrono si la page a été fermée sans sauvegarde
     if (rawTimer) {
         try {
-            const tmr = JSON.parse(rawTimer);
-            if (tmr && Number.isFinite(tmr.startedAt) && tmr.startedAt > 0) {
+            const t = JSON.parse(rawTimer);
+            if (t && Number.isFinite(t.startedAt) && t.startedAt > 0) {
                 // Ajoute le temps écoulé depuis le dernier start jusqu'à maintenant, réparti par jour
-                addTimeRangeToStats(tmr.startedAt, nowMs());
+                addTimeRangeToStats(t.startedAt, nowMs());
                 saveStats();
                 // Repart immédiatement le chrono à partir de maintenant
                 App.session.startedAt = nowMs();
@@ -365,6 +363,27 @@ function loadPersisted() {
 }
 function saveCards() {
     localStorage.setItem(STORAGE_KEYS.cards, JSON.stringify([...App.cards.values()]));
+}
+/* =========================
+Langue UI
+========================= */
+function setReverseButtonLabel() {
+    els.reverseModeButton.textContent = App.prefs.reverseMode ? t('reverse_en_fr') : t('reverse_fr_en');
+}
+function applyLanguage() {
+    document.documentElement.lang = App.prefs.lang === 'en' ? 'en' : 'fr';
+    setReverseButtonLabel();
+
+    // re-render sections avec du texte
+    renderChaptersMenu();
+    updateCurrentChapterLabel();
+    populateResetOptions();
+    renderStats();
+    updateProgress();
+    if (App.session.currentCardId) {
+        const c = App.cards.get(App.session.currentCardId);
+        renderCard(c);
+    }
 }
 function savePrefs() {
     localStorage.setItem(STORAGE_KEYS.prefs, JSON.stringify(App.prefs));
@@ -523,6 +542,7 @@ function renderChaptersMenu() {
     updateCurrentChapterLabel();
     populateResetOptions();
 }
+
 function updateCurrentChapterLabel() {
     const actives = App.prefs.activeChapters;
     let text = '';
@@ -532,6 +552,34 @@ function updateCurrentChapterLabel() {
         text = actives[0];
     } else {
         text = t('n_chapters_selected', { n: actives.length });
+    }
+    els.currentChapterLabel.textContent = text;
+}
+
+function populateResetOptions() {
+    const sel = els.resetOptions;
+    sel.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = 'ALL';
+    optAll.textContent = t('reset_all');
+    sel.appendChild(optAll);
+
+    for (const ch of App.data.chapters) {
+        const opt = document.createElement('option');
+        opt.value = ch;
+        opt.textContent = t('reset_chapter', { chapter: ch });
+        sel.appendChild(opt);
+    }
+}
+function updateCurrentChapterLabel() {
+    const actives = App.prefs.activeChapters;
+    let text = '';
+    if (!actives || actives.length === 0) {
+        text = 'Tous chapitres';
+    } else if (actives.length === 1) {
+        text = actives[0];
+    } else {
+        text = `${actives.length} chapitres sélectionnés`;
     }
     els.currentChapterLabel.textContent = text;
 }
@@ -555,13 +603,13 @@ function populateResetOptions() {
     sel.innerHTML = '';
     const optAll = document.createElement('option');
     optAll.value = 'ALL';
-    optAll.textContent = t('reset_all');
+    optAll.textContent = 'Tout réinitialiser (toutes cartes)';
     sel.appendChild(optAll);
 
     for (const ch of App.data.chapters) {
         const opt = document.createElement('option');
         opt.value = ch;
-        opt.textContent = t('reset_chapter', { chapter: ch });
+        opt.textContent = `Réinitialiser: ${ch}`;
         sel.appendChild(opt);
     }
 }
@@ -839,7 +887,6 @@ function renderStats() {
          <div>${t('time_today_and_total', { timeToday: formatMs(s.timeMs || 0), timeTotal: formatMs(App.stats.totalTimeMs || 0) })}</div>
          <div>${t('grades_breakdown', { again: s.again, hard: s.hard, good: s.good, easy: s.easy })}</div>
          <div>${t('streak', { streak: App.stats.streak })}</div>`;
-
     const days = [];
     const now = new Date();
     for (let i = 13; i >= 0; i--) {
@@ -869,7 +916,7 @@ function renderStats() {
         els.sparklineLast.setAttribute('cy', pts[pts.length - 1][1]);
     }
 
-    els.chartLegend.textContent = `${values[values.length - 1]} ${t('cards')}`;
+    els.chartLegend.textContent = `${values[values.length - 1]} cartes`;
 }
 
 /* =========================
@@ -889,7 +936,6 @@ function startTimer() {
     }
 
     const tick = () => {
-        // recalculer base aujourd'hui à chaque tick (gère le passage minuit si une sauvegarde est intervenue)
         const baseMs = (App.stats.byDay?.[todayKey()]?.timeMs) || 0;
         const liveMs = App.session.startedAt ? (nowMs() - App.session.startedAt) : 0;
         const elapsedMs = baseMs + Math.max(0, liveMs);
@@ -897,7 +943,6 @@ function startTimer() {
         els.timer.textContent = formatMs(elapsedMs);
         els.timer.setAttribute('title', t('total_time_title', { x: formatMs(App.stats.totalTimeMs || 0) }));
 
-        // On persiste startedAt fréquemment pour tolérance aux crashs
         persistTimerState();
     };
 
@@ -930,9 +975,9 @@ function evaluateAnswer() {
     const reverse = App.prefs.reverseMode;
     const user = els.answerInput.value.trim();
     if (!user) {
-        flashMessage(t("empty_input_hint"), true);
-        return;
-    }
+    flashMessage(t("empty_input_hint"), true);
+    return;
+}
 
     App.session.revealed = true;
     App.session.inputLocked = true;
@@ -1025,13 +1070,13 @@ function applyGrade(card, grade, { auto = false, showFeedback = false, typedAnsw
     removeFromQueues(card.id);
 
     if (showFeedback) {
-        let label = '';
-        if (grade === 1) label = t('grade_again');
-        if (grade === 2) label = t('grade_hard');
-        if (grade === 3) label = t('grade_good');
-        if (grade === 4) label = t('grade_easy');
-        flashMessage(`${t('auto_prefix')}${label}`, false);
-    }
+    let label = '';
+    if (grade === 1) label = t('grade_again');
+    if (grade === 2) label = t('grade_hard');
+    if (grade === 3) label = t('grade_good');
+    if (grade === 4) label = t('grade_easy');
+    flashMessage(`${t('auto_prefix')}${label}`, false);
+}
 
     App.session.studiedCount += 1;
     updateProgress();
@@ -1168,11 +1213,11 @@ function resetSelection() {
 
     // NOUVEAU: le chrono ne se remet à zéro QUE si la cible est "ALL"
     if (target === 'ALL') {
-        resetAllTimerCounters();
-        flashMessage(t('reset_selection_and_timer'));
-    } else {
-        flashMessage(t('reset_selection'));
-    }
+    resetAllTimerCounters();
+    flashMessage(t('reset_selection_and_timer'));
+} else {
+    flashMessage(t('reset_selection'));
+}
 
     rebuildQueuesAndMaybeReload();
 }
@@ -1196,33 +1241,11 @@ function resetAllTimerCounters() {
     // met à jour l’UI et efface l’état persistant du timer
     try { localStorage.removeItem(STORAGE_KEYS.timer); } catch {}
     els.timer.textContent = formatMs(0);
-    els.timer.setAttribute('title', t('total_time_title', { x: formatMs(0) }));
+    els.timer.setAttribute('title', `Total cumulé: ${formatMs(0)}`);
     renderStats();
 
     // repart proprement
     startTimer();
-}
-
-/* =========================
-Langue UI
-========================= */
-function setReverseButtonLabel() {
-    els.reverseModeButton.textContent = App.prefs.reverseMode ? t('reverse_en_fr') : t('reverse_fr_en');
-}
-function applyLanguage() {
-    document.documentElement.lang = App.prefs.lang === 'en' ? 'en' : 'fr';
-    setReverseButtonLabel();
-
-    // re-render sections avec du texte
-    renderChaptersMenu();
-    updateCurrentChapterLabel();
-    populateResetOptions();
-    renderStats();
-    updateProgress();
-    if (App.session.currentCardId) {
-        const c = App.cards.get(App.session.currentCardId);
-        renderCard(c);
-    }
 }
 
 /* =========================
@@ -1253,6 +1276,8 @@ function setupTheme() {
     });
     applyTheme();
 }
+
+
 function setupReverseMode() {
     els.reverseModeButton.addEventListener('click', () => {
         App.prefs.reverseMode = !App.prefs.reverseMode;
@@ -1260,7 +1285,7 @@ function setupReverseMode() {
         // NOUVEAU: on couple la langue à la direction d'étude
         // FR→EN (reverseMode = false) => UI en anglais
         // EN→FR (reverseMode = true)  => UI en français
-        App.prefs.lang = App.prefs.reverseMode ? 'fr' : 'en';
+        //App.prefs.lang = App.prefs.reverseMode ? 'fr' : 'en';
 
         savePrefs();
         applyLanguage();
@@ -1365,9 +1390,7 @@ function init() {
     setupSearch();
     renderStats();
 
-    // Chrono: sauvegarde sur masquage/sortie et reprise auto
     setupAutoSaveOnLeave();
-
     rebuildQueues();
     loadNextCard();
     startTimer();
