@@ -168,7 +168,7 @@ const App = {
 
     // stats (persistées)
     stats: {
-        byDay: {}, // 'YYYY-MM-DD' -> { studied: number, correct: number, again: number, hard: number, good: number, easy: number }
+        byDay: {}, // 'YYYY-MM-DD' -> { studied: number, correct: number, again: number, hard: number, good: number, easy: number, timeMs: number }
         streak: 0,
         lastStudyDay: null,
          totalTimeMs: 0,        // <= NOUVEAU: temps total cumulé (ms)
@@ -176,7 +176,7 @@ const App = {
 
     // session
     session: {
-        startedAt: nowMs(),
+        startedAt: null, // MODIFIÉ: initialisé à null, défini dans startTimer
         timerInterval: null,
         queueLearning: [],
         queueReview: [],
@@ -707,36 +707,26 @@ function bumpDailyStats(grade) {
 /* =========================
 Sauvegarde du temps (auto à la sortie)
 ========================= */
-function saveSessionElapsedToStats({ updateUI = false } = {}) {
-    const start = App.session.startedAt;
-    if (!start) return;
+// NOUVEAU: Fonction simplifiée pour sauvegarder le temps écoulé
+function saveElapsedTime() {
+    // Si le timer n'a pas démarré sur ce chargement de page, il n'y a rien à sauvegarder.
+    if (!App.session.startedAt) return;
 
-    const elapsed = nowMs() - start;                          // temps écoulé depuis le début de session
-    const already = App.session._persistedSessionMs || 0;     // déjà comptabilisé pour cette session
-    const delta = Math.max(0, elapsed - already);
-    if (delta <= 0) return;
+    const deltaMs = nowMs() - App.session.startedAt;
+    if (deltaMs <= 0) return;
 
-    // Marquer comme persisté pour éviter le double comptage
-    App.session._persistedSessionMs = already + delta;
+    // Ajoute le temps écoulé au total cumulé
+    App.stats.totalTimeMs = (App.stats.totalTimeMs || 0) + deltaMs;
 
-    // Total cumulé
-    App.stats.totalTimeMs = (App.stats.totalTimeMs || 0) + delta;
-
-    // Par jour
+    // Ajoute le temps écoulé aux stats du jour
     const day = todayKey();
     if (!App.stats.byDay[day]) {
+        // Initialise si ça n'existe pas
         App.stats.byDay[day] = { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 };
     }
-    App.stats.byDay[day].timeMs = (App.stats.byDay[day].timeMs || 0) + delta;
+    App.stats.byDay[day].timeMs = (App.stats.byDay[day].timeMs || 0) + deltaMs;
 
     saveStats();
-
-    if (updateUI) {
-        renderStats();
-        if (els.timer) {
-            els.timer.setAttribute('title', `Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}`);
-        }
-    }
 }
 
 function renderStats() {
@@ -787,13 +777,28 @@ function renderStats() {
 /* =========================
 Timer
 ========================= */
+// MODIFIÉ: Le timer reprend à partir du temps déjà sauvegardé pour la journée
 function startTimer() {
-    const start = App.session.startedAt;
+    if (!els.timer) return;
+
     if (App.session.timerInterval) clearInterval(App.session.timerInterval);
-    App.session.timerInterval = setInterval(() => {
-        els.timer.textContent = formatMs(nowMs() - start);
-    }, 1000);
+
+    // Base = temps déjà sauvegardé aujourd'hui
+    const baseMs = (App.stats.byDay?.[todayKey()]?.timeMs) || 0;
+
+    // Commence à mesurer la partie "live" à partir de maintenant
+    App.session.startedAt = nowMs();
+
+    const tick = () => {
+        const elapsedMs = baseMs + (nowMs() - App.session.startedAt);
+        els.timer.textContent = formatMs(elapsedMs);
+        els.timer.setAttribute('title', `Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}`);
+    };
+
+    tick(); // affichage immédiat
+    App.session.timerInterval = setInterval(tick, 1000);
 }
+
 
 /* =========================
 Évaluation / Notation
@@ -982,18 +987,31 @@ function flashMessage(msg, isError = false) {
 Recherche
 ========================= */
 
+// MODIFIÉ: Gère la sauvegarde du temps et la pause/reprise du timer
 function setupAutoSaveOnLeave() {
-    const handler = () => saveSessionElapsedToStats({ updateUI: false });
+    const handler = () => saveElapsedTime();
 
-    // iOS/Safari
+    // iOS/Safari, Quitter la page / rafraîchir
     window.addEventListener('pagehide', handler);
-    // Navigate away / refresh
     window.addEventListener('beforeunload', handler);
-    // L’onglet passe en arrière-plan
+
+    // L'onglet est masqué ou affiché (pause/reprise du timer)
     document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') handler();
+        if (document.visibilityState === 'hidden') {
+            // Sauvegarde le temps écoulé et met en pause le timer à l'écran
+            handler();
+            if (App.session.timerInterval) {
+                clearInterval(App.session.timerInterval);
+                App.session.timerInterval = null; // Référence effacée
+            }
+        } else if (document.visibilityState === 'visible') {
+            // Quand l'onglet redevient visible, on redémarre le timer.
+            // Il reprendra automatiquement le temps de base mis à jour.
+            startTimer();
+        }
     });
 }
+
 
 function setupSearch() {
     els.searchBar.addEventListener('input', () => {
@@ -1223,6 +1241,9 @@ function init() {
     setupReset();
     setupSearch();
     renderStats();
+
+    // NOUVEAU: sauvegarde le temps écoulé en quittant/rafraîchissant/masquant
+    setupAutoSaveOnLeave();
 
     rebuildQueues();
     loadNextCard();
