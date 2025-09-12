@@ -708,12 +708,21 @@ function bumpDailyStats(grade) {
 Sauvegarde du temps (auto à la sortie)
 ========================= */
 // NOUVEAU: Fonction simplifiée pour sauvegarder le temps écoulé
+/* =========================
+Sauvegarde du temps (auto à la sortie)
+========================= */
+// MODIFIÉ: anti double comptage + remise à zéro du départ + maj UI
 function saveElapsedTime() {
-    // Si le timer n'a pas démarré sur ce chargement de page, il n'y a rien à sauvegarder.
-    if (!App.session.startedAt) return;
+    const startedAt = App.session.startedAt;
+    if (!startedAt) return;
 
-    const deltaMs = nowMs() - App.session.startedAt;
-    if (deltaMs <= 0) return;
+    const now = nowMs();
+    const deltaMs = now - startedAt;
+    if (!Number.isFinite(deltaMs) || deltaMs <= 0) {
+        // Même si rien à ajouter, on remet à zéro pour éviter tout double comptage ultérieur
+        App.session.startedAt = null;
+        return;
+    }
 
     // Ajoute le temps écoulé au total cumulé
     App.stats.totalTimeMs = (App.stats.totalTimeMs || 0) + deltaMs;
@@ -721,12 +730,15 @@ function saveElapsedTime() {
     // Ajoute le temps écoulé aux stats du jour
     const day = todayKey();
     if (!App.stats.byDay[day]) {
-        // Initialise si ça n'existe pas
         App.stats.byDay[day] = { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 };
     }
     App.stats.byDay[day].timeMs = (App.stats.byDay[day].timeMs || 0) + deltaMs;
 
     saveStats();
+    renderStats();
+
+    // IMPORTANT: éviter le double comptage si plusieurs événements se déclenchent (hidden + pagehide + beforeunload)
+    App.session.startedAt = null;
 }
 
 function renderStats() {
@@ -988,25 +1000,32 @@ Recherche
 ========================= */
 
 // MODIFIÉ: Gère la sauvegarde du temps et la pause/reprise du timer
+/* =========================
+Recherche
+========================= */
+
+// MODIFIÉ: pause propre + sauvegarde, sans double comptage
 function setupAutoSaveOnLeave() {
-    const handler = () => saveElapsedTime();
+    const pauseAndSave = () => {
+        // Stoppe l'affichage du timer avant de calculer le delta
+        if (App.session.timerInterval) {
+            clearInterval(App.session.timerInterval);
+            App.session.timerInterval = null;
+        }
+        // Persiste le delta depuis le dernier start
+        saveElapsedTime();
+    };
 
-    // iOS/Safari, Quitter la page / rafraîchir
-    window.addEventListener('pagehide', handler);
-    window.addEventListener('beforeunload', handler);
+    // iOS/Safari et autres navigateurs
+    window.addEventListener('pagehide', pauseAndSave, { capture: true });
+    window.addEventListener('beforeunload', pauseAndSave, { capture: true });
 
-    // L'onglet est masqué ou affiché (pause/reprise du timer)
+    // Pause/reprise lors du masquage/affichage de l'onglet
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-            // Sauvegarde le temps écoulé et met en pause le timer à l'écran
-            handler();
-            if (App.session.timerInterval) {
-                clearInterval(App.session.timerInterval);
-                App.session.timerInterval = null; // Référence effacée
-            }
+            pauseAndSave();
         } else if (document.visibilityState === 'visible') {
-            // Quand l'onglet redevient visible, on redémarre le timer.
-            // Il reprendra automatiquement le temps de base mis à jour.
+            // Le timer repart automatiquement depuis le temps déjà sauvegardé aujourd'hui
             startTimer();
         }
     });
