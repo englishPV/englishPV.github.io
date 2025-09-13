@@ -1,3 +1,4 @@
+/* style.css */
 :root{--easing:cubic-bezier(.2,.7,.2,1);--brand:#10b981;--brand-2:#06b6d4}
 .glassmorphism,.glassmorphism-menu{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .light-mode-card-neutral{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.05);color:#374151}
@@ -12,7 +13,8 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 :where(button,input,select){outline:none}
 :where(button,input,select):focus-visible{box-shadow:0 0 0 2px var(--brand),0 0 0 4px rgba(16,185,129,.25);border-color:transparent!important}
 button{transition:transform .15s var(--easing),opacity .2s;min-height:40px}
-button:hover{transform:translateY(-1px)}button:active{transform:translateY(0)}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0)}
 .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s var(--easing);z-index:30}
 body.menu-open .menu-overlay{opacity:1;pointer-events:auto}
 .chapter-button-active{background-color:#F59E0B;color:#fff!important;box-shadow:0 2px 8px rgba(0,0,0,.2);transform:translateY(-1px)}
@@ -32,5 +34,6 @@ body.dark-mode .bg-white\/50{background-color:rgba(30,41,59,.8)}
 @keyframes shakeX{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-3px)}40%,60%{transform:translateX(3px)}}
 .flash-error{animation:shakeX .4s ease-in-out}
 #input-bar{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
-.card-translation{color:#2563eb}body.dark-mode .card-translation{color:#60a5fa}
-#flashcard-container{transition: background-color .35s var(--easing), border-color .35s var(--easing), color .35s var(--easing)}
+.card-translation{color:#2563eb}
+body.dark-mode .card-translation{color:#60a5fa}
+#flashcard-container{transition:background-color .35s var(--easing),border-color .35s var(--easing),color .35s var(--easing)}
