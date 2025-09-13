@@ -29,78 +29,6 @@ const KEYCODES = {
     ESC: 'Escape',
 };
 
-/* =========================
-I18N
-========================= */
-const I18N = {
-    fr: {
-        reverse_fr_en: '⇄ FR → EN',
-        reverse_en_fr: '⇄ EN → FR',
-        toggle_chapter_tooltip: 'Activer/désactiver ce chapitre',
-        all_chapters: 'Tous les chapitres',
-        all_chapters_short: 'Tous chapitres',
-        n_chapters_selected: '{n} chapitres sélectionnés',
-        reset_all: 'Tout réinitialiser (toutes cartes)',
-        reset_chapter: 'Réinitialiser: {chapter}',
-        type_and_enter: 'Tapez votre réponse et appuyez Entrée (Entrée sans réponse = révéler)',
-        press_enter_or_click: 'Appuyez sur Entrée ou cliquez la carte pour passer',
-        grading_shortcuts: 'Encore (1) • Difficile (2) • Bien (3) • Facile (4) — ou Entrée/clic pour passer',
-        grade_again: 'Encore',
-        grade_hard: 'Difficile',
-        grade_good: 'Bien',
-        grade_easy: 'Facile',
-        session_done_title: '🎉 Session terminée',
-        session_done_subtitle: 'Vous avez triomphé des cartes disponibles. Revenez plus tard !',
-        cycle_progress: 'Cycle: {done}/{total}',
-        today_studied_correct: "Aujourd'hui: {studied} cartes, {correct} correctes",
-        time_today_and_total: "Temps aujourd'hui: {timeToday} • Total cumulé: {timeTotal}",
-        grades_breakdown: 'Encore: {again} • Difficile: {hard} • Bien: {good} • Facile: {easy}',
-        streak: 'Streak: {streak} 🔥',
-        cards: 'cartes',
-        total_time_title: 'Total cumulé: {x}',
-        empty_input_hint: 'Champ vide. Appuyez sur Espace pour révéler ou tapez une réponse.',
-        auto_prefix: 'Auto: ',
-        reset_selection_and_timer: 'Sélection réinitialisée ✅ — Chrono remis à zéro ⏱️',
-        reset_selection: 'Sélection réinitialisée ✅',
-    },
-    en: {
-        reverse_fr_en: '⇄ FR → EN',
-        reverse_en_fr: '⇄ EN → FR',
-        toggle_chapter_tooltip: 'Toggle this chapter',
-        all_chapters: 'All chapters',
-        all_chapters_short: 'All chapters',
-        n_chapters_selected: '{n} chapters selected',
-        reset_all: 'Reset everything (all cards)',
-        reset_chapter: 'Reset: {chapter}',
-        type_and_enter: 'Type your answer and press Enter (Enter on an empty field reveals)',
-        press_enter_or_click: 'Press Enter or click the card to continue',
-        grading_shortcuts: 'Again (1) • Hard (2) • Good (3) • Easy (4) — or Enter/click to continue',
-        grade_again: 'Again',
-        grade_hard: 'Hard',
-        grade_good: 'Good',
-        grade_easy: 'Easy',
-        session_done_title: '🎉 Session complete',
-        session_done_subtitle: 'You have finished the available cards. Come back later!',
-        cycle_progress: 'Cycle: {done}/{total}',
-        today_studied_correct: 'Today: {studied} cards, {correct} correct',
-        time_today_and_total: 'Time today: {timeToday} • Total time: {timeTotal}',
-        grades_breakdown: 'Again: {again} • Hard: {hard} • Good: {good} • Easy: {easy}',
-        streak: 'Streak: {streak} 🔥',
-        cards: 'cards',
-        total_time_title: 'Total time: {x}',
-        empty_input_hint: 'Empty field. Press Space to reveal or type an answer.',
-        auto_prefix: 'Auto: ',
-        reset_selection_and_timer: 'Selection reset ✅ — Timer cleared ⏱️',
-        reset_selection: 'Selection reset ✅',
-    }
-};
-
-function t(key, params = {}) {
-    const dict = I18N[App?.prefs?.lang] || I18N.fr;
-    const base = dict[key] ?? I18N.fr[key] ?? key;
-    return base.replace(/\{(\w+)\}/g, (_, k) => (params[k] != null ? String(params[k]) : ''));
-}
-
 function nowMs() {
     return Date.now();
 }
@@ -237,7 +165,6 @@ const App = {
         reverseMode: false,
         theme: 'default',
         activeChapters: [], // multi-sélection (strings)
-        lang: 'fr', // NOUVEAU
     },
 
     // stats (persistées)
@@ -341,10 +268,10 @@ function loadPersisted() {
     // NOUVEAU: rattrapage du chrono si la page a été fermée sans sauvegarde
     if (rawTimer) {
         try {
-            const tmr = JSON.parse(rawTimer);
-            if (tmr && Number.isFinite(tmr.startedAt) && tmr.startedAt > 0) {
+            const t = JSON.parse(rawTimer);
+            if (t && Number.isFinite(t.startedAt) && t.startedAt > 0) {
                 // Ajoute le temps écoulé depuis le dernier start jusqu'à maintenant, réparti par jour
-                addTimeRangeToStats(tmr.startedAt, nowMs());
+                addTimeRangeToStats(t.startedAt, nowMs());
                 saveStats();
                 // Repart immédiatement le chrono à partir de maintenant
                 App.session.startedAt = nowMs();
@@ -418,10 +345,8 @@ Thème / Mode Sombre / BG
 function applyDarkMode() {
     document.body.classList.toggle('dark-mode', !!App.prefs.darkMode);
     document.body.classList.toggle('light-mode', !App.prefs.darkMode);
-    if (els.darkModeToggle) {
-        els.darkModeToggle.setAttribute('aria-pressed', App.prefs.darkMode ? 'true' : 'false');
-        els.darkModeToggle.textContent = App.prefs.darkMode ? '☀️' : '🌙';
-    }
+    els.darkModeToggle.setAttribute('aria-pressed', App.prefs.darkMode ? 'true' : 'false');
+    els.darkModeToggle.textContent = App.prefs.darkMode ? '☀️' : '🌙';
 }
 function applyTheme() {
     const theme = App.prefs.theme || 'default';
@@ -433,7 +358,6 @@ function applyTheme() {
 }
 function enablePastelBg() {
     const c = els.animatedBg;
-    if (!c) return;
     c.innerHTML = '';
     const count = 10;
     for (let i = 0; i < count; i++) {
@@ -479,23 +403,19 @@ Menu Burger
 ========================= */
 function openMenu() {
     document.body.classList.add('menu-open');
-    if (els.menuOverlay) els.menuOverlay.setAttribute('aria-hidden', 'false');
-    if (els.sidebarMenu) {
-        els.sidebarMenu.setAttribute('aria-hidden', 'false');
-        els.sidebarMenu.classList.remove('menu-slide-out');
-        els.sidebarMenu.classList.add('menu-slide-in');
-    }
-    if (els.burgerButton) els.burgerButton.setAttribute('aria-expanded', 'true');
+    els.menuOverlay.setAttribute('aria-hidden', 'false');
+    els.sidebarMenu.setAttribute('aria-hidden', 'false');
+    els.burgerButton.setAttribute('aria-expanded', 'true');
+    els.sidebarMenu.classList.remove('menu-slide-out');
+    els.sidebarMenu.classList.add('menu-slide-in');
 }
 function closeMenu() {
     document.body.classList.remove('menu-open');
-    if (els.menuOverlay) els.menuOverlay.setAttribute('aria-hidden', 'true');
-    if (els.sidebarMenu) {
-        els.sidebarMenu.setAttribute('aria-hidden', 'true');
-        els.sidebarMenu.classList.add('menu-slide-out');
-        els.sidebarMenu.classList.remove('menu-slide-in');
-    }
-    if (els.burgerButton) els.burgerButton.setAttribute('aria-expanded', 'false');
+    els.menuOverlay.setAttribute('aria-hidden', 'true');
+    els.sidebarMenu.setAttribute('aria-hidden', 'true');
+    els.burgerButton.setAttribute('aria-expanded', 'false');
+    els.sidebarMenu.classList.add('menu-slide-out');
+    els.sidebarMenu.classList.remove('menu-slide-in');
 }
 
 /* =========================
@@ -503,7 +423,6 @@ Chapitres / UI menu
 ========================= */
 function renderChaptersMenu() {
     const container = els.menuChapters;
-    if (!container) return;
     container.innerHTML = '';
 
     const makeBtn = (label, value, isActive) => {
@@ -511,7 +430,7 @@ function renderChaptersMenu() {
         btn.type = 'button';
         btn.className = `w-full px-3 py-2 rounded-md text-left ${isActive ? 'chapter-button-active' : 'chapter-button-default'}`;
         btn.textContent = `${CHAPTER_EMOJIS[value] || '📘'} ${label}`;
-        btn.title = t('toggle_chapter_tooltip');
+        btn.title = 'Activer/désactiver ce chapitre';
         btn.addEventListener('click', () => {
             toggleChapter(value);
         });
@@ -519,7 +438,7 @@ function renderChaptersMenu() {
     };
 
     const allActive = App.prefs.activeChapters.length === 0;
-    const btnAll = makeBtn(t('all_chapters'), 'ALL', allActive);
+    const btnAll = makeBtn('Tous les chapitres', 'ALL', allActive);
     btnAll.addEventListener('click', () => setChapters([]));
     container.appendChild(btnAll);
 
@@ -532,18 +451,16 @@ function renderChaptersMenu() {
     populateResetOptions();
 }
 function updateCurrentChapterLabel() {
-    const el = els.currentChapterLabel;
-    if (!el) return;
     const actives = App.prefs.activeChapters;
     let text = '';
     if (!actives || actives.length === 0) {
-        text = t('all_chapters_short');
+        text = 'Tous chapitres';
     } else if (actives.length === 1) {
         text = actives[0];
     } else {
-        text = t('n_chapters_selected', { n: actives.length });
+        text = `${actives.length} chapitres sélectionnés`;
     }
-    el.textContent = text;
+    els.currentChapterLabel.textContent = text;
 }
 function setChapters(arr) {
     App.prefs.activeChapters = arr.slice();
@@ -562,17 +479,16 @@ function toggleChapter(chapter) {
 }
 function populateResetOptions() {
     const sel = els.resetOptions;
-    if (!sel) return;
     sel.innerHTML = '';
     const optAll = document.createElement('option');
     optAll.value = 'ALL';
-    optAll.textContent = t('reset_all');
+    optAll.textContent = 'Tout réinitialiser (toutes cartes)';
     sel.appendChild(optAll);
 
     for (const ch of App.data.chapters) {
         const opt = document.createElement('option');
         opt.value = ch;
-        opt.textContent = t('reset_chapter', { chapter: ch });
+        opt.textContent = `Réinitialiser: ${ch}`;
         sel.appendChild(opt);
     }
 }
@@ -678,58 +594,52 @@ Affichage de carte
 function renderCard(card) {
     const reverse = App.prefs.reverseMode;
 
-    if (els.cardEnglish) els.cardEnglish.classList.toggle('hidden', !App.session.revealed);
+    els.cardEnglish.classList.toggle('hidden', !App.session.revealed);
 
-    if (els.cardScore) {
-        if (App.session.lastScore != null) {
-            els.cardScore.textContent = `${Math.round(App.session.lastScore * 100)}%`;
-        } else if (App.session.lastGrade != null) {
-            const labels = {1: t('grade_again'), 2: t('grade_hard'), 3: t('grade_good'), 4: t('grade_easy')};
-            els.cardScore.textContent = labels[App.session.lastGrade] || '--%';
-        } else {
-            els.cardScore.textContent = '--%';
-        }
+    if (App.session.lastScore != null) {
+        els.cardScore.textContent = `${Math.round(App.session.lastScore * 100)}%`;
+    } else if (App.session.lastGrade != null) {
+        const labels = {1: 'Encore', 2: 'Difficile', 3: 'Bien', 4: 'Facile'};
+        els.cardScore.textContent = labels[App.session.lastGrade] || '--%';
+    } else {
+        els.cardScore.textContent = '--%';
     }
 
     if (!reverse) {
-        if (els.cardFrench) els.cardFrench.textContent = card.french;
-        if (els.cardEnglish) els.cardEnglish.textContent = card.english;
+        els.cardFrench.textContent = card.french;
+        els.cardEnglish.textContent = card.english;
     } else {
-        if (els.cardFrench) els.cardFrench.textContent = card.english;
-        if (els.cardEnglish) els.cardEnglish.textContent = card.french;
+        els.cardFrench.textContent = card.english;
+        els.cardEnglish.textContent = card.french;
     }
 
     const cardEl = els.flashcardContainer;
     const isDark = document.body.classList.contains('dark-mode');
-    if (cardEl) {
-        cardEl.classList.remove('flash-error');
-        cardEl.style.backgroundColor = '';
-        cardEl.style.borderColor = '';
-        cardEl.style.color = '';
-        cardEl.classList.toggle('dark-mode-card-neutral', isDark);
-        cardEl.classList.toggle('light-mode-card-neutral', !isDark);
+    cardEl.classList.remove('flash-error');
+    cardEl.style.backgroundColor = '';
+    cardEl.style.borderColor = '';
+    cardEl.style.color = '';
+    cardEl.classList.toggle('dark-mode-card-neutral', isDark);
+    cardEl.classList.toggle('light-mode-card-neutral', !isDark);
+
+    if (!App.session.revealed) {
+        els.messageArea.textContent = 'Tapez votre réponse et appuyez Entrée (Entrée sans réponse = révéler)';
+    } else if (App.session.autoGraded) {
+        els.messageArea.textContent = 'Appuyez sur Entrée ou cliquez la carte pour passer';
+    } else {
+        els.messageArea.textContent = 'Encore (1) • Difficile (2) • Bien (3) • Facile (4) — ou Entrée/clic pour passer';
     }
 
-    if (els.messageArea) {
-        if (!App.session.revealed) {
-            els.messageArea.textContent = t('type_and_enter');
-        } else if (App.session.autoGraded) {
-            els.messageArea.textContent = t('press_enter_or_click');
-        } else {
-            els.messageArea.textContent = t('grading_shortcuts');
-        }
-    }
+    els.answerInput.disabled = App.session.inputLocked;
+    els.submitAnswerButton.disabled = App.session.inputLocked;
 
-    if (els.answerInput) els.answerInput.disabled = App.session.inputLocked;
-    if (els.submitAnswerButton) els.submitAnswerButton.disabled = App.session.inputLocked;
-
-    if (els.gradeBar) els.gradeBar.classList.toggle('hidden', !App.session.revealed);
+    els.gradeBar.classList.toggle('hidden', !App.session.revealed);
 
     const allowGrading = App.session.revealed && !App.session.autoGraded;
-    if (els.btnAgain) els.btnAgain.disabled = !allowGrading;
-    if (els.btnHard) els.btnHard.disabled = !allowGrading;
-    if (els.btnGood) els.btnGood.disabled = !allowGrading;
-    if (els.btnEasy) els.btnEasy.disabled = !allowGrading;
+    els.btnAgain.disabled = !allowGrading;
+    els.btnHard.disabled = !allowGrading;
+    els.btnGood.disabled = !allowGrading;
+    els.btnEasy.disabled = !allowGrading;
 }
 function loadNextCard() {
     App.session.revealed = false;
@@ -748,43 +658,37 @@ function loadNextCard() {
         return;
     }
 
-    if (els.answerInput) {
-        els.answerInput.value = '';
-        els.answerInput.disabled = false;
-    }
-    if (els.submitAnswerButton) els.submitAnswerButton.disabled = false;
+    els.answerInput.value = '';
+    els.answerInput.disabled = false;
+    els.submitAnswerButton.disabled = false;
 
     const card = App.cards.get(id);
     App.session.recentlyShown.push(id);
     renderCard(card);
 
     try {
-        els.answerInput?.focus({ preventScroll: true });
-        els.answerInput?.select();
+        els.answerInput.focus({ preventScroll: true });
+        els.answerInput.select();
     } catch {}
     requestAnimationFrame(() => {
         try {
-            els.answerInput?.focus({ preventScroll: true });
-            els.answerInput?.select();
+            els.answerInput.focus({ preventScroll: true });
+            els.answerInput.select();
         } catch {}
     });
 
     updateProgress();
 }
 function renderSessionDone() {
-    if (els.cardFrench) els.cardFrench.textContent = t('session_done_title');
-    if (els.cardEnglish) {
-        els.cardEnglish.textContent = '';
-        els.cardEnglish.classList.add('hidden');
-    }
-    if (els.cardScore) els.cardScore.textContent = '--%';
-    if (els.messageArea) els.messageArea.textContent = t('session_done_subtitle');
-    if (els.answerInput) {
-        els.answerInput.value = '';
-        els.answerInput.disabled = true;
-    }
-    if (els.submitAnswerButton) els.submitAnswerButton.disabled = true;
-    if (els.gradeBar) els.gradeBar.classList.add('hidden');
+    els.cardFrench.textContent = '🎉 Session terminée';
+    els.cardEnglish.textContent = '';
+    els.cardEnglish.classList.add('hidden');
+    els.cardScore.textContent = '--%';
+    els.messageArea.textContent = 'Vous avez triomphé des cartes disponibles. Revenez plus tard !';
+    els.answerInput.value = '';
+    els.answerInput.disabled = true;
+    els.submitAnswerButton.disabled = true;
+    els.gradeBar.classList.add('hidden');
 }
 
 /* =========================
@@ -793,10 +697,10 @@ Progression / Stats
 function updateProgress() {
     const done = App.session.studiedCount;
     const total = App.session.sessionTotal;
-    if (els.progressText) els.progressText.textContent = t('cycle_progress', { done, total });
+    els.progressText.textContent = `Cycle: ${done}/${total}`;
     const p = total > 0 ? (done / Math.max(1, total)) : 1;
-    if (els.progressPerc) els.progressPerc.textContent = percent(p);
-    if (els.progressFill) els.progressFill.style.width = percent(p);
+    els.progressPerc.textContent = percent(p);
+    els.progressFill.style.width = percent(p);
 }
 function updateStreakOnGrade(grade) {
     if (grade >= 3) {
@@ -804,7 +708,7 @@ function updateStreakOnGrade(grade) {
     } else {
         App.stats.streak = 0;
     }
-    if (els.streakBadge) els.streakBadge.textContent = `🔥 ${App.stats.streak}`;
+    els.streakBadge.textContent = `🔥 ${App.stats.streak}`;
     saveStats();
 }
 function bumpDailyStats(grade) {
@@ -831,6 +735,7 @@ function bumpDailyStats(grade) {
 /* =========================
 Sauvegarde du temps (chrono persistant)
 ========================= */
+// MODIFIÉ: ajoute le delta écoulé au stats.byDay (avec répartition multi-jours) et au total
 function saveElapsedTime() {
     const startedAt = App.session.startedAt;
     if (!startedAt) return;
@@ -856,15 +761,11 @@ function renderStats() {
     const day = todayKey();
     const s = App.stats.byDay[day] || { studied: 0, correct: 0, again: 0, hard: 0, good: 0, easy: 0, timeMs: 0 };
 
-    if (els.statsContent) {
-        els.statsContent.innerHTML =
-            `<div>${t('today_studied_correct', { studied: s.studied, correct: s.correct })}</div>
-             <div>${t('time_today_and_total', { timeToday: formatMs(s.timeMs || 0), timeTotal: formatMs(App.stats.totalTimeMs || 0) })}</div>
-             <div>${t('grades_breakdown', { again: s.again, hard: s.hard, good: s.good, easy: s.easy })}</div>
-             <div>${t('streak', { streak: App.stats.streak })}</div>`;
-    }
+    els.statsContent.innerHTML = `<div>Aujourd'hui: ${s.studied} cartes, ${s.correct} correctes</div>
+                                  <div>Temps aujourd'hui: ${formatMs(s.timeMs || 0)} • Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}</div>
+                                  <div>Encore: ${s.again} • Difficile: ${s.hard} • Bien: ${s.good} • Facile: ${s.easy}</div>
+                                  <div>Streak: ${App.stats.streak} 🔥</div>`;
 
-    // Données du graphe
     const days = [];
     const now = new Date();
     for (let i = 13; i >= 0; i--) {
@@ -874,38 +775,34 @@ function renderStats() {
     const values = days.map(k => (App.stats.byDay[k]?.studied) || 0);
     const max = Math.max(1, ...values);
 
-    // Si les éléments du sparkline n'existent pas, on saute proprement.
-    const hasSpark = !!(els.sparkline && els.sparklinePath && els.sparklineFill && els.sparklineLast);
-    if (hasSpark) {
-        const W = (els.sparkline?.viewBox?.baseVal?.width) || (els.sparkline?.clientWidth) || 260;
-        const H = (els.sparkline?.viewBox?.baseVal?.height) || 70;
+    const W = els.sparkline.viewBox?.baseVal?.width || els.sparkline.clientWidth || 260;
+    const H = els.sparkline.viewBox?.baseVal?.height || 70;
 
-        const stepX = W / (values.length - 1 || 1);
-        const pts = values.map((v, i) => {
-            const x = i * stepX;
-            const y = H - (v / max) * (H - 10) - 5;
-            return [x, y];
-        });
+    const stepX = W / (values.length - 1 || 1);
+    const pts = values.map((v, i) => {
+        const x = i * stepX;
+        const y = H - (v / max) * (H - 10) - 5;
+        return [x, y];
+    });
 
-        const dPath = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
-        els.sparklinePath.setAttribute('d', dPath);
+    const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+    els.sparklinePath.setAttribute('d', d);
 
-        if (pts.length) {
-            const df = `${dPath} L${pts[pts.length - 1][0]},${H} L0,${H} Z`;
-            els.sparklineFill.setAttribute('d', df);
-            els.sparklineLast.setAttribute('cx', pts[pts.length - 1][0]);
-            els.sparklineLast.setAttribute('cy', pts[pts.length - 1][1]);
-        }
+    if (pts.length) {
+        const df = `${d} L${pts[pts.length - 1][0]},${H} L0,${H} Z`;
+        els.sparklineFill.setAttribute('d', df);
+        els.sparklineLast.setAttribute('cx', pts[pts.length - 1][0]);
+        els.sparklineLast.setAttribute('cy', pts[pts.length - 1][1]);
     }
 
-    if (els.chartLegend) {
-        els.chartLegend.textContent = `${values[values.length - 1]} ${t('cards')}`;
-    }
+    els.chartLegend.textContent = `${values[values.length - 1]} cartes`;
 }
 
 /* =========================
 Timer (affichage + persistance continue)
 ========================= */
+// MODIFIÉ: Le timer repart à partir du temps déjà sauvegardé aujourd'hui + delta "live".
+// L'état de départ (startedAt) est persisté pour rattraper après reload/crash.
 function startTimer() {
     if (!els.timer) return;
 
@@ -924,7 +821,7 @@ function startTimer() {
         const elapsedMs = baseMs + Math.max(0, liveMs);
 
         els.timer.textContent = formatMs(elapsedMs);
-        els.timer.setAttribute('title', t('total_time_title', { x: formatMs(App.stats.totalTimeMs || 0) }));
+        els.timer.setAttribute('title', `Total cumulé: ${formatMs(App.stats.totalTimeMs || 0)}`);
 
         // On persiste startedAt fréquemment pour tolérance aux crashs
         persistTimerState();
@@ -934,6 +831,7 @@ function startTimer() {
     App.session.timerInterval = setInterval(tick, 1000);
 }
 
+// NOUVEAU: arrêt propre de l’affichage du timer
 function stopTimerDisplay() {
     if (App.session.timerInterval) {
         clearInterval(App.session.timerInterval);
@@ -956,9 +854,9 @@ function evaluateAnswer() {
     if (!card) return;
 
     const reverse = App.prefs.reverseMode;
-    const user = els.answerInput?.value.trim() || '';
+    const user = els.answerInput.value.trim();
     if (!user) {
-        flashMessage(t("empty_input_hint"), true);
+        flashMessage("Champ vide. Appuyez sur Espace pour révéler ou tapez une réponse.", true);
         return;
     }
 
@@ -989,6 +887,8 @@ function applyGrade(card, grade, { auto = false, showFeedback = false, typedAnsw
     else if (grade === 4) card.ease = clamp(card.ease + 0.15, MIN_EASE, 3.5);
 
     const fuzz = randFuzz();
+
+    const wasNewOrLearning = (card.state === 'new' || card.state === 'learning' || card.state === 'relearning');
 
     if (grade === 1) {
         card.state = (card.state === 'review') ? 'relearning' : 'learning';
@@ -1052,11 +952,11 @@ function applyGrade(card, grade, { auto = false, showFeedback = false, typedAnsw
 
     if (showFeedback) {
         let label = '';
-        if (grade === 1) label = t('grade_again');
-        if (grade === 2) label = t('grade_hard');
-        if (grade === 3) label = t('grade_good');
-        if (grade === 4) label = t('grade_easy');
-        flashMessage(`${t('auto_prefix')}${label}`, false);
+        if (grade === 1) label = 'Encore';
+        if (grade === 2) label = 'Difficile';
+        if (grade === 3) label = 'Bien';
+        if (grade === 4) label = 'Facile';
+        flashMessage(`Auto: ${label}`, false);
     }
 
     App.session.studiedCount += 1;
@@ -1089,8 +989,8 @@ function skipCurrentCard() {
 UI utils
 ========================= */
 function flashMessage(msg, isError = false) {
-    if (els.messageArea) els.messageArea.textContent = msg || '';
-    if (isError && els.flashcardContainer) {
+    els.messageArea.textContent = msg || '';
+    if (isError) {
         els.flashcardContainer.classList.remove('flash-error');
         void els.flashcardContainer.offsetWidth;
         els.flashcardContainer.classList.add('flash-error');
@@ -1120,7 +1020,6 @@ function setupAutoSaveOnLeave() {
 }
 
 function setupSearch() {
-    if (!els.searchBar || !els.searchResults) return;
     els.searchBar.addEventListener('input', () => {
         const q = normalizeText(els.searchBar.value);
         const cont = els.searchResults;
@@ -1162,16 +1061,15 @@ function jumpToCard(id) {
     loadNextCard();
 
     closeMenu();
-    if (els.searchBar) els.searchBar.value = '';
-    if (els.searchResults) els.searchResults.innerHTML = '';
+    els.searchBar.value = '';
+    els.searchResults.innerHTML = '';
 }
 
 /* =========================
 Reset / Réinitialisation
 ========================= */
 function resetSelection() {
-    const sel = els.resetOptions;
-    const target = sel ? sel.value : 'ALL';
+    const target = els.resetOptions.value;
     const targets = [];
 
     for (const c of App.cards.values()) {
@@ -1194,11 +1092,12 @@ function resetSelection() {
     }
     saveCards();
 
+    // NOUVEAU: le chrono ne se remet à zéro QUE si la cible est "ALL"
     if (target === 'ALL') {
         resetAllTimerCounters();
-        flashMessage(t('reset_selection_and_timer'));
+        flashMessage('Sélection réinitialisée ✅ — Chrono remis à zéro ⏱️');
     } else {
-        flashMessage(t('reset_selection'));
+        flashMessage('Sélection réinitialisée ✅');
     }
 
     rebuildQueuesAndMaybeReload();
@@ -1222,10 +1121,8 @@ function resetAllTimerCounters() {
 
     // met à jour l’UI et efface l’état persistant du timer
     try { localStorage.removeItem(STORAGE_KEYS.timer); } catch {}
-    if (els.timer) {
-        els.timer.textContent = formatMs(0);
-        els.timer.setAttribute('title', t('total_time_title', { x: formatMs(0) }));
-    }
+    els.timer.textContent = formatMs(0);
+    els.timer.setAttribute('title', `Total cumulé: ${formatMs(0)}`);
     renderStats();
 
     // repart proprement
@@ -1233,41 +1130,18 @@ function resetAllTimerCounters() {
 }
 
 /* =========================
-Langue UI
-========================= */
-function setReverseButtonLabel() {
-    if (!els.reverseModeButton) return;
-    els.reverseModeButton.textContent = App.prefs.reverseMode ? t('reverse_en_fr') : t('reverse_fr_en');
-}
-function applyLanguage() {
-    document.documentElement.lang = App.prefs.lang === 'en' ? 'en' : 'fr';
-    setReverseButtonLabel();
-
-    // re-render sections avec du texte
-    renderChaptersMenu();
-    updateCurrentChapterLabel();
-    populateResetOptions();
-    renderStats();
-    updateProgress();
-    if (App.session.currentCardId) {
-        const c = App.cards.get(App.session.currentCardId);
-        renderCard(c);
-    }
-}
-
-/* =========================
 Événements UI
 ========================= */
 function setupMenu() {
-    els.burgerButton?.addEventListener('click', openMenu);
-    els.menuOverlay?.addEventListener('click', closeMenu);
-    els.closeMenuButton?.addEventListener('click', closeMenu);
+    els.burgerButton.addEventListener('click', openMenu);
+    els.menuOverlay.addEventListener('click', closeMenu);
+    els.closeMenuButton.addEventListener('click', closeMenu);
     document.addEventListener('keydown', (e) => {
         if (e.key === KEYCODES.ESC) closeMenu();
     });
 }
 function setupDarkMode() {
-    els.darkModeToggle?.addEventListener('click', () => {
+    els.darkModeToggle.addEventListener('click', () => {
         App.prefs.darkMode = !App.prefs.darkMode;
         savePrefs();
         applyDarkMode();
@@ -1275,40 +1149,33 @@ function setupDarkMode() {
     applyDarkMode();
 }
 function setupTheme() {
-    if (els.themeSelector) {
-        els.themeSelector.value = App.prefs.theme || 'default';
-        els.themeSelector.addEventListener('change', () => {
-            App.prefs.theme = els.themeSelector.value;
-            savePrefs();
-            applyTheme();
-        });
-    }
+    els.themeSelector.value = App.prefs.theme || 'default';
+    els.themeSelector.addEventListener('change', () => {
+        App.prefs.theme = els.themeSelector.value;
+        savePrefs();
+        applyTheme();
+    });
     applyTheme();
 }
 function setupReverseMode() {
-    els.reverseModeButton?.addEventListener('click', () => {
+    els.reverseModeButton.addEventListener('click', () => {
         App.prefs.reverseMode = !App.prefs.reverseMode;
-
-        // NOUVEAU: on couple la langue à la direction d'étude
-        // FR→EN (reverseMode = false) => UI en anglais
-        // EN→FR (reverseMode = true)  => UI en français
-        App.prefs.lang = App.prefs.reverseMode ? 'fr' : 'en';
-
         savePrefs();
-        applyLanguage();
+        const txt = App.prefs.reverseMode ? '⇄ EN → FR' : '⇄ FR → EN';
+        els.reverseModeButton.textContent = txt;
         if (App.session.currentCardId) {
             const c = App.cards.get(App.session.currentCardId);
             renderCard(c);
         }
     });
-
-    setReverseButtonLabel();
+    const txt = App.prefs.reverseMode ? '⇄ EN → FR' : '⇄ FR → EN';
+    els.reverseModeButton.textContent = txt;
 }
 function setupReset() {
-    els.resetButton?.addEventListener('click', resetSelection);
+    els.resetButton.addEventListener('click', resetSelection);
 }
 function setupCardInteractions() {
-    els.flashcardContainer?.addEventListener('click', () => {
+    els.flashcardContainer.addEventListener('click', () => {
         if (!App.session.revealed) {
             revealAnswer('click');
             App.session.pendingNext = true;
@@ -1319,7 +1186,7 @@ function setupCardInteractions() {
         }
     });
 
-    els.submitAnswerButton?.addEventListener('click', () => {
+    els.submitAnswerButton.addEventListener('click', () => {
         if (!App.session.revealed) evaluateAnswer();
     });
 
@@ -1338,15 +1205,15 @@ function setupCardInteractions() {
         applyGrade(card, g, { auto: false, showFeedback: false });
         loadNextCard();
     };
-    els.btnAgain?.addEventListener('click', () => onGradeBtn(1));
-    els.btnHard?.addEventListener('click', () => onGradeBtn(2));
-    els.btnGood?.addEventListener('click', () => onGradeBtn(3));
-    els.btnEasy?.addEventListener('click', () => onGradeBtn(4));
+    els.btnAgain.addEventListener('click', () => onGradeBtn(1));
+    els.btnHard.addEventListener('click', () => onGradeBtn(2));
+    els.btnGood.addEventListener('click', () => onGradeBtn(3));
+    els.btnEasy.addEventListener('click', () => onGradeBtn(4));
 
     document.addEventListener('keydown', (e) => {
         const targetTag = (e.target && e.target.tagName) || '';
         const isTyping = targetTag === 'INPUT' || targetTag === 'TEXTAREA';
-        const inputEmpty = (els.answerInput?.value.trim().length || 0) === 0;
+        const inputEmpty = els.answerInput.value.trim().length === 0;
 
         if (e.key === KEYCODES.SPACE) {
             if (!isTyping) e.preventDefault();
@@ -1389,9 +1256,6 @@ function init() {
     setupDarkMode();
     setupTheme();
     setupReverseMode();
-
-    applyLanguage(); // NOUVEAU: applique la langue courante à toute l’UI
-
     renderChaptersMenu();
     setupReset();
     setupSearch();
