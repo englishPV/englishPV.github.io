@@ -99,6 +99,9 @@
     }
 
     .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display: flex;
       align-items: center;
       padding: 0 10px;
@@ -142,11 +145,12 @@
 
     main#view {
       min-height: 0;
-      overflow: hidden;
-      /* AUCUN scroll vertical */
-      padding: 8px;
+      height: 100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      /* pas de scroll global pendant la révision */
+      padding: 8px;
       gap: 10px;
       justify-content: flex-start;
       /* pour tout tenir d'un coup d'oeil */
@@ -403,10 +407,11 @@
     /* Review view */
     .review-wrap {
       position: relative;
-      height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
 
     .review-top {
@@ -422,10 +427,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 8px;
       border-radius: 14px;
       border: 1px dashed var(--border);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.10));
-      padding: 12px;
       text-align: center;
     }
 
@@ -437,6 +442,7 @@
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
       background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .35));
       backdrop-filter: saturate(140%) blur(8px);
+      z-index: 2;
     }
 
     .review-actions .btn {
@@ -1821,12 +1827,15 @@
     startReviewBtn.addEventListener('click', () => startReview(State.chapterId));
     // ------------------ Rendu (views) ------------------
     function setTopbar({
-      showBack,
-      title
-    }) {
-      backBtn.classList.toggle('hidden', !showBack);
-      titleEl.textContent = title;
+      title,
+      showBack
+    } = {}) {
+      const autoShow = (State.view !== 'deck'); // visible partout sauf en Deck
+      const visible = (typeof showBack === 'boolean') ? showBack : autoShow;
+      backBtn.classList.toggle('hidden', !visible);
+      if (title) titleEl.textContent = title;
     }
+
 
     function setBottomVisibility({
       actions = false,
@@ -1865,8 +1874,8 @@
       State.view = 'deck';
       State.chapterId = null;
       setTopbar({
-        showBack: false,
-        title: 'Deck'
+        title: 'Deck',
+        showBack: false
       });
       setBottomVisibility({
         actions: false,
@@ -1926,6 +1935,9 @@
       State.view = 'chapter';
       State.chapterId = chapterId;
       const chap = getChapter(chapterId);
+      setTopbar({
+        title: chap?.title || 'Statistiques'
+      });
       setBottomVisibility({
         actions: true,
         revision: true,
@@ -1942,7 +1954,13 @@
       const chap = getChapter(chapterId);
       const sel = chap.filters.grades || {};
       const counts = getLiveGradeCounts(chap);
-      const { unseen, echec, difficile, bien, facile } = counts;
+      const {
+        unseen,
+        echec,
+        difficile,
+        bien,
+        facile
+      } = counts;
 
       const today = getTodayCount(chap);
       const week = getWeekCount(chap);
@@ -1985,7 +2003,13 @@
         `;
 
       // Dessiner le camembert (segments non sélectionnés atténués)
-      drawGradeChart('gradeChart', { unseen, echec, difficile, bien, facile }, chap.filters.grades);
+      drawGradeChart('gradeChart', {
+        unseen,
+        echec,
+        difficile,
+        bien,
+        facile
+      }, chap.filters.grades);
 
       // Clic sur camembert (toujours supporté)
       const canvas = $('#gradeChart');
@@ -2026,7 +2050,6 @@
       State.chapterId = chapterId;
       const chap = getChapter(chapterId);
       setTopbar({
-        showBack: true,
         title: `${chap.title} • Cartes`
       });
       setBottomVisibility({
@@ -2076,7 +2099,6 @@
       const r = State.review;
       const chap = getChapter(r.chapterId);
       setTopbar({
-        showBack: true,
         title: 'Révision'
       });
       setBottomVisibility({
@@ -2157,7 +2179,6 @@
       if (push) Nav.push();
       State.view = 'recap';
       setTopbar({
-        showBack: true,
         title: 'Récapitulatif'
       });
       setBottomVisibility({
@@ -2697,8 +2718,6 @@
       // Tailles de police
       document.documentElement.style.setProperty('--fs-term', (p.fsTerm || 20) + 'px');
       document.documentElement.style.setProperty('--fs-def', (p.fsDef || 24) + 'px');
-      document.documentElement.style.setProperty('--fs-front-list', (p.fsFrontList || 16) + 'px');
-      document.documentElement.style.setProperty('--fs-back-list', (p.fsBackList || 18) + 'px');
       // Arrondis
       document.documentElement.style.setProperty('--radius-md', (p.radius || 14) + 'px');
       // Accent (met à jour --primary)
@@ -2750,7 +2769,6 @@
       const v = $('#view');
       State.view = 'settings';
       setTopbar({
-        showBack: true,
         title: `${chap.title} • Paramètres`
       });
       setBottomVisibility({
