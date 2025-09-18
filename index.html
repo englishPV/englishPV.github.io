@@ -801,7 +801,7 @@
   </div>
   <script>
     // ------------------ Données & stockage ------------------
-    const STORAGE_KEY = 'flash9x16_data_v3';
+   const STORAGE_KEY = 'flash9x16_data_v3';
 
     // === ZONE DE COLLAGE DES DONNÉES BRUTES ===
     // Catégories (constantes)
@@ -810,7 +810,8 @@
       CI = "Immigration",
       CIT = "Relations internationales",
       CU = "Travail",
-      CR = "Crime";
+      CR = "Crime",
+      PC = "Peine Capitale"; // AJOUT : Constante pour le nouveau chapitre
 
     // Emoji par chapitre (optionnel pour l’affichage)
     const CHAPTER_EMOJIS = {
@@ -820,6 +821,7 @@
       [CIT]: '🌐',
       [CU]: '💼',
       [CR]: '⚖️',
+      [PC]: '💀', // AJOUT : Emoji pour le nouveau chapitre
       'Politique': '🏛️',
       'Business': '💼',
       'Education': '🎓',
@@ -1606,6 +1608,62 @@
 775|to be on parole|être en liberté conditionnelle|${CR}
 776|to report to the police|se présenter à la police|${CR}
 777|an electronic tag|un bracelet de surveillance électronique|${CR}
+778|contre la peine de mort|against the death penalty|${PC}
+779|le meurtre|murder|${PC}
+780|être coupable de meurtre|to be guilty of murder|${PC}
+781|un meurtrier|a murderer|${PC}
+782|le viol|rape|${PC}
+783|un violeur|a rapist|${PC}
+784|un délinquant sexuel|a sex offender|${PC}
+785|un récidiviste|a repeat offender, a recidivist|${PC}
+786|la culpabilité|guilt|${PC}
+787|appliquer la loi du talion|to demand an eye for an eye|${PC}
+788|déclarer qn coupable, condamner qn|to convict sb, to find sb guilty|${PC}
+789|une condamnation|a conviction|${PC}
+790|une condamnation à tort|a wrongful conviction|${PC}
+791|condamner qn à mort|to sentence sb to death|${PC}
+792|condamner qn à 25 ans de prison|to sentence sb to 25 years imprisonment|${PC}
+793|un coupable|a culprit|${PC}
+794|dissuader qn de faire qch|to deter sb from doing sth|${PC}
+795|avoir un effet dissuasif|to act as a deterrent|${PC}
+796|une condamnation à mort|a death sentence|${PC}
+797|une condamnation à perpétuité|a life sentence|${PC}
+798|perpétuité sans possibilité de remise de peine|life without parole|${PC}
+799|mettre qn en prison|to jail, imprison sb|${PC}
+800|un détenu, un prisonnier|a prisoner, an inmate, a detainee|${PC}
+801|être dans les couloirs de la mort|to be on death row|${PC}
+802|une cellule|a cell|${PC}
+803|un avocat|a lawyer|${PC}
+804|un appel|an appeal|${PC}
+805|faire appel d’une décision|to appeal against a decision|${PC}
+806|casser une décision (de justice)|to quash, to overturn a decision|${PC}
+807|commuer une condamnation à mort en réclusion à perpétuité|to commute a death sentence to life|${PC}
+808|surseoir à l’exécution d’un condamné|to grant a convict a stay of execution, a reprieve|${PC}
+809|gracier un criminel|to pardon a criminal|${PC}
+810|executer un condamné|to execute a convict|${PC}
+811|mettre qn à mort|to put sb to death|${PC}
+812|un bourreau|an executioner|${PC}
+813|une piqûre mortelle|a lethal injection|${PC}
+814|faire une piqûre mortelle à qn|to inject sb with a lethal substance|${PC}
+815|pendre qn|to hang sb|${PC}
+816|la guillotine|the guillotine|${PC}
+817|guillotiner qn|to guillotine sb|${PC}
+818|électrocuter qn|to electrocute sb|${PC}
+819|la chaise électrique|the electric chair|${PC}
+820|lapider qn, tuer qn à coups de pierre|to stone sb to death|${PC}
+821|abolir|to abolish, to do away with|${PC}
+822|rétablir la peine de mort|to reinstate, to reintroduce, to restore the death penalty|${PC}
+823|appliquer la peine de mort|to apply, to enforce the death penalty|${PC}
+824|une erreur judiciaire|a miscarriage of justice|${PC}
+825|les tests ADN|DNA analysis, DNA testing|${PC}
+826|innocenter qn|to prove sb innocent, to exonerate sb|${PC}
+827|être innocenté grâce à l’ADN|to be cleared by DNA|${PC}
+828|un problème controversé|a controversial, contentious issue|${PC}
+829|un problème sensible, qui suscite de vives réactions|a hot-button issue|${PC}
+830|partisans de la peine de mort|advocates, supporters, proponents of the death penalty|${PC}
+831|opposants à, adversaires de la peine de mort|critics, opponents of the death penalty|${PC}
+832|être contre la peine de mort|to oppose the death penalty, to be opposed to the death penalty|${PC}
+833|un abolitionniste|an abolitionist|${PC}
 `.trim();
 
     // Parsing de la liste brute -> structure homogène
