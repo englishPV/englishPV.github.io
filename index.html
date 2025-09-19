@@ -82,7 +82,7 @@
       max-width: 100%;
       max-height: 100%;
       display: grid;
-      grid-template-rows: 52px 1fr 52px 64px;
+      grid-template-rows: var(--row-top, 52px) var(--row-main, 1fr) var(--row-actions, 52px) var(--row-rev, 64px);
       /* top, main, actions, revision */
       background: transparent;
       /* fusion avec le fond */
@@ -404,6 +404,28 @@
       box-shadow: none
     }
 
+    .review-actions-bar {
+      display: none;
+      /* masquée par défaut */
+      grid-row: 4;
+      /* même rangée que .revision-bar */
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15)), rgba(10, 15, 35, 0.0);
+      backdrop-filter: blur(8px) saturate(140%);
+    }
+
+    .review-actions-bar .btn {
+      width: 100%;
+      min-height: 44px
+    }
+
+    .review-actions-bar .row-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      width: 100%
+    }
+
     /* Review view */
     .review-wrap {
       position: relative;
@@ -411,7 +433,8 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      padding-bottom: calc(60px + env(safe-area-inset-bottom));
+      padding-bottom: 0;
+      /* pas d’espace réservé: on colle tout en bas */
     }
 
     .review-top {
@@ -432,23 +455,36 @@
       border: 1px dashed var(--border);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.10));
       text-align: center;
+      cursor: ns-resize;
+      /* Indice visuel: curseur redimension sur desktop */
     }
 
-    .review-actions {
+    /* Petite bulle de feedback (optionnel) */
+    .size-toast {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .35));
-      backdrop-filter: saturate(140%) blur(8px);
-      z-index: 2;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(64px + env(safe-area-inset-bottom) + 8px);
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 3;
     }
 
-    .review-actions .btn {
-      width: 100%;
-      min-height: 44px;
+    :root[data-theme="light"] .size-toast {
+      background: rgba(0, 0, 0, .15);
+      color: #0f172a;
     }
+
+    /* ANCIENNES ACTIONS DE REVIEW SUPPRIMÉES
+    .review-actions {
+      position: absolute; ...
+    }
+    */
 
     .btn {
       appearance: none;
@@ -776,7 +812,567 @@
         padding: 16px 20px;
       }
     }
-  </style>
+  
+    /* --- Flat UI Override --- */
+
+    /* Flat mode: aucun fond/bordure/ombre sur les conteneurs */
+    .card,
+    .deck-item,
+    .review-card,
+    .viewer,
+    .card-item,
+    .legend-item,
+    .kpi .k,
+    .stat,
+    .chip {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* Supprimer l’outline au survol des items de Deck */
+    .deck-item:hover {
+      outline: none !important
+    }
+
+    /* Garder un peu d’air, sans boîte */
+    .deck-item,
+    .card-item {
+      padding: 8px 0 !important;
+      /* zone cliquable confortable */
+    }
+
+    /* Légende totalement “plate” */
+    .legend-item {
+      padding: 0 !important;
+    }
+
+    /* Les “chips” deviennent de simples libellés */
+    .chip {
+      padding: 0 !important;
+      border-radius: 0 !important;
+      color: var(--muted) !important;
+    }
+
+    /* Les KPI/statistiques sans tuiles */
+    .kpi .k,
+    .stat {
+      padding: 0 !important;
+    }
+
+    /* Le viewer (liste cartes) sans encadré */
+    .viewer {
+      border: 0 !important;
+    }
+
+    /* Topbar plate (pas de trait ni de gradient) */
+    .topbar {
+      background: transparent !important;
+      border-bottom: 0 !important;
+    }
+
+    /* Barres du bas totalement plates aussi */
+    .bottom-actions,
+    .revision-bar {
+      background: transparent !important;
+      border-top: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* La zone centrale de révision est totalement plate */
+    .review-card {
+      border: 0 !important;
+      background: transparent !important;
+    }
+
+    /* Thème clair: garantir lisibilité (textes bien visibles) */
+    :root[data-theme="light"] .definition,
+    :root[data-theme="light"] .card-item .back {
+      color: var(--text) !important;
+      opacity: 1 !important;
+    }
+
+    :root[data-theme="light"] .muted {
+      color: var(--muted) !important;
+    }
+    
+    /* Optionnel: densifier la liste Deck */
+    #deckList .list {
+      gap: 6px !important
+    }
+
+    /* au lieu de 8px */
+    .deck-item>div .deck-meta {
+      margin-top: 2px
+    }
+
+    /* resserre “description” */
+    .section-title {
+      margin-bottom: 4px !important
+    }
+
+  
+/* ========== SETTINGS (Paramètres) ========== */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 4px
+}
+
+.settings-hero {
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: .2px;
+  color: var(--text);
+}
+
+.settings-sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: -2px
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px
+}
+
+.settings-section .section-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  margin: 10px 0 2px 0 !important;
+}
+
+/* Palette d'accent en pastilles */
+.swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--sw, #6366f1);
+  cursor: pointer;
+  position: relative;
+}
+
+.swatch.is-active::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+}
+
+/* Wheels affinés en paramètres */
+.wheel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border)
+}
+
+.wheel .name {
+  font-size: 13px
+}
+
+.wheel .wheel-value {
+  font-size: 13px
+}
+
+/* Boutons paramètres plus lisibles */
+.settings-page .btn {
+  font-size: 13px;
+  font-weight: 800
+}
+
+/* Bar chart 7 jours */
+.bar7-wrap {
+  margin-top: 8px
+}
+
+canvas#bar7 {
+  width: 100%;
+  height: 68px;
+  display: block
+}
+
+/* Preview: curseur resize et petite bulle de taille (optionnel) */
+#typoPreview {
+  cursor: ns-resize;
+  position: relative
+}
+
+.size-toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 6px;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 3;
+  display: none;
+}
+
+:root[data-theme="light"] .size-toast {
+  background: rgba(0, 0, 0, .15);
+  color: #0f172a;
+}
+
+/* Un peu plus de couleur pour la hiérarchie */
+.settings-hero {
+  color: var(--primary)
+}
+
+.settings-section .section-title {
+  color: var(--primary)
+}
+
+.bar7-wrap {
+  margin-top: 8px
+}
+
+canvas#bar7 {
+  width: 100%;
+  height: 68px;
+  display: block
+}
+
+.bar7-labels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.legend-item .count {
+  font-weight: 900
+}
+
+.legend-item[data-key="unseen"] .count {
+  color: #9ca3af
+}
+
+.legend-item[data-key="echec"] .count {
+  color: var(--red)
+}
+
+.legend-item[data-key="difficile"] .count {
+  color: var(--amber)
+}
+
+.legend-item[data-key="bien"] .count {
+  color: var(--blue)
+}
+
+.legend-item[data-key="facile"] .count {
+  color: var(--green)
+}
+
+/* Activité 7 jours: labels sous chaque barre */
+.bar7-wrap {
+  margin-top: 8px
+}
+
+canvas#bar7 {
+  width: 100%;
+  height: 68px;
+  display: block
+}
+
+.bar7-labels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Cartes en blocs (vue Cartes) */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px
+}
+
+@media (min-width:480px) {
+  .cards-grid {
+    grid-template-columns: 1fr 1fr
+  }
+}
+
+@media (min-width:900px) {
+  .cards-grid {
+    grid-template-columns: 1fr 1fr 1fr
+  }
+}
+
+.card-block {
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 14px;
+  background: transparent;
+}
+
+.card-block .term {
+  text-align: center
+}
+
+.card-block .definition {
+  display: none;
+  text-align: center;
+  margin-top: 6px
+}
+
+.card-block.flipped .definition {
+  display: block
+}
+
+/* Temps (sans label) en bas du bloc */
+.cb-time {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Bordures colorées selon la note */
+.card-block.grade-echec {
+  border-color: var(--red)
+}
+
+.card-block.grade-difficile {
+  border-color: var(--amber)
+}
+
+.card-block.grade-bien {
+  border-color: var(--blue)
+}
+
+.card-block.grade-facile {
+  border-color: var(--green)
+}
+
+.card-block.grade-unseen {
+  border-color: #9ca3af
+}
+
+/* gris pour Non vu */
+
+/* Légende: chiffres colorés (plus lisible/“joli”) */
+.legend-item .count {
+  font-weight: 900
+}
+
+.legend-item[data-key="unseen"] .count {
+  color: #9ca3af
+}
+
+.legend-item[data-key="echec"] .count {
+  color: var(--red)
+}
+
+.legend-item[data-key="difficile"] .count {
+  color: var(--amber)
+}
+
+.legend-item[data-key="bien"] .count {
+  color: var(--blue)
+}
+
+.legend-item[data-key="facile"] .count {
+  color: var(--green)
+}
+
+/* Thème clair: renfort de contrastes (boutons, puces, légendes) */
+:root[data-theme="light"] .btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .chip {
+  color: #334155;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+:root[data-theme="light"] .legend-item {
+  color: #0f172a;
+  border-color: #e2e8f0;
+  background: transparent;
+}
+
+:root[data-theme="light"] .muted {
+  color: #475569 !important
+}
+
+/* ========== CORRECTIONS CONTRASTE & POLICES ========== */
+
+/* --- Contrastes mode Clair --- */
+:root[data-theme="light"] {
+  --bg: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  --surface: #ffffff;
+  --card: #ffffff;
+  --text: #0f172a;
+  /* texte principal foncé */
+  --muted: #475569;
+  /* texte secondaire lisible */
+  --primary: #3b82f6;
+  --primary-600: #2563eb;
+  --border: #cbd5e1;
+  /* bordure plus contrastée */
+}
+
+/* Boutons d’action du bas (Cartes / Paramètres) en clair: fond visible, texte sombre */
+:root[data-theme="light"] .bottom-actions .action {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .bottom-actions .action:hover {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+}
+
+/* Boutons génériques (dont Paramètres en page de stats) */
+:root[data-theme="light"] .btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .btn.red {
+  color: #b91c1c !important
+}
+
+:root[data-theme="light"] .btn.amber {
+  color: #a16207 !important
+}
+
+:root[data-theme="light"] .btn.blue {
+  color: #1d4ed8 !important
+}
+
+:root[data-theme="light"] .btn.green {
+  color: #166534 !important
+}
+
+/* Chips et légendes plus lisibles */
+:root[data-theme="light"] .chip {
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+  background: #f8fafc !important;
+}
+
+:root[data-theme="light"] .legend-item {
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+  background: transparent !important;
+}
+
+:root[data-theme="light"] .muted {
+  color: #475569 !important
+}
+
+/* Barres bas (révision) et topbar plates mais lisibles */
+:root[data-theme="light"] .revision-bar {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0), rgba(241, 245, 249, 0.9)) !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+:root[data-theme="light"] .topbar {
+  background: transparent !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+
+/* --- Polices globalement un peu plus grandes --- */
+/* Base +1 (léger) */
+body {
+  font-size: 17px;
+}
+
+/* Renforcer lisibilité des petits textes */
+.section-title {
+  font-size: 14px !important
+}
+
+.deck-meta {
+  font-size: 13px !important
+}
+
+.legend-item {
+  font-size: 13px !important
+}
+
+.k .label {
+  font-size: 12px !important
+}
+
+.k .value {
+  font-size: 17px !important
+}
+
+.review-top {
+  font-size: 13px !important
+}
+
+.small {
+  font-size: 13px !important
+}
+
+/* Boutons un peu plus gros aussi */
+.btn {
+  font-size: 15px !important
+}
+
+.bottom-actions .action {
+  font-size: 15px !important
+}
+
+/* Labels sous le bar-chart (activité 7j) */
+.bar7-labels {
+  font-size: 12px !important
+}
+
+/* Cartes (vue Cartes) – si tu utilises la grille “card-block” */
+.card-block .term {
+  font-size: calc(var(--fs-term) + 0px) !important
+}
+
+.card-block .definition {
+  font-size: calc(var(--fs-def) + 0px) !important
+}
+
+
+/* Réglage direct des tailles en révision */
+.review-card .term,
+.review-card .definition {
+  cursor: ns-resize;
+  /* indique qu’on peut glisser ↑↓ pour changer la taille */
+}
+</style>
 </head>
 <body>
   <div class="wrapper">
@@ -797,11 +1393,13 @@
       <footer class="revision-bar" id="revisionBar">
         <button id="startReviewBtn" class="rev-btn">Révision • 10 cartes</button>
       </footer>
+
+      <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
     </div>
   </div>
   <script>
     // ------------------ Données & stockage ------------------
-   const STORAGE_KEY = 'flash9x16_data_v3';
+    const STORAGE_KEY = 'flash9x16_data_v3';
 
     // === ZONE DE COLLAGE DES DONNÉES BRUTES ===
     // Catégories (constantes)
@@ -1769,22 +2367,82 @@
 
     let data = loadData();
 
+    // ====== Cookies backup (secours) ======
+    function setCookie(name, value, days = 365) {
+      try {
+        const v = encodeURIComponent(value);
+        document.cookie = `${name}=${v}; max-age=${days*86400}; path=/; SameSite=Lax;`;
+      } catch (e) { /* noop */ }
+    }
+
+    function getCookie(name) {
+      try {
+        const dec = decodeURIComponent;
+        const m = document.cookie.split(';').map(s => s.trim()).find(s => s.startsWith(name + '='));
+        return m ? dec(m.split('=').slice(1).join('=')) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function delCookie(name) {
+      document.cookie = `${name}=; max-age=0; path=/; SameSite=Lax;`;
+    }
+
+    // sérialise en plusieurs cookies (3x ~3.5KB => ~10KB backup)
+    function writeCookieBackup(str) {
+      const CHUNK = 3400; // marge
+      const parts = Math.ceil(str.length / CHUNK);
+      for (let i = 0; i < parts; i++) {
+        setCookie(`F9X16_B${i}`, str.slice(i * CHUNK, (i + 1) * CHUNK));
+      }
+      // nettoie surplus
+      for (let i = parts; i < 10; i++) {
+        delCookie(`F9X16_B${i}`);
+      }
+      setCookie('F9X16_BN', String(parts));
+    }
+
+    function readCookieBackup() {
+      const n = parseInt(getCookie('F9X16_BN') || '0', 10);
+      if (!n || n <= 0) return null;
+      let out = '';
+      for (let i = 0; i < n; i++) {
+        const p = getCookie(`F9X16_B${i}`);
+        if (p == null) return null;
+        out += p;
+      }
+      return out;
+    }
+
     function loadData() {
+      // 1) localStorage prioritaire
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          return JSON.parse(raw);
-        }
+        if (raw) return JSON.parse(raw);
       } catch (e) {
         console.warn('Storage parse error', e);
       }
-      // Si rien en storage, on construit depuis la liste collée
+      // 2) backup cookies
+      try {
+        const c = readCookieBackup();
+        if (c) {
+          return JSON.parse(c);
+        }
+      } catch (e) { /* ignore */ }
+      // 3) fallback: construit depuis la liste collée
       return buildChaptersFromFlashcards(flashcardData);
     }
 
 
     function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      try {
+        const str = JSON.stringify(data);
+        localStorage.setItem(STORAGE_KEY, str);
+        writeCookieBackup(str); // backup secours
+      } catch (e) {
+        console.warn('Save error', e);
+      }
     }
     // ------------------ Utilitaires ------------------
     const $ = sel => document.querySelector(sel);
@@ -1831,7 +2489,8 @@
       view: 'deck', // 'deck' | 'chapter' | 'cards' | 'review' | 'recap' | 'settings'
       chapterId: null,
       review: null, // { chapterId, queue:[ids], index, flipped, answers:[], start, end }
-      cardsIndex: 0
+      cardsIndex: 0,
+      cardsFlippedAll: false
     };
     const Nav = {
       stack: [],
@@ -1906,6 +2565,11 @@
       bottomActions.style.display = actions ? 'grid' : 'none';
       revisionBar.style.display = revision ? 'block' : 'none';
 
+      // Ajuste la grille: rangée 3 (actions) et rangée 4 (révision)
+      const phoneEl = document.getElementById('app');
+      phoneEl.style.setProperty('--row-actions', actions ? '52px' : '0px');
+      phoneEl.style.setProperty('--row-rev', revision ? '64px' : '0px');
+
       if (available == null && chapterId) {
         const chap = getChapter(chapterId);
         available = chap ? countAvailable(chap) : 0;
@@ -1926,6 +2590,13 @@
       else if (State.view === 'recap') goRecap(push);
       else if (State.view === 'settings') openSettings(State.chapterId, push);
     }
+    function hideReviewActionsBar() {
+      const el = document.getElementById('reviewActionsBar');
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    }
     // --- Vues
     function goDeck(push = true) {
       if (push) Nav.push();
@@ -1939,13 +2610,13 @@
         actions: false,
         revision: false
       });
+      hideReviewActionsBar();
       renderDeck();
     }
 
     function renderDeck() {
       const v = $('#view');
       const chapters = data.chapters;
-      const showEmoji = data.app?.prefs?.showEmoji !== false;
 
       v.innerHTML = `
         <div class="card flexcol" style="flex:1;">
@@ -1955,25 +2626,35 @@
               ${chapters.map(ch => {
                 const { unseen, echec, difficile, bien, facile } = getLiveGradeCounts(ch);
                 const total = ch.cards?.length ?? 0;
-                const emoji = showEmoji ? emojiFor(ch.title) : '';
+                const viewed = Math.max(0, total - unseen);
+                const pct = total ? Math.round((viewed / total) * 100) : 0;
+
+                // IMPORTANT:
+                // - Pas d’emoji dans le titre (nom du deck)
+                // - On laisse l’emoji dans la description (ch.description) comme aujourd’hui
                 return `
-                <div class="deck-item" data-id="${ch.id}">
-                  <div style="min-width:0">
-                    <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
-                      ${emoji ? `<span style="margin-right:6px">${emoji}</span>` : ''}${ch.title}
+                  <div class="deck-item" data-id="${ch.id}">
+                    <div style="min-width:0">
+                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
+                        ${ch.title}  <!-- pas d’emoji ici -->
+                      </div>
+
+                      <div class="deck-meta">
+                        ${ch.description || ''}  <!-- emoji + nom (comme actuellement) -->
+                      </div>
+
+                      <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
+                        <span class="chip" title="Progression vue">Vu: ${pct}%</span>
+                        <span class="chip" title="Échec">🟥 ${echec}</span>
+                        <span class="chip" title="Difficile">🟨 ${difficile}</span>
+                        <span class="chip" title="Bien">🟦 ${bien}</span>
+                        <span class="chip" title="Facile">🟩 ${facile}</span>
+                      </div>
                     </div>
-                    <div class="deck-meta">${ch.description || ''}</div>
-                    <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
-                      <span class="chip">Non vus: ${unseen}/${total}</span>
-                      <span class="chip" title="Échec">⛔ ${echec}</span>
-                      <span class="chip" title="Difficile">⚠️ ${difficile}</span>
-                      <span class="chip" title="Bien">👍 ${bien}</span>
-                      <span class="chip" title="Facile">✅ ${facile}</span>
-                    </div>
+                    <div class="muted" style="font-size:18px">›</div>
                   </div>
-                  <div class="muted" style="font-size:18px">›</div>
-                </div>
-              `;}).join('')}
+                `;
+              }).join('')}
             </div>
           </div>
         </div>
@@ -2004,6 +2685,7 @@
         available: countAvailable(chap),
         chapterId: chap.id
       });
+      hideReviewActionsBar();
       renderChapter(chapterId);
     }
 
@@ -2024,10 +2706,13 @@
       const week = getWeekCount(chap);
       const success = getSuccessRate(chap);
       const avg7 = get7DayAvgMs(chap);
+      const dueNow = getDueNow(chap);
+      const streak = getStreakDays(chap);
+      const emoji = emojiFor(chap.title);
 
       v.innerHTML = `
         <div class="card" style="flex:1; display:flex; flex-direction:column;">
-          <div class="section-title">Statistiques</div>
+          <div class="section-title">${emoji ? emoji+' ' : ''}Statistiques</div>
           <div class="kpi">
             <div class="k"><div class="label">Cartes non vues</div><div class="value">${unseen}</div></div>
             <div class="k"><div class="label">Total cartes</div><div class="value">${chap.cards.length}</div></div>
@@ -2038,12 +2723,14 @@
           </div>
 
           <div class="legend" id="legend">
-            <div class="legend-item ${sel.unseen ? '' : 'inactive'}" data-key="unseen" role="button" tabindex="0"><span class="dot gray"></span> Non vus: ${unseen}</div>
-            <div class="legend-item ${sel.echec ? '' : 'inactive'}" data-key="echec" role="button" tabindex="0"><span class="dot red"></span> Échec: ${echec}</div>
-            <div class="legend-item ${sel.difficile ? '' : 'inactive'}" data-key="difficile" role="button" tabindex="0"><span class="dot amber"></span> Difficile: ${difficile}</div>
-            <div class="legend-item ${sel.bien ? '' : 'inactive'}" data-key="bien" role="button" tabindex="0"><span class="dot blue"></span> Bien: ${bien}</div>
-            <div class="legend-item ${sel.facile ? '' : 'inactive'}" data-key="facile" role="button" tabindex="0"><span class="dot green"></span> Facile: ${facile}</div>
+            <div class="legend-item ${sel.unseen ? '' : 'inactive'}" data-key="unseen"><span class="dot gray"></span> Non vus: <b class="count">${unseen}</b></div>
+            <div class="legend-item ${sel.echec ? '' : 'inactive'}" data-key="echec"><span class="dot red"></span> Échec: <b class="count">${echec}</b></div>
+            <div class="legend-item ${sel.difficile ? '' : 'inactive'}" data-key="difficile"><span class="dot amber"></span> Difficile: <b class="count">${difficile}</b></div>
+            <div class="legend-item ${sel.bien ? '' : 'inactive'}" data-key="bien"><span class="dot blue"></span> Bien: <b class="count">${bien}</b></div>
+            <div class="legend-item ${sel.facile ? '' : 'inactive'}" data-key="facile"><span class="dot green"></span> Facile: <b class="count">${facile}</b></div>
           </div>
+          
+
 
           <div class="kpi mt8">
             <div class="k"><div class="label">Aujourd'hui</div><div class="value">${today}</div></div>
@@ -2053,10 +2740,17 @@
             <div class="k"><div class="label">Taux de réussite</div><div class="value">${success}%</div></div>
             <div class="k"><div class="label">Temps moyen (7j)</div><div class="value">${avg7? (Math.round(avg7/100)/10)+'s':'—'}</div></div>
           </div>
-
-          <div class="mt8 muted" style="font-size:12px">
-            Filtres actifs: <b>${activeGradesLabel(sel)}</b>
+          <div class="kpi mt8">
+            <div class="k"><div class="label">À réviser maintenant</div><div class="value">${dueNow}</div></div>
+            <div class="k"><div class="label">Série (jours)</div><div class="value">${streak}</div></div>
           </div>
+          
+          <div class="bar7-wrap">
+            <div class="label" style="color:var(--primary)">Activité 7 jours</div>
+            <canvas id="bar7" width="220" height="60"></canvas>
+            <div class="bar7-labels" id="bar7Labels"></div>
+          </div>
+
         </div>
         `;
 
@@ -2087,6 +2781,26 @@
       });
       // Mettre à jour le bouton de révision (cartes dispo selon filtre)
       updateRevisionBarForChapter(chap);
+      
+
+      drawBars7('bar7', getLast7DaysArray(chap));
+      const lbl = document.getElementById('bar7Labels');
+      if (lbl) {
+        const noms = getLast7DaysLabelsFR();
+        lbl.innerHTML = noms.map(j => `<div>${j.substring(0,3)}</div>`).join('');
+      }
+
+      // Redessiner au resize (dé-bouncé)
+      (function() {
+        let t;
+        const redraw = () => drawBars7('bar7', getLast7DaysArray(chap));
+        window.removeEventListener('resize', window._bar7ResizeHandler || (() => {}));
+        window._bar7ResizeHandler = () => {
+          clearTimeout(t);
+          t = setTimeout(redraw, 150);
+        };
+        window.addEventListener('resize', window._bar7ResizeHandler);
+      })();
     }
 
 
@@ -2106,6 +2820,7 @@
       if (push) Nav.push();
       State.view = 'cards';
       State.chapterId = chapterId;
+      State.cardsFlippedAll = false; // reset flip global
       const chap = getChapter(chapterId);
       setTopbar({
         title: `${chap.title} • Cartes`
@@ -2114,6 +2829,7 @@
         actions: false,
         revision: false
       });
+      hideReviewActionsBar();
       renderCards(chapterId);
     }
 
@@ -2123,31 +2839,39 @@
       const sel = chap.filters.grades || {};
       const pool = chap.cards.filter(c => sel[(c.grade || 'unseen')]);
 
+      // Préparer un indicateur de flip global
+      const flipped = !!State.cardsFlippedAll;
+
       v.innerHTML = `
-        <div class="card flexcol" style="flex:1;">
-          <div class="section-title">Cartes disponibles</div>
-          <div class="muted" style="font-size:12px; margin-bottom:6px">
-            Filtres actifs: ${activeGradesLabel(sel)} • ${pool.length} carte(s)
-          </div>
-          <div id="cardsScroll" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-            <div class="list">
-              ${pool.map(c => {
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="section-title">Cartes (${pool.length})</div>
+          <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+            <div class="cards-grid">
+              ${pool.map(c=>{
                 const { frontText, backText } = getCardSides(c, chap);
+                const gradeClass = `grade-${c.grade || 'unseen'}`;
+                const timeStr = c.avgMs ? formatDuration(c.avgMs) : '';
                 return `
-                <div class="card-item">
-                  <div style="min-width:0">
-                    <div class="front" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${frontText}</div>
-                    <div class="back mt4" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${backText}</div>
-                    <div class="mt4" style="font-size:12px; color:#c7d2fe">
-                      Note: ${labelForGrade(c.grade)} • Temps moyen: ${c.avgMs ? (Math.round(c.avgMs/100)/10)+'s' : '—'}
-                    </div>
-                  </div>
+                <div class="card-block ${gradeClass} ${flipped?'flipped':''}" data-id="${c.id}">
+                  <div class="term">${frontText}</div>
+                  <div class="definition">${backText}</div>
+                  ${timeStr ? `<div class="cb-time">${timeStr}</div>` : ``}
                 </div>
-              `}).join('')}
+                `;
+              }).join('')}
             </div>
           </div>
         </div>
       `;
+
+      // Clic sur un bloc => on bascule TOUTES les cartes
+      const grid = $('#cardsGrid');
+      grid.addEventListener('click', (e) => {
+        const block = e.target.closest('.card-block');
+        if (!block) return;
+        State.cardsFlippedAll = !State.cardsFlippedAll;
+        $$('.card-block').forEach(b => b.classList.toggle('flipped', State.cardsFlippedAll));
+      });
     }
 
 
@@ -2156,14 +2880,40 @@
       State.view = 'review';
       const r = State.review;
       const chap = getChapter(r.chapterId);
+
       setTopbar({
         title: 'Révision'
       });
+
+      // Conserve la rangée 4 visible (même Y), mais masque la barre "Révision" visuelle
       setBottomVisibility({
         actions: false,
-        revision: false
-      });
+        revision: true
+      }); // 4e rangée = 64px (même que le bouton Révision)
+      revisionBar.style.display = 'none'; // masque le bouton "Révision" pendant la révision
+      document.getElementById('reviewActionsBar').style.display = 'block'; // affiche notre barre d'actions de révision
+
       renderReview();
+    }
+
+
+    function renderReviewFooter() {
+      const bar = document.getElementById('reviewActionsBar');
+      if (!bar) return;
+      const r = State.review;
+      if (!r.flipped) {
+        bar.innerHTML = `<button class="btn" id="flipBtn">Retourner</button>`;
+        document.getElementById('flipBtn').onclick = () => {
+          r.flipped = true;
+          renderReview();
+        };
+      } else {
+        bar.innerHTML = `<div class="row-4"> <button class="btn red" id="grade_echec">Échec</button> <button class="btn amber" id="grade_difficile">Difficile</button> <button class="btn blue" id="grade_bien">Bien</button> <button class="btn green" id="grade_facile">Facile</button> </div>`;
+        document.getElementById('grade_echec').onclick = () => submitGrade('echec');
+        document.getElementById('grade_difficile').onclick = () => submitGrade('difficile');
+        document.getElementById('grade_bien').onclick = () => submitGrade('bien');
+        document.getElementById('grade_facile').onclick = () => submitGrade('facile');
+      }
     }
 
     function renderReview() {
@@ -2181,6 +2931,9 @@
       } = getCardSides(current, chap);
       const frontFirst = chap.settings.reviewOrder !== 'back-first';
       const prompt = frontFirst ? frontText : backText;
+      const isPromptFront = frontFirst; // true si on affiche le recto en premier
+      const promptClass = isPromptFront ? 'term' : 'definition';
+      const promptFace = isPromptFront ? 'front' : 'back';
 
       v.innerHTML = `
         <div class="review-wrap">
@@ -2192,44 +2945,20 @@
           <div class="review-card">
             <div>
               ${!r.flipped
-                ? `<div class="term">${prompt}</div>`
+                ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
                 : `
                   <div class="stack">
-                    <div class="term">${frontText}</div>
-                    <div class="definition" style="margin-top:6px">${backText}</div>
+                    <div class="term" data-face="front">${frontText}</div>
+                    <div class="definition" data-face="back" style="margin-top:6px">${backText}</div>
                   </div>
                 `
               }
             </div>
           </div>
-
-          <div class="review-actions" id="reviewActions">
-            ${!r.flipped
-              ? `<button class="btn" id="flipBtn">Retourner</button>`
-              : `
-                <div class="row-4">
-                  <button class="btn red" id="grade_echec">Échec</button>
-                  <button class="btn amber" id="grade_difficile">Difficile</button>
-                  <button class="btn blue" id="grade_bien">Bien</button>
-                  <button class="btn green" id="grade_facile">Facile</button>
-                </div>
-              `
-            }
-          </div>
         </div>
         `;
-
-      if (!r.flipped) {
-        $('#flipBtn').addEventListener('click', () => {
-          r.flipped = true;
-          renderReview();
-        });
-      } else {
-        $('#grade_echec').addEventListener('click', () => submitGrade('echec'));
-        $('#grade_difficile').addEventListener('click', () => submitGrade('difficile'));
-        $('#grade_bien').addEventListener('click', () => submitGrade('bien'));
-        $('#grade_facile').addEventListener('click', () => submitGrade('facile'));
-      }
+      bindReviewSizeControls();
+      renderReviewFooter();
     }
 
 
@@ -2243,6 +2972,7 @@
         actions: false,
         revision: false
       });
+      hideReviewActionsBar();
       renderRecap();
     }
 
@@ -2489,6 +3219,8 @@
       return counts;
     }
 
+
+
     function syncGradeCounts(chap) {
       chap.stats = chap.stats || {};
       chap.stats.gradeCounts = getLiveGradeCounts(chap);
@@ -2612,6 +3344,124 @@
     function countAvailable(chap) {
       const sel = chap.filters.grades;
       return chap.cards.filter(c => sel[(c.grade || 'unseen')]).length;
+    }
+
+    function getDueNow(chap) {
+      const now = Date.now();
+      return chap.cards.filter(c => c.dueAt && c.dueAt > 0 && c.dueAt <= now).length;
+    }
+
+    function getStreakDays(chap) {
+      // Nombre de jours consécutifs (en remontant) avec au moins 1 révision/jour
+      const base = new Date();
+      let streak = 0;
+      for (let i = 0; i < 365; i++) {
+        const d = new Date(base);
+        d.setDate(base.getDate() - i);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const n = chap.stats.dailyReviews[key] || 0;
+        if (n > 0) streak++;
+        else break;
+      }
+      return streak;
+    }
+
+    function getLast7DaysArray(chap) {
+      const arr = [];
+      const base = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(base);
+        d.setDate(base.getDate() - i);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        arr.push(chap.stats.dailyReviews[key] || 0);
+      }
+      return arr;
+    }
+
+    function getLast7DaysLabelsFR() {
+      const arr = [];
+      const base = new Date();
+      const jours = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(base);
+        d.setDate(base.getDate() - i);
+        arr.push(jours[d.getDay()]);
+      }
+      return arr;
+    }
+
+    function drawBars7(canvasId, values) {
+      const el = document.getElementById(canvasId);
+      if (!el) return;
+      const ctx = el.getContext('2d');
+
+      // DPR + taille CSS réelle
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const cssW = Math.round(el.clientWidth || el.getBoundingClientRect().width || 220);
+      const cssH = Math.round(parseFloat(getComputedStyle(el).height) || el.height || 60);
+
+      if (el.width !== cssW * dpr || el.height !== cssH * dpr) {
+        el.width = cssW * dpr;
+        el.height = cssH * dpr;
+      }
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, el.width, el.height);
+      ctx.scale(dpr, dpr);
+
+      const w = cssW,
+        h = cssH;
+
+      const max = Math.max(1, ...values);
+      const n = values.length;
+      const gap = 6;
+      const totalGap = gap * (n - 1);
+      const barW = Math.max(6, Math.floor((w - totalGap) / n));
+
+      const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#6366f1';
+      const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#0f172a';
+
+      // Police plus petite et bande texte en bas
+      const fontPx = Math.max(9, Math.min(10, Math.floor(barW * 0.7)));
+      const textPad = fontPx + 4; // bande réservée pour les chiffres
+      const baseY = h - textPad - 2; // ligne de base des barres (au-dessus des chiffres)
+      const minH = 3; // petite barre min
+
+      // Ligne de base (au-dessus des chiffres)
+      ctx.strokeStyle = 'rgba(148,163,184,0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, baseY + 0.5);
+      ctx.lineTo(w, baseY + 0.5);
+      ctx.stroke();
+
+      // Paramètres texte (en bas)
+      ctx.font = `bold ${fontPx}px ui-sans-serif, system-ui`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top'; // on écrit depuis le haut de la bande
+
+      let x = 0;
+      values.forEach(v => {
+        const bhRaw = Math.round((v / max) * (h - textPad - 8));
+        const bh = Math.max(minH, bhRaw);
+        const y = baseY - bh;
+
+        // Barre
+        ctx.fillStyle = primary;
+        ctx.globalAlpha = 0.95;
+        ctx.fillRect(x, y, barW, bh);
+        ctx.globalAlpha = 1;
+
+        // Nombre en bas du diagramme (dans la bande réservée)
+        ctx.fillStyle = textColor;
+        ctx.fillText(String(v), x + barW / 2, baseY + 2);
+
+        // ombre subtile au pied des barres
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(x, baseY, barW, 2);
+
+        x += barW + gap;
+      });
     }
     // ------------------ Diagramme donut ------------------
     function drawGradeChart(canvasId, counts, activeKeys = null) {
@@ -2822,8 +3672,11 @@
     }
     // ------------------ Paramètres (placeholder) ------------------
     function openSettings(chapterId, push = true) {
-      if (push) Nav.push();
+      if (!chapterId) chapterId = State.chapterId; // fallback sûr
       const chap = getChapter(chapterId);
+      if (!chap) return;
+
+      if (push) Nav.push();
       const v = $('#view');
       State.view = 'settings';
       setTopbar({
@@ -2833,42 +3686,68 @@
         actions: false,
         revision: false
       });
+      hideReviewActionsBar();
       v.innerHTML = `
-        <div class="card flexcol" style="flex:1;">
-        <div class="section-title">Préférences</div>
-        <div class="scroll-y" style="flex:1; min-height:0; padding:4px;">
+        <div class="settings-page scroll-y" style="flex:1; min-height:0;">
+          <div>
+            <div class="settings-hero">Paramètres</div>
+            <div class="settings-sub">Personnalisez l’affichage, les langues et vos objectifs</div>
+          </div>
 
-          <div class="section-title">Apparence</div>
-          <div class="mt6 muted" style="font-size:13px">
-            • Thème: <b id="themeLbl">${data.app.theme==='light'?'Clair':'Sombre'}</b> — <button class="btn" id="toggleTheme">Basculer</button><br>
-            • Couleur d'accent: <b id="accentLbl">${data.app.prefs.accent}</b><br>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
-              ${['indigo','blue','teal','emerald','rose','amber','violet'].map(k=>`
-                <button class="chip" data-accent="${k}" ${data.app.prefs.accent===k?'style="outline:2px solid var(--primary)"':''}>${k}</button>
-              `).join('')}
+          <div class="settings-section">
+            <div class="section-title">Apparence</div>
+            <div class="mt6 muted" style="font-size:13px">
+              • Thème: <b id="themeLbl">${data.app.theme==='light'?'Clair':'Sombre'}</b>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn" id="toggleTheme">Basculer Clair/Sombre</button>
+            </div>
+
+            <div class="mt6 muted" style="font-size:13px">Couleur d’accent</div>
+            <div class="swatches" id="accentSwatches">
+              <button class="swatch" data-accent="indigo" style="--sw:#6366f1"></button>
+              <button class="swatch" data-accent="blue" style="--sw:#3b82f6"></button>
+              <button class="swatch" data-accent="teal" style="--sw:#14b8a6"></button>
+              <button class="swatch" data-accent="emerald" style="--sw:#10b981"></button>
+              <button class="swatch" data-accent="rose" style="--sw:#f43f5e"></button>
+              <button class="swatch" data-accent="amber" style="--sw:#f59e0b"></button>
+              <button class="swatch" data-accent="violet" style="--sw:#8b5cf6"></button>
             </div>
           </div>
 
-          <div class="section-title" style="margin-top:10px">Langues</div>
-          <div class="mt6 muted" style="font-size:13px">
-            Recto → Verso: <b id="langOrderLbl">${chap.settings.langSwap ? 'EN → FR' : 'FR → EN'}</b>
+          <div class="settings-section">
+            <div class="section-title">Langues</div>
+            <div class="mt6 muted" style="font-size:13px">Recto → Verso: <b id="langOrderLbl">${chap.settings.langSwap ? 'EN → FR' : 'FR → EN'}</b></div>
+            <button class="btn" id="toggleLangSwap">Basculer FR ↔ EN</button>
           </div>
-          <button class="btn mt6" id="toggleLangSwap">Basculer FR ↔ EN</button>
-
-          <div class="section-title" style="margin-top:10px">Typographie</div>
-           <div class="card" id="typoPreview" style="margin-bottom:8px; padding:10px">
-            <div class="term">Exemple recto (Front)</div>
-            <div class="definition" style="margin-top:6px">Exemple verso (Back)</div>
-            <div class="muted" style="font-size:12px; margin-top:6px">La prévisualisation reflète vos réglages en temps réel.</div>
+          
+          <div class="settings-section">
+            <div class="section-title">Typographie</div>
+            <div class="card" id="typoPreview" style="margin-bottom:8px; padding:10px">
+              <div class="term">Exemple recto (Front)</div>
+              <div class="definition" style="margin-top:6px">Exemple verso (Back)</div>
+              <div class="muted" style="font-size:12px; margin-top:6px">Ajustez via les roues ci‑dessous.</div>
+            </div>
+            <div class="wheel" id="wheelFsTerm"><div class="name">Recto (Front)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
+            <div class="wheel mt6" id="wheelFsDef"><div class="name">Verso (Back)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
           </div>
-          <div class="wheel mt6" id="wheelFsTerm"><div class="name">Recto (Front)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
-          <div class="wheel mt6" id="wheelFsDef"><div class="name">Verso (Back)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
 
-          <div class="section-title" style="margin-top:10px">Session & Objectif</div>
-          <div class="wheel mt6" id="wheelSession"><div class="name">Taille session</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
-          <div class="wheel mt6" id="wheelGoal"><div class="name">Objectif quotidien</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
+          <div class="settings-section">
+            <div class="section-title">Session & Objectif</div>
+            <div class="wheel" id="wheelSession"><div class="name">Taille session</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
+            <div class="wheel mt6" id="wheelGoal"><div class="name">Objectif quotidien</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
+          </div>
 
-        </div>
+          <div class="settings-section">
+            <div class="section-title">Réinitialiser</div>
+            <div class="mt6 muted" style="font-size:13px">
+              Remettre à zéro la progression (grades, stats, temps) du chapitre courant ou de toute l’application.
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px">
+              <button class="btn" id="resetChapterBtn">Reset chapitre</button>
+              <button class="btn red" id="resetAllBtn">Reset application</button>
+            </div>
+          </div>
         </div>
       `;
 
@@ -2900,12 +3779,15 @@
         refreshTheme();
       };
 
-      $$('[data-accent]').forEach(b => {
-        b.onclick = () => {
-          P.accent = b.getAttribute('data-accent');
+      const activeAccent = data.app.prefs.accent || 'indigo';
+      $$('#accentSwatches .swatch').forEach(sw => {
+        const key = sw.getAttribute('data-accent');
+        if (key === activeAccent) sw.classList.add('is-active');
+        sw.onclick = () => {
+          data.app.prefs.accent = key;
           saveData();
-          applyUI();
-          openSettings(chapterId, false); // Re-render to update outline
+          applyUI(); // refresh visuel
+          $$('#accentSwatches .swatch').forEach(x => x.classList.toggle('is-active', x.getAttribute('data-accent') === key));
         };
       });
 
@@ -2950,6 +3832,18 @@
         step: 5,
         unit: ' cartes'
       });
+
+      $('#resetChapterBtn').onclick = () => {
+        if (!confirm('Réinitialiser la progression de ce chapitre ?')) return;
+        resetChapter(chap.id);
+        saveData();
+        // rafraîchit la vue de paramètres (et stats à la prochaine ouverture)
+        openSettings(chapterId, false);
+      };
+
+      $('#resetAllBtn').onclick = resetAll;
+
+      bindTypoPreviewDrag();
     }
 
     function syncFromRawFlashcards() {
@@ -3038,6 +3932,176 @@
       }
     }
 
+
+
+    function bindReviewSizeControls() {
+      const faces = document.querySelectorAll('.review-card [data-face]');
+      if (!faces || !faces.length) return;
+
+      const P = data.app.prefs || {};
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+      // applique immédiatement les variables CSS (live)
+      const applyVars = () => {
+        document.documentElement.style.setProperty('--fs-term', (P.fsTerm || 20) + 'px');
+        document.documentElement.style.setProperty('--fs-def', (P.fsDef || 24) + 'px');
+      };
+
+      faces.forEach(el => {
+        const face = el.getAttribute('data-face'); // 'front' | 'back'
+        let startY = null,
+          startVal = null;
+
+        const getVal = () => face === 'front' ? (P.fsTerm || 20) : (P.fsDef || 24);
+        const setVal = (v) => {
+          if (face === 'front') P.fsTerm = clamp(v, 12, 60);
+          else P.fsDef = clamp(v, 14, 72);
+          applyVars(); // mise à jour en direct
+        };
+        const commit = () => saveData();
+
+        // Pointer (mobile + desktop)
+        el.addEventListener('pointerdown', e => {
+          startY = e.clientY;
+          startVal = getVal();
+          el.setPointerCapture?.(e.pointerId); // ← correct (sans espace)
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        el.addEventListener('pointermove', e => {
+          if (startY == null) return;
+          const dy = startY - e.clientY; // glisser vers le haut => augmente
+          const delta = Math.round(dy / 6); // 6px de déplacement => +1px
+          setVal(startVal + delta);
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        const end = e => {
+          if (startY != null) commit();
+          startY = null;
+          startVal = null;
+          e.preventDefault();
+          e.stopPropagation();
+        };
+        el.addEventListener('pointerup', end);
+        el.addEventListener('pointercancel', end);
+
+        // Molette (desktop)
+        el.addEventListener('wheel', e => {
+          e.preventDefault();
+          const dir = e.deltaY > 0 ? -1 : 1;
+          setVal(getVal() + dir);
+          commit();
+        }, {
+          passive: false
+        });
+      });
+    }
+
+    function bindTypoPreviewDrag() {
+      const box = document.getElementById('typoPreview');
+      if (!box) return;
+      const termEl = box.querySelector('.term');
+      const defEl = box.querySelector('.definition');
+      const toast = document.getElementById('typoToast');
+      const P = data.app.prefs || {};
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+      let startY = null,
+        startTerm = null,
+        startDef = null,
+        target = 'both';
+
+      const showToast = (msg) => {
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.style.display = 'block';
+      };
+      const hideToast = () => {
+        if (toast) toast.style.display = 'none';
+      };
+
+      const updateVars = () => {
+        document.documentElement.style.setProperty('--fs-term', (P.fsTerm || 20) + 'px');
+        document.documentElement.style.setProperty('--fs-def', (P.fsDef || 24) + 'px');
+      };
+
+      const start = (e) => {
+        const t = e.target.closest('.term, .definition, #typoPreview');
+        if (!t) return;
+        startY = (e.touches ? e.touches[0].clientY : e.clientY);
+        startTerm = P.fsTerm || 20;
+        startDef = P.fsDef || 24;
+        if (t.classList.contains('term')) target = 'term';
+        else if (t.classList.contains('definition')) target = 'def';
+        else target = 'both';
+        e.preventDefault();
+      };
+      const move = (e) => {
+        if (startY == null) return;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY);
+        const dy = startY - y; // haut => grand
+        const delta = Math.round(dy / 6);
+
+        if (target === 'term' || target === 'both') {
+          P.fsTerm = clamp(startTerm + delta, 12, 60);
+        }
+        if (target === 'def' || target === 'both') {
+          P.fsDef = clamp(startDef + delta, 14, 72);
+        }
+        updateVars(); // LIVE
+        showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`);
+      };
+      const end = () => {
+        if (startY != null) {
+          saveData();
+        }
+        startY = null;
+        startTerm = null;
+        startDef = null;
+        target = 'both';
+        setTimeout(hideToast, 200);
+      };
+
+      // Pointer/touch
+      box.addEventListener('pointerdown', start);
+      box.addEventListener('pointermove', move);
+      box.addEventListener('pointerup', end);
+      box.addEventListener('pointercancel', end);
+      box.addEventListener('touchstart', start, {
+        passive: false
+      });
+      box.addEventListener('touchmove', move, {
+        passive: false
+      });
+      box.addEventListener('touchend', end, {
+        passive: false
+      });
+
+      // Molette: term si sur term, def si sur def, sinon both
+      const wheelOn = (el, which) => {
+        el.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const dir = e.deltaY > 0 ? -1 : 1;
+          if (which === 'term' || which === 'both') {
+            P.fsTerm = clamp((P.fsTerm || 20) + dir, 12, 60);
+          }
+          if (which === 'def' || which === 'both') {
+            P.fsDef = clamp((P.fsDef || 24) + dir, 14, 72);
+          }
+          updateVars();
+          saveData();
+          showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`);
+          setTimeout(hideToast, 250);
+        }, {
+          passive: false
+        });
+      };
+      wheelOn(termEl, 'term');
+      wheelOn(defEl, 'def');
+      wheelOn(box, 'both');
+    }
+
     function bindWheel(node, {
       get,
       set,
@@ -3064,6 +4128,8 @@
       const setVal = (v) => {
         set(clampv(v));
         render();
+        // LIVE update (sans attendre "commit")
+        applyUI();
       };
 
       const pd = (e) => {
@@ -3169,6 +4235,34 @@
 
     // ------------------ Init ------------------
     function init() {
+      // Demande un stockage persistant (évite l'éviction)
+      if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().then(granted => console.log('persist granted?', granted));
+      }
+
+      // Sauvegarde sur changements de visibilité / fermeture
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') saveData();
+      });
+      window.addEventListener('pagehide', saveData);
+      window.addEventListener('beforeunload', saveData);
+
+      // Autosave périodique (toutes les 15s)
+      setInterval(() => {
+        saveData();
+      }, 15000);
+
+      // Sync multi-onglets: recharge si une autre tab a sauvé
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY && e.newValue) {
+          try {
+            data = JSON.parse(e.newValue);
+            // re-rendu non intrusif
+            renderByState(false);
+          } catch (err) {}
+        }
+      });
+
       upgradeData();
       applyTheme();
       applyUI();
