@@ -812,6 +812,19 @@
         padding: 16px 20px;
       }
     }
+    
+    .chip-pie {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      /* Le dégradé conique qui crée l'effet camembert */
+      background: conic-gradient(
+        var(--primary) var(--progress, 0%), 
+        var(--border) var(--progress, 0%)
+      );
+      display: inline-block;
+      vertical-align: middle; /* Pour bien l'aligner avec les autres carrés */
+    }
   
     /* --- Flat UI Override --- */
 
@@ -2724,16 +2737,12 @@ body {
                 return `
                   <div class="deck-item" data-id="${ch.id}">
                     <div style="min-width:0">
-                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
-                        ${ch.title}  <!-- pas d’emoji ici -->
-                      </div>
-
-                      <div class="deck-meta">
-                        ${ch.description || ''}  <!-- emoji + nom (comme actuellement) -->
-                      </div>
+                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 18px;">
+                        ${ch.description || ch.title}
+                        </div>
 
                       <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
-                        <span class="chip" title="Progression vue">Vu: ${pct}%</span>
+                        <div class="chip-pie" title="Progression : ${pct}%" style="--progress: ${pct}%"></div>
                         <span class="chip" title="Échec">🟥 ${echec}</span>
                         <span class="chip" title="Difficile">🟨 ${difficile}</span>
                         <span class="chip" title="Bien">🟦 ${bien}</span>
