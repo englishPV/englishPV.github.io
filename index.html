@@ -5,1393 +5,361 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Flashcards 9:16</title>
   <style>
-    :root {
-      --bg: #0b1020;
-      --surface: #12172b;
-      --card: #161c33;
-      --muted: #8aa0d3;
-      --text: #e6ecff;
-      --primary: #6366f1;
-      --primary-600: #5457e6;
-      --green: #22c55e;
-      --blue: #3b82f6;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --ring: #e5e7eb;
-      --border: #232a48;
+    :root{
+      --bg:#0b1020;
+      --surface:#12172b;
+      --card:#161c33;
+      --text:#e6ecff;
+      --muted:#8aa0d3;
+      --primary:#6366f1;
+      --primary-600:#5457e6;
+      --green:#22c55e;
+      --blue:#3b82f6;
+      --amber:#f59e0b;
+      --red:#ef4444;
+      --ring:#e5e7eb;
+      --border:#232a48;
 
-      /* Variables globales UI (tailles, arrondis) */
-      --fs-term: 20px;
-      /* Front (recto) - un peu plus grand qu'avant */
-      --fs-def: 24px;
-      /* Back (verso) */
-      --fs-front-list: 16px;
-      /* Liste cartes: front */
-      --fs-back-list: 18px;
-      /* Liste cartes: back */
-      --radius-md: 14px;
-      /* Arrondi par défaut */
+      --fs-term:20px;
+      --fs-def:24px;
+      --fs-front-list:16px;
+      --fs-back-list:18px;
+      --radius-md:14px;
+
+      /* Tokens Boutons Dark (par défaut) */
+      --btn-neutral-bg: rgba(255,255,255,.06);
+      --btn-neutral-fg: #e6ecff;
+      --btn-neutral-bd: #232a48;
+      --btn-neutral-bg-h: rgba(255,255,255,.10);
+
+      --btn-soft-primary-bg: color-mix(in srgb, var(--primary) 22%, transparent);
+      --btn-soft-primary-bg-h: color-mix(in srgb, var(--primary) 34%, transparent);
+      --btn-soft-primary-fg: #dbe4ff;
+      --btn-soft-primary-bd: color-mix(in srgb, var(--primary) 55%, transparent);
+
+      --btn-soft-red-bg: rgba(239,68,68,.18);
+      --btn-soft-red-bg-h: rgba(239,68,68,.28);
+      --btn-soft-red-fg: #fecaca;
+      --btn-soft-red-bd: rgba(239,68,68,.45);
+
+      --btn-soft-amber-bg: rgba(245,158,11,.18);
+      --btn-soft-amber-bg-h: rgba(245,158,11,.28);
+      --btn-soft-amber-fg: #fde68a;
+      --btn-soft-amber-bd: rgba(245,158,11,.45);
+
+      --btn-soft-blue-bg: rgba(59,130,246,.18);
+      --btn-soft-blue-bg-h: rgba(59,130,246,.28);
+      --btn-soft-blue-fg: #bfdbfe;
+      --btn-soft-blue-bd: rgba(59,130,246,.45);
+
+      --btn-soft-green-bg: rgba(34,197,94,.18);
+      --btn-soft-green-bg-h: rgba(34,197,94,.28);
+      --btn-soft-green-fg: #bbf7d0;
+      --btn-soft-green-bd: rgba(34,197,94,.45);
+
+      --btn-solid-primary-bg: var(--primary);
+      --btn-solid-primary-bg-h: var(--primary-600);
+      --btn-solid-primary-fg: #fff;
+      --btn-solid-primary-bd: var(--primary-600);
+
+      --btn-solid-red-bg:#ef4444;  --btn-solid-red-bg-h:#dc2626;  --btn-solid-red-fg:#fff;  --btn-solid-red-bd:#dc2626;
+      --btn-solid-amber-bg:#f59e0b;--btn-solid-amber-bg-h:#d97706;--btn-solid-amber-fg:#0f172a;--btn-solid-amber-bd:#d97706;
+      --btn-solid-blue-bg:#3b82f6; --btn-solid-blue-bg-h:#2563eb; --btn-solid-blue-fg:#fff;  --btn-solid-blue-bd:#2563eb;
+      --btn-solid-green-bg:#22c55e;--btn-solid-green-bg-h:#16a34a;--btn-solid-green-fg:#0f172a;--btn-solid-green-bd:#16a34a;
     }
 
-    :root[data-theme="light"] {
-      --bg: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-      --surface: #ffffff;
-      --card: #ffffff;
-      --text: #0f172a;
-      /* Texte principal foncé */
-      --muted: #475569;
-      /* Texte secondaire lisible */
-      --primary: #3b82f6;
-      --primary-600: #2563eb;
-      --border: #e2e8f0;
+    :root[data-theme="light"]{
+      --bg:linear-gradient(180deg,#f8fafc 0%,#eef2f7 100%);
+      --surface:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --primary:#3b82f6;
+      --primary-600:#2563eb;
+      --border:#cbd5e1;
+
+      /* Tokens Boutons Light */
+      --btn-neutral-bg:#f1f5f9;
+      --btn-neutral-fg:#0f172a;
+      --btn-neutral-bd:#cbd5e1;
+      --btn-neutral-bg-h:#e2e8f0;
+
+      --btn-soft-primary-bg: color-mix(in srgb, var(--primary) 14%, white 86%);
+      --btn-soft-primary-bg-h: color-mix(in srgb, var(--primary) 22%, white 78%);
+      --btn-soft-primary-fg: color-mix(in srgb, var(--primary) 78%, black 22%);
+      --btn-soft-primary-bd: color-mix(in srgb, var(--primary) 35%, white 65%);
+
+      --btn-soft-red-bg:#fee2e2;   --btn-soft-red-bg-h:#fecaca;   --btn-soft-red-fg:#991b1b;   --btn-soft-red-bd:#fca5a5;
+      --btn-soft-amber-bg:#fef3c7; --btn-soft-amber-bg-h:#fde68a; --btn-soft-amber-fg:#92400e; --btn-soft-amber-bd:#fcd34d;
+      --btn-soft-blue-bg:#dbeafe;  --btn-soft-blue-bg-h:#bfdbfe;  --btn-soft-blue-fg:#1e3a8a;  --btn-soft-blue-bd:#93c5fd;
+      --btn-soft-green-bg:#dcfce7; --btn-soft-green-bg-h:#bbf7d0; --btn-soft-green-fg:#14532d; --btn-soft-green-bd:#86efac;
     }
 
-    * {
-      box-sizing: border-box
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+      font-size:17px;
     }
 
-    html,
-    body {
-      height: 100%
+    .wrapper{
+      height:100dvh; width:100%;
+      display:flex; align-items:center; justify-content:center;
+      padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
-      /* jamais de scroll vertical global */
+    .phone{
+      aspect-ratio:9/16;
+      height:100%; width:auto; max-width:100%; max-height:100%;
+      display:grid;
+      grid-template-rows: var(--row-top,52px) var(--row-main,1fr) var(--row-actions,52px) var(--row-rev,64px);
+      position:relative; min-height:0; touch-action:pan-y; overflow:hidden; background:transparent; border:0; border-radius:0; box-shadow:none;
     }
 
-    .wrapper {
-      height: 100dvh;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; padding:0 10px;
+      background:transparent; border-bottom:0;
     }
 
-    .phone {
-      aspect-ratio: 9/16;
-      height: 100%;
-      width: auto;
-      max-width: 100%;
-      max-height: 100%;
-      display: grid;
-      grid-template-rows: var(--row-top, 52px) var(--row-main, 1fr) var(--row-actions, 52px) var(--row-rev, 64px);
-      /* top, main, actions, revision */
-      background: transparent;
-      /* fusion avec le fond */
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
-      overflow: hidden;
-      /* empêche tout scroll interne */
-      position: relative;
-      min-height: 0;
-      /* pour les enfants flex */
-      touch-action: pan-y;
-      /* évite les overscroll */
+    .topbar .back{
+      appearance:none; border:0; outline:0; background:transparent; color:var(--text);
+      padding:8px 10px; margin-right:4px; border-radius:10px;
+      display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;
+    }
+    .topbar .back:hover{background:rgba(255,255,255,.06)}
+    .topbar .title{font-weight:800; font-size:16px; letter-spacing:.2px; margin-left:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .topbar .spacer{flex:1}
+
+    main#view{
+      min-height:0; height:100%;
+      display:flex; flex-direction:column; overflow:hidden;
+      padding:8px; gap:10px; justify-content:flex-start;
     }
 
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    /* Utilities */
+    .hidden{display:none!important}
+    .muted{color:var(--muted)}
+    .center{text-align:center}
+    .mt6{margin-top:6px}
+    .mt8{margin-top:8px}
+    .scroll-y{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; touch-action:pan-y;}
+    .list{display:flex; flex-direction:column; gap:8px}
+    .stack{display:flex; flex-direction:column; gap:6px}
+    .flexcol{display:flex; flex-direction:column; min-height:0}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row-4{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100%}
+    .face-label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.3px}
+
+    /* Cards/containers base (flat) */
+    .card,.deck-item,.review-card,.viewer,.card-item,.legend-item,.kpi .k,.stat,.chip{
+      background:transparent; border:0; box-shadow:none;
+      border-radius:var(--radius-md);
     }
 
-    .topbar .back {
-      appearance: none;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      padding: 8px 10px;
-      margin-right: 4px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      font-weight: 700;
-    }
+    .section-title{font-weight:900; font-size:14px; color:var(--primary); letter-spacing:.3px; margin:0 0 6px}
 
-    .topbar .back:hover {
-      background: rgba(255, 255, 255, 0.06)
-    }
+    .kpi{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+    .kpi .k{padding:0}
+    .k .label{color:var(--muted); font-size:12px}
+    .k .value{font-weight:900; font-size:17px; margin-top:2px}
 
-    .topbar .title {
-      font-weight: 800;
-      font-size: 16px;
-      letter-spacing: .2px;
-      margin-left: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    /* Deck list */
+    .deck-wrap{display:flex; align-items:center; gap:8px}
+    .decks{display:grid; grid-template-columns:1fr; gap:8px; flex:1}
+    .deck-item{display:flex; align-items:center; justify-content:space-between; padding:8px 0; cursor:pointer}
+    .deck-item:hover{outline:none}
+    .deck-meta{color:var(--muted); font-size:13px}
 
-    .topbar .spacer {
-      flex: 1
-    }
+    /* Chips */
+    .chip{display:inline-flex; align-items:center; gap:8px; padding:0; border-radius:0; color:var(--muted); cursor:pointer; user-select:none; font-size:12px}
+    .chip.toggle{opacity:.75}
+    .chip.toggle.active{opacity:1; border-color:#6b7cff; box-shadow:inset 0 0 0 1px rgba(107,124,255,.35)}
+    .chip-pie{width:18px; height:18px; border-radius:50%;
+      background:conic-gradient(var(--primary) var(--progress,0%), var(--border) var(--progress,0%)); display:inline-block; vertical-align:middle}
+    .legend{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px}
+    .legend-item{display:flex; align-items:center; gap:6px; padding:0; font-size:13px; color:#dbe4ff; cursor:pointer; user-select:none; transition:opacity .15s ease, filter .15s ease}
+    .legend-item.inactive{opacity:.45; filter:grayscale(20%)}
+    .legend-item .count{font-weight:900}
+    .legend-item[data-key="unseen"] .count{color:#9ca3af}
+    .legend-item[data-key="echec"] .count{color:var(--red)}
+    .legend-item[data-key="difficile"] .count{color:var(--amber)}
+    .legend-item[data-key="bien"] .count{color:var(--blue)}
+    .legend-item[data-key="facile"] .count{color:var(--green)}
 
-    main#view {
-      min-height: 0;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      /* pas de scroll global pendant la révision */
-      padding: 8px;
-      gap: 10px;
-      justify-content: flex-start;
-      /* pour tout tenir d'un coup d'oeil */
-    }
+    /* Dots */
+    .dot{width:10px; height:10px; border-radius:50%}
+    .dot.gray{background:#9ca3af}
+    .dot.red{background:var(--red)}
+    .dot.amber{background:var(--amber)}
+    .dot.blue{background:var(--blue)}
+    .dot.green{background:var(--green)}
 
-    /* Cards (conteneurs UI) */
-    .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.10)), var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-    }
+    /* Chart */
+    .chart-wrap{display:flex; align-items:center; justify-content:center; height:200px}
+    canvas#gradeChart{width:180px; height:180px}
 
-    .section-title {
-      font-weight: 800;
-      font-size: 13px;
-      color: #c9d4ff;
-      letter-spacing: .3px;
-      margin: 0 0 6px 0;
-    }
-
-    .kpi {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .kpi .k {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 8px;
-    }
-
-    .k .label {
-      color: var(--muted);
-      font-size: 11px
-    }
-
-    .k .value {
-      font-weight: 900;
-      font-size: 16px;
-      margin-top: 2px
-    }
-
-    /* Deck list (pagination pour rester sans scroll) */
-    .deck-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .navbtn {
-      appearance: none;
-      border: 1px solid var(--border);
-      outline: 0;
-      background: rgba(255, 255, 255, 0.04);
-      color: #e8edff;
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      min-width: 44px;
-    }
-
-    .navbtn:disabled {
-      opacity: .4;
-      cursor: not-allowed
-    }
-
-    .decks {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      flex: 1;
-    }
-
-    .deck-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.12));
-      cursor: pointer;
-    }
-
-    .deck-item:hover {
-      outline: 1px solid rgba(255, 255, 255, 0.08)
-    }
-
-    .deck-meta {
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      color: #dbe4ff;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .chip.toggle {
-      opacity: .75
-    }
-
-    .chip.toggle.active {
-      opacity: 1;
-      border-color: #6b7cff;
-      box-shadow: inset 0 0 0 1px rgba(107, 124, 255, .35)
-    }
-
-    .legend {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 6px
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 6px 8px;
-      font-size: 12px;
-      color: #dbe4ff;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%
-    }
-
-    .dot.red {
-      background: var(--red)
-    }
-
-    .dot.amber {
-      background: var(--amber)
-    }
-
-    .dot.blue {
-      background: var(--blue)
-    }
-
-    .dot.green {
-      background: var(--green)
-    }
-
-    /* Diagramme */
-    .chart-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 200px
-    }
-
-    canvas#gradeChart {
-      width: 180px;
-      height: 180px
-    }
-
-    /* Filtres */
-    .filters {
-      display: grid;
-      gap: 8px;
-    }
-
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px
-    }
-
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px
-    }
-
-    /* Bottom actions (Cartes / Paramètres) */
-    .bottom-actions {
-      display: none;
-      padding: 8px 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.04));
-      gap: 8px;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .bottom-actions .action {
-      appearance: none;
-      border: 1px solid var(--border);
-      outline: 0;
-      background: rgba(255, 255, 255, 0.04);
-      color: #e8edff;
-      width: 100%;
-      padding: 10px;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .bottom-actions .action:hover {
-      border-color: rgba(255, 255, 255, 0.12)
-    }
-
-    /* Revision sticky bar */
-    .revision-bar {
-      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15)), rgba(10, 15, 35, 0.7);
-      backdrop-filter: blur(8px) saturate(140%);
-      display: none;
-    }
-
-    .rev-btn {
-      appearance: none;
-      border: 0;
-      outline: 0;
-      width: 100%;
-      background: linear-gradient(180deg, var(--primary), var(--primary-600));
-      color: white;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight: 900;
-      letter-spacing: .3px;
-      cursor: pointer;
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35);
-      font-size: 14px;
-    }
-
-    .rev-btn[disabled] {
-      opacity: .5;
-      cursor: not-allowed;
-      box-shadow: none
-    }
-
-    .review-actions-bar {
-      display: none;
-      /* masquée par défaut */
-      grid-row: 4;
-      /* même rangée que .revision-bar */
-      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15)), rgba(10, 15, 35, 0.0);
-      backdrop-filter: blur(8px) saturate(140%);
-    }
-
-    .review-actions-bar .btn {
-      width: 100%;
-      min-height: 44px
-    }
-
-    .review-actions-bar .row-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      width: 100%
-    }
+    /* Bottom bars */
+    .bottom-actions{display:none; padding:8px 10px; gap:8px; grid-template-columns:1fr 1fr; background:transparent; border-top:0; box-shadow:none}
+    .revision-bar{padding:8px 10px calc(8px + env(safe-area-inset-bottom)); background:transparent; border-top:0; box-shadow:none; display:none}
+    .review-actions-bar{display:none; grid-row:4; padding:8px 10px calc(8px + env(safe-area-inset-bottom)); backdrop-filter:blur(8px) saturate(140%);}
 
     /* Review view */
-    .review-wrap {
-      position: relative;
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 0;
-      /* pas d’espace réservé: on colle tout en bas */
+    .review-wrap{position:relative; flex:1; min-height:0; display:flex; flex-direction:column; padding-bottom:0}
+    .review-top{display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px}
+    .review-card{flex:1; display:flex; align-items:center; justify-content:center; padding:8px; text-align:center; cursor:ns-resize}
+    .size-toast{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:calc(64px + env(safe-area-inset-bottom) + 8px);
+      background:rgba(0,0,0,.55); color:#fff; font-weight:800; font-size:12px; padding:6px 10px; border-radius:999px;
+      pointer-events:none; z-index:3; display:none;
     }
+    :root[data-theme="light"] .size-toast{background:rgba(0,0,0,.15); color:#0f172a}
 
-    .review-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .review-card {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border-radius: 14px;
-      border: 1px dashed var(--border);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.10));
-      text-align: center;
-      cursor: ns-resize;
-      /* Indice visuel: curseur redimension sur desktop */
-    }
-
-    /* Petite bulle de feedback (optionnel) */
-    .size-toast {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: calc(64px + env(safe-area-inset-bottom) + 8px);
-      background: rgba(0, 0, 0, .55);
-      color: #fff;
-      font-weight: 800;
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      pointer-events: none;
-      z-index: 3;
-    }
-
-    :root[data-theme="light"] .size-toast {
-      background: rgba(0, 0, 0, .15);
-      color: #0f172a;
-    }
-
-    /* ANCIENNES ACTIONS DE REVIEW SUPPRIMÉES
-    .review-actions {
-      position: absolute; ...
-    }
-    */
-
-    .btn {
-      appearance: none;
-      border: 1px solid var(--border);
-      outline: 0;
-      background: rgba(255, 255, 255, 0.04);
-      color: #e8edff;
-      padding: 10px;
-      border-radius: 12px;
-      font-weight: 900;
-      cursor: pointer;
-      width: 100%;
-      font-size: 14px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px
-    }
-
-    .btn.red {
-      background: rgba(239, 68, 68, .12);
-      border-color: rgba(239, 68, 68, .35);
-      color: #fecaca
-    }
-
-    .btn.amber {
-      background: rgba(245, 158, 11, .12);
-      border-color: rgba(245, 158, 11, .35);
-      color: #fde68a
-    }
-
-    .btn.blue {
-      background: rgba(59, 130, 246, .12);
-      border-color: rgba(59, 130, 246, .35);
-      color: #bfdbfe
-    }
-
-    .btn.green {
-      background: rgba(34, 197, 94, .12);
-      border-color: rgba(34, 197, 94, .35);
-      color: #bbf7d0
-    }
-
-    /* Cards view (sans scroll, pagination) */
-    .cards-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      height: 100%
-    }
-
-    .cards-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .viewer {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 12px;
-      text-align: center;
-    }
-
-    .viewer .front {
-      font-weight: 900;
-      font-size: 20px
-    }
-
-    .viewer .back {
-      color: #d9e6ff;
-      opacity: .95;
-      font-size: 15px;
-      margin-top: 6px
-    }
-
-    .viewer-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--muted)
-    }
+    /* Cards view */
+    .cards-wrap{display:flex; flex-direction:column; gap:8px; height:100%}
+    .cards-top{display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:12px}
+    .viewer{flex:1; display:flex; align-items:center; justify-content:center; padding:12px; text-align:center}
+    .viewer .front{font-weight:900; font-size:20px}
+    .viewer .back{color:#d9e6ff; opacity:.95; font-size:15px; margin-top:6px}
+    .viewer-actions{display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px}
+    .small{font-size:13px; color:var(--muted)}
 
     /* Recap */
-    .recap {
-      display: flex;
-      flex-direction: column;
-      gap: 8px
+    .recap{display:flex; flex-direction:column; gap:8px}
+    .recap h2{margin:0; font-size:18px}
+    .recap .subtitle{color:var(--muted); margin-top:-2px; font-size:12px}
+    .stat{padding:0}
+    .label{color:var(--muted); font-size:11px}
+    .val{font-weight:900; font-size:16px; margin-top:2px}
+    .cta{margin-top:4px}
+
+    /* Typo sizes */
+    .term{font-size:var(--fs-term)!important; font-weight:600}
+    .definition{font-size:var(--fs-def)!important; font-weight:900}
+    .card-item .front{font-size:var(--fs-front-list); font-weight:600}
+    .card-item .back{font-size:var(--fs-back-list); font-weight:800; color:var(--text); opacity:.95}
+
+    /* Wheel control */
+    .wheel{
+      display:flex; align-items:center; gap:12px; padding:10px 12px;
+      border:1px solid var(--border); border-radius:var(--radius-md);
+      background:rgba(255,255,255,.04); touch-action:none; user-select:none; cursor:ns-resize;
+    }
+    .wheel .name{font-weight:800; font-size:13px}
+    .wheel .hint{color:var(--muted); font-size:12px}
+    .wheel .wheel-value{margin-left:auto; font-weight:900; font-size:13px}
+
+    /* Settings */
+    .settings-page{display:flex; flex-direction:column; gap:14px; padding:6px 4px}
+    .settings-hero{font-weight:900; font-size:18px; letter-spacing:.2px; color:var(--primary)}
+    .settings-sub{color:var(--muted); font-size:12px; margin-top:-2px}
+    .settings-section{display:flex; flex-direction:column; gap:8px}
+    .settings-section .section-title{font-size:12px; font-weight:900; color:var(--primary); letter-spacing:.4px; text-transform:uppercase; margin:10px 0 2px!important}
+    .swatches{display:flex; gap:8px; flex-wrap:wrap}
+    .swatch{width:26px; height:26px; border-radius:8px; border:1px solid var(--border); background:var(--sw,#6366f1); cursor:pointer; position:relative}
+    .swatch.is-active::after{content:''; position:absolute; inset:-3px; border:2px solid var(--primary); border-radius:10px}
+
+    /* 7-day activity */
+    .bar7-wrap{margin-top:8px}
+    canvas#bar7{width:100%; height:68px; display:block}
+    .bar7-labels{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:4px; font-size:12px; color:var(--muted); text-align:center}
+    .bar7-labels > div { cursor: pointer; }
+
+    /* Cards grid */
+    .cards-grid{display:grid; grid-template-columns:1fr; gap:10px}
+    @media(min-width:480px){.cards-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:900px){.cards-grid{grid-template-columns:1fr 1fr 1fr}}
+    .card-block{position:relative; border:2px solid transparent; border-radius:14px; padding:14px; background:transparent}
+    .card-block .term{text-align:center}
+    .card-block .definition{display:none; text-align:center; margin-top:6px}
+    .card-block.flipped .definition{display:block}
+    .cb-time{position:absolute; right:10px; bottom:8px; font-size:12px; color:var(--muted)}
+    .card-block.grade-echec{border-color:var(--red)}
+    .card-block.grade-difficile{border-color:var(--amber)}
+    .card-block.grade-bien{border-color:var(--blue)}
+    .card-block.grade-facile{border-color:var(--green)}
+    .card-block.grade-unseen{border-color:#9ca3af}
+
+
+    /* Light theme boosts */
+    :root[data-theme="light"] .definition,
+    :root[data-theme="light"] .card-item .back{color:var(--text)!important; opacity:1!important}
+    :root[data-theme="light"] .muted{color:#475569!important}
+    :root[data-theme="light"] .legend-item{color:#0f172a!important; border-color:#e2e8f0!important; background:transparent!important}
+    :root[data-theme="light"] .chip{color:#334155!important; border-color:#cbd5e1!important; background:#f8fafc!important}
+    :root[data-theme="light"] .revision-bar{
+      background:linear-gradient(180deg,rgba(248,250,252,0),rgba(241,245,249,.9))!important;
+      border-top:1px solid #e2e8f0!important;
+    }
+    :root[data-theme="light"] .topbar{
+      background:transparent!important;
+      border-bottom:1px solid #e2e8f0!important;
     }
 
-    .recap h2 {
-      margin: 0;
-      font-size: 18px
-    }
-
-    .recap .subtitle {
-      color: var(--muted);
-      margin-top: -2px;
-      font-size: 12px
-    }
-
-    .recap .grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px
-    }
-
-    .stat {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 8px
-    }
-
-    .label {
-      color: var(--muted);
-      font-size: 11px
-    }
-
-    .val {
-      font-weight: 900;
-      font-size: 16px;
-      margin-top: 2px
-    }
-
-    .cta {
-      margin-top: 4px
-    }
-
-    /* Helpers */
-    .muted {
-      color: var(--muted)
-    }
-
-    .hidden {
-      display: none !important
-    }
-
-    .center {
-      text-align: center
-    }
-
-    .mt6 {
-      margin-top: 6px
-    }
-
-    .mt8 {
-      margin-top: 8px
-    }
-
-    .scroll-y {
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      touch-action: pan-y;
-    }
-
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px
-    }
-
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 6px
-    }
-
-    .face-label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .3px
-    }
-
-    .flexcol {
-      display: flex;
-      flex-direction: column;
-      min-height: 0
-    }
-
-    .row-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      width: 100%
-    }
-
-    /* Texte Q/R */
-    .term {
-      font-size: var(--fs-term) !important;
-      font-weight: 600
-    }
-
-    .definition {
-      font-size: var(--fs-def) !important;
-      font-weight: 900
-    }
-
-    /* Liste des cartes (vue Cartes) */
-    .card-item .front {
-      font-size: var(--fs-front-list);
-      font-weight: 600
-    }
-
-    .card-item .back {
-      font-size: var(--fs-back-list);
-      font-weight: 800;
-      color: var(--text);
-      opacity: .95
-    }
-
-    /* Arrondis pilotés par variable */
-    .card,
-    .deck-item,
-    .review-card,
+    /* === SYSTÈME DE BOUTONS AVEC VARIANTES (SOFT/SOLID) === */
     .btn,
-    .chip,
-    .action,
-    .viewer,
-    .card-item {
-      border-radius: var(--radius-md) !important;
-    }
-
-    .legend-item {
-      cursor: pointer;
-      user-select: none;
-      transition: opacity .15s ease, filter .15s ease
-    }
-
-    .legend-item.inactive {
-      opacity: .45;
-      filter: grayscale(20%)
-    }
-
-    /* Assure la lisibilité en thème clair */
-    :root[data-theme="light"] .definition,
-    :root[data-theme="light"] .card-item .back {
-      color: var(--text) !important;
-      opacity: 1 !important;
-    }
-
-    :root[data-theme="light"] .muted {
-      color: var(--muted) !important;
-    }
-
-    :root[data-theme="light"] .review-card {
-      border-color: var(--border) !important;
-      background: #ffffff !important;
-    }
-
-    :root[data-theme="light"] .btn,
-    :root[data-theme="light"] .chip {
-      color: var(--text) !important;
-    }
-
-    /* Wheel (contrôle de taille) */
-    .wheel {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
+    .bottom-actions .action,
+    .navbtn,
+    .review-actions-bar .btn,
+    .rev-btn{
+      background: var(--btn-bg, var(--btn-neutral-bg));
+      color: var(--btn-fg, var(--btn-neutral-fg));
+      border: 1px solid var(--btn-bd, var(--btn-neutral-bd));
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.04);
-      touch-action: none;
-      user-select: none;
-      cursor: ns-resize;
+      padding: 10px 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+      width: 100%;
+      appearance: none;
+      outline: 0;
+      font-size: 15px;
     }
-
-    .wheel .name {
-      font-weight: 800
+    .btn:hover,
+    .bottom-actions .action:hover,
+    .navbtn:hover,
+    .review-actions-bar .btn:hover,
+    .rev-btn:hover{
+      background: var(--btn-bg-h, var(--btn-bg, var(--btn-neutral-bg-h)));
     }
+    .btn:disabled, .rev-btn:disabled, .navbtn:disabled, .action:disabled {opacity:.6; cursor:not-allowed}
+    .btn:focus-visible{outline:2px solid var(--btn-bd, var(--btn-neutral-bd)); outline-offset:2px}
 
-    .wheel .hint {
-      color: var(--muted);
-      font-size: 12px
+    /* Variantes SOFT (pastel) */
+    .btn--primary{ --btn-bg:var(--btn-soft-primary-bg); --btn-bg-h:var(--btn-soft-primary-bg-h); --btn-fg:var(--btn-soft-primary-fg); --btn-bd:var(--btn-soft-primary-bd); }
+    .btn--red    { --btn-bg:var(--btn-soft-red-bg);     --btn-bg-h:var(--btn-soft-red-bg-h);     --btn-fg:var(--btn-soft-red-fg);     --btn-bd:var(--btn-soft-red-bd); }
+    .btn--amber  { --btn-bg:var(--btn-soft-amber-bg);   --btn-bg-h:var(--btn-soft-amber-bg-h);   --btn-fg:var(--btn-soft-amber-fg);   --btn-bd:var(--btn-soft-amber-bd); }
+    .btn--blue   { --btn-bg:var(--btn-soft-blue-bg);    --btn-bg-h:var(--btn-soft-blue-bg-h);    --btn-fg:var(--btn-soft-blue-fg);    --btn-bd:var(--btn-soft-blue-bd); }
+    .btn--green  { --btn-bg:var(--btn-soft-green-bg);   --btn-bg-h:var(--btn-soft-green-bg-h);   --btn-fg:var(--btn-soft-green-fg);   --btn-bd:var(--btn-soft-green-bd); }
+
+    /* Ton SOLID (plein) – combine avec la couleur */
+    .btn--solid.btn--primary{ --btn-bg:var(--btn-solid-primary-bg); --btn-bg-h:var(--btn-solid-primary-bg-h); --btn-fg:var(--btn-solid-primary-fg); --btn-bd:var(--btn-solid-primary-bd); }
+    .btn--solid.btn--red    { --btn-bg:var(--btn-solid-red-bg);     --btn-bg-h:var(--btn-solid-red-bg-h);     --btn-fg:var(--btn-solid-red-fg);     --btn-bd:var(--btn-solid-red-bd); }
+    .btn--solid.btn--amber  { --btn-bg:var(--btn-solid-amber-bg);   --btn-bg-h:var(--btn-solid-amber-bg-h);   --btn-fg:var(--btn-solid-amber-fg);   --btn-bd:var(--btn-solid-amber-bd); }
+    .btn--solid.btn--blue   { --btn-bg:var(--btn-solid-blue-bg);    --btn-bg-h:var(--btn-solid-blue-bg-h);    --btn-fg:var(--btn-solid-blue-fg);    --btn-bd:var(--btn-solid-blue-bd); }
+    .btn--solid.btn--green  { --btn-bg:var(--btn-solid-green-bg);   --btn-bg-h:var(--btn-solid-green-bg-h);   --btn-fg:var(--btn-solid-green-fg);   --btn-bd:var(--btn-solid-green-bd); }
+
+    /* Desktop wide */
+    @media (pointer:fine) and (min-width:1024px){
+      .phone{aspect-ratio:auto; width:100%; height:100dvh}
+      .topbar, main#view, .bottom-actions, .revision-bar{max-width:1200px; margin:0 auto; width:100%}
+      main#view{padding:16px 20px}
     }
-
-    .wheel .wheel-value {
-      margin-left: auto;
-      font-weight: 900
-    }
-
-    .dot.gray {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #9ca3af
-    }
-
-    @media (pointer: fine) and (min-width: 1024px) {
-      .phone {
-        aspect-ratio: auto;
-        /* lève la contrainte 9:16 sur desktop */
-        width: 100%;
-        height: 100dvh;
-      }
-
-      .topbar,
-      main#view,
-      .bottom-actions,
-      .revision-bar {
-        max-width: 1200px;
-        /* largeur confortable sur PC */
-        margin: 0 auto;
-        width: 100%;
-      }
-
-      main#view {
-        padding: 16px 20px;
-      }
-    }
-    
-    .chip-pie {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      /* Le dégradé conique qui crée l'effet camembert */
-      background: conic-gradient(
-        var(--primary) var(--progress, 0%), 
-        var(--border) var(--progress, 0%)
-      );
-      display: inline-block;
-      vertical-align: middle; /* Pour bien l'aligner avec les autres carrés */
-    }
-  
-    /* --- Flat UI Override --- */
-
-    /* Flat mode: aucun fond/bordure/ombre sur les conteneurs */
-    .card,
-    .deck-item,
-    .review-card,
-    .viewer,
-    .card-item,
-    .legend-item,
-    .kpi .k,
-    .stat,
-    .chip {
-      background: transparent !important;
-      border: 0 !important;
-      box-shadow: none !important;
-    }
-
-    /* Supprimer l’outline au survol des items de Deck */
-    .deck-item:hover {
-      outline: none !important
-    }
-
-    /* Garder un peu d’air, sans boîte */
-    .deck-item,
-    .card-item {
-      padding: 8px 0 !important;
-      /* zone cliquable confortable */
-    }
-
-    /* Légende totalement “plate” */
-    .legend-item {
-      padding: 0 !important;
-    }
-
-    /* Les “chips” deviennent de simples libellés */
-    .chip {
-      padding: 0 !important;
-      border-radius: 0 !important;
-      color: var(--muted) !important;
-    }
-
-    /* Les KPI/statistiques sans tuiles */
-    .kpi .k,
-    .stat {
-      padding: 0 !important;
-    }
-
-    /* Le viewer (liste cartes) sans encadré */
-    .viewer {
-      border: 0 !important;
-    }
-
-    /* Topbar plate (pas de trait ni de gradient) */
-    .topbar {
-      background: transparent !important;
-      border-bottom: 0 !important;
-    }
-
-    /* Barres du bas totalement plates aussi */
-    .bottom-actions,
-    .revision-bar {
-      background: transparent !important;
-      border-top: 0 !important;
-      box-shadow: none !important;
-    }
-
-    /* La zone centrale de révision est totalement plate */
-    .review-card {
-      border: 0 !important;
-      background: transparent !important;
-    }
-
-    /* Thème clair: garantir lisibilité (textes bien visibles) */
-    :root[data-theme="light"] .definition,
-    :root[data-theme="light"] .card-item .back {
-      color: var(--text) !important;
-      opacity: 1 !important;
-    }
-
-    :root[data-theme="light"] .muted {
-      color: var(--muted) !important;
-    }
-    
-    /* Optionnel: densifier la liste Deck */
-    #deckList .list {
-      gap: 6px !important
-    }
-
-    /* au lieu de 8px */
-    .deck-item>div .deck-meta {
-      margin-top: 2px
-    }
-
-    /* resserre “description” */
-    .section-title {
-      margin-bottom: 4px !important
-    }
-
-  
-/* ========== SETTINGS (Paramètres) ========== */
-.settings-page {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 6px 4px
-}
-
-.settings-hero {
-  font-weight: 900;
-  font-size: 18px;
-  letter-spacing: .2px;
-  color: var(--text);
-}
-
-.settings-sub {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: -2px
-}
-
-.settings-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px
-}
-
-.settings-section .section-title {
-  font-size: 12px;
-  font-weight: 900;
-  color: var(--primary);
-  letter-spacing: .4px;
-  text-transform: uppercase;
-  margin: 10px 0 2px 0 !important;
-}
-
-/* Palette d'accent en pastilles */
-.swatches {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap
-}
-
-.swatch {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--sw, #6366f1);
-  cursor: pointer;
-  position: relative;
-}
-
-.swatch.is-active::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-}
-
-/* Wheels affinés en paramètres */
-.wheel {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border)
-}
-
-.wheel .name {
-  font-size: 13px
-}
-
-.wheel .wheel-value {
-  font-size: 13px
-}
-
-/* Boutons paramètres plus lisibles */
-.settings-page .btn {
-  font-size: 13px;
-  font-weight: 800
-}
-
-/* Bar chart 7 jours */
-.bar7-wrap {
-  margin-top: 8px
-}
-
-canvas#bar7 {
-  width: 100%;
-  height: 68px;
-  display: block
-}
-
-/* Preview: curseur resize et petite bulle de taille (optionnel) */
-#typoPreview {
-  cursor: ns-resize;
-  position: relative
-}
-
-.size-toast {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 6px;
-  background: rgba(0, 0, 0, .55);
-  color: #fff;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  pointer-events: none;
-  z-index: 3;
-  display: none;
-}
-
-:root[data-theme="light"] .size-toast {
-  background: rgba(0, 0, 0, .15);
-  color: #0f172a;
-}
-
-/* Un peu plus de couleur pour la hiérarchie */
-.settings-hero {
-  color: var(--primary)
-}
-
-.settings-section .section-title {
-  color: var(--primary)
-}
-
-.bar7-wrap {
-  margin-top: 8px
-}
-
-canvas#bar7 {
-  width: 100%;
-  height: 68px;
-  display: block
-}
-
-.bar7-labels {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 11px;
-  color: var(--muted);
-  text-align: center;
-}
-
-.legend-item .count {
-  font-weight: 900
-}
-
-.legend-item[data-key="unseen"] .count {
-  color: #9ca3af
-}
-
-.legend-item[data-key="echec"] .count {
-  color: var(--red)
-}
-
-.legend-item[data-key="difficile"] .count {
-  color: var(--amber)
-}
-
-.legend-item[data-key="bien"] .count {
-  color: var(--blue)
-}
-
-.legend-item[data-key="facile"] .count {
-  color: var(--green)
-}
-
-/* Activité 7 jours: labels sous chaque barre */
-.bar7-wrap {
-  margin-top: 8px
-}
-
-canvas#bar7 {
-  width: 100%;
-  height: 68px;
-  display: block
-}
-
-.bar7-labels {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 11px;
-  color: var(--muted);
-  text-align: center;
-}
-
-/* Cartes en blocs (vue Cartes) */
-.cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px
-}
-
-@media (min-width:480px) {
-  .cards-grid {
-    grid-template-columns: 1fr 1fr
-  }
-}
-
-@media (min-width:900px) {
-  .cards-grid {
-    grid-template-columns: 1fr 1fr 1fr
-  }
-}
-
-.card-block {
-  position: relative;
-  border: 2px solid transparent;
-  border-radius: 14px;
-  padding: 14px;
-  background: transparent;
-}
-
-.card-block .term {
-  text-align: center
-}
-
-.card-block .definition {
-  display: none;
-  text-align: center;
-  margin-top: 6px
-}
-
-.card-block.flipped .definition {
-  display: block
-}
-
-/* Temps (sans label) en bas du bloc */
-.cb-time {
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Bordures colorées selon la note */
-.card-block.grade-echec {
-  border-color: var(--red)
-}
-
-.card-block.grade-difficile {
-  border-color: var(--amber)
-}
-
-.card-block.grade-bien {
-  border-color: var(--blue)
-}
-
-.card-block.grade-facile {
-  border-color: var(--green)
-}
-
-.card-block.grade-unseen {
-  border-color: #9ca3af
-}
-
-/* gris pour Non vu */
-
-/* Légende: chiffres colorés (plus lisible/“joli”) */
-.legend-item .count {
-  font-weight: 900
-}
-
-.legend-item[data-key="unseen"] .count {
-  color: #9ca3af
-}
-
-.legend-item[data-key="echec"] .count {
-  color: var(--red)
-}
-
-.legend-item[data-key="difficile"] .count {
-  color: var(--amber)
-}
-
-.legend-item[data-key="bien"] .count {
-  color: var(--blue)
-}
-
-.legend-item[data-key="facile"] .count {
-  color: var(--green)
-}
-
-/* Thème clair: renfort de contrastes (boutons, puces, légendes) */
-:root[data-theme="light"] .btn {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
-}
-
-:root[data-theme="light"] .chip {
-  color: #334155;
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-
-:root[data-theme="light"] .legend-item {
-  color: #0f172a;
-  border-color: #e2e8f0;
-  background: transparent;
-}
-
-:root[data-theme="light"] .muted {
-  color: #475569 !important
-}
-
-/* ========== CORRECTIONS CONTRASTE & POLICES ========== */
-
-/* --- Contrastes mode Clair --- */
-:root[data-theme="light"] {
-  --bg: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  --surface: #ffffff;
-  --card: #ffffff;
-  --text: #0f172a;
-  /* texte principal foncé */
-  --muted: #475569;
-  /* texte secondaire lisible */
-  --primary: #3b82f6;
-  --primary-600: #2563eb;
-  --border: #cbd5e1;
-  /* bordure plus contrastée */
-}
-
-/* Boutons d’action du bas (Cartes / Paramètres) en clair: fond visible, texte sombre */
-:root[data-theme="light"] .bottom-actions .action {
-  background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-:root[data-theme="light"] .bottom-actions .action:hover {
-  background: #e2e8f0 !important;
-  border-color: #94a3b8 !important;
-}
-
-/* Boutons génériques (dont Paramètres en page de stats) */
-:root[data-theme="light"] .btn {
-  background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-:root[data-theme="light"] .btn.red {
-  color: #b91c1c !important
-}
-
-:root[data-theme="light"] .btn.amber {
-  color: #a16207 !important
-}
-
-:root[data-theme="light"] .btn.blue {
-  color: #1d4ed8 !important
-}
-
-:root[data-theme="light"] .btn.green {
-  color: #166534 !important
-}
-
-/* Chips et légendes plus lisibles */
-:root[data-theme="light"] .chip {
-  color: #334155 !important;
-  border-color: #cbd5e1 !important;
-  background: #f8fafc !important;
-}
-
-:root[data-theme="light"] .legend-item {
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-  background: transparent !important;
-}
-
-:root[data-theme="light"] .muted {
-  color: #475569 !important
-}
-
-/* Barres bas (révision) et topbar plates mais lisibles */
-:root[data-theme="light"] .revision-bar {
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0), rgba(241, 245, 249, 0.9)) !important;
-  border-top: 1px solid #e2e8f0 !important;
-}
-
-:root[data-theme="light"] .topbar {
-  background: transparent !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-
-/* --- Polices globalement un peu plus grandes --- */
-/* Base +1 (léger) */
-body {
-  font-size: 17px;
-}
-
-/* Renforcer lisibilité des petits textes */
-.section-title {
-  font-size: 14px !important
-}
-
-.deck-meta {
-  font-size: 13px !important
-}
-
-.legend-item {
-  font-size: 13px !important
-}
-
-.k .label {
-  font-size: 12px !important
-}
-
-.k .value {
-  font-size: 17px !important
-}
-
-.review-top {
-  font-size: 13px !important
-}
-
-.small {
-  font-size: 13px !important
-}
-
-/* Boutons un peu plus gros aussi */
-.btn {
-  font-size: 15px !important
-}
-
-.bottom-actions .action {
-  font-size: 15px !important
-}
-
-/* Labels sous le bar-chart (activité 7j) */
-.bar7-labels {
-  font-size: 12px !important
-}
-
-/* Cartes (vue Cartes) – si tu utilises la grille “card-block” */
-.card-block .term {
-  font-size: calc(var(--fs-term) + 0px) !important
-}
-
-.card-block .definition {
-  font-size: calc(var(--fs-def) + 0px) !important
-}
-
-
-/* Réglage direct des tailles en révision */
-.review-card .term,
-.review-card .definition {
-  cursor: ns-resize;
-  /* indique qu’on peut glisser ↑↓ pour changer la taille */
-}
-</style>
+  </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="phone" id="app">
       <header class="topbar">
-        <button class="back" id="backBtn" title="Retour"> <span aria-hidden="true">←</span> <span>Retour</span> </button>
+        <button class="back" id="backBtn" title="Retour"><span aria-hidden="true">←</span><span>Retour</span></button>
         <div class="title" id="title">Deck</div>
         <div class="spacer"></div>
       </header>
@@ -1399,49 +367,32 @@ body {
       <main id="view"></main>
 
       <div class="bottom-actions" id="bottomActions">
-        <button class="action" id="cardsBtn">Cartes</button>
-        <button class="action" id="settingsBtn">Paramètres</button>
+        <button class="action btn" id="cardsBtn">Cartes</button>
+        <button class="action btn" id="settingsBtn">Paramètres</button>
       </div>
 
       <footer class="revision-bar" id="revisionBar">
-        <button id="startReviewBtn" class="rev-btn">Révision • 10 cartes</button>
+        <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">Révision • 10 cartes</button>
       </footer>
 
       <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
     </div>
   </div>
+
   <script>
-    // ------------------ Données & stockage ------------------
+    // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
 
-    // === ZONE DE COLLAGE DES DONNÉES BRUTES ===
-    // Catégories (constantes)
-    const CD = "Democracy",
-      CG = "Genetics",
-      CI = "Immigration",
-      CIT = "International Relations",
-      CU = "Labor",
-      CR = "Crime",
-      PC = "Capital Punishment", // ou "Death Penalty"
-      CF = "Status of Women";     // ou "Women's Issues"// AJOUT : Constante pour le nouveau chapitre
+    // Catégories
+    const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
 
-    // Emoji par chapitre (optionnel pour l’affichage)
+    // Emojis chapitres
     const CHAPTER_EMOJIS = {
-      [CD]: '🏛️',
-      [CG]: '🧬',
-      [CI]: '🧳',
-      [CIT]: '🌐',
-      [CU]: '💼',
-      [CR]: '⚖️',
-      [PC]: '💀',
-      [CF]: '♀️', // AJOUT : Emoji pour le nouveau chapitre
-      'Politique': '🏛️',
-      'Business': '💼',
-      'Education': '🎓',
-      'Thanksgiving': '🦃'
+      [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
+      'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃'
     };
 
-    // Collez ici votre longue liste (id|français|anglais|${CHAP})
+    // Liste brute (id|fr|en|chap)
     const cardsRawText = `
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
@@ -2366,383 +1317,200 @@ body {
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
 `.trim();
 
+    // Parsing
+    const flashcardData = cardsRawText.split(/\r?\n/).map(l=>{
+      const p=l.split('|'); if(p.length!==4) return null;
+      const [id,f,e,c]=p; return {id:id.trim(),front:f.trim(),back:e.trim(),chapter:c.trim()};
+    }).filter(Boolean);
 
-    // Parsing de la liste brute -> structure homogène
-    const flashcardData = cardsRawText
-      .trim()
-      .split(/\r?\n/)
-      .map(l => {
-        const parts = l.split('|');
-        if (parts.length === 4) {
-          const [id, f, e, c] = parts;
-          return {
-            id: id.trim(),
-            front: f.trim(), // FR
-            back: e.trim(), // EN
-            chapter: c.trim()
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
+    // ---------- Utils ----------
+    const $ = s=>document.querySelector(s);
+    const $$ = s=>Array.from(document.querySelectorAll(s));
+    const ChartHit = {}; // hitmap donut
+    const Bar7Hit = {}; // { [canvasId]: { cssW, cssH, bars: [{x,w}] } }
 
-    // Helpers pour construire les chapitres à partir de la liste brute
-    function slugify(s) {
-      return s.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const dateKey = (d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const todayKey = ()=>dateKey(new Date());
+    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+    const formatDuration = (ms)=>{const sec=Math.round(ms/1000); const m=Math.floor(sec/60); const s=sec%60; return `${m}:${String(s).padStart(2,'0')}`;};
+    const avg = a=>!a?.length?0:a.reduce((x,y)=>x+y,0)/a.length;
+    const deepClone = o=>JSON.parse(JSON.stringify(o));
+    const pickN = (arr,n)=>{const c=arr.slice(); for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]];} return c.slice(0,n);};
+    const isSuccess = g=>g==='facile'||g==='bien';
+
+    function formatDayKeyFR(key){
+      // key = "YYYY-MM-DD"
+      const [Y,M,D]=key.split('-').map(Number);
+      const d=new Date(Y, M-1, D);
+      const jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+      const mois=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+      return `${jours[d.getDay()]} ${String(D).padStart(2,'0')} ${mois[M-1]} ${Y}`;
     }
 
-    function emojiFor(title) {
-      return CHAPTER_EMOJIS[title] || '';
+    const slugify=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    const emojiFor=title=>CHAPTER_EMOJIS[title]||'';
+
+    // --- Helper: extrait l'ID numérique (rowId) à la fin d'un card.id (ex: "democracy-123" -> "123")
+    function extractRowId(cardId) {
+      const m = String(cardId).match(/-(\d+)$/);
+      return m ? m[1] : null;
     }
 
-    function buildChaptersFromFlashcards(list) {
-      const byChap = {};
-      list.forEach(row => {
-        const name = row.chapter || 'Sans catégorie';
-        (byChap[name] = byChap[name] || []).push(row);
-      });
-
-      const chapters = Object.keys(byChap).map(name => {
-        const id = 'chap-' + slugify(name);
-        const cards = byChap[name].map(row => ({
-          id: `${slugify(name)}-${row.id}`,
-          front: row.front,
-          back: row.back,
-          grade: 'unseen',
-          timesReviewed: 0,
-          lastReviewed: 0,
-          lastMs: 0,
-          avgMs: 0,
-          perfEma: 0.5,
-          ef: 2.5,
-          intervalDays: 0,
-          dueAt: 0,
-          streak: 0,
-          successes: 0,
-          failures: 0
+    // ---------- Construction données ----------
+    function buildChaptersFromFlashcards(list){
+      const byChap={}; list.forEach(r=>{const n=r.chapter||'Sans catégorie'; (byChap[n]=byChap[n]||[]).push(r);});
+      const chapters = Object.keys(byChap).map(name=>{
+        const id='chap-'+slugify(name);
+        const cards=byChap[name].map(r=>({
+          id:`${slugify(name)}-${r.id}`, front:r.front, back:r.back,
+          grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0,
+          perfEma:0.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
         }));
         return {
-          id,
-          title: name,
-          // vous pouvez afficher l’emoji dans le titre ou en description
-          description: emojiFor(name) ? `${emojiFor(name)} ${name}` : name,
-          settings: {
-            sessionSize: 10,
-            dailyGoal: 10,
-            reviewOrder: 'front-first'
-          },
-          filters: {
-            grades: {
-              unseen: true,
-              echec: true,
-              difficile: true,
-              bien: true,
-              facile: true
-            }
-          },
-          stats: {
-            gradeCounts: {
-              unseen: cards.length,
-              echec: 0,
-              difficile: 0,
-              bien: 0,
-              facile: 0
-            },
-            totalReviews: 0,
-            dailyReviews: {},
-            dailyChanges: {},
-            dailyDurMs: {},
-            dailyDurCount: {}
+          id, title:name, description: emojiFor(name)?`${emojiFor(name)} ${name}`:name,
+          settings:{sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:false},
+          filters:{grades:{unseen:true, echec:true, difficile:true, bien:true, facile:true}},
+          stats:{
+            gradeCounts:{unseen:cards.length,echec:0,difficile:0,bien:0,facile:0},
+            totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog: {}
           },
           cards
         };
       });
-
-      return {
-        chapters,
-        app: {
-          currentChapterId: chapters[0]?.id || null
-        }
-      };
+      return {chapters, app:{currentChapterId:chapters[0]?.id||null, theme:'dark', prefs:{fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14}}};
     }
 
-    let data = loadData();
-
-    // ====== Cookies backup (secours) ======
-    function setCookie(name, value, days = 365) {
-      try {
-        const v = encodeURIComponent(value);
-        document.cookie = `${name}=${v}; max-age=${days*86400}; path=/; SameSite=Lax;`;
-      } catch (e) { /* noop */ }
-    }
-
-    function getCookie(name) {
-      try {
-        const dec = decodeURIComponent;
-        const m = document.cookie.split(';').map(s => s.trim()).find(s => s.startsWith(name + '='));
-        return m ? dec(m.split('=').slice(1).join('=')) : null;
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function delCookie(name) {
-      document.cookie = `${name}=; max-age=0; path=/; SameSite=Lax;`;
-    }
-
-    // sérialise en plusieurs cookies (3x ~3.5KB => ~10KB backup)
-    function writeCookieBackup(str) {
-      const CHUNK = 3400; // marge
-      const parts = Math.ceil(str.length / CHUNK);
-      for (let i = 0; i < parts; i++) {
-        setCookie(`F9X16_B${i}`, str.slice(i * CHUNK, (i + 1) * CHUNK));
-      }
-      // nettoie surplus
-      for (let i = parts; i < 10; i++) {
-        delCookie(`F9X16_B${i}`);
-      }
-      setCookie('F9X16_BN', String(parts));
-    }
-
-    function readCookieBackup() {
-      const n = parseInt(getCookie('F9X16_BN') || '0', 10);
-      if (!n || n <= 0) return null;
-      let out = '';
-      for (let i = 0; i < n; i++) {
-        const p = getCookie(`F9X16_B${i}`);
-        if (p == null) return null;
-        out += p;
-      }
-      return out;
-    }
-
-    function loadData() {
-      // 1) localStorage prioritaire
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (e) {
-        console.warn('Storage parse error', e);
-      }
-      // 2) backup cookies
-      try {
-        const c = readCookieBackup();
-        if (c) {
-          return JSON.parse(c);
-        }
-      } catch (e) { /* ignore */ }
-      // 3) fallback: construit depuis la liste collée
+    function loadData(){
+      try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw);}catch(e){}
+      try{const c=readCookieBackup(); if(c) return JSON.parse(c);}catch(e){}
       return buildChaptersFromFlashcards(flashcardData);
     }
 
-
-    function saveData() {
-      try {
-        const str = JSON.stringify(data);
-        localStorage.setItem(STORAGE_KEY, str);
-        writeCookieBackup(str); // backup secours
-      } catch (e) {
-        console.warn('Save error', e);
-      }
-    }
-    // ------------------ Utilitaires ------------------
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const ChartHit = {}; // { [canvasId]: { cx, cy, innerR, outerR, arcs:[{key,start,end}] } }
-    const todayKey = () => {
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = (d.getMonth() + 1).toString().padStart(2, '0');
-      const dd = d.getDate().toString().padStart(2, '0');
-      return `${y}-${m}-${dd}`;
-    };
-
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
+    function saveData(){
+      try{
+        const str=JSON.stringify(data);
+        localStorage.setItem(STORAGE_KEY,str);
+        writeCookieBackup(str);
+      }catch(e){console.warn('Save error',e);}
     }
 
-    function formatDuration(ms) {
-      const sec = Math.round(ms / 1000);
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return `${m}:${s.toString().padStart(2,'0')}`;
-    }
+    // Cookies backup
+    function setCookie(name,value,days=365){try{document.cookie=`${name}=${encodeURIComponent(value)}; max-age=${days*86400}; path=/; SameSite=Lax;`;}catch(e){}}
+    function getCookie(name){try{const m=document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'=')); return m?decodeURIComponent(m.split('=').slice(1).join('=')):null;}catch(e){return null;}}
+    function delCookie(name){document.cookie=`${name}=; max-age=0; path=/; SameSite=Lax;`;}
+    function writeCookieBackup(str){const CHUNK=3400; const parts=Math.ceil(str.length/CHUNK); for(let i=0;i<parts;i++) setCookie(`F9X16_B${i}`,str.slice(i*CHUNK,(i+1)*CHUNK)); for(let i=parts;i<10;i++) delCookie(`F9X16_B${i}`); setCookie('F9X16_BN',String(parts));}
+    function readCookieBackup(){const n=parseInt(getCookie('F9X16_BN')||'0',10); if(!n) return null; let out=''; for(let i=0;i<n;i++){const p=getCookie(`F9X16_B${i}`); if(p==null) return null; out+=p;} return out;}
 
-    function avg(a) {
-      if (!a || !a.length) return 0;
-      return a.reduce((x, y) => x + y, 0) / a.length;
-    }
+    let data = loadData();
 
-    function pickN(arr, n) {
-      const copy = arr.slice();
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy.slice(0, n);
-    }
-
-    function deepClone(o) {
-      return JSON.parse(JSON.stringify(o));
-    }
-    // ------------------ État UI + Navigation ------------------
-    const State = {
-      view: 'deck', // 'deck' | 'chapter' | 'cards' | 'review' | 'recap' | 'settings'
-      chapterId: null,
-      review: null, // { chapterId, queue:[ids], index, flipped, answers:[], start, end }
-      cardsIndex: 0
-    };
+    // ---------- État UI + Nav ----------
+    const State = {view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey: null};
     const Nav = {
-      stack: [],
-      push() {
+      stack:[],
+      push(){
         this.stack.push(deepClone({
-          view: State.view,
-          chapterId: State.chapterId,
-          review: State.review,
-          cardsIndex: State.cardsIndex
+          view:State.view, chapterId:State.chapterId, review:State.review,
+          cardsIndex:State.cardsIndex, dailyKey: State.dailyKey
         }));
       },
-      back() {
-        if (this.stack.length === 0) return;
-        const prev = this.stack.pop();
-        State.view = prev.view;
-        State.chapterId = prev.chapterId;
-        State.review = prev.review;
-        State.cardsIndex = prev.cardsIndex || 0;
+      back(){
+        if(!this.stack.length) return;
+        const prev=this.stack.pop();
+        State.view=prev.view; State.chapterId=prev.chapterId; State.review=prev.review;
+        State.cardsIndex=prev.cardsIndex||0; State.dailyKey=prev.dailyKey||null;
         renderByState(false);
       },
-      clear() {
-        this.stack = [];
-      }
+      clear(){this.stack=[];}
     };
-    // ------------------ Éléments DOM persistants ------------------
-    const backBtn = $('#backBtn');
-    const titleEl = $('#title');
-    const bottomActions = $('#bottomActions');
-    const revisionBar = $('#revisionBar');
-    const startReviewBtn = $('#startReviewBtn');
-    backBtn.addEventListener('click', () => {
-      // Si on quitte une révision en cours, demander une confirmation
-      if (State.view === 'review' && State.review && State.review.end == null) {
-        if (!confirm('Quitter la révision en cours ?')) return;
-      }
 
-      if (State.view !== 'chapter') {
-        // Toujours ramener à la vue Statistiques du chapitre courant
-        if (State.chapterId) {
-          return goChapter(State.chapterId, false);
-        }
-        // S'il n'y a pas de chapitre, fallback deck
+    // ---------- DOM persistants ----------
+    const backBtn=$('#backBtn');
+    const titleEl=$('#title');
+    const bottomActions=$('#bottomActions');
+    const revisionBar=$('#revisionBar');
+    const startReviewBtn=$('#startReviewBtn');
+
+    backBtn.addEventListener('click',()=>{
+      if(State.view==='review' && State.review && State.review.end==null){
+        if(!confirm('Quitter la révision en cours ?')) return;
+      }
+      if(State.view!=='chapter'){
+        if(State.chapterId) return goChapter(State.chapterId,false);
         return goDeck(false);
-      } else {
-        // Déjà dans statistiques -> menu des decks
+      }else{
         return goDeck(false);
       }
     });
-    $('#cardsBtn').addEventListener('click', () => goCards(State.chapterId));
-    $('#settingsBtn').addEventListener('click', () => openSettings(State.chapterId));
-    startReviewBtn.addEventListener('click', () => startReview(State.chapterId));
-    // ------------------ Rendu (views) ------------------
-    function setTopbar({
-      title,
-      showBack
-    } = {}) {
-      const autoShow = (State.view !== 'deck'); // visible partout sauf en Deck
-      const visible = (typeof showBack === 'boolean') ? showBack : autoShow;
-      backBtn.classList.toggle('hidden', !visible);
-      if (title) titleEl.textContent = title;
+    $('#cardsBtn').addEventListener('click',()=>goCards(State.chapterId));
+    $('#settingsBtn').addEventListener('click',()=>openSettings(State.chapterId));
+    startReviewBtn.addEventListener('click',()=>startReview(State.chapterId));
+
+    // ---------- Rendu ----------
+    function setTopbar({title,showBack}={}){
+      const visible = typeof showBack==='boolean' ? showBack : (State.view!=='deck');
+      backBtn.classList.toggle('hidden',!visible);
+      if(title) titleEl.textContent=title;
     }
 
+    function setBottomVisibility({actions=false, revision=false, sessionSize=10, enabled=true, available=null, chapterId=null}={}){
+      bottomActions.style.display = actions?'grid':'none';
+      revisionBar.style.display = revision?'block':'none';
+      const phoneEl=$('#app');
+      phoneEl.style.setProperty('--row-actions', actions?'52px':'0px');
+      phoneEl.style.setProperty('--row-rev', revision?'64px':'0px');
 
-    function setBottomVisibility({
-      actions = false,
-      revision = false,
-      sessionSize = 10,
-      enabled = true,
-      available = null,
-      chapterId = null
-    }) {
-      bottomActions.style.display = actions ? 'grid' : 'none';
-      revisionBar.style.display = revision ? 'block' : 'none';
-
-      // Ajuste la grille: rangée 3 (actions) et rangée 4 (révision)
-      const phoneEl = document.getElementById('app');
-      phoneEl.style.setProperty('--row-actions', actions ? '52px' : '0px');
-      phoneEl.style.setProperty('--row-rev', revision ? '64px' : '0px');
-
-      if (available == null && chapterId) {
-        const chap = getChapter(chapterId);
-        available = chap ? countAvailable(chap) : 0;
+      if(available==null && chapterId){
+        const chap=getChapter(chapterId); available = chap?countAvailable(chap):0;
       }
-      if (available == null) available = 0;
-
-      const planned = available > 0 ? Math.min(sessionSize, available) : 0;
-      startReviewBtn.textContent = `Révision • ${planned || sessionSize} cartes${revision ? (available>0? ` • ${available} dispo`:'') : ''}`;
-      startReviewBtn.disabled = !enabled || available <= 0;
+      if(available==null) available=0;
+      const planned = available>0 ? Math.min(sessionSize,available):0;
+      startReviewBtn.textContent = `Révision • ${planned||sessionSize} cartes${revision ? (available>0? ` • ${available} dispo`:'') : ''}`;
+      startReviewBtn.disabled = !enabled || available<=0;
     }
 
-
-    function renderByState(push = true) {
-      if (State.view === 'deck') goDeck(push);
-      else if (State.view === 'chapter') goChapter(State.chapterId, push);
-      else if (State.view === 'cards') goCards(State.chapterId, push);
-      else if (State.view === 'review') goReview(push);
-      else if (State.view === 'recap') goRecap(push);
-      else if (State.view === 'settings') openSettings(State.chapterId, push);
-    }
-    function hideReviewActionsBar() {
-      const el = document.getElementById('reviewActionsBar');
-      if (el) {
-        el.style.display = 'none';
-        el.innerHTML = '';
+    function renderByState(push=true){
+      switch(State.view){
+        case 'deck': return goDeck(push);
+        case 'chapter': return goChapter(State.chapterId,push);
+        case 'cards': return goCards(State.chapterId,push);
+        case 'review': return goReview(push);
+        case 'recap': return goRecap(push);
+        case 'settings': return openSettings(State.chapterId,push);
+        case 'daily': return goDaily(State.chapterId, State.dailyKey, push);
       }
     }
-    // --- Vues
-    function goDeck(push = true) {
-      if (push) Nav.push();
-      State.view = 'deck';
-      State.chapterId = null;
-      setTopbar({
-        title: 'Deck',
-        showBack: false
-      });
-      setBottomVisibility({
-        actions: false,
-        revision: false
-      });
+    function hideReviewActionsBar(){const el=$('#reviewActionsBar'); if(el){el.style.display='none'; el.innerHTML='';}}
+
+    // Deck
+    function goDeck(push=true){
+      if(push) Nav.push();
+      State.view='deck'; State.chapterId=null;
+      setTopbar({title:'Deck', showBack:false});
+      setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
       renderDeck();
     }
 
-    function renderDeck() {
-      const v = $('#view');
-      const chapters = data.chapters;
-
+    function renderDeck(){
+      const v=$('#view'); const chapters=data.chapters;
       v.innerHTML = `
         <div class="card flexcol" style="flex:1;">
           <div class="section-title">Chapitres</div>
           <div id="deckList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
             <div class="list">
-              ${chapters.map(ch => {
-                const { unseen, echec, difficile, bien, facile } = getLiveGradeCounts(ch);
-                const total = ch.cards?.length ?? 0;
-                const viewed = Math.max(0, total - unseen);
-                const pct = total ? Math.round((viewed / total) * 100) : 0;
-
-                // IMPORTANT:
-                // - Pas d’emoji dans le titre (nom du deck)
-                // - On laisse l’emoji dans la description (ch.description) comme aujourd’hui
+              ${chapters.map(ch=>{
+                const {unseen,echec,difficile,bien,facile}=getLiveGradeCounts(ch);
+                const total=ch.cards?.length??0;
+                const viewed=Math.max(0,total-unseen);
+                const pct= total ? Math.round((viewed/total)*100):0;
                 return `
                   <div class="deck-item" data-id="${ch.id}">
                     <div style="min-width:0">
-                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 18px;">
-                        ${ch.description || ch.title}
-                        </div>
-
+                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
+                        ${ch.description||ch.title}
+                      </div>
                       <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
-                        <div class="chip-pie" title="Progression : ${pct}%" style="--progress: ${pct}%"></div>
+                        <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
                         <span class="chip" title="Échec">🟥 ${echec}</span>
                         <span class="chip" title="Difficile">🟨 ${difficile}</span>
                         <span class="chip" title="Bien">🟦 ${bien}</span>
@@ -2757,78 +1525,55 @@ body {
           </div>
         </div>
       `;
-
-      $$('.deck-item').forEach(el => {
-        el.addEventListener('click', () => {
-          const id = el.getAttribute('data-id');
-          goChapter(id);
-        });
-      });
+      $$('.deck-item').forEach(el=>el.addEventListener('click',()=>goChapter(el.getAttribute('data-id'))));
     }
 
-
-    function goChapter(chapterId, push = true) {
-      if (push) Nav.push();
-      State.view = 'chapter';
-      State.chapterId = chapterId;
-      const chap = getChapter(chapterId);
-      setTopbar({
-        title: chap?.title || 'Statistiques'
-      });
+    // Chapter
+    function goChapter(chapterId,push=true){
+      if(push) Nav.push();
+      State.view='chapter'; State.chapterId=chapterId;
+      const chap=getChapter(chapterId);
+      setTopbar({title:chap?.title||'Statistiques'});
       setBottomVisibility({
-        actions: true,
-        revision: true,
-        sessionSize: chap.settings.sessionSize,
-        enabled: (chap.cards && chap.cards.length > 0),
-        available: countAvailable(chap),
-        chapterId: chap.id
+        actions:true, revision:true, sessionSize:chap.settings.sessionSize,
+        enabled:(chap.cards && chap.cards.length>0),
+        available:countAvailable(chap), chapterId:chap.id
       });
       hideReviewActionsBar();
       renderChapter(chapterId);
     }
 
-    function renderChapter(chapterId) {
-      const v = $('#view');
-      const chap = getChapter(chapterId);
-      const sel = chap.filters.grades || {};
-      const counts = getLiveGradeCounts(chap);
-      const {
-        unseen,
-        echec,
-        difficile,
-        bien,
-        facile
-      } = counts;
+    function renderChapter(chapterId){
+      const v=$('#view'); const chap=getChapter(chapterId);
+      const sel=chap.filters.grades||{};
+      const counts=getLiveGradeCounts(chap);
+      const {unseen,echec,difficile,bien,facile}=counts;
 
-      const today = getTodayCount(chap);
-      const week = getWeekCount(chap);
-      const success = getSuccessRate(chap);
-      const avg7 = get7DayAvgMs(chap);
-      const dueNow = getDueNow(chap);
-      const streak = getStreakDays(chap);
-      const emoji = emojiFor(chap.title);
+      const today=getTodayCount(chap);
+      const week=getWeekCount(chap);
+      const success=getSuccessRate(chap);
+      const avg7=get7DayAvgMs(chap);
+      const dueNow=getDueNow(chap);
+      const streak=getStreakDays(chap);
+      const emoji=emojiFor(chap.title);
 
       v.innerHTML = `
         <div class="card" style="flex:1; display:flex; flex-direction:column;">
-          <div class="section-title">${emoji ? emoji+' ' : ''}Statistiques</div>
+          <div class="section-title">${emoji?emoji+' ':''}Statistiques</div>
           <div class="kpi">
             <div class="k"><div class="label">Cartes non vues</div><div class="value">${unseen}</div></div>
             <div class="k"><div class="label">Total cartes</div><div class="value">${chap.cards.length}</div></div>
           </div>
 
-          <div class="chart-wrap">
-            <canvas id="gradeChart" width="180" height="180" aria-label="Diagramme des scores"></canvas>
-          </div>
+          <div class="chart-wrap"><canvas id="gradeChart" width="180" height="180" aria-label="Diagramme des scores"></canvas></div>
 
           <div class="legend" id="legend">
-            <div class="legend-item ${sel.unseen ? '' : 'inactive'}" data-key="unseen"><span class="dot gray"></span> Non vus: <b class="count">${unseen}</b></div>
-            <div class="legend-item ${sel.echec ? '' : 'inactive'}" data-key="echec"><span class="dot red"></span> Échec: <b class="count">${echec}</b></div>
-            <div class="legend-item ${sel.difficile ? '' : 'inactive'}" data-key="difficile"><span class="dot amber"></span> Difficile: <b class="count">${difficile}</b></div>
-            <div class="legend-item ${sel.bien ? '' : 'inactive'}" data-key="bien"><span class="dot blue"></span> Bien: <b class="count">${bien}</b></div>
-            <div class="legend-item ${sel.facile ? '' : 'inactive'}" data-key="facile"><span class="dot green"></span> Facile: <b class="count">${facile}</b></div>
+            <div class="legend-item ${sel.unseen?'':'inactive'}" data-key="unseen"><span class="dot gray"></span> Non vus: <b class="count">${unseen}</b></div>
+            <div class="legend-item ${sel.echec?'':'inactive'}" data-key="echec"><span class="dot red"></span> Échec: <b class="count">${echec}</b></div>
+            <div class="legend-item ${sel.difficile?'':'inactive'}" data-key="difficile"><span class="dot amber"></span> Difficile: <b class="count">${difficile}</b></div>
+            <div class="legend-item ${sel.bien?'':'inactive'}" data-key="bien"><span class="dot blue"></span> Bien: <b class="count">${bien}</b></div>
+            <div class="legend-item ${sel.facile?'':'inactive'}" data-key="facile"><span class="dot green"></span> Facile: <b class="count">${facile}</b></div>
           </div>
-          
-
 
           <div class="kpi mt8">
             <div class="k"><div class="label">Aujourd'hui</div><div class="value">${today}</div></div>
@@ -2842,101 +1587,84 @@ body {
             <div class="k"><div class="label">À réviser maintenant</div><div class="value">${dueNow}</div></div>
             <div class="k"><div class="label">Série (jours)</div><div class="value">${streak}</div></div>
           </div>
-          
+
           <div class="bar7-wrap">
             <div class="label" style="color:var(--primary)">Activité 7 jours</div>
             <canvas id="bar7" width="220" height="60"></canvas>
             <div class="bar7-labels" id="bar7Labels"></div>
           </div>
-
         </div>
-        `;
+      `;
 
-      // Dessiner le camembert (segments non sélectionnés atténués)
-      drawGradeChart('gradeChart', {
-        unseen,
-        echec,
-        difficile,
-        bien,
-        facile
-      }, chap.filters.grades);
+      // Chart donut
+      drawGradeChart('gradeChart',counts,chap.filters.grades);
+      const canvas=$('#gradeChart'); canvas.style.cursor='pointer';
+      canvas.onclick=(ev)=>handleChartClick(ev,'gradeChart',chap,counts);
 
-      // Clic sur camembert (toujours supporté)
-      const canvas = $('#gradeChart');
-      canvas.style.cursor = 'pointer';
-      canvas.onclick = (ev) => handleChartClick(ev, 'gradeChart', chap, counts);
-
-      // Clic sur la légende pour filtrer
-      $$('#legend .legend-item').forEach(el => {
-        const key = el.getAttribute('data-key');
-        el.addEventListener('click', () => handleLegendClick(key, chap));
-        el.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleLegendClick(key, chap);
-          }
-        });
+      // Légende clic
+      $$('#legend .legend-item').forEach(el=>{
+        const key=el.getAttribute('data-key');
+        const act=()=>{handleLegendClick(key,chap);};
+        el.addEventListener('click',act);
+        el.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' ') {e.preventDefault(); act();}});
+        el.setAttribute('tabindex','0');
+        el.setAttribute('role','button');
       });
-      // Mettre à jour le bouton de révision (cartes dispo selon filtre)
-      updateRevisionBarForChapter(chap);
-      
 
-      drawBars7('bar7', getLast7DaysArray(chap));
-      const lbl = document.getElementById('bar7Labels');
-      if (lbl) {
-        const noms = getLast7DaysLabelsFR();
-        lbl.innerHTML = noms.map(j => `<div>${j.substring(0,3)}</div>`).join('');
+      // Révision bar refresh
+      updateRevisionBarForChapter(chap);
+
+      // 7-day bars
+      drawBars7('bar7', getLastNDaysArray(chap,7));
+      const lbl=$('#bar7Labels');
+      if(lbl){const noms=getLastNDaysLabelsFR(7); lbl.innerHTML=noms.map(j=>`<div>${j.substring(0,3)}</div>`).join('');}
+
+      // Clic sur le canvas bar-chart
+      const barCanvas = document.getElementById('bar7');
+      if (barCanvas) {
+        barCanvas.style.cursor = 'pointer';
+        barCanvas.onclick = (ev) => openDayFromBarClick(ev, 'bar7', chap.id, 7);
       }
 
-      // Redessiner au resize (dé-bouncé)
-      (function() {
-        let t;
-        const redraw = () => drawBars7('bar7', getLast7DaysArray(chap));
-        window.removeEventListener('resize', window._bar7ResizeHandler || (() => {}));
-        window._bar7ResizeHandler = () => {
-          clearTimeout(t);
-          t = setTimeout(redraw, 150);
-        };
+      // Clic sur les labels
+      const labelsWrap = document.getElementById('bar7Labels');
+      if (labelsWrap) {
+        Array.from(labelsWrap.children).forEach((el, i) => {
+          el.style.cursor = 'pointer';
+          el.title = 'Voir les cartes de ce jour';
+          el.onclick = () => goDaily(chap.id, dayKeyFromIndex(7, i));
+        });
+      }
+
+      // Redraw on resize (debounced)
+      (function(){
+        let t; const redraw=()=>drawBars7('bar7',getLastNDaysArray(chap,7));
+        window.removeEventListener('resize', window._bar7ResizeHandler || (()=>{}));
+        window._bar7ResizeHandler=()=>{clearTimeout(t); t=setTimeout(redraw,150);};
         window.addEventListener('resize', window._bar7ResizeHandler);
       })();
     }
 
-
-
-    function updateRevisionBarForChapter(chap) {
-      const available = countAvailable(chap);
-      setBottomVisibility({
-        actions: true,
-        revision: true,
-        sessionSize: chap.settings.sessionSize,
-        enabled: available > 0,
-        available
-      });
+    function updateRevisionBarForChapter(chap){
+      const available=countAvailable(chap);
+      setBottomVisibility({actions:true, revision:true, sessionSize:chap.settings.sessionSize, enabled:available>0, available});
     }
 
-    function goCards(chapterId, push = true) {
-      if (push) Nav.push();
-      State.view = 'cards';
-      State.chapterId = chapterId;
-      const chap = getChapter(chapterId);
-      setTopbar({
-        title: `${chap.title} • Cartes`
-      });
-      setBottomVisibility({
-        actions: false,
-        revision: false
-      });
+    // Cards
+    function goCards(chapterId,push=true){
+      if(push) Nav.push();
+      State.view='cards'; State.chapterId=chapterId;
+      const chap=getChapter(chapterId);
+      setTopbar({title:`${chap.title} • Cartes`});
+      setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
       renderCards(chapterId);
     }
 
-    function renderCards(chapterId) {
-      const v = $('#view');
-      const chap = getChapter(chapterId);
-      const sel = chap.filters.grades || {};
-      const pool = chap.cards.filter(c => sel[(c.grade || 'unseen')]);
-
-      // Préparer un indicateur de flip global
+    function renderCards(chapterId){
+      const v=$('#view'); const chap=getChapter(chapterId);
+      const sel=chap.filters.grades||{};
+      const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
 
       v.innerHTML = `
         <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
@@ -2944,15 +1672,15 @@ body {
           <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
             <div class="cards-grid">
               ${pool.map(c=>{
-                const { frontText, backText } = getCardSides(c, chap);
-                const gradeClass = `grade-${c.grade || 'unseen'}`;
-                const timeStr = c.avgMs ? formatDuration(c.avgMs) : '';
+                const {frontText,backText}=getCardSides(c,chap);
+                const gradeClass=`grade-${c.grade||'unseen'}`;
+                const timeStr=c.avgMs?formatDuration(c.avgMs):'';
                 return `
-                <div class="card-block ${gradeClass}" data-id="${c.id}">
-                  <div class="term">${frontText}</div>
-                  <div class="definition">${backText}</div>
-                  ${timeStr ? `<div class="cb-time">${timeStr}</div>` : ``}
-                </div>
+                  <div class="card-block ${gradeClass}" data-id="${c.id}">
+                    <div class="term">${frontText}</div>
+                    <div class="definition">${backText}</div>
+                    ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
+                  </div>
                 `;
               }).join('')}
             </div>
@@ -2960,546 +1688,367 @@ body {
         </div>
       `;
 
-      // Clic: ne flip QUE la carte cliquée (et referme les autres)
-      const grid = $('#cardsGrid');
-      grid.addEventListener('click', (e) => {
-        const block = e.target.closest('.card-block');
-        if (!block) return;
-
-        // referme les autres pour n’en avoir qu’une ouverte
-        $$('.card-block').forEach(b => {
-          if (b !== block) {
-            b.classList.remove('flipped');
-          }
-        });
-        
-        // flip uniquement celle-ci
+      const grid=$('#cardsGrid');
+      grid.addEventListener('click',e=>{
+        const block=e.target.closest('.card-block'); if(!block) return;
+        $$('.card-block').forEach(b=>{if(b!==block) b.classList.remove('flipped');});
         block.classList.toggle('flipped');
       });
     }
 
-
-    function goReview(push = true) {
+    // Daily Activity View
+    function goDaily(chapterId, dayKey, push=true){
       if (push) Nav.push();
-      State.view = 'review';
-      const r = State.review;
-      const chap = getChapter(r.chapterId);
+      State.view='daily';
+      State.chapterId=chapterId;
+      State.dailyKey=dayKey;
+      const chap=getChapter(chapterId);
+      setTopbar({ title:`Activité • ${formatDayKeyFR(dayKey)}` });
+      setBottomVisibility({ actions:false, revision:false });
+      hideReviewActionsBar();
+      renderDaily(chap, dayKey);
+    }
 
-      setTopbar({
-        title: 'Révision'
+    function renderDaily(chap, dayKey){
+      const v = document.getElementById('view');
+      const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
+      if (!log.length){
+        v.innerHTML = `
+          <div class="card" style="flex:1; display:flex; flex-direction:column;">
+            <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
+            <div class="muted">Aucune donnée pour ce jour.</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Agrège par carte: earliest prev (grade avant jour) et latest next (grade après jour)
+      log.sort((a,b)=>a.ts-b.ts);
+      const byCard = new Map();
+      for (const e of log){
+        const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
+        if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
+        if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
+        curr.events.push(e);
+        byCard.set(e.cardId, curr);
+      }
+
+      const rows = [];
+      for (const [cardId, info] of byCard){
+        const card = chap.cards.find(c=>c.id===cardId);
+        if (!card) continue;
+        const {frontText, backText} = getCardSides(card, chap);
+        rows.push({
+          id: cardId,
+          term: frontText,
+          def: backText,
+          before: info.firstPrev || 'unseen',
+          after: info.lastNext || (card.grade || 'unseen')
+        });
+      }
+
+      // Option: ordonner les changements d'abord
+      rows.sort((a,b)=>{
+        const ca = (a.before!==a.after), cb=(b.before!==b.after);
+        if (ca!==cb) return ca? -1: 1;
+        return a.term.localeCompare(b.term, 'fr');
       });
 
-      // Conserve la rangée 4 visible (même Y), mais masque la barre "Révision" visuelle
-      setBottomVisibility({
-        actions: false,
-        revision: true
-      }); // 4e rangée = 64px (même que le bouton Révision)
-      revisionBar.style.display = 'none'; // masque le bouton "Révision" pendant la révision
-      document.getElementById('reviewActionsBar').style.display = 'block'; // affiche notre barre d'actions de révision
+      v.innerHTML = `
+        <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
+          <div id="dailyList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+            <div class="list" style="gap:10px">
+              ${rows.map(r=>`
+                <div class="grid2">
+                  <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
+                    <div class="term">${r.term}</div>
+                    <div class="definition">${r.def}</div>
+                  </div>
+                  <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
+                    <div class="term">${r.term}</div>
+                    <div class="definition">${r.def}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
+        </div>
+      `;
+
+      // Flip individuel des blocs (comme la vue Cartes)
+      const list = document.getElementById('dailyList');
+      list.addEventListener('click', (e)=>{
+        const block = e.target.closest('.card-block');
+        if (!block) return;
+        block.classList.toggle('flipped');
+      });
+    }
+
+    // Review
+    function goReview(push=true){
+      if(push) Nav.push();
+      State.view='review';
+      setTopbar({title:'Révision'});
+
+      setBottomVisibility({actions:false, revision:true}); // réserve la rangée
+      revisionBar.style.display='none'; // masque bouton
+      $('#reviewActionsBar').style.display='block'; // affiche barre d'actions
 
       renderReview();
     }
 
-
-    function renderReviewFooter() {
-      const bar = document.getElementById('reviewActionsBar');
-      if (!bar) return;
-      const r = State.review;
-      if (!r.flipped) {
-        bar.innerHTML = `<button class="btn" id="flipBtn">Retourner</button>`;
-        document.getElementById('flipBtn').onclick = () => {
-          r.flipped = true;
-          renderReview();
-        };
-      } else {
-        bar.innerHTML = `<div class="row-4"> <button class="btn red" id="grade_echec">Échec</button> <button class="btn amber" id="grade_difficile">Difficile</button> <button class="btn blue" id="grade_bien">Bien</button> <button class="btn green" id="grade_facile">Facile</button> </div>`;
-        document.getElementById('grade_echec').onclick = () => submitGrade('echec');
-        document.getElementById('grade_difficile').onclick = () => submitGrade('difficile');
-        document.getElementById('grade_bien').onclick = () => submitGrade('bien');
-        document.getElementById('grade_facile').onclick = () => submitGrade('facile');
+    function renderReviewFooter(){
+      const bar=$('#reviewActionsBar'); if(!bar) return;
+      const r=State.review;
+      if(!r.flipped){
+        bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
+        $('#flipBtn').onclick=()=>{r.flipped=true; renderReview();};
+      }else{
+        bar.innerHTML=`
+          <div class="row-4">
+            <button class="btn btn--red" id="grade_echec">Échec</button>
+            <button class="btn btn--amber" id="grade_difficile">Difficile</button>
+            <button class="btn btn--blue" id="grade_bien">Bien</button>
+            <button class="btn btn--green" id="grade_facile">Facile</button>
+          </div>`;
+        $('#grade_echec').onclick=()=>submitGrade('echec');
+        $('#grade_difficile').onclick=()=>submitGrade('difficile');
+        $('#grade_bien').onclick=()=>submitGrade('bien');
+        $('#grade_facile').onclick=()=>submitGrade('facile');
       }
     }
 
-    function renderReview() {
-      const v = $('#view');
-      const r = State.review;
-      const chap = getChapter(r.chapterId);
-      const total = r.queue.length;
-      const current = getCurrentCard();
-      const idx = r.index + 1;
-
-      // Ordre d’affichage (Face→Dos par défaut, sinon Dos→Face)
-      const {
-        frontText,
-        backText
-      } = getCardSides(current, chap);
-      const frontFirst = chap.settings.reviewOrder !== 'back-first';
-      const prompt = frontFirst ? frontText : backText;
-      const isPromptFront = frontFirst; // true si on affiche le recto en premier
-      const promptClass = isPromptFront ? 'term' : 'definition';
-      const promptFace = isPromptFront ? 'front' : 'back';
+    function renderReview(){
+      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
+      const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
+      const {frontText,backText}=getCardSides(current,chap);
+      const frontFirst = chap.settings.reviewOrder!=='back-first';
+      const prompt=frontFirst?frontText:backText;
+      const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
 
       v.innerHTML = `
         <div class="review-wrap">
-          <div class="review-top">
-            <div>${chap.title}</div>
-            <div>${idx} / ${total}</div>
-          </div>
-
+          <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
           <div class="review-card">
             <div>
               ${!r.flipped
                 ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
-                : `
-                  <div class="stack">
-                    <div class="term" data-face="front">${frontText}</div>
-                    <div class="definition" data-face="back" style="margin-top:6px">${backText}</div>
-                  </div>
-                `
+                : `<div class="stack"><div class="term" data-face="front">${frontText}</div><div class="definition" data-face="back" style="margin-top:6px">${backText}</div></div>`
               }
             </div>
           </div>
         </div>
-        `;
+      `;
       bindReviewSizeControls();
       renderReviewFooter();
     }
 
-
-    function goRecap(push = true) {
-      if (push) Nav.push();
-      State.view = 'recap';
-      setTopbar({
-        title: 'Récapitulatif'
-      });
-      setBottomVisibility({
-        actions: false,
-        revision: false
-      });
+    // Recap
+    function goRecap(push=true){
+      if(push) Nav.push();
+      State.view='recap';
+      setTopbar({title:'Récapitulatif'});
+      setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
       renderRecap();
     }
 
-    function renderRecap() {
-      const v = $('#view');
-      const r = State.review;
-      const chap = getChapter(r.chapterId);
-      const totalSession = r.answers.length;
-      const duration = r.end - r.start;
-      const avgPerCard = totalSession ? duration / totalSession : 0;
-      const todayChange = getTodayChange(chap);
-      const todayReviews = getTodayCount(chap);
+    function renderRecap(){
+      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
+      const totalSession=r.answers.length; const duration=r.end-r.start; const avgPerCard=totalSession?duration/totalSession:0;
+      const todayChange=getTodayChange(chap); const todayReviews=getTodayCount(chap);
       v.innerHTML = `
         <div class="card recap" style="flex:1">
-          <div>
-            <h2>Récapitulatif</h2>
-            <div class="subtitle">${chap.title}</div>
+          <div><h2>Récapitulatif</h2><div class="subtitle">${chap.title}</div></div>
+          <div class="grid2">
+            <div class="stat"><div class="label">Révisions/jour (7j)</div><div class="val">${get7DayAverage(chap)}</div></div>
+            <div class="stat"><div class="label">Changement de classe aujourd'hui</div><div class="val">${todayChange.total>0?Math.round((todayChange.changed/todayChange.total)*100):0}%</div></div>
+            <div class="stat"><div class="label">Objectif quotidien</div><div class="val">${chap.settings.dailyGoal}</div></div>
+            <div class="stat"><div class="label">Révisions aujourd'hui</div><div class="val">${todayReviews}/${chap.settings.dailyGoal}</div></div>
           </div>
           <div class="grid2">
-            <div class="stat">
-              <div class="label">Révisions/jour (7j)</div>
-              <div class="val">${get7DayAverage(chap)}</div>
-            </div>
-            <div class="stat">
-              <div class="label">Changement de classe aujourd'hui</div>
-              <div class="val">${todayChange.total>0 ? Math.round( (todayChange.changed / todayChange.total)*100 ) : 0}%</div>
-            </div>
-            <div class="stat">
-              <div class="label">Objectif quotidien</div>
-              <div class="val">${chap.settings.dailyGoal}</div>
-            </div>
-            <div class="stat">
-              <div class="label">Révisions aujourd'hui</div>
-              <div class="val">${todayReviews}/${chap.settings.dailyGoal}</div>
-            </div>
+            <div class="stat"><div class="label">Total révisions (session)</div><div class="val">${totalSession}</div></div>
+            <div class="stat"><div class="label">Durée (session)</div><div class="val">${formatDuration(duration)}</div></div>
+            <div class="stat"><div class="label">Temps moyen/carte</div><div class="val">${formatDuration(avgPerCard)}</div></div>
           </div>
-          <div class="grid2">
-            <div class="stat">
-              <div class="label">Total révisions (session)</div>
-              <div class="val">${totalSession}</div>
-            </div>
-            <div class="stat">
-              <div class="label">Durée (session)</div>
-              <div class="val">${formatDuration(duration)}</div>
-            </div>
-            <div class="stat">
-              <div class="label">Temps moyen/carte</div>
-              <div class="val">${formatDuration(avgPerCard)}</div>
-            </div>
-          </div>
-          <div class="cta">
-            <button class="btn" id="continueBtn">Continuer</button>
-          </div>
+          <div class="cta"><button class="btn btn--solid btn--primary" id="continueBtn">Continuer</button></div>
         </div>
       `;
-      $('#continueBtn').addEventListener('click', () => {
-        // Relance une nouvelle session avec les mêmes filtres
-        startReview(r.chapterId);
-      });
+      $('#continueBtn').addEventListener('click',()=>startReview(r.chapterId));
     }
-    // ------------------ Logique Révision ------------------
-    function startReview(chapterId) {
-      if (!chapterId) return;
-      const chap = getChapter(chapterId);
-      const sel = chap.filters.grades;
-      const pool = chap.cards.filter(c => sel[(c.grade || 'unseen')]);
-      const size = Math.min(chap.settings.sessionSize, pool.length);
 
-      if (size <= 0) {
-        alert('Aucune carte disponible avec les filtres sélectionnés.');
-        return;
-      }
-
-      const queue = buildSmartQueue(chap, pool, size).map(c => c.id);
-
-      State.review = {
-        chapterId,
-        queue,
-        index: 0,
-        flipped: false,
-        answers: [],
-        start: Date.now(),
-        end: null,
-        cardStart: Date.now()
-      };
+    // ---------- Logique révision ----------
+    function startReview(chapterId){
+      if(!chapterId) return;
+      const chap=getChapter(chapterId);
+      const sel=chap.filters.grades;
+      const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
+      const size=Math.min(chap.settings.sessionSize,pool.length);
+      if(size<=0){alert('Aucune carte disponible avec les filtres sélectionnés.'); return;}
+      const queue=buildSmartQueue(chap,pool,size).map(c=>c.id);
+      State.review={chapterId, queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now()};
       goReview();
     }
 
-
-    function buildSmartQueue(chap, pool, size) {
-      const now = Date.now();
-      // Poids de base selon le grade courant
-      const baseWMap = {
-        unseen: 6,
-        echec: 5,
-        difficile: 3.5,
-        bien: 2,
-        facile: 1
-      };
-
-      const scored = pool.map(c => {
-        const g = c.grade || 'unseen';
-        const baseW = baseWMap[g] ?? 1;
-
-        // Échéance: si en retard, boost; si à venir, légère pénalisation
-        let dueBoost = 1;
-        if (c.dueAt && c.dueAt > 0) {
-          const delta = now - c.dueAt; // >0 si en retard
-          if (delta > 0) {
-            const overdueDays = delta / 864e5;
-            dueBoost = 1 + Math.min(3, overdueDays); // jusqu’à x4
-          } else {
-            // pas en retard: pas prioritaire, mais pas exclu
-            dueBoost = 0.85;
-          }
-        } else {
-          // jamais planifié: priorité légère
-          dueBoost = 1.15;
-        }
-
-        // Performance moyenne (plus la perf est basse, plus on priorise)
-        const ema = (typeof c.perfEma === 'number') ? c.perfEma : 0.5;
-        const perfBoost = 1 + (1 - ema) * 1.6; // 1..2.6
-
-        // Streak: longues séries de succès => léger downweight; séries d’échecs => upweight
-        const s = c.streak || 0;
-        const streakAdj = s >= 3 ? (1 / (1 + 0.12 * (s - 2))) : (s < 0 ? (1 + 0.18 * Math.min(8, Math.abs(s))) : 1);
-
-        // Temps moyen (plus c’est long, plus on priorise)
-        const t = c.avgMs || 0;
-        const timeBoost = 1 + Math.min(2, t / 3000); // max x3
-
-        // Légère randomisation
-        const jitter = 0.9 + Math.random() * 0.2;
-
-        const weight = baseW * dueBoost * perfBoost * streakAdj * timeBoost * jitter;
-        return {
-          card: c,
-          weight
-        };
+    function buildSmartQueue(chap,pool,size){
+      const now=Date.now();
+      const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+      const scored=pool.map(c=>{
+        const g=c.grade||'unseen'; const baseW=baseWMap[g]??1;
+        let dueBoost=1;
+        if(c.dueAt && c.dueAt>0){
+          const delta=now-c.dueAt;
+          dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
+        }else{ dueBoost=1.15; }
+        const ema=typeof c.perfEma==='number' ? c.perfEma : 0.5;
+        const perfBoost=1+(1-ema)*1.6;
+        const s=c.streak||0;
+        const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
+        const t=c.avgMs||0; const timeBoost=1+Math.min(2,t/3000);
+        const jitter=0.9+Math.random()*0.2;
+        return {card:c, weight:baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter};
       });
-
-      scored.sort((a, b) => b.weight - a.weight);
-      return scored.slice(0, size).map(x => x.card);
+      scored.sort((a,b)=>b.weight-a.weight);
+      return scored.slice(0,size).map(x=>x.card);
     }
 
-
-    function getCurrentCard() {
-      const r = State.review;
-      const chap = getChapter(r.chapterId);
-      const id = r.queue[r.index];
-      return chap.cards.find(c => c.id === id);
+    function getCurrentCard(){
+      const r=State.review; const chap=getChapter(r.chapterId);
+      const id=r.queue[r.index]; return chap.cards.find(c=>c.id===id);
     }
 
-    function submitGrade(nextGrade) {
-      const r = State.review;
-      const chap = getChapter(r.chapterId);
-      const card = getCurrentCard();
-      const now = Date.now();
+    function submitGrade(nextGrade){
+      const r=State.review; const chap=getChapter(r.chapterId); const card=getCurrentCard(); const now=Date.now();
+      const duration=Math.max(0, now-(r.cardStart||now));
+      const prevGrade=card.grade||'unseen'; const next=nextGrade;
 
-      // 1) Durée de réponse
-      const duration = Math.max(0, now - (r.cardStart || now));
-
-      // 2) Comptages grades chapitre
-      const prevGrade = card.grade || 'unseen';
-      const next = nextGrade;
-
-      const wasZeroBeforeNext = (chap.stats.gradeCounts[next] || 0) === 0;
-
-      card.grade = next;
-
+      const wasZeroBeforeNext=(chap.stats.gradeCounts[next]||0)===0;
+      card.grade=next;
       syncGradeCounts(chap);
 
+      // Perf + planification
+      const alpha=0.3; const q01=gradeNorm01(next);
+      card.perfEma = (1-alpha)*(card.perfEma??0.5) + alpha*q01;
+      scheduleNext(card,next,now);
 
-      // 3) Progression carte (EMA perf, E‑Factor, intervalle, streak)
-      const alpha = 0.3; // EMA lissage
-      const q01 = gradeNorm01(next);
-      card.perfEma = (1 - alpha) * (card.perfEma ?? 0.5) + alpha * q01;
+      // Temps + counters
+      card.lastReviewed=now; card.lastMs=duration;
+      card.avgMs = card.avgMs ? Math.round(card.avgMs*0.7 + duration*0.3) : duration;
+      card.timesReviewed=(card.timesReviewed||0)+1;
+      if(isSuccess(next)) card.successes+=1; else card.failures+=1;
 
-      scheduleNext(card, next, now);
-
-      // 4) Temps / succès / échecs
-      card.lastReviewed = now;
-      card.lastMs = duration;
-      card.avgMs = card.avgMs ? Math.round(card.avgMs * 0.7 + duration * 0.3) : duration;
-      card.timesReviewed = (card.timesReviewed || 0) + 1;
-      if (isSuccess(next)) card.successes += 1;
-      else card.failures += 1;
-
-      // 5) Stats globales jour (déjà présentes)
+      // Stats jour
       chap.stats.totalReviews += 1;
-      const tk = todayKey();
-      chap.stats.dailyReviews[tk] = (chap.stats.dailyReviews[tk] || 0) + 1;
-      chap.stats.dailyDurMs[tk] = (chap.stats.dailyDurMs[tk] || 0) + duration;
-      chap.stats.dailyDurCount[tk] = (chap.stats.dailyDurCount[tk] || 0) + 1;
-      const dc = chap.stats.dailyChanges[tk] || {
-        changed: 0,
-        total: 0
-      };
-      dc.total += 1;
-      if (prevGrade !== next) dc.changed += 1;
-      chap.stats.dailyChanges[tk] = dc;
+      const tk=todayKey();
+      chap.stats.dailyReviews[tk]=(chap.stats.dailyReviews[tk]||0)+1;
+      chap.stats.dailyDurMs[tk]=(chap.stats.dailyDurMs[tk]||0)+duration;
+      chap.stats.dailyDurCount[tk]=(chap.stats.dailyDurCount[tk]||0)+1;
+      const dc=chap.stats.dailyChanges[tk]||{changed:0,total:0};
+      dc.total+=1; if(prevGrade!==next) dc.changed+=1; chap.stats.dailyChanges[tk]=dc;
 
-      // 6) Auto-sélection filtre si première apparition de cette note (si fonction déjà en place)
-      if (wasZeroBeforeNext && next !== 'unseen') {
-        chap.filters.grades[next] = true;
-      }
+      // journal détaillé par carte
+      const log = chap.stats.dailyLog[tk] || [];
+      log.push({ cardId: card.id, prev: prevGrade, next, ms: duration, ts: now });
+      chap.stats.dailyLog[tk] = log;
 
-      // 7) Traces session et navigation
-      r.answers.push({
-        cardId: card.id,
-        prev: prevGrade,
-        next,
-        ms: duration
-      });
+      if(wasZeroBeforeNext && next!=='unseen'){ chap.filters.grades[next]=true; }
 
-      if (r.index < r.queue.length - 1) {
-        r.index += 1;
-        r.flipped = false;
-        r.cardStart = Date.now();
-        saveData();
-        renderReview();
-      } else {
-        r.end = Date.now();
-        saveData();
-        goRecap();
+      // Trace + nav
+      r.answers.push({cardId:card.id, prev:prevGrade, next, ms:duration});
+      if(r.index < r.queue.length-1){
+        r.index+=1; r.flipped=false; r.cardStart=Date.now();
+        saveData(); renderReview();
+      }else{
+        r.end=Date.now(); saveData(); goRecap();
       }
     }
 
-
-    function getLiveGradeCounts(chap) {
-      const counts = {
-        unseen: 0,
-        echec: 0,
-        difficile: 0,
-        bien: 0,
-        facile: 0
-      };
-      (chap.cards || []).forEach(c => {
-        const g = c.grade || 'unseen';
-        if (counts[g] != null) counts[g] += 1;
-        else counts.unseen += 1;
-      });
-      return counts;
+    // ---------- Helpers chapitres/stats ----------
+    function getChapter(id){return data.chapters.find(c=>c.id===id);}
+    function getCardSides(card,chap){
+      return chap?.settings?.langSwap ? {frontText:card.back, backText:card.front} : {frontText:card.front, backText:card.back};
     }
-
-
-
-    function syncGradeCounts(chap) {
-      chap.stats = chap.stats || {};
-      chap.stats.gradeCounts = getLiveGradeCounts(chap);
+    function getLiveGradeCounts(chap){
+      const c={unseen:0,echec:0,difficile:0,bien:0,facile:0};
+      (chap.cards||[]).forEach(x=>{const g=x.grade||'unseen'; c[g]!=null ? c[g]++ : c.unseen++;});
+      return c;
     }
-    // ------------------ Helpers Chapitre/Stats ------------------
-    function getChapter(id) {
-      return data.chapters.find(c => c.id === id);
-    }
+    function syncGradeCounts(chap){chap.stats=chap.stats||{}; chap.stats.gradeCounts=getLiveGradeCounts(chap);}
 
-    function getCardSides(card, chap) {
-      if (chap?.settings?.langSwap) {
-        return {
-          frontText: card.back,
-          backText: card.front
-        }; // EN→FR
-      }
-      return {
-        frontText: card.front,
-        backText: card.back
-      }; // FR→EN (par défaut)
-    }
-
-    function labelForGrade(g) {
-      return ({
-        unseen: 'Non vu',
-        echec: 'Échec',
-        difficile: 'Difficile',
-        bien: 'Bien',
-        facile: 'Facile'
-      })[g] || g;
-    }
-
-    function getTodayCount(chap) {
-      const tk = todayKey();
-      return chap.stats.dailyReviews[tk] || 0;
-    }
-
-    function getTodayChange(chap) {
-      const tk = todayKey();
-      const x = chap.stats.dailyChanges[tk] || {
-        changed: 0,
-        total: 0
-      };
-      return x;
-    }
-
-    function get7DayAverage(chap) {
-      const days = [];
-      const base = new Date();
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        const key = `${y}-${m}-${dd}`;
-        days.push(chap.stats.dailyReviews[key] || 0);
-      }
+    function getTodayCount(chap){return chap.stats.dailyReviews[todayKey()]||0;}
+    function getTodayChange(chap){return chap.stats.dailyChanges[todayKey()]||{changed:0,total:0};}
+    function get7DayAverage(chap){
+      const base=new Date(); const days=[];
+      for(let i=6;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); days.push(chap.stats.dailyReviews[dateKey(d)]||0);}
       return Math.round(avg(days));
     }
-
-    function getWeekCount(chap) {
-      // Somme des 7 derniers jours (aujourd'hui inclus)
-      const base = new Date();
-      let sum = 0;
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        const key = `${y}-${m}-${dd}`;
-        sum += (chap.stats.dailyReviews[key] || 0);
-      }
+    function getWeekCount(chap){
+      const base=new Date(); let sum=0;
+      for(let i=0;i<7;i++){const d=new Date(base); d.setDate(base.getDate()-i); sum+=(chap.stats.dailyReviews[dateKey(d)]||0);}
       return sum;
     }
-
-    function getSuccessRate(chap) {
-      const gc = chap.stats.gradeCounts || {};
-      const good = (gc.bien || 0) + (gc.facile || 0);
-      const attempt = good + (gc.echec || 0) + (gc.difficile || 0);
-      if (attempt === 0) return 0;
-      return Math.round((good / attempt) * 100);
+    function getSuccessRate(chap){
+      const gc=chap.stats.gradeCounts||{};
+      const good=(gc.bien||0)+(gc.facile||0);
+      const attempt=good+(gc.echec||0)+(gc.difficile||0);
+      return attempt===0?0:Math.round((good/attempt)*100);
     }
-
-    function get7DayAvgMs(chap) {
-      if (!chap.stats.dailyDurMs || !chap.stats.dailyDurCount) return 0;
-      const base = new Date();
-      let sum = 0,
-        cnt = 0;
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        const key = `${y}-${m}-${dd}`;
-        const s = chap.stats.dailyDurMs[key] || 0;
-        const c = chap.stats.dailyDurCount[key] || 0;
-        sum += s;
-        cnt += c;
+    function get7DayAvgMs(chap){
+      if(!chap.stats.dailyDurMs||!chap.stats.dailyDurCount) return 0;
+      const base=new Date(); let sum=0,cnt=0;
+      for(let i=0;i<7;i++){
+        const d=new Date(base); d.setDate(base.getDate()-i);
+        const k=dateKey(d); sum+=(chap.stats.dailyDurMs[k]||0); cnt+=(chap.stats.dailyDurCount[k]||0);
       }
-      return cnt ? Math.round(sum / cnt) : 0;
+      return cnt?Math.round(sum/cnt):0;
     }
-
-    function activeGradesLabel(sel) {
-      const keys = Object.keys(sel || {}).filter(k => sel[k]);
-      if (keys.length === 0) return 'Aucun';
-      if (keys.length === 5) return 'Tous';
-      const map = {
-        unseen: 'Jamais',
-        echec: 'Échec',
-        difficile: 'Difficile',
-        bien: 'Bien',
-        facile: 'Facile'
-      };
-      return keys.map(k => map[k] || k).join(' + ');
-    }
-
-
-    function countAvailable(chap) {
-      const sel = chap.filters.grades;
-      return chap.cards.filter(c => sel[(c.grade || 'unseen')]).length;
-    }
-
-    function getDueNow(chap) {
-      const now = Date.now();
-      return chap.cards.filter(c => c.dueAt && c.dueAt > 0 && c.dueAt <= now).length;
-    }
-
-    function getStreakDays(chap) {
-      // Nombre de jours consécutifs (en remontant) avec au moins 1 révision/jour
-      const base = new Date();
-      let streak = 0;
-      for (let i = 0; i < 365; i++) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        const n = chap.stats.dailyReviews[key] || 0;
-        if (n > 0) streak++;
-        else break;
-      }
+    function countAvailable(chap){const sel=chap.filters.grades; return chap.cards.filter(c=>sel[(c.grade||'unseen')]).length;}
+    function getDueNow(chap){const now=Date.now(); return chap.cards.filter(c=>c.dueAt && c.dueAt>0 && c.dueAt<=now).length;}
+    function getStreakDays(chap){
+      const base=new Date(); let streak=0;
+      for(let i=0;i<365;i++){const d=new Date(base); d.setDate(base.getDate()-i); const n=chap.stats.dailyReviews[dateKey(d)]||0; if(n>0) streak++; else break;}
       return streak;
     }
 
-    function getLast7DaysArray(chap) {
-      const arr = [];
-      const base = new Date();
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        arr.push(chap.stats.dailyReviews[key] || 0);
-      }
+    function getLastNDaysArray(chap,n){
+      const arr=[]; const base=new Date();
+      for(let i=n-1;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); arr.push(chap.stats.dailyReviews[dateKey(d)]||0);}
       return arr;
     }
-
-    function getLast7DaysLabelsFR() {
-      const arr = [];
-      const base = new Date();
-      const jours = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(base);
-        d.setDate(base.getDate() - i);
-        arr.push(jours[d.getDay()]);
-      }
-      return arr;
+    function getLastNDaysLabelsFR(n){
+      const noms=[]; const base=new Date(); const J=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      for(let i=n-1;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); noms.push(J[d.getDay()]);}
+      return noms;
     }
 
+    function dayKeyFromIndex(n, index) {
+      const base = new Date();
+      const offset = (n - 1) - index; // ex: n=7, index 0 => offset 6 jours
+      const d = new Date(base);
+      d.setHours(0,0,0,0);
+      d.setDate(base.getDate() - offset);
+      return dateKey(d);
+    }
+
+    function openDayFromBarClick(evt, canvasId, chapId, n=7) {
+      const hit = Bar7Hit[canvasId];
+      if (!hit) return;
+      const rect = evt.target.getBoundingClientRect();
+      const xCSS = (evt.clientX - rect.left) * (hit.cssW / rect.width);
+      const i = hit.bars.findIndex(b => xCSS >= b.x && xCSS <= b.x + b.w);
+      if (i < 0) return;
+      const key = dayKeyFromIndex(n, i);
+      goDaily(chapId, key);
+    }
+
+    // ---------- Bar chart ----------
     function drawBars7(canvasId, values) {
       const el = document.getElementById(canvasId);
       if (!el) return;
       const ctx = el.getContext('2d');
 
-      // DPR + taille CSS réelle
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       const cssW = Math.round(el.clientWidth || el.getBoundingClientRect().width || 220);
       const cssH = Math.round(parseFloat(getComputedStyle(el).height) || el.height || 60);
@@ -3513,9 +2062,7 @@ body {
       ctx.clearRect(0, 0, el.width, el.height);
       ctx.scale(dpr, dpr);
 
-      const w = cssW,
-        h = cssH;
-
+      const w = cssW, h = cssH;
       const max = Math.max(1, ...values);
       const n = values.length;
       const gap = 6;
@@ -3525,13 +2072,11 @@ body {
       const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#6366f1';
       const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#0f172a';
 
-      // Police plus petite et bande texte en bas
       const fontPx = Math.max(9, Math.min(10, Math.floor(barW * 0.7)));
-      const textPad = fontPx + 4; // bande réservée pour les chiffres
-      const baseY = h - textPad - 2; // ligne de base des barres (au-dessus des chiffres)
-      const minH = 3; // petite barre min
+      const textPad = fontPx + 4;
+      const baseY = h - textPad - 2;
+      const minH = 3;
 
-      // Ligne de base (au-dessus des chiffres)
       ctx.strokeStyle = 'rgba(148,163,184,0.35)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -3539,258 +2084,153 @@ body {
       ctx.lineTo(w, baseY + 0.5);
       ctx.stroke();
 
-      // Paramètres texte (en bas)
       ctx.font = `bold ${fontPx}px ui-sans-serif, system-ui`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'top'; // on écrit depuis le haut de la bande
+      ctx.textBaseline = 'top';
 
       let x = 0;
+      const bars = [];
       values.forEach(v => {
         const bhRaw = Math.round((v / max) * (h - textPad - 8));
         const bh = Math.max(minH, bhRaw);
         const y = baseY - bh;
 
-        // Barre
         ctx.fillStyle = primary;
         ctx.globalAlpha = 0.95;
         ctx.fillRect(x, y, barW, bh);
         ctx.globalAlpha = 1;
 
-        // Nombre en bas du diagramme (dans la bande réservée)
         ctx.fillStyle = textColor;
         ctx.fillText(String(v), x + barW / 2, baseY + 2);
 
-        // ombre subtile au pied des barres
         ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.fillRect(x, baseY, barW, 2);
 
+        bars.push({ x, w: barW });
         x += barW + gap;
       });
+
+      Bar7Hit[canvasId] = { cssW: w, cssH: h, bars };
     }
-    // ------------------ Diagramme donut ------------------
-    function drawGradeChart(canvasId, counts, activeKeys = null) {
-      const el = document.getElementById(canvasId);
-      if (!el) return;
-      const ctx = el.getContext('2d');
-      const w = el.width,
-        h = el.height;
-      ctx.clearRect(0, 0, w, h);
 
-      const centerX = w / 2,
-        centerY = h / 2;
-      const outerR = Math.min(w, h) / 2 - 6;
-      const innerR = outerR * 0.65;
 
-      const segments = [{
-        key: 'unseen',
-        color: '#9ca3af'
-      }, {
-        key: 'echec',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--red').trim()
-      }, {
-        key: 'difficile',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--amber').trim()
-      }, {
-        key: 'bien',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()
-      }, {
-        key: 'facile',
-        color: getComputedStyle(document.documentElement).getPropertyValue('--green').trim()
-      }];
-      const total = segments.reduce((s, seg) => s + (counts[seg.key] || 0), 0);
+    // ---------- Donut ----------
+    function drawGradeChart(canvasId,counts,activeKeys=null){
+      const el=document.getElementById(canvasId); if(!el) return;
+      const ctx=el.getContext('2d'); const w=el.width,h=el.height;
+      ctx.clearRect(0,0,w,h);
+      const cx=w/2, cy=h/2; const outerR=Math.min(w,h)/2-6; const innerR=outerR*0.65;
 
-      const arcs = [];
-      if (total === 0) {
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
-        ctx.arc(centerX, centerY, innerR, 0, Math.PI * 2, true);
-        ctx.fillStyle = '#cbd5e1';
-        ctx.globalAlpha = 0.25;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#475569';
-        ctx.font = 'bold 12px ui-sans-serif, system-ui';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('Aucune donnée', centerX, centerY);
-        ChartHit[canvasId] = {
-          cx: centerX,
-          cy: centerY,
-          innerR,
-          outerR,
-          arcs: []
-        };
-        return;
+      const css=getComputedStyle(document.documentElement);
+      const segments=[
+        {key:'unseen',color:'#9ca3af'},
+        {key:'echec',color:css.getPropertyValue('--red').trim()},
+        {key:'difficile',color:css.getPropertyValue('--amber').trim()},
+        {key:'bien',color:css.getPropertyValue('--blue').trim()},
+        {key:'facile',color:css.getPropertyValue('--green').trim()},
+      ];
+      const total=segments.reduce((s,seg)=>s+(counts[seg.key]||0),0);
+      const arcs=[];
+      if(total===0){
+        ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2); ctx.arc(cx,cy,innerR,0,Math.PI*2,true);
+        ctx.fillStyle='#cbd5e1'; ctx.globalAlpha=.25; ctx.fill(); ctx.globalAlpha=1;
+        ctx.fillStyle='#64748b'; ctx.font='bold 12px ui-sans-serif, system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('Aucune donnée',cx,cy);
+        ChartHit[canvasId]={cx,cy,innerR,outerR,arcs:[]}; return;
       }
+      let start=-Math.PI/2;
+      segments.forEach(seg=>{
+        const val=counts[seg.key]||0; if(val<=0) return;
+        const a=(val/total)*Math.PI*2; const end=start+a;
+        const active=!activeKeys || !!activeKeys[seg.key];
 
-      let startAngle = -Math.PI / 2;
-      segments.forEach(seg => {
-        const value = counts[seg.key] || 0;
-        if (value <= 0) return;
-        const angle = (value / total) * Math.PI * 2;
-        const endAngle = startAngle + angle;
+        ctx.beginPath(); ctx.arc(cx,cy,outerR,start,end); ctx.arc(cx,cy,innerR,end,start,true);
+        ctx.fillStyle=seg.color; ctx.globalAlpha=active?0.9:0.22; ctx.fill(); ctx.globalAlpha=1;
 
-        const isActive = !activeKeys || !!activeKeys[seg.key];
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, outerR, startAngle, endAngle);
-        ctx.arc(centerX, centerY, innerR, endAngle, startAngle, true);
-        ctx.fillStyle = seg.color;
-        ctx.globalAlpha = isActive ? 0.9 : 0.22;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        arcs.push({
-          key: seg.key,
-          start: startAngle,
-          end: endAngle
-        });
-        startAngle = endAngle;
+        arcs.push({key:seg.key,start,end}); start=end;
       });
 
-      // Centre label
-      ctx.fillStyle = '#0ea5e9';
-      ctx.font = 'bold 18px ui-sans-serif, system-ui';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(total.toString(), centerX, centerY - 4);
-      ctx.fillStyle = '#64748b';
-      ctx.font = '10px ui-sans-serif, system-ui';
-      ctx.fillText('cartes', centerX, centerY + 10);
+      ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px ui-sans-serif, system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(String(total),cx,cy-4);
+      ctx.fillStyle='#64748b'; ctx.font='10px ui-sans-serif, system-ui'; ctx.fillText('cartes',cx,cy+10);
 
-      // Hitmap pour clic
-      ChartHit[canvasId] = {
-        cx: centerX,
-        cy: centerY,
-        innerR,
-        outerR,
-        arcs
-      };
+      ChartHit[canvasId]={cx,cy,innerR,outerR,arcs};
     }
 
-    function toggleFilterKey(chap, key) {
-      const sel = chap.filters.grades;
-      const total = Object.keys(sel).length;
-      const active = Object.keys(sel).filter(k => sel[k]);
-      const isSelected = !!sel[key];
-
-      if (active.length === total) {
-        Object.keys(sel).forEach(k => sel[k] = false);
-        sel[key] = true;
-      } else if (active.length === 1 && isSelected) {
-        sel[key] = true;
-      } else {
-        sel[key] = !isSelected;
-        if (Object.keys(sel).filter(k => sel[k]).length === 0) {
-          sel[key] = true;
-        }
+    function toggleFilterKey(chap,key){
+      const sel=chap.filters.grades; const total=Object.keys(sel).length; const active=Object.keys(sel).filter(k=>sel[k]); const isSelected=!!sel[key];
+      if(active.length===total){Object.keys(sel).forEach(k=>sel[k]=false); sel[key]=true;}
+      else if(active.length===1 && isSelected){sel[key]=true;}
+      else{
+        sel[key]=!isSelected;
+        if(Object.keys(sel).filter(k=>sel[k]).length===0){sel[key]=true;}
       }
     }
-
-    function handleChartClick(evt, canvasId, chap, countsRef) {
-      const map = ChartHit[canvasId];
-      if (!map || !map.arcs || map.arcs.length === 0) return;
-
-      const rect = evt.target.getBoundingClientRect();
-      const scaleX = evt.target.width / rect.width;
-      const scaleY = evt.target.height / rect.height;
-      const x = (evt.clientX - rect.left) * scaleX;
-      const y = (evt.clientY - rect.top) * scaleY;
-
-      const dx = x - map.cx;
-      const dy = y - map.cy;
-      const r = Math.hypot(dx, dy);
-      if (r < map.innerR || r > map.outerR) return;
-
-      let a = Math.atan2(dy, dx);
-      while (a < -Math.PI / 2) a += 2 * Math.PI;
-      while (a > 3 * Math.PI / 2) a -= 2 * Math.PI;
-
-      const hit = map.arcs.find(s => a >= s.start && a <= s.end);
-      if (!hit) return;
-
-      toggleFilterKey(chap, hit.key);
-      saveData();
-      renderChapter(chap.id);
+    function handleChartClick(evt,canvasId,chap){
+      const map=ChartHit[canvasId]; if(!map||!map.arcs.length) return;
+      const rect=evt.target.getBoundingClientRect(); const scaleX=evt.target.width/rect.width; const scaleY=evt.target.height/rect.height;
+      const x=(evt.clientX-rect.left)*scaleX; const y=(evt.clientY-rect.top)*scaleY;
+      const dx=x-map.cx, dy=y-map.cy; const r=Math.hypot(dx,dy); if(r<map.innerR||r>map.outerR) return;
+      let a=Math.atan2(dy,dx); while(a<-Math.PI/2) a+=2*Math.PI; while(a>3*Math.PI/2) a-=2*Math.PI;
+      const hit=map.arcs.find(s=>a>=s.start && a<=s.end); if(!hit) return;
+      toggleFilterKey(chap,hit.key); saveData(); renderChapter(chap.id);
     }
+    function handleLegendClick(key,chap){toggleFilterKey(chap,key); saveData(); renderChapter(chap.id);}
 
-    function handleLegendClick(key, chap) {
-      toggleFilterKey(chap, key);
-      saveData();
-      renderChapter(chap.id);
-    }
-
-    function applyTheme() {
-      const theme = (data?.app?.theme) || 'dark';
-      document.documentElement.setAttribute('data-theme', theme);
-    }
-
-    function applyUI() {
-      const p = data.app.prefs || {};
-      // Tailles de police
-      document.documentElement.style.setProperty('--fs-term', (p.fsTerm || 20) + 'px');
-      document.documentElement.style.setProperty('--fs-def', (p.fsDef || 24) + 'px');
-      // Arrondis
-      document.documentElement.style.setProperty('--radius-md', (p.radius || 14) + 'px');
-      // Accent (met à jour --primary)
-      const palette = {
-        indigo: ['#6366f1', '#5457e6'],
-        blue: ['#3b82f6', '#2563eb'],
-        teal: ['#14b8a6', '#0d9488'],
-        emerald: ['#10b981', '#059669'],
-        rose: ['#f43f5e', '#e11d48'],
-        amber: ['#f59e0b', '#d97706'],
-        violet: ['#8b5cf6', '#7c3aed']
+    // ---------- Thème / UI ----------
+    function applyTheme(){document.documentElement.setAttribute('data-theme', (data?.app?.theme)||'dark');}
+    function applyUI(){
+      const p=data.app.prefs||{};
+      document.documentElement.style.setProperty('--fs-term',(p.fsTerm||20)+'px');
+      document.documentElement.style.setProperty('--fs-def',(p.fsDef||24)+'px');
+      document.documentElement.style.setProperty('--radius-md',(p.radius||14)+'px');
+      const palette={
+        indigo:['#6366f1','#5457e6'], blue:['#3b82f6','#2563eb'], teal:['#14b8a6','#0d9488'],
+        emerald:['#10b981','#059669'], rose:['#f43f5e','#e11d48'], amber:['#f59e0b','#d97706'], violet:['#8b5cf6','#7c3aed']
       };
-      const acc = palette[p.accent] || palette.indigo;
-      document.documentElement.style.setProperty('--primary', acc[0]);
-      document.documentElement.style.setProperty('--primary-600', acc[1]);
+      const acc=palette[p.accent]||palette.indigo;
+      document.documentElement.style.setProperty('--primary',acc[0]);
+      document.documentElement.style.setProperty('--primary-600',acc[1]);
     }
 
-    // Mise à jour des données
-    function upgradeData() {
-      data.app = data.app || {};
-      if (!('theme' in data.app)) data.app.theme = 'dark';
-      data.app.prefs = data.app.prefs || {};
-      // Préférences UI par défaut
-      if (typeof data.app.prefs.fsTerm !== 'number') data.app.prefs.fsTerm = 22; // px
-      if (typeof data.app.prefs.fsDef !== 'number') data.app.prefs.fsDef = 24; // px
-      if (!data.app.prefs.accent) data.app.prefs.accent = 'indigo'; // palette
-      if (typeof data.app.prefs.showEmoji !== 'boolean') data.app.prefs.showEmoji = true;
+    function upgradeData(){
+      data.app=data.app||{}; if(!('theme' in data.app)) data.app.theme='dark';
+      data.app.prefs=data.app.prefs||{};
+      if(typeof data.app.prefs.fsTerm!=='number') data.app.prefs.fsTerm=22;
+      if(typeof data.app.prefs.fsDef!=='number') data.app.prefs.fsDef=24;
+      if(!data.app.prefs.accent) data.app.prefs.accent='indigo';
+      if(typeof data.app.prefs.showEmoji!=='boolean') data.app.prefs.showEmoji=true;
+      if(typeof data.app.prefs.radius!=='number') data.app.prefs.radius=14;
 
-      data.chapters.forEach(ch => {
-        ch.settings = ch.settings || {};
-        if (typeof ch.settings.langSwap !== 'boolean') ch.settings.langSwap = false; // false = FR→EN (par défaut)
-        ch.cards.forEach(c => {
-          if (typeof c.perfEma !== 'number') c.perfEma = 0.5; // moyenne mobile exp des notes (0..1)
-          if (typeof c.ef !== 'number') c.ef = 2.5; // E‑Factor (SM‑2), min 1.3
-          if (typeof c.intervalDays !== 'number') c.intervalDays = 0; // intervalle en jours
-          if (typeof c.dueAt !== 'number') c.dueAt = 0; // timestamp prochain passage
-          if (typeof c.streak !== 'number') c.streak = 0; // série (+ succès / - échecs), bornée
-          if (typeof c.successes !== 'number') c.successes = 0;
-          if (typeof c.failures !== 'number') c.failures = 0;
+      data.chapters.forEach(ch=>{
+        ch.settings=ch.settings||{};
+        if(typeof ch.settings.langSwap!=='boolean') ch.settings.langSwap=false;
+        if (!ch.stats.dailyLog) ch.stats.dailyLog = {};
+        ch.cards.forEach(c=>{
+          if(typeof c.perfEma!=='number') c.perfEma=0.5;
+          if(typeof c.ef!=='number') c.ef=2.5;
+          if(typeof c.intervalDays!=='number') c.intervalDays=0;
+          if(typeof c.dueAt!=='number') c.dueAt=0;
+          if(typeof c.streak!=='number') c.streak=0;
+          if(typeof c.successes!=='number') c.successes=0;
+          if(typeof c.failures!=='number') c.failures=0;
         });
         syncGradeCounts(ch);
       });
       saveData();
     }
-    // ------------------ Paramètres (placeholder) ------------------
-    function openSettings(chapterId, push = true) {
-      if (!chapterId) chapterId = State.chapterId; // fallback sûr
-      const chap = getChapter(chapterId);
-      if (!chap) return;
 
-      if (push) Nav.push();
-      const v = $('#view');
-      State.view = 'settings';
-      setTopbar({
-        title: `${chap.title} • Paramètres`
-      });
-      setBottomVisibility({
-        actions: false,
-        revision: false
-      });
+    // ---------- Paramètres ----------
+    function openSettings(chapterId,push=true){
+      if(!chapterId) chapterId=State.chapterId;
+      const chap=getChapter(chapterId); if(!chap) return;
+
+      if(push) Nav.push();
+      const v=$('#view'); State.view='settings';
+      setTopbar({title:`${chap.title} • Paramètres`});
+      setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
+
       v.innerHTML = `
         <div class="settings-page scroll-y" style="flex:1; min-height:0;">
           <div>
@@ -3800,37 +2240,35 @@ body {
 
           <div class="settings-section">
             <div class="section-title">Apparence</div>
-            <div class="mt6 muted" style="font-size:13px">
-              • Thème: <b id="themeLbl">${data.app.theme==='light'?'Clair':'Sombre'}</b>
-            </div>
+            <div class="mt6 muted" style="font-size:13px">• Thème: <b id="themeLbl">${data.app.theme==='light'?'Clair':'Sombre'}</b></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap">
               <button class="btn" id="toggleTheme">Basculer Clair/Sombre</button>
             </div>
-
             <div class="mt6 muted" style="font-size:13px">Couleur d’accent</div>
             <div class="swatches" id="accentSwatches">
-              <button class="swatch" data-accent="indigo" style="--sw:#6366f1"></button>
-              <button class="swatch" data-accent="blue" style="--sw:#3b82f6"></button>
-              <button class="swatch" data-accent="teal" style="--sw:#14b8a6"></button>
-              <button class="swatch" data-accent="emerald" style="--sw:#10b981"></button>
-              <button class="swatch" data-accent="rose" style="--sw:#f43f5e"></button>
-              <button class="swatch" data-accent="amber" style="--sw:#f59e0b"></button>
-              <button class="swatch" data-accent="violet" style="--sw:#8b5cf6"></button>
+              <button class="swatch" data-accent="indigo" style="--sw:#6366f1" aria-label="Indigo"></button>
+              <button class="swatch" data-accent="blue" style="--sw:#3b82f6" aria-label="Bleu"></button>
+              <button class="swatch" data-accent="teal" style="--sw:#14b8a6" aria-label="Teal"></button>
+              <button class="swatch" data-accent="emerald" style="--sw:#10b981" aria-label="Émeraude"></button>
+              <button class="swatch" data-accent="rose" style="--sw:#f43f5e" aria-label="Rose"></button>
+              <button class="swatch" data-accent="amber" style="--sw:#f59e0b" aria-label="Ambre"></button>
+              <button class="swatch" data-accent="violet" style="--sw:#8b5cf6" aria-label="Violet"></button>
             </div>
           </div>
 
           <div class="settings-section">
             <div class="section-title">Langues</div>
-            <div class="mt6 muted" style="font-size:13px">Recto → Verso: <b id="langOrderLbl">${chap.settings.langSwap ? 'EN → FR' : 'FR → EN'}</b></div>
+            <div class="mt6 muted" style="font-size:13px">Recto → Verso: <b id="langOrderLbl">${chap.settings.langSwap?'EN → FR':'FR → EN'}</b></div>
             <button class="btn" id="toggleLangSwap">Basculer FR ↔ EN</button>
           </div>
-          
+
           <div class="settings-section">
             <div class="section-title">Typographie</div>
-            <div class="card" id="typoPreview" style="margin-bottom:8px; padding:10px">
+            <div class="card" id="typoPreview" style="margin-bottom:8px; padding:10px; position:relative;">
               <div class="term">Exemple recto (Front)</div>
               <div class="definition" style="margin-top:6px">Exemple verso (Back)</div>
-              <div class="muted" style="font-size:12px; margin-top:6px">Ajustez via les roues ci‑dessous.</div>
+              <div class="muted" style="font-size:12px; margin-top:6px">Glissez ↑↓ pour ajuster via les roues ou directement ici.</div>
+              <div id="typoToast" class="size-toast"></div>
             </div>
             <div class="wheel" id="wheelFsTerm"><div class="name">Recto (Front)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
             <div class="wheel mt6" id="wheelFsDef"><div class="name">Verso (Back)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
@@ -3844,533 +2282,284 @@ body {
 
           <div class="settings-section">
             <div class="section-title">Réinitialiser</div>
-            <div class="mt6 muted" style="font-size:13px">
-              Remettre à zéro la progression (grades, stats, temps) du chapitre courant ou de toute l’application.
-            </div>
+            <div class="mt6 muted" style="font-size:13px">Remettre à zéro la progression (grades, stats, temps).</div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px">
               <button class="btn" id="resetChapterBtn">Reset chapitre</button>
-              <button class="btn red" id="resetAllBtn">Reset application</button>
+              <button class="btn btn--solid btn--red" id="resetAllBtn">Reset application</button>
             </div>
           </div>
         </div>
       `;
 
-      const P = data.app.prefs;
+      const P=data.app.prefs;
 
-      const refreshTheme = () => {
-        const theme = data.app.theme === 'light' ? 'Clair' : 'Sombre';
-        $('#themeLbl').textContent = theme;
-      };
+      const refreshTheme=()=>{$('#themeLbl').textContent=data.app.theme==='light'?'Clair':'Sombre';};
+      const refreshLang=()=>{$('#langOrderLbl').textContent=chap.settings.langSwap?'EN → FR':'FR → EN';};
 
-      const refreshLang = () => {
-        const lbl = document.getElementById('langOrderLbl');
-        if (lbl) lbl.textContent = chap.settings.langSwap ? 'EN → FR' : 'FR → EN';
-      };
-      refreshLang();
+      $('#toggleLangSwap').onclick=()=>{chap.settings.langSwap=!chap.settings.langSwap; saveData(); refreshLang(); renderByState(false);};
+      $('#toggleTheme').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light'; saveData(); applyTheme(); refreshTheme();};
 
-      $('#toggleLangSwap').onclick = () => {
-        chap.settings.langSwap = !chap.settings.langSwap;
-        saveData();
-        refreshLang();
-        // Re-rendre la vue courante pour voir l’effet immédiatement si besoin
-        renderByState(false);
-      };
-
-      $('#toggleTheme').onclick = () => {
-        data.app.theme = data.app.theme === 'light' ? 'dark' : 'light';
-        saveData();
-        applyTheme();
-        refreshTheme();
-      };
-
-      const activeAccent = data.app.prefs.accent || 'indigo';
-      $$('#accentSwatches .swatch').forEach(sw => {
-        const key = sw.getAttribute('data-accent');
-        if (key === activeAccent) sw.classList.add('is-active');
-        sw.onclick = () => {
-          data.app.prefs.accent = key;
-          saveData();
-          applyUI(); // refresh visuel
-          $$('#accentSwatches .swatch').forEach(x => x.classList.toggle('is-active', x.getAttribute('data-accent') === key));
-        };
+      const activeAccent=data.app.prefs.accent||'indigo';
+      $$('#accentSwatches .swatch').forEach(sw=>{
+        const key=sw.getAttribute('data-accent');
+        sw.classList.toggle('is-active', key===activeAccent);
+        sw.onclick=()=>{data.app.prefs.accent=key; saveData(); applyUI(); $$('#accentSwatches .swatch').forEach(x=>x.classList.toggle('is-active', x.getAttribute('data-accent')===key));};
       });
 
-      bindWheel($('#wheelFsTerm'), {
-        get: () => P.fsTerm,
-        set: (v) => {
-          P.fsTerm = v
-        },
-        min: 12,
-        max: 44,
-        step: 1,
-        unit: 'px'
-      });
-      bindWheel($('#wheelFsDef'), {
-        get: () => P.fsDef,
-        set: (v) => {
-          P.fsDef = v
-        },
-        min: 14,
-        max: 52,
-        step: 1,
-        unit: 'px'
-      });
+      bindWheel($('#wheelFsTerm'),{get:()=>P.fsTerm, set:v=>{P.fsTerm=v}, min:12,max:60,step:1,unit:'px'});
+      bindWheel($('#wheelFsDef'),{get:()=>P.fsDef, set:v=>{P.fsDef=v}, min:14,max:72,step:1,unit:'px'});
+      bindWheel($('#wheelSession'),{get:()=>chap.settings.sessionSize,set:v=>{chap.settings.sessionSize=v}, min:5,max:200,step:5,unit:' cartes'});
+      bindWheel($('#wheelGoal'),{get:()=>chap.settings.dailyGoal,set:v=>{chap.settings.dailyGoal=v}, min:5,max:500,step:5,unit:' cartes'});
 
-      bindWheel($('#wheelSession'), {
-        get: () => chap.settings.sessionSize,
-        set: (v) => {
-          chap.settings.sessionSize = v
-        },
-        min: 5,
-        max: 200,
-        step: 5,
-        unit: ' cartes'
-      });
-      bindWheel($('#wheelGoal'), {
-        get: () => chap.settings.dailyGoal,
-        set: (v) => {
-          chap.settings.dailyGoal = v
-        },
-        min: 5,
-        max: 500,
-        step: 5,
-        unit: ' cartes'
-      });
-
-      $('#resetChapterBtn').onclick = () => {
-        if (!confirm('Réinitialiser la progression de ce chapitre ?')) return;
-        resetChapter(chap.id);
-        saveData();
-        // rafraîchit la vue de paramètres (et stats à la prochaine ouverture)
-        openSettings(chapterId, false);
+      $('#resetChapterBtn').onclick=()=>{
+        if(!confirm('Réinitialiser la progression de ce chapitre ?')) return;
+        resetChapter(chap.id); saveData(); openSettings(chapterId,false);
       };
-
-      $('#resetAllBtn').onclick = resetAll;
+      $('#resetAllBtn').onclick=resetAll;
 
       bindTypoPreviewDrag();
     }
 
-    function syncFromRawFlashcards() {
-      if (!Array.isArray(flashcardData) || flashcardData.length === 0) return;
-      const byTitle = {};
-      data.chapters.forEach(ch => byTitle[ch.title] = ch);
+    /**
+     * Réconcilie le stockage avec le voc "source de vérité".
+     * - Aligne la liste de chapitres (noms) et la taille (nb de cartes) sur le voc.
+     * - Conserve la progression quand possible (match des cartes par rowId numérique).
+     * - Supprime ce qui n'existe plus dans le voc, ajoute ce qui manque.
+     */
+    function reconcileWithCanonical() {
+      // 1) Canonique depuis le code
+      const canonChapters = buildChaptersFromFlashcards(flashcardData).chapters;
 
-      // Index des cartes existantes par id pour chaque chapitre
-      const ensureChapter = (title) => {
-        if (byTitle[title]) return byTitle[title];
-        // Créer un nouveau chapitre
-        const id = 'chap-' + slugify(title);
-        const newChap = {
-          id,
-          title,
-          description: emojiFor(title) ? `${emojiFor(title)} ${title}` : title,
-          settings: {
-            sessionSize: 10,
-            dailyGoal: 10,
-            reviewOrder: 'front-first'
-          },
+      const oldChapters = Array.isArray(data.chapters) ? data.chapters : [];
+      const prevSelId = data?.app?.currentChapterId || null;
+      const prevSelTitle = oldChapters.find(ch => ch.id === prevSelId)?.title || null;
+
+      // Index global de toutes les cartes enregistrées par rowId (pour récupérer la progression même si un chapitre a été renommé)
+      const savedCardByRowId = new Map();
+      for (const ch of oldChapters) {
+        for (const c of (ch.cards || [])) {
+          const rid = extractRowId(c.id);
+          if (rid != null && !savedCardByRowId.has(rid)) savedCardByRowId.set(rid, c);
+        }
+      }
+
+      const PROG_KEYS = [
+        'grade','timesReviewed','lastReviewed','lastMs','avgMs',
+        'perfEma','ef','intervalDays','dueAt','streak','successes','failures'
+      ];
+
+      // 2) Recrée la liste des chapitres à partir du canonique en réinjectant la progression
+      const newChapters = canonChapters.map(cCh => {
+        const sCh = oldChapters.find(x => x.title === cCh.title) || null;
+
+        const merged = {
+          id: cCh.id,
+          title: cCh.title,
+          description: cCh.description, // garde la desc (avec emoji éventuel)
+          settings: { ...cCh.settings, ...(sCh?.settings || {}) }, // on garde tes réglages
           filters: {
-            grades: {
-              unseen: true,
-              echec: true,
-              difficile: true,
-              bien: true,
-              facile: true
-            }
+            grades: { ...cCh.filters.grades, ...(sCh?.filters?.grades || {}) }
           },
-          stats: {
-            gradeCounts: {
-              unseen: 0,
-              echec: 0,
-              difficile: 0,
-              bien: 0,
-              facile: 0
-            },
-            totalReviews: 0,
-            dailyReviews: {},
-            dailyChanges: {},
-            dailyDurMs: {},
-            dailyDurCount: {}
-          },
+          // On garde l'historique jour (si présent), puis on recalcule gradeCounts après
+          stats: sCh?.stats ? { ...sCh.stats } : { ...cCh.stats },
           cards: []
         };
-        data.chapters.push(newChap);
-        byTitle[title] = newChap;
-        return newChap;
-      };
 
-      let added = 0;
-      flashcardData.forEach(row => {
-        const title = row.chapter || 'Sans catégorie';
-        const ch = ensureChapter(title);
-        const cardId = `${slugify(title)}-${row.id}`;
-        if (!ch.cards.find(c => c.id === cardId)) {
-          ch.cards.push({
-            id: cardId,
-            front: row.front,
-            back: row.back,
-            grade: 'unseen',
-            timesReviewed: 0,
-            lastReviewed: 0,
-            lastMs: 0,
-            avgMs: 0,
-            perfEma: 0.5,
-            ef: 2.5,
-            intervalDays: 0,
-            dueAt: 0,
-            streak: 0,
-            successes: 0,
-            failures: 0
+        // Index des cartes sauvegardées par rowId pour ce chapitre (rapide)
+        const byRowId = new Map();
+        if (sCh) {
+          (sCh.cards || []).forEach(sc => {
+            const rid = extractRowId(sc.id);
+            if (rid != null) byRowId.set(rid, sc);
           });
-          added++;
         }
-      });
 
-      if (added > 0) {
-        data.chapters.forEach(ch => syncGradeCounts(ch));
-        // S’assurer que le chapitre courant est cohérent
-        if (!data.app.currentChapterId && data.chapters[0]) {
-          data.app.currentChapterId = data.chapters[0].id;
-        }
-        saveData();
-      }
-    }
-
-
-
-    function bindReviewSizeControls() {
-      const faces = document.querySelectorAll('.review-card [data-face]');
-      if (!faces || !faces.length) return;
-
-      const P = data.app.prefs || {};
-      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-      // applique immédiatement les variables CSS (live)
-      const applyVars = () => {
-        document.documentElement.style.setProperty('--fs-term', (P.fsTerm || 20) + 'px');
-        document.documentElement.style.setProperty('--fs-def', (P.fsDef || 24) + 'px');
-      };
-
-      faces.forEach(el => {
-        const face = el.getAttribute('data-face'); // 'front' | 'back'
-        let startY = null,
-          startVal = null;
-
-        const getVal = () => face === 'front' ? (P.fsTerm || 20) : (P.fsDef || 24);
-        const setVal = (v) => {
-          if (face === 'front') P.fsTerm = clamp(v, 12, 60);
-          else P.fsDef = clamp(v, 14, 72);
-          applyVars(); // mise à jour en direct
-        };
-        const commit = () => saveData();
-
-        // Pointer (mobile + desktop)
-        el.addEventListener('pointerdown', e => {
-          startY = e.clientY;
-          startVal = getVal();
-          el.setPointerCapture?.(e.pointerId); // ← correct (sans espace)
-          e.preventDefault();
-          e.stopPropagation();
-        });
-        el.addEventListener('pointermove', e => {
-          if (startY == null) return;
-          const dy = startY - e.clientY; // glisser vers le haut => augmente
-          const delta = Math.round(dy / 6); // 6px de déplacement => +1px
-          setVal(startVal + delta);
-          e.preventDefault();
-          e.stopPropagation();
-        });
-        const end = e => {
-          if (startY != null) commit();
-          startY = null;
-          startVal = null;
-          e.preventDefault();
-          e.stopPropagation();
-        };
-        el.addEventListener('pointerup', end);
-        el.addEventListener('pointercancel', end);
-
-        // Molette (desktop)
-        el.addEventListener('wheel', e => {
-          e.preventDefault();
-          const dir = e.deltaY > 0 ? -1 : 1;
-          setVal(getVal() + dir);
-          commit();
-        }, {
-          passive: false
-        });
-      });
-    }
-
-    function bindTypoPreviewDrag() {
-      const box = document.getElementById('typoPreview');
-      if (!box) return;
-      const termEl = box.querySelector('.term');
-      const defEl = box.querySelector('.definition');
-      const toast = document.getElementById('typoToast');
-      const P = data.app.prefs || {};
-      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-      let startY = null,
-        startTerm = null,
-        startDef = null,
-        target = 'both';
-
-      const showToast = (msg) => {
-        if (!toast) return;
-        toast.textContent = msg;
-        toast.style.display = 'block';
-      };
-      const hideToast = () => {
-        if (toast) toast.style.display = 'none';
-      };
-
-      const updateVars = () => {
-        document.documentElement.style.setProperty('--fs-term', (P.fsTerm || 20) + 'px');
-        document.documentElement.style.setProperty('--fs-def', (P.fsDef || 24) + 'px');
-      };
-
-      const start = (e) => {
-        const t = e.target.closest('.term, .definition, #typoPreview');
-        if (!t) return;
-        startY = (e.touches ? e.touches[0].clientY : e.clientY);
-        startTerm = P.fsTerm || 20;
-        startDef = P.fsDef || 24;
-        if (t.classList.contains('term')) target = 'term';
-        else if (t.classList.contains('definition')) target = 'def';
-        else target = 'both';
-        e.preventDefault();
-      };
-      const move = (e) => {
-        if (startY == null) return;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY);
-        const dy = startY - y; // haut => grand
-        const delta = Math.round(dy / 6);
-
-        if (target === 'term' || target === 'both') {
-          P.fsTerm = clamp(startTerm + delta, 12, 60);
-        }
-        if (target === 'def' || target === 'both') {
-          P.fsDef = clamp(startDef + delta, 14, 72);
-        }
-        updateVars(); // LIVE
-        showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`);
-      };
-      const end = () => {
-        if (startY != null) {
-          saveData();
-        }
-        startY = null;
-        startTerm = null;
-        startDef = null;
-        target = 'both';
-        setTimeout(hideToast, 200);
-      };
-
-      // Pointer/touch
-      box.addEventListener('pointerdown', start);
-      box.addEventListener('pointermove', move);
-      box.addEventListener('pointerup', end);
-      box.addEventListener('pointercancel', end);
-      box.addEventListener('touchstart', start, {
-        passive: false
-      });
-      box.addEventListener('touchmove', move, {
-        passive: false
-      });
-      box.addEventListener('touchend', end, {
-        passive: false
-      });
-
-      // Molette: term si sur term, def si sur def, sinon both
-      const wheelOn = (el, which) => {
-        el.addEventListener('wheel', (e) => {
-          e.preventDefault();
-          const dir = e.deltaY > 0 ? -1 : 1;
-          if (which === 'term' || which === 'both') {
-            P.fsTerm = clamp((P.fsTerm || 20) + dir, 12, 60);
+        // Recrée les cartes du chapitre à partir du canonique et copie la progression si on trouve un match
+        merged.cards = cCh.cards.map(cc => {
+          const rid = extractRowId(cc.id);
+          const sc = byRowId.get(rid) || savedCardByRowId.get(rid);
+          if (sc) {
+            const copy = { ...cc }; // front/back/ids = canonique
+            PROG_KEYS.forEach(k => { if (sc[k] !== undefined) copy[k] = sc[k]; });
+            return copy;
           }
-          if (which === 'def' || which === 'both') {
-            P.fsDef = clamp((P.fsDef || 24) + dir, 14, 72);
-          }
-          updateVars();
-          saveData();
-          showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`);
-          setTimeout(hideToast, 250);
-        }, {
-          passive: false
+          return { ...cc }; // carte nouvelle : progression par défaut (unseen)
         });
-      };
-      wheelOn(termEl, 'term');
-      wheelOn(defEl, 'def');
-      wheelOn(box, 'both');
+
+        // Recalcule la distribution des grades
+        merged.stats.gradeCounts = getLiveGradeCounts(merged);
+
+        return merged;
+      });
+
+      // 3) Applique
+      data.chapters = newChapters;
+
+      // 4) Recalage du chapitre courant (par titre); sinon 1er chapitre
+      const newSel = prevSelTitle
+        ? newChapters.find(ch => ch.title === prevSelTitle)
+        : newChapters[0];
+      data.app = data.app || {};
+      data.app.currentChapterId = newSel?.id || newChapters[0]?.id || null;
+
+      saveData();
     }
 
-    function bindWheel(node, {
-      get,
-      set,
-      min,
-      max,
-      step = 1,
-      unit = 'px',
-      onApply
-    }) {
-      const valueEl = node.querySelector('.wheel-value');
-      const render = () => {
-        valueEl.textContent = get() + (unit || '');
+    // ---------- Contrôles taille texte ----------
+    function bindReviewSizeControls(){
+      const faces=document.querySelectorAll('.review-card [data-face]'); if(!faces.length) return;
+      const P=data.app.prefs||{};
+      const applyVars=()=>{
+        document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
+        document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
       };
-      const clampv = (v) => Math.max(min, Math.min(max, v));
-      let startY = null,
-        startV = null;
+      faces.forEach(el=>{
+        const face=el.getAttribute('data-face');
+        let startY=null,startVal=null;
+        const getVal=()=> face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
+        const setVal=v=>{
+          if(face==='front') P.fsTerm=clamp(v,12,60);
+          else P.fsDef=clamp(v,14,72);
+          applyVars();
+        };
+        const commit=()=>saveData();
 
-      const commit = () => {
-        saveData();
-        applyUI();
-        if (onApply) onApply();
+        el.addEventListener('pointerdown',e=>{startY=e.clientY; startVal=getVal(); el.setPointerCapture?.(e.pointerId); e.preventDefault(); e.stopPropagation();});
+        el.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6); setVal(startVal+delta); e.preventDefault(); e.stopPropagation();});
+        const end=e=>{if(startY!=null) commit(); startY=null; startVal=null; e.preventDefault(); e.stopPropagation();};
+        el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+        el.addEventListener('wheel',e=>{e.preventDefault(); const dir=e.deltaY>0?-1:1; setVal(getVal()+dir); commit();},{passive:false});
+      });
+    }
+
+    function bindTypoPreviewDrag(){
+      const box=$('#typoPreview'); if(!box) return;
+      const termEl=box.querySelector('.term'); const defEl=box.querySelector('.definition'); const toast=$('#typoToast'); const P=data.app.prefs||{};
+      let startY=null,startTerm=null,startDef=null,target='both';
+      const showToast=msg=>{if(!toast) return; toast.textContent=msg; toast.style.display='block';};
+      const hideToast=()=>{if(toast) toast.style.display='none';};
+      const updateVars=()=>{
+        document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
+        document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
       };
-
-      const setVal = (v) => {
-        set(clampv(v));
-        render();
-        // LIVE update (sans attendre "commit")
-        applyUI();
-      };
-
-      const pd = (e) => {
+      const start=e=>{
+        const t=e.target.closest('.term, .definition, #typoPreview'); if(!t) return;
+        startY=(e.touches?e.touches[0].clientY:e.clientY); startTerm=P.fsTerm||20; startDef=P.fsDef||24;
+        target = t.classList.contains('term')?'term' : t.classList.contains('definition')?'def':'both';
         e.preventDefault();
-        e.stopPropagation();
       };
-
-      node.addEventListener('pointerdown', (e) => {
-        startY = e.clientY;
-        startV = get();
-        node.setPointerCapture?.(e.pointerId);
-        pd(e);
-      });
-      node.addEventListener('pointermove', (e) => {
-        if (startY == null) return;
-        const dy = startY - e.clientY;
-        const delta = Math.round(dy / 6) * step; // 6px ~ 1 step
-        setVal(startV + delta);
-        pd(e);
-      });
-      const end = (e) => {
-        if (startY != null) commit();
-        startY = null;
-        startV = null;
-        pd(e);
+      const move=e=>{
+        if(startY==null) return;
+        const y=(e.touches?e.touches[0].clientY:e.clientY);
+        const dy=startY-y; const delta=Math.round(dy/6);
+        if(target==='term'||target==='both') P.fsTerm=clamp(startTerm+delta,12,60);
+        if(target==='def'||target==='both') P.fsDef=clamp(startDef+delta,14,72);
+        updateVars(); showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`);
       };
-      node.addEventListener('pointerup', end);
-      node.addEventListener('pointercancel', end);
+      const end=()=>{
+        if(startY!=null) saveData();
+        startY=null; startTerm=null; startDef=null; target='both'; setTimeout(hideToast,200);
+      };
+      box.addEventListener('pointerdown',start);
+      box.addEventListener('pointermove',move);
+      box.addEventListener('pointerup',end);
+      box.addEventListener('pointercancel',end);
+      box.addEventListener('touchstart',start,{passive:false});
+      box.addEventListener('touchmove',move,{passive:false});
+      box.addEventListener('touchend',end,{passive:false});
 
-      // Molette (desktop)
-      node.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const dir = e.deltaY > 0 ? -step : step;
-        setVal(get() + dir);
-        commit();
-      }, {
-        passive: false
-      });
+      const wheelOn=(el,which)=>{
+        el.addEventListener('wheel',(e)=>{
+          e.preventDefault();
+          const dir=e.deltaY>0?-1:1;
+          if(which==='term'||which==='both') P.fsTerm=clamp((P.fsTerm||20)+dir,12,60);
+          if(which==='def'||which==='both') P.fsDef=clamp((P.fsDef||24)+dir,14,72);
+          updateVars(); saveData(); showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`); setTimeout(hideToast,250);
+        },{passive:false});
+      };
+      wheelOn(termEl,'term'); wheelOn(defEl,'def'); wheelOn(box,'both');
+    }
 
+    function bindWheel(node,{get,set,min,max,step=1,unit='px',onApply}){
+      const valueEl=node.querySelector('.wheel-value');
+      const render=()=>{valueEl.textContent=get()+unit;};
+      const commit=()=>{saveData(); applyUI(); if(onApply) onApply();};
+      const setVal=v=>{set(clamp(v,min,max)); render(); applyUI();};
+      const pd=e=>{e.preventDefault(); e.stopPropagation();};
+
+      let startY=null,startV=null;
+      node.addEventListener('pointerdown',e=>{startY=e.clientY; startV=get(); node.setPointerCapture?.(e.pointerId); pd(e);});
+      node.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6)*step; setVal(startV+delta); pd(e);});
+      const end=e=>{if(startY!=null) commit(); startY=null; startV=null; pd(e);};
+      node.addEventListener('pointerup',end); node.addEventListener('pointercancel',end);
+      node.addEventListener('wheel',e=>{e.preventDefault(); const dir=e.deltaY>0?-step:step; setVal(get()+dir); commit();},{passive:false});
       render();
     }
 
-    function gradeQuality5(g) {
-      switch (g) {
-        case 'facile':
-          return 5;
-        case 'bien':
-          return 4;
-        case 'difficile':
-          return 2;
-        case 'echec':
-          return 1;
-        default:
-          return 0;
+    function gradeQuality5(g){switch(g){case'facile':return 5; case'bien':return 4; case'difficile':return 2; case'echec':return 1; default:return 0;}}
+    function gradeNorm01(g){switch(g){case'facile':return 1.0; case'bien':return 0.75; case'difficile':return 0.35; case'echec':return 0.0; default:return 0.5;}}
+
+    function scheduleNext(card,grade,now=Date.now()){
+      const q=gradeQuality5(grade);
+      let EF=card.ef||2.5; EF = EF + (0.1 - (5-q)*(0.08+(5-q)*0.02)); if(EF<1.3) EF=1.3; card.ef=EF;
+      if(q<3){
+        card.intervalDays = (grade==='echec')?0.02:0.5;
+        card.dueAt=now+card.intervalDays*864e5;
+        card.streak=(card.streak<=0?card.streak-1:-1);
+      }else{
+        let next; if(card.intervalDays<1e-6) next=1; else if(card.intervalDays<1.5) next=6; else next=Math.round(card.intervalDays*EF);
+        card.intervalDays=next; card.dueAt=now+next*864e5;
+        card.streak=(card.streak>=0?card.streak+1:1);
       }
+      card.streak=Math.max(-8,Math.min(12,card.streak));
     }
 
-    function gradeNorm01(g) {
-      switch (g) {
-        case 'facile':
-          return 1.0;
-        case 'bien':
-          return 0.75;
-        case 'difficile':
-          return 0.35;
-        case 'echec':
-          return 0.0;
-        default:
-          return 0.5;
-      }
-    }
-
-    function isSuccess(g) {
-      return g === 'facile' || g === 'bien';
-    }
-
-    // Planification SM‑2 simplifiée + streak
-    function scheduleNext(card, grade, now = Date.now()) {
-      const q = gradeQuality5(grade);
-      // E‑Factor
-      let EF = card.ef || 2.5;
-      EF = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-      if (EF < 1.3) EF = 1.3;
-      card.ef = EF;
-
-      // Intervalle (jours) + due date
-      if (q < 3) { // mauvaise réponse (échec/difficile)
-        card.intervalDays = (grade === 'echec') ? 0.02 : 0.5; // ~30 min ou 12h
-        card.dueAt = now + card.intervalDays * 864e5;
-        card.streak = (card.streak <= 0 ? card.streak - 1 : -1);
-      } else { // bonne réponse (bien/facile)
-        let next;
-        if (card.intervalDays < 1e-6) next = 1;
-        else if (card.intervalDays < 1.5) next = 6;
-        else next = Math.round(card.intervalDays * EF);
-        card.intervalDays = next;
-        card.dueAt = now + next * 864e5;
-        card.streak = (card.streak >= 0 ? card.streak + 1 : 1);
-      }
-      // Borne le streak
-      card.streak = Math.max(-8, Math.min(12, card.streak));
-    }
-
-    // ------------------ Init ------------------
-    function init() {
-      // Demande un stockage persistant (évite l'éviction)
-      if (navigator.storage && navigator.storage.persist) {
-        navigator.storage.persist().then(granted => console.log('persist granted?', granted));
-      }
-
-      // Sauvegarde sur changements de visibilité / fermeture
-      window.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') saveData();
+    // ---------- Reset helpers (corrige les boutons manquants) ----------
+    function resetChapter(chapId){
+      const chap=getChapter(chapId); if(!chap) return;
+      chap.cards.forEach(c=>{
+        c.grade='unseen'; c.timesReviewed=0; c.lastReviewed=0; c.lastMs=0; c.avgMs=0; c.perfEma=0.5;
+        c.ef=2.5; c.intervalDays=0; c.dueAt=0; c.streak=0; c.successes=0; c.failures=0;
       });
-      window.addEventListener('pagehide', saveData);
-      window.addEventListener('beforeunload', saveData);
+      chap.stats.gradeCounts={unseen:chap.cards.length,echec:0,difficile:0,bien:0,facile:0};
+      chap.stats.totalReviews=0;
+      chap.stats.dailyReviews = {};
+      chap.stats.dailyChanges = {};
+      chap.stats.dailyDurMs = {};
+      chap.stats.dailyDurCount = {};
+      chap.stats.dailyLog = {};
+      saveData(); alert('Chapitre réinitialisé.');
+    }
 
-      // Autosave périodique (toutes les 15s)
-      setInterval(() => {
-        saveData();
-      }, 15000);
+    function resetAll(){
+      if(!confirm('Réinitialiser toute l’application ?')) return;
+      const theme=data.app?.theme||'dark';
+      const prefs=deepClone(data.app?.prefs||{});
+      const fresh=buildChaptersFromFlashcards(flashcardData);
+      fresh.app.theme=theme; fresh.app.prefs=prefs;
+      data=fresh; upgradeData(); applyTheme(); applyUI(); saveData(); goDeck(false);
+      alert('Application réinitialisée.');
+    }
 
-      // Sync multi-onglets: recharge si une autre tab a sauvé
-      window.addEventListener('storage', (e) => {
-        if (e.key === STORAGE_KEY && e.newValue) {
-          try {
-            data = JSON.parse(e.newValue);
-            // re-rendu non intrusif
-            renderByState(false);
-          } catch (err) {}
-        }
-      });
+    // ---------- Init ----------
+    function init(){
+      if(navigator.storage && navigator.storage.persist){
+        navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
+      }
+      window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
+      window.addEventListener('pagehide',saveData);
+      window.addEventListener('beforeunload',saveData);
+      setInterval(saveData,15000);
+      window.addEventListener('storage',(e)=>{if(e.key===STORAGE_KEY && e.newValue){try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}}});
 
+      // IMPORTANT: réconcilier d'abord avec le voc canonique
+      reconcileWithCanonical();
+
+      // S'assure que les champs manquants sont complétés après la fusion
       upgradeData();
+
       applyTheme();
       applyUI();
-      syncFromRawFlashcards();
       Nav.clear();
       goDeck(false);
     }
