@@ -300,6 +300,13 @@
       background: var(--border); /* Fond subtil pour les transparences/chargement */
     }
 
+    /* NOUVEAU : Gérer le contenu trop large (LaTeX, etc.) */
+    .review-card > div,
+    .card-block {
+      overflow-x: auto;  /* Ajoute un scroll horizontal SI et seulement SI le contenu déborde */
+      max-width: 100%;   /* S'assure que le conteneur lui-même ne grandit pas trop */
+    }
+
 
     /* Light theme boosts */
     :root[data-theme="light"] .definition,
