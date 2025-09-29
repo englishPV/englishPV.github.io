@@ -1364,15 +1364,11 @@
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
 `.trim();
 
-    // Données Physique (id|fr|en|chapitre)
-    // Données Physique (id|fr|en|chapitre) - Format M2 avec chemins d'images corrigés
-// Données Physique (id|fr|en|chapitre) - Format M2 avec chemins d'images corrigés
-// Données Physique (id|fr|en|chapitre) - Format M2, chemins images et cartes à trous corrigés
-const physicsRawText = `
+    const physicsRawText = `
 10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
-10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel <b>en translation rectiligne et uniforme par</b> rapport à un référentiel galiléen est galiléen|${PM}
-10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ <b>n’est pas galiléen</b>|${PM}
-10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen <b>n’est jamais galiléen.</b>|${PM}
+10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<b>en translation rectiligne et uniforme par</b>|${PM}
+10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
+10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<b>n’est jamais galiléen.</b>|${PM}
 10004|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg">|<img src="images/paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg">|${PM}
 10005|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-d77f3722e5a6b97cce4097de2c62d12a8d197b00.jpg">|<img src="images/paste-94c2181742a47574197e38c01becf17fe5e14056.jpg"><br>Avec O' un point fixe de R'|${PM}
 10006|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-cb677b12d3a6508a44f3f9b492a67a4a71774fca.jpg">|Cas de R' en translation par rapport à R: $\\vec{f_{ic}}=\\vec{0}$ donc&nbsp;$P(\\vec{f_{ic}})=0$<br><br>Cas de R' en rotation par rapport à R: $P(\\vec{f_ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ). \\vec{v}_{M/R'}=0$<br><br>TPC:&nbsp;$\\frac{dEc_{/R'}}{dt}=\\sum_i P(\\vec{F_i})/R'+P(\\vec{f_{ie}})/R'$|${PM}
