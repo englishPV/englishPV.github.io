@@ -289,6 +289,18 @@
     .card-block.grade-unseen{border-color:#9ca3af}
 
 
+    /* NOUVEAU : Rendre les images des cartes responsives */
+    .review-card img,
+    .card-block img {
+      max-width: 100%;       /* Ne jamais déborder du conteneur */
+      height: auto;          /* Garder les bonnes proportions */
+      display: block;        /* Éviter les espaces indésirables sous l'image */
+      margin: 10px auto;     /* Ajouter un espacement vertical et centrer horizontalement */
+      border-radius: 8px;    /* Coins arrondis pour correspondre au design */
+      background: var(--border); /* Fond subtil pour les transparences/chargement */
+    }
+
+
     /* Light theme boosts */
     :root[data-theme="light"] .definition,
     :root[data-theme="light"] .card-item .back{color:var(--text)!important; opacity:1!important}
