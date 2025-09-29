@@ -134,7 +134,7 @@
       display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;
     }
     .topbar .back:hover{background:rgba(255,255,255,.06)}
-    .topbar .title{font-weight:800; font-size:16px; letter-spacing:.2px; margin-left:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .topbar .title{font-weight:800; font-size:16px; letter-spacing:.2px; margin-left:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;}
     .topbar .spacer{flex:1}
 
     main#view{
@@ -289,6 +289,25 @@
     .card-block.grade-unseen{border-color:#9ca3af}
 
 
+    /* NOUVEAU : Rendre les images des cartes responsives */
+    .review-card img,
+    .card-block img {
+      max-width: 100%;       /* Ne jamais déborder du conteneur */
+      height: auto;          /* Garder les bonnes proportions */
+      display: block;        /* Éviter les espaces indésirables sous l'image */
+      margin: 10px auto;     /* Ajouter un espacement vertical et centrer horizontalement */
+      border-radius: 8px;    /* Coins arrondis pour correspondre au design */
+      background: var(--border); /* Fond subtil pour les transparences/chargement */
+    }
+
+    /* NOUVEAU : Gérer le contenu trop large (LaTeX, etc.) */
+    .review-card > div,
+    .card-block {
+      overflow-x: auto;  /* Ajoute un scroll horizontal SI et seulement SI le contenu déborde */
+      max-width: 100%;   /* S'assure que le conteneur lui-même ne grandit pas trop */
+    }
+
+
     /* Light theme boosts */
     :root[data-theme="light"] .definition,
     :root[data-theme="light"] .card-item .back{color:var(--text)!important; opacity:1!important}
@@ -353,6 +372,30 @@
       .topbar, main#view, .bottom-actions, .revision-bar{max-width:1200px; margin:0 auto; width:100%}
       main#view{padding:16px 20px}
     }
+
+    /* Subject menu (sélecteur de matière) */
+    .subject-menu{
+      position: absolute;
+      top: 52px;
+      left: 10px;
+      background: var(--surface);
+      color: var(--text);
+      border:1px solid var(--border);
+      border-radius: var(--radius-md);
+      min-width: 220px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      padding: 6px;
+      z-index: 1000;
+      display:none;
+    }
+    .subject-item{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:10px; cursor:pointer;
+    }
+    .subject-item:hover{ background: rgba(255,255,255,.06) }
+    .subject-item .name{ font-weight:800; flex:1 }
+    .subject-item .meta{ font-size:12px; color:var(--muted) }
+    :root[data-theme="light"] .subject-item:hover{ background: rgba(0,0,0,.06) }
   </style>
 </head>
 <body>
@@ -383,16 +426,20 @@
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
 
-    // Catégories
+    // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
+    // Chapitres Physique (constantes pratiques pour le raw)
+    const PM = "M2";
 
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
-      'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃'
+      'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
+      // === Physique (nouvelles matières/chapitres) ===
+      'M2':'⚙️'
     };
 
-    // Liste brute (id|fr|en|chap)
+    // Liste brute Anglais (id|fr|en|chap)
     const cardsRawText = `
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
@@ -1317,11 +1364,36 @@
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
 `.trim();
 
-    // Parsing
-    const flashcardData = cardsRawText.split(/\r?\n/).map(l=>{
-      const p=l.split('|'); if(p.length!==4) return null;
-      const [id,f,e,c]=p; return {id:id.trim(),front:f.trim(),back:e.trim(),chapter:c.trim()};
-    }).filter(Boolean);
+    // Données Physique (id|fr|en|chapitre)
+    // Données Physique (id|fr|en|chapitre) - Format M2 avec chemins d'images corrigés
+// Données Physique (id|fr|en|chapitre) - Format M2 avec chemins d'images corrigés
+// Données Physique (id|fr|en|chapitre) - Format M2, chemins images et cartes à trous corrigés
+const physicsRawText = `
+10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
+10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel <b>en translation rectiligne et uniforme par</b> rapport à un référentiel galiléen est galiléen|${PM}
+10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ <b>n’est pas galiléen</b>|${PM}
+10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen <b>n’est jamais galiléen.</b>|${PM}
+10004|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg">|<img src="images/paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg">|${PM}
+10005|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-d77f3722e5a6b97cce4097de2c62d12a8d197b00.jpg">|<img src="images/paste-94c2181742a47574197e38c01becf17fe5e14056.jpg"><br>Avec O' un point fixe de R'|${PM}
+10006|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-cb677b12d3a6508a44f3f9b492a67a4a71774fca.jpg">|Cas de R' en translation par rapport à R: $\\vec{f_{ic}}=\\vec{0}$ donc&nbsp;$P(\\vec{f_{ic}})=0$<br><br>Cas de R' en rotation par rapport à R: $P(\\vec{f_ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ). \\vec{v}_{M/R'}=0$<br><br>TPC:&nbsp;$\\frac{dEc_{/R'}}{dt}=\\sum_i P(\\vec{F_i})/R'+P(\\vec{f_{ie}})/R'$|${PM}
+10007|<span style="color: rgb(255, 170, 0);"><u><b>(MAG)</b></u></span>Justifier que fic ne travaille pas et exprimer le TEC dans R' non gal.|$P(\\vec{f_ic}) = 0$<br>En effet lorsque&nbsp;R' est en translation par rapport à R $\\vec{f_{ic}}=\\vec{0}$ donc&nbsp;$P(\\vec{f_{ic}})=0$<br><br>et lorsque R' en rotation par rapport à R: $P(\\vec{f_ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ). \\vec{v}_{M/R'}=0$<br>csq1:&nbsp;$W(\\vec{f_{ic}})=\\int P(\\vec{f_{ic}}).dt=0$ i.e.&nbsp;$\\vec{f_{ic}}$ ne travaille pas.<br><br>csq2: TEC dans R':&nbsp;$\\Delta Ec_{/R'}=\\sum_i W(\\vec{F_i})/R'+W(\\vec{f_{ie}})/R'$|${PM}
+10008|<b><span style="color: rgb(255, 170, 0);">(MAG)</span></b><span style="color: rgb(0, 85, 255);">&nbsp;sur l'expl d'un manège avec sièges suspendus à des chaînes:</span><span style="color: rgb(255, 170, 0);"><u><br></u></span><img src="images/paste-a933d76dcbeef4f62508fa32bd894eade0892cea.jpg"><br><img src="images/paste-162500c424b12166f0f9f7c8345e074e19a42672.jpg">|<img src="images/paste-7d986b294569fcc662beb25c0076c304bcdbb34e.jpg">|${PM}
+10009|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>Exprimer la force d'inertie de Coriolis et la force d'inertie d'entrainement dans le cas d'une rotation de R' par rapport à R|$\\vec{f_ic} = -2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'}&nbsp;$<br>et<br>$\\vec{f_ie} = m \\Omega^2 \\overrightarrow{HM}&nbsp;$|${PM}
+10010|<span style="color: rgb(0, 255, 0);">(INC)</span> TEM dans R' repère non galiléen|<br>[latex] Si $\\vec{f_{ie}} $ est conservative, $\\vec{f_{ie}}$ dérive d'une énergie potentielle $E_{p,f_{ie}}$ qui est contenue dans $E_m$ et qui est tq: $W(\\vec{f_{ie}})=-\\Delta E_{p,f_{ie}}$ \\newline<br><br>Alors TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'}) $ \\newline<br><br>Si $\\vec{f}_{ie}$ est non conservative \\newline<br>TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'})+W(\\vec{f_{ie/R'}}) $[/latex]<br>|${PM}
+10011|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un réfrentiel R' non galileen.|On part de la loi de composition des vitesses $m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + \\vec{a_c} + \\vec{a_e}&nbsp;&nbsp;$<br>de plus $m \\vec{a}_{M/R} = \\sum_i \\vec{F_i} $<br>En réarrangant les termes on a $m \\vec{a}_{M/R'} = \\sum_i \\vec{F_i} -m \\vec{a_c} - m \\vec{a_e} $<br>avec $ - m \\vec{a_e} $ qui est la force d'inertie d'entrainement et $&nbsp;- m \\vec{a_c} $ qui est la force d'inertie de coriolis|${PM}
+10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $ \\vec{f_{ic}} $ et $ \\vec{f_{ie}} $ dans le cas d'une translation de R' par rapport à R|&nbsp;$ \\vec{f_{ic}} = \\vec{0} $ et&nbsp;&nbsp;$ \\vec{a_c} = \\vec{0} $ dans ce cas<br>et<br>$ \\vec{f_{ie}} = -m(\\frac{d^2 \\vec{OO'}}{dt^2})_R $|${PM}
+`.trim();
+
+    // Parsing générique multi-matières
+    function parseCardsRaw(raw){
+      return raw.split(/\r?\n/).map(l=>{
+        const p=l.split('|'); if(p.length!==4) return null;
+        const [id,f,e,c]=p;
+        return {id:id.trim(),front:f.trim(),back:e.trim(),chapter:c.trim()};
+      }).filter(Boolean);
+    }
+    const flashcardDataEN  = parseCardsRaw(cardsRawText);
+    const flashcardDataPHY = parseCardsRaw(physicsRawText);
 
     // ---------- Utils ----------
     const $ = s=>document.querySelector(s);
@@ -1337,7 +1409,42 @@
     const deepClone = o=>JSON.parse(JSON.stringify(o));
     const pickN = (arr,n)=>{const c=arr.slice(); for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]];} return c.slice(0,n);};
     const isSuccess = g=>g==='facile'||g==='bien';
+    
+    function preprocessLaTeX(s){
+  if (!s) return s;
+  // NOTE : J'ai adapté la regex pour correspondre à vos balises [latex] et non ```math...
+  return s
+    .replace(/\[latex\]/gi, '')         // on enlève [latex]
+    .replace(/\[\/latex\]/gi, '')       // on enlève [/latex]
+    .replace(/\\newline\s*/g, '<br/>'); // \newline -> <br> (en dehors des maths)
+}
 
+// Typeset MathJax dans un conteneur donné
+function typesetLatex(container){
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    // On s'assure que le conteneur est bien un élément du DOM
+    const el = (typeof container === 'string') ? $(container) : container;
+    if (el) {
+      return window.MathJax.typesetPromise([el]).catch(err=>console.warn('MathJax error:', err));
+    }
+  }
+  return Promise.resolve(); // Retourne une promesse résolue si MathJax n'est pas prêt
+}
+
+    
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$','$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        packages: {'[+]': ['noerrors', 'noundefined']} // évite les plantages si une macro manque
+      },
+      options: {
+        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+      },
+      startup: { typeset: false } // on déclenche manuellement après chaque rendu
+    };
+    
     function formatDayKeyFR(key){
       // key = "YYYY-MM-DD"
       const [Y,M,D]=key.split('-').map(Number);
@@ -1380,10 +1487,62 @@
       return {chapters, app:{currentChapterId:chapters[0]?.id||null, theme:'dark', prefs:{fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14}}};
     }
 
+    // Construit un "Subject" (matière) à partir d'une liste raw
+    function buildSubjectFromList(title, list){
+      const built = buildChaptersFromFlashcards(list); // réutilise votre builder existant
+      return { id: slugify(title), title, chapters: built.chapters };
+    }
+
+    // Canonique: matières disponibles (Anglais, Physique)
+    function buildCanonicalSubjects(){
+      const en  = buildSubjectFromList('Anglais',  flashcardDataEN);
+      const phy = buildSubjectFromList('Physique', flashcardDataPHY);
+      return [en, phy];
+    }
+
     function loadData(){
-      try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw);}catch(e){}
-      try{const c=readCookieBackup(); if(c) return JSON.parse(c);}catch(e){}
-      return buildChaptersFromFlashcards(flashcardData);
+      // 1) Tente localStorage
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          // Si déjà en mode "subjects", on renvoie tel quel
+          if (Array.isArray(parsed.subjects)) return parsed;
+          // Sinon (legacy): on enveloppe l'ancien format "chapters" dans une matière "Anglais"
+          if (Array.isArray(parsed.chapters)) {
+            return {
+              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters }],
+              app: parsed.app || { theme:'dark', prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }, currentSubjectId:'anglais' }
+            };
+          }
+        }
+      }catch(e){}
+
+      // 2) Tente cookie backup (ancienne version) et applique la même logique
+      try{
+        const c = readCookieBackup();
+        if(c){
+          const parsed = JSON.parse(c);
+          if (Array.isArray(parsed.subjects)) return parsed;
+          if (Array.isArray(parsed.chapters)) {
+            return {
+              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters }],
+              app: parsed.app || { theme:'dark', prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }, currentSubjectId:'anglais' }
+            };
+          }
+        }
+      }catch(e){}
+
+      // 3) Première exécution: crée les deux matières à partir des données canoniques
+      const subjects = buildCanonicalSubjects();
+      return {
+        subjects,
+        app:{
+          currentSubjectId: subjects[0]?.id || null,
+          theme:'dark',
+          prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }
+        }
+      };
     }
 
     function saveData(){
@@ -1402,6 +1561,25 @@
     function readCookieBackup(){const n=parseInt(getCookie('F9X16_BN')||'0',10); if(!n) return null; let out=''; for(let i=0;i<n;i++){const p=getCookie(`F9X16_B${i}`); if(p==null) return null; out+=p;} return out;}
 
     let data = loadData();
+
+    // ---------- Helpers de matière ----------
+    function getCurrentSubject(){
+      const id = data?.app?.currentSubjectId;
+      const s = data?.subjects?.find(x=>x.id===id);
+      return s || data?.subjects?.[0] || null;
+    }
+    function setCurrentSubject(id){
+      if (!data?.subjects?.find(s=>s.id===id)) return;
+      data.app.currentSubjectId = id;
+      saveData();
+    }
+    function getCurrentChapters(){
+      const s=getCurrentSubject();
+      return s?.chapters || [];
+    }
+    function getChapter(id){
+      return getCurrentChapters().find(c=>c.id===id);
+    }
 
     // ---------- État UI + Nav ----------
     const State = {view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey: null};
@@ -1429,6 +1607,78 @@
     const bottomActions=$('#bottomActions');
     const revisionBar=$('#revisionBar');
     const startReviewBtn=$('#startReviewBtn');
+
+    // ----- Subject menu (UI) -----
+    const subjectMenuId = 'subjectMenu';
+    function ensureSubjectMenu(){
+      let m = document.getElementById(subjectMenuId);
+      if(!m){
+        m = document.createElement('div');
+        m.id = subjectMenuId;
+        m.className = 'subject-menu';
+        document.body.appendChild(m);
+      }
+      return m;
+    }
+    function renderSubjectMenu(){
+      const m = ensureSubjectMenu();
+      const list = data.subjects || [];
+      const currentId = data.app.currentSubjectId;
+      m.innerHTML = list.map(s=>`
+        <div class="subject-item" data-id="${s.id}">
+          <div class="name">${s.title}</div>
+          <div class="meta">${s.chapters?.length||0} chap.</div>
+          ${s.id===currentId ? '<div class="muted">✓</div>': ''}
+        </div>
+      `).join('');
+      m.querySelectorAll('.subject-item').forEach(el=>{
+        el.addEventListener('click', (e)=>{
+          const id = el.getAttribute('data-id');
+          if(id && id!==currentId){
+            setCurrentSubject(id);
+            closeSubjectMenu();
+            goDeck(false);
+          }else{
+            closeSubjectMenu();
+          }
+          e.stopPropagation();
+        });
+      });
+    }
+    function positionSubjectMenu(){
+      const m = ensureSubjectMenu();
+      const rect = titleEl.getBoundingClientRect();
+      const top = rect.bottom + 6 + window.scrollY;
+      const left = rect.left + window.scrollX;
+      m.style.top = `${top}px`;
+      m.style.left = `${Math.max(8, left - 10)}px`;
+    }
+    function openSubjectMenu(){
+      renderSubjectMenu();
+      positionSubjectMenu();
+      const m = ensureSubjectMenu();
+      m.style.display='block';
+      setTimeout(()=>document.addEventListener('click', onDocClickClose), 0);
+    }
+    function closeSubjectMenu(){
+      const m = ensureSubjectMenu();
+      m.style.display='none';
+      document.removeEventListener('click', onDocClickClose);
+    }
+    function onDocClickClose(e){
+      const m = document.getElementById(subjectMenuId);
+      if(!m) return;
+      if(m.contains(e.target) || e.target===titleEl) return;
+      closeSubjectMenu();
+    }
+    // Ouvre le menu quand on est sur "Deck" (sinon on revient au Deck)
+    titleEl.addEventListener('click', ()=>{
+      if(State.view!=='deck'){ goDeck(false); return; }
+      const m = document.getElementById(subjectMenuId);
+      if(m && m.style.display==='block') closeSubjectMenu();
+      else openSubjectMenu();
+    });
+
 
     backBtn.addEventListener('click',()=>{
       if(State.view==='review' && State.review && State.review.end==null){
@@ -1484,15 +1734,19 @@
     // Deck
     function goDeck(push=true){
       if(push) Nav.push();
-      State.view='deck'; State.chapterId=null;
-      setTopbar({title:'Deck', showBack:false});
+      State.view='deck';
+      State.chapterId=null;
+      const subj = getCurrentSubject();
+      setTopbar({title:`Deck • ${subj?.title||''}`, showBack:false});
       setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
       renderDeck();
     }
 
     function renderDeck(){
-      const v=$('#view'); const chapters=data.chapters;
+      const v=$('#view');
+      const chapters=getCurrentChapters(); // <-- au lieu de data.chapters
+
       v.innerHTML = `
         <div class="card flexcol" style="flex:1;">
           <div class="section-title">Chapitres</div>
@@ -1662,40 +1916,45 @@
     }
 
     function renderCards(chapterId){
-      const v=$('#view'); const chap=getChapter(chapterId);
-      const sel=chap.filters.grades||{};
-      const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
+  const v=$('#view'); const chap=getChapter(chapterId);
+  const sel=chap.filters.grades||{};
+  const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
 
-      v.innerHTML = `
-        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
-          <div class="section-title">Cartes (${pool.length})</div>
-          <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-            <div class="cards-grid">
-              ${pool.map(c=>{
-                const {frontText,backText}=getCardSides(c,chap);
-                const gradeClass=`grade-${c.grade||'unseen'}`;
-                const timeStr=c.avgMs?formatDuration(c.avgMs):'';
-                return `
-                  <div class="card-block ${gradeClass}" data-id="${c.id}">
-                    <div class="term">${frontText}</div>
-                    <div class="definition">${backText}</div>
-                    ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
+  v.innerHTML = `
+    <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="section-title">Cartes (${pool.length})</div>
+      <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+        <div class="cards-grid">
+          ${pool.map(c=>{
+            // MODIFICATION : Utiliser preprocessLaTeX
+            const {frontText,backText}=getCardSides(c,chap);
+            const f = preprocessLaTeX(frontText);
+            const b = preprocessLaTeX(backText);
+            const gradeClass=`grade-${c.grade||'unseen'}`;
+            const timeStr=c.avgMs?formatDuration(c.avgMs):'';
+            return `
+              <div class="card-block ${gradeClass}" data-id="${c.id}">
+                <div class="term">${f}</div>
+                <div class="definition">${b}</div>
+                ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
+              </div>
+            `;
+          }).join('')}
         </div>
-      `;
+      </div>
+    </div>
+  `;
 
-      const grid=$('#cardsGrid');
-      grid.addEventListener('click',e=>{
-        const block=e.target.closest('.card-block'); if(!block) return;
-        $$('.card-block').forEach(b=>{if(b!==block) b.classList.remove('flipped');});
-        block.classList.toggle('flipped');
-      });
-    }
+  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
+  typesetLatex(v);
 
+  const grid=$('#cardsGrid');
+  grid.addEventListener('click',e=>{
+    const block=e.target.closest('.card-block'); if(!block) return;
+    $$('.card-block').forEach(b=>{if(b!==block) b.classList.remove('flipped');});
+    block.classList.toggle('flipped');
+  });
+}
     // Daily Activity View
     function goDaily(chapterId, dayKey, push=true){
       if (push) Nav.push();
@@ -1710,81 +1969,86 @@
     }
 
     function renderDaily(chap, dayKey){
-      const v = document.getElementById('view');
-      const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
-      if (!log.length){
-        v.innerHTML = `
-          <div class="card" style="flex:1; display:flex; flex-direction:column;">
-            <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
-            <div class="muted">Aucune donnée pour ce jour.</div>
-          </div>
-        `;
-        return;
-      }
+  const v = document.getElementById('view');
+  const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
+  if (!log.length){
+    v.innerHTML = `
+      <div class="card" style="flex:1; display:flex; flex-direction:column;">
+        <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
+        <div class="muted">Aucune donnée pour ce jour.</div>
+      </div>
+    `;
+    return;
+  }
 
-      // Agrège par carte: earliest prev (grade avant jour) et latest next (grade après jour)
-      log.sort((a,b)=>a.ts-b.ts);
-      const byCard = new Map();
-      for (const e of log){
-        const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
-        if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
-        if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
-        curr.events.push(e);
-        byCard.set(e.cardId, curr);
-      }
+  log.sort((a,b)=>a.ts-b.ts);
+  const byCard = new Map();
+  for (const e of log){
+    const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
+    if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
+    if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
+    curr.events.push(e);
+    byCard.set(e.cardId, curr);
+  }
 
-      const rows = [];
-      for (const [cardId, info] of byCard){
-        const card = chap.cards.find(c=>c.id===cardId);
-        if (!card) continue;
-        const {frontText, backText} = getCardSides(card, chap);
-        rows.push({
-          id: cardId,
-          term: frontText,
-          def: backText,
-          before: info.firstPrev || 'unseen',
-          after: info.lastNext || (card.grade || 'unseen')
-        });
-      }
+  const rows = [];
+  for (const [cardId, info] of byCard){
+    const card = chap.cards.find(c=>c.id===cardId);
+    if (!card) continue;
+    
+    // MODIFICATION : Utiliser preprocessLaTeX ici
+    const {frontText, backText} = getCardSides(card, chap);
+    rows.push({
+      id: cardId,
+      term: preprocessLaTeX(frontText),
+      def:  preprocessLaTeX(backText),
+      before: info.firstPrev || 'unseen',
+      after: info.lastNext || (card.grade || 'unseen')
+    });
+  }
 
-      // Option: ordonner les changements d'abord
-      rows.sort((a,b)=>{
-        const ca = (a.before!==a.after), cb=(b.before!==b.after);
-        if (ca!==cb) return ca? -1: 1;
-        return a.term.localeCompare(b.term, 'fr');
-      });
+  rows.sort((a,b)=>{
+    const ca = (a.before!==a.after), cb=(b.before!==b.after);
+    if (ca!==cb) return ca? -1: 1;
+    // On compare sur la version texte brut pour le tri, pas HTML
+    const cardA = chap.cards.find(c=>c.id===a.id);
+    const cardB = chap.cards.find(c=>c.id===b.id);
+    return cardA.front.localeCompare(cardB.front, 'fr');
+  });
 
-      v.innerHTML = `
-        <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
-          <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
-          <div id="dailyList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-            <div class="list" style="gap:10px">
-              ${rows.map(r=>`
-                <div class="grid2">
-                  <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
-                    <div class="term">${r.term}</div>
-                    <div class="definition">${r.def}</div>
-                  </div>
-                  <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
-                    <div class="term">${r.term}</div>
-                    <div class="definition">${r.def}</div>
-                  </div>
-                </div>
-              `).join('')}
+  v.innerHTML = `
+    <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
+      <div id="dailyList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+        <div class="list" style="gap:10px">
+          ${rows.map(r=>`
+            <div class="grid2">
+              <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
+                <div class="term">${r.term}</div>
+                <div class="definition">${r.def}</div>
+              </div>
+              <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
+                <div class="term">${r.term}</div>
+                <div class="definition">${r.def}</div>
+              </div>
             </div>
-          </div>
-          <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
+          `).join('')}
         </div>
-      `;
+      </div>
+      <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
+    </div>
+  `;
 
-      // Flip individuel des blocs (comme la vue Cartes)
-      const list = document.getElementById('dailyList');
-      list.addEventListener('click', (e)=>{
-        const block = e.target.closest('.card-block');
-        if (!block) return;
-        block.classList.toggle('flipped');
-      });
-    }
+  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
+  typesetLatex(v);
+
+  const list = document.getElementById('dailyList');
+  list.addEventListener('click', (e)=>{
+    const block = e.target.closest('.card-block');
+    if (!block) return;
+    block.classList.toggle('flipped');
+  });
+}
 
     // Review
     function goReview(push=true){
@@ -1821,29 +2085,38 @@
     }
 
     function renderReview(){
-      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
-      const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
-      const {frontText,backText}=getCardSides(current,chap);
-      const frontFirst = chap.settings.reviewOrder!=='back-first';
-      const prompt=frontFirst?frontText:backText;
-      const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
+  const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
+  const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
 
-      v.innerHTML = `
-        <div class="review-wrap">
-          <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
-          <div class="review-card">
-            <div>
-              ${!r.flipped
-                ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
-                : `<div class="stack"><div class="term" data-face="front">${frontText}</div><div class="definition" data-face="back" style="margin-top:6px">${backText}</div></div>`
-              }
-            </div>
-          </div>
+  // MODIFICATION : Utiliser preprocessLaTeX pour toutes les faces
+  const {frontText,backText}=getCardSides(current,chap);
+  const frontHTML = preprocessLaTeX(frontText);
+  const backHTML  = preprocessLaTeX(backText);
+
+  const frontFirst = chap.settings.reviewOrder!=='back-first';
+  const prompt = frontFirst ? frontHTML : backHTML;
+  const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
+
+  v.innerHTML = `
+    <div class="review-wrap">
+      <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
+      <div class="review-card">
+        <div>
+          ${!r.flipped
+            ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
+            : `<div class="stack"><div class="term" data-face="front">${frontHTML}</div><div class="definition" data-face="back" style="margin-top:6px">${backHTML}</div></div>`
+          }
         </div>
-      `;
-      bindReviewSizeControls();
-      renderReviewFooter();
-    }
+      </div>
+    </div>
+  `;
+
+  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
+  typesetLatex(v);
+
+  bindReviewSizeControls();
+  renderReviewFooter();
+}
 
     // Recap
     function goRecap(push=true){
@@ -1966,7 +2239,6 @@
     }
 
     // ---------- Helpers chapitres/stats ----------
-    function getChapter(id){return data.chapters.find(c=>c.id===id);}
     function getCardSides(card,chap){
       return chap?.settings?.langSwap ? {frontText:card.back, backText:card.front} : {frontText:card.front, backText:card.back};
     }
@@ -2194,7 +2466,8 @@
     }
 
     function upgradeData(){
-      data.app=data.app||{}; if(!('theme' in data.app)) data.app.theme='dark';
+      data.app=data.app||{};
+      if(!('theme' in data.app)) data.app.theme='dark';
       data.app.prefs=data.app.prefs||{};
       if(typeof data.app.prefs.fsTerm!=='number') data.app.prefs.fsTerm=22;
       if(typeof data.app.prefs.fsDef!=='number') data.app.prefs.fsDef=24;
@@ -2202,20 +2475,30 @@
       if(typeof data.app.prefs.showEmoji!=='boolean') data.app.prefs.showEmoji=true;
       if(typeof data.app.prefs.radius!=='number') data.app.prefs.radius=14;
 
-      data.chapters.forEach(ch=>{
-        ch.settings=ch.settings||{};
-        if(typeof ch.settings.langSwap!=='boolean') ch.settings.langSwap=false;
-        if (!ch.stats.dailyLog) ch.stats.dailyLog = {};
-        ch.cards.forEach(c=>{
-          if(typeof c.perfEma!=='number') c.perfEma=0.5;
-          if(typeof c.ef!=='number') c.ef=2.5;
-          if(typeof c.intervalDays!=='number') c.intervalDays=0;
-          if(typeof c.dueAt!=='number') c.dueAt=0;
-          if(typeof c.streak!=='number') c.streak=0;
-          if(typeof c.successes!=='number') c.successes=0;
-          if(typeof c.failures!=='number') c.failures=0;
+      if(!Array.isArray(data.subjects)){
+        // Migration depuis ancien format
+        data.subjects = [{ id:'anglais', title:'Anglais', chapters: data.chapters||[] }];
+        delete data.chapters;
+        if(!data.app.currentSubjectId) data.app.currentSubjectId='anglais';
+      }
+
+      data.subjects.forEach(subj=>{
+        (subj.chapters||[]).forEach(ch=>{
+          ch.settings=ch.settings||{};
+          if(typeof ch.settings.langSwap!=='boolean') ch.settings.langSwap=false;
+          ch.stats=ch.stats||{};
+          if (!ch.stats.dailyLog) ch.stats.dailyLog = {};
+          (ch.cards||[]).forEach(c=>{
+            if(typeof c.perfEma!=='number') c.perfEma=0.5;
+            if(typeof c.ef!=='number') c.ef=2.5;
+            if(typeof c.intervalDays!=='number') c.intervalDays=0;
+            if(typeof c.dueAt!=='number') c.dueAt=0;
+            if(typeof c.streak!=='number') c.streak=0;
+            if(typeof c.successes!=='number') c.successes=0;
+            if(typeof c.failures!=='number') c.failures=0;
+          });
+          syncGradeCounts(ch);
         });
-        syncGradeCounts(ch);
       });
       saveData();
     }
@@ -2321,87 +2604,79 @@
     }
 
     /**
-     * Réconcilie le stockage avec le voc "source de vérité".
-     * - Aligne la liste de chapitres (noms) et la taille (nb de cartes) sur le voc.
-     * - Conserve la progression quand possible (match des cartes par rowId numérique).
-     * - Supprime ce qui n'existe plus dans le voc, ajoute ce qui manque.
+     * Réconciliation
      */
-    function reconcileWithCanonical() {
-      // 1) Canonique depuis le code
-      const canonChapters = buildChaptersFromFlashcards(flashcardData).chapters;
-
-      const oldChapters = Array.isArray(data.chapters) ? data.chapters : [];
-      const prevSelId = data?.app?.currentChapterId || null;
-      const prevSelTitle = oldChapters.find(ch => ch.id === prevSelId)?.title || null;
-
-      // Index global de toutes les cartes enregistrées par rowId (pour récupérer la progression même si un chapitre a été renommé)
+    function reconcileChaptersWithCanonical(canonChapters, oldChapters){
       const savedCardByRowId = new Map();
-      for (const ch of oldChapters) {
-        for (const c of (ch.cards || [])) {
+      for (const ch of (oldChapters||[])) {
+        for (const c of (ch.cards||[])) {
           const rid = extractRowId(c.id);
           if (rid != null && !savedCardByRowId.has(rid)) savedCardByRowId.set(rid, c);
         }
       }
-
       const PROG_KEYS = [
         'grade','timesReviewed','lastReviewed','lastMs','avgMs',
         'perfEma','ef','intervalDays','dueAt','streak','successes','failures'
       ];
 
-      // 2) Recrée la liste des chapitres à partir du canonique en réinjectant la progression
-      const newChapters = canonChapters.map(cCh => {
-        const sCh = oldChapters.find(x => x.title === cCh.title) || null;
-
+      return canonChapters.map(cCh => {
+        const sCh = (oldChapters||[]).find(x => x.title === cCh.title) || null;
         const merged = {
           id: cCh.id,
           title: cCh.title,
-          description: cCh.description, // garde la desc (avec emoji éventuel)
-          settings: { ...cCh.settings, ...(sCh?.settings || {}) }, // on garde tes réglages
-          filters: {
-            grades: { ...cCh.filters.grades, ...(sCh?.filters?.grades || {}) }
-          },
-          // On garde l'historique jour (si présent), puis on recalcule gradeCounts après
+          description: cCh.description,
+          settings: { ...cCh.settings, ...(sCh?.settings || {}) },
+          filters: { grades: { ...cCh.filters.grades, ...(sCh?.filters?.grades || {}) } },
           stats: sCh?.stats ? { ...sCh.stats } : { ...cCh.stats },
           cards: []
         };
-
-        // Index des cartes sauvegardées par rowId pour ce chapitre (rapide)
         const byRowId = new Map();
         if (sCh) {
-          (sCh.cards || []).forEach(sc => {
+          (sCh.cards||[]).forEach(sc => {
             const rid = extractRowId(sc.id);
-            if (rid != null) byRowId.set(rid, sc);
+            if (rid!=null) byRowId.set(rid, sc);
           });
         }
-
-        // Recrée les cartes du chapitre à partir du canonique et copie la progression si on trouve un match
-        merged.cards = cCh.cards.map(cc => {
+        merged.cards = cCh.cards.map(cc=>{
           const rid = extractRowId(cc.id);
           const sc = byRowId.get(rid) || savedCardByRowId.get(rid);
-          if (sc) {
-            const copy = { ...cc }; // front/back/ids = canonique
+          if (sc){
+            const copy = { ...cc };
             PROG_KEYS.forEach(k => { if (sc[k] !== undefined) copy[k] = sc[k]; });
             return copy;
           }
-          return { ...cc }; // carte nouvelle : progression par défaut (unseen)
+          return { ...cc };
         });
-
-        // Recalcule la distribution des grades
         merged.stats.gradeCounts = getLiveGradeCounts(merged);
-
         return merged;
       });
+    }
 
-      // 3) Applique
-      data.chapters = newChapters;
+    function reconcileAllSubjectsWithCanonical(){
+      const canonSubjects = buildCanonicalSubjects();
+      const oldSubjects = Array.isArray(data.subjects) ? data.subjects : [];
 
-      // 4) Recalage du chapitre courant (par titre); sinon 1er chapitre
-      const newSel = prevSelTitle
-        ? newChapters.find(ch => ch.title === prevSelTitle)
-        : newChapters[0];
-      data.app = data.app || {};
-      data.app.currentChapterId = newSel?.id || newChapters[0]?.id || null;
+      const newSubjects = [];
+      // Aligne les sujets existants avec les canoniques (par titre/id)
+      canonSubjects.forEach(cSub=>{
+        const sSub = oldSubjects.find(s => s.id===cSub.id || s.title===cSub.title);
+        const merged = {
+          id: cSub.id,
+          title: cSub.title,
+          chapters: reconcileChaptersWithCanonical(cSub.chapters, sSub?.chapters || [])
+        };
+        newSubjects.push(merged);
+      });
 
+      // Ajoute (rare) les sujets non-canoniques conservés (si vous en ajoutez plus tard côté code)
+      oldSubjects.forEach(sSub=>{
+        if(!newSubjects.find(ns=>ns.id===sSub.id)) newSubjects.push(sSub);
+      });
+
+      data.subjects = newSubjects;
+      if (!data.app.currentSubjectId || !data.subjects.find(s=>s.id===data.app.currentSubjectId)) {
+        data.app.currentSubjectId = data.subjects[0]?.id || null;
+      }
       saveData();
     }
 
@@ -2514,7 +2789,7 @@
       card.streak=Math.max(-8,Math.min(12,card.streak));
     }
 
-    // ---------- Reset helpers (corrige les boutons manquants) ----------
+    // ---------- Reset helpers ----------
     function resetChapter(chapId){
       const chap=getChapter(chapId); if(!chap) return;
       chap.cards.forEach(c=>{
@@ -2535,9 +2810,13 @@
       if(!confirm('Réinitialiser toute l’application ?')) return;
       const theme=data.app?.theme||'dark';
       const prefs=deepClone(data.app?.prefs||{});
-      const fresh=buildChaptersFromFlashcards(flashcardData);
-      fresh.app.theme=theme; fresh.app.prefs=prefs;
-      data=fresh; upgradeData(); applyTheme(); applyUI(); saveData(); goDeck(false);
+      const subjects = buildCanonicalSubjects();
+      data = { subjects, app: { theme, prefs, currentSubjectId: subjects[0]?.id || null } };
+      upgradeData();
+      applyTheme();
+      applyUI();
+      saveData();
+      goDeck(false);
       alert('Application réinitialisée.');
     }
 
@@ -2550,14 +2829,17 @@
       window.addEventListener('pagehide',saveData);
       window.addEventListener('beforeunload',saveData);
       setInterval(saveData,15000);
-      window.addEventListener('storage',(e)=>{if(e.key===STORAGE_KEY && e.newValue){try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}}});
+      window.addEventListener('storage',(e)=>{
+        if(e.key===STORAGE_KEY && e.newValue){
+          try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
+        }
+      });
 
-      // IMPORTANT: réconcilier d'abord avec le voc canonique
-      reconcileWithCanonical();
+      // IMPORTANT: réconcilier d'abord avec le voc canonique (multi-matières)
+      reconcileAllSubjectsWithCanonical();
 
       // S'assure que les champs manquants sont complétés après la fusion
       upgradeData();
-
       applyTheme();
       applyUI();
       Nav.clear();
@@ -2565,5 +2847,7 @@
     }
     init();
   </script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>
 </html>
