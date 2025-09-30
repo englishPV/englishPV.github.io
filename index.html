@@ -293,8 +293,7 @@
     .card-block.grade-facile{border-color:var(--green)}
     .card-block.grade-unseen{border-color:#9ca3af}
 
-
-    /* [CORRIGÉ] Styles consolidés pour les images */
+    /* Styles consolidés pour les images */
     .review-card img,
     .card-block img {
       display: block;
@@ -413,27 +412,43 @@
     /* === LIGHTBOX IMAGE VIEWER === */
     .img-lightbox{
       position:fixed; inset:0;
-      display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.55);
-      backdrop-filter: blur(4px) saturate(140%);
+      display:none; /* on affiche via .open */
+      background:transparent; /* pas de flou, pas d'assombrissement */
       z-index:10000;
     }
-    .img-lightbox.open{ display:flex; }
+    .img-lightbox.open{ display:block; }
 
-    /* Scène: on gère nous-mêmes zoom/pan via transform */
-    .img-stage{ position:relative; width:100%; height:100%; overflow:hidden; touch-action:none; cursor:grab; }
-    .img-canvas{ position:absolute; top:0; left:0; transform:translate(0px,0px) scale(1); transform-origin:0 0; will-change:transform; }
-    .img-canvas img{ display:block; width:100%; height:auto; user-select:none; -webkit-user-drag:none; pointer-events:none; }
+    /* Surface de geste: 100% de l’écran, drag/pinch/zoom partout */
+    .img-stage{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      overflow:hidden;
+      touch-action:none;      /* on gère le pan/zoom nous-mêmes */
+      cursor:grab;
+    }
 
-    /* Chrome (actions) */
+    /* Canvas transformé (pan/zoom via translate+scale) */
+    .img-canvas{
+      position:absolute; top:0; left:0;
+      transform:translate(0px,0px) scale(1);
+      transform-origin:0 0;
+      will-change:transform;
+    }
+    .img-canvas img{
+      display:block;
+      width:100%; height:auto;
+      user-select:none; -webkit-user-drag:none;
+      pointer-events:none; /* toute la surface sert aux gestes */
+    }
+
+    /* Boutons / compteur (on garde un petit chrome) */
     .img-close, .img-nav{
       position:absolute; z-index:2;
-      background:rgba(255,255,255,.08);
-      color:#fff; border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.9);
+      color:#0f172a; border:1px solid #e2e8f0;
       width:42px; height:42px; border-radius:999px;
       display:flex; align-items:center; justify-content:center;
       font-weight:900; cursor:pointer;
-      backdrop-filter: blur(6px) saturate(140%);
     }
     .img-close{ top:14px; right:14px; }
     .img-nav.prev{ left:14px; top:50%; transform:translateY(-50%); }
@@ -441,59 +456,10 @@
     .img-counter{
       position:absolute; left:50%; transform:translateX(-50%);
       bottom:16px; z-index:2;
-      background:rgba(0,0,0,.45); color:#fff; padding:6px 10px;
-      border-radius:999px; font-weight:900; font-size:12px;
+      background:rgba(255,255,255,.9); color:#0f172a;
+      padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px;
     }
-/* === LIGHTBOX IMAGE VIEWER (fond transparent, pas de flou) === */
-.img-lightbox{
-  position:fixed; inset:0;
-  display:none; /* on affiche via .open */
-  background:transparent; /* pas de flou, pas d'assombrissement */
-  z-index:10000;
-}
-.img-lightbox.open{ display:block; }
-
-/* Surface de geste: 100% de l’écran, drag/pinch/zoom partout */
-.img-stage{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  overflow:hidden;
-  touch-action:none;      /* on gère le pan/zoom nous-mêmes */
-  cursor:grab;
-}
-
-/* Canvas transformé (pan/zoom via translate+scale) */
-.img-canvas{
-  position:absolute; top:0; left:0;
-  transform:translate(0px,0px) scale(1);
-  transform-origin:0 0;
-  will-change:transform;
-}
-.img-canvas img{
-  display:block;
-  width:100%; height:auto;
-  user-select:none; -webkit-user-drag:none;
-  pointer-events:none; /* toute la surface sert aux gestes */
-}
-
-/* Boutons / compteur (on garde un petit chrome) */
-.img-close, .img-nav{
-  position:absolute; z-index:2;
-  background:rgba(255,255,255,.9);
-  color:#0f172a; border:1px solid #e2e8f0;
-  width:42px; height:42px; border-radius:999px;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:900; cursor:pointer;
-}
-.img-close{ top:14px; right:14px; }
-.img-nav.prev{ left:14px; top:50%; transform:translateY(-50%); }
-.img-nav.next{ right:14px; top:50%; transform:translateY(-50%); }
-.img-counter{
-  position:absolute; left:50%; transform:translateX(-50%);
-  bottom:16px; z-index:2;
-  background:rgba(255,255,255,.9); color:#0f172a;
-  padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px;
-}
+    
     /* Light/clair */
     :root[data-theme="light"] .img-close,
     :root[data-theme="light"] .img-nav{ color:#0f172a; background:rgba(255,255,255,.9); border-color:#e2e8f0; }
@@ -1482,210 +1448,209 @@
 10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $ \\vec{f_{ic}} $ et $ \\vec{f_{ie}} $ dans le cas d'une translation de R' par rapport à R|&nbsp;$ \\vec{f_{ic}} = \\vec{0} $ et&nbsp;&nbsp;$ \\vec{a_c} = \\vec{0} $ dans ce cas<br>et<br>$ \\vec{f_{ie}} = -m(\\frac{d^2 \\vec{OO'}}{dt^2})_R $|${PM}
 `.trim();
 
-    // === LIGHTBOX IMAGE VIEWER (clic simple sur image) ===
-    // === LIGHTBOX IMAGE VIEWER (fond transparent, gestures plein écran) ===
-const LB = {
-  el:null, stage:null, canvas:null, img:null,
-  btnClose:null, btnPrev:null, btnNext:null, counter:null,
-  images:[], idx:0,
-  baseW:0, baseH:0,
-  s:1, minS:1, maxS:5, x:0, y:0,
-  pointers:new Map(), startDist:0, startS:1, startX:0, startY:0, panStartX:0, panStartY:0,
-  tapStartX:0, tapStartY:0, tapMoved:false
-};
+    // === LIGHTBOX IMAGE VIEWER ===
+    const LB = {
+      el:null, stage:null, canvas:null, img:null,
+      btnClose:null, btnPrev:null, btnNext:null, counter:null,
+      images:[], idx:0,
+      baseW:0, baseH:0,
+      s:1, minS:1, maxS:5, x:0, y:0,
+      pointers:new Map(), startDist:0, startS:1, startX:0, startY:0, panStartX:0, panStartY:0,
+      tapStartX:0, tapStartY:0, tapMoved:false
+    };
 
-function ensureLightbox(){
-  if (LB.el) return LB.el;
-  const el = document.createElement('div');
-  el.className = 'img-lightbox';
-  el.innerHTML = `
-    <div class="img-stage" id="lbStage" tabindex="-1" aria-label="Image viewer">
-      <div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div>
-    </div>
-    <button class="img-close" id="lbClose" aria-label="Fermer">✕</button>
-    <button class="img-nav prev" id="lbPrev" aria-label="Précédent">‹</button>
-    <button class="img-nav next" id="lbNext" aria-label="Suivant">›</button>
-    <div class="img-counter" id="lbCounter">1/1</div>
-  `;
-  document.body.appendChild(el);
-  LB.el = el;
-  LB.stage = el.querySelector('#lbStage');
-  LB.canvas = el.querySelector('#lbCanvas');
-  LB.img = el.querySelector('#lbImg');
-  LB.btnClose = el.querySelector('#lbClose');
-  LB.btnPrev = el.querySelector('#lbPrev');
-  LB.btnNext = el.querySelector('#lbNext');
-  LB.counter = el.querySelector('#lbCounter');
+    function ensureLightbox(){
+      if (LB.el) return LB.el;
+      const el = document.createElement('div');
+      el.className = 'img-lightbox';
+      el.innerHTML = `
+        <div class="img-stage" id="lbStage" tabindex="-1" aria-label="Image viewer">
+          <div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div>
+        </div>
+        <button class="img-close" id="lbClose" aria-label="Fermer">✕</button>
+        <button class="img-nav prev" id="lbPrev" aria-label="Précédent">‹</button>
+        <button class="img-nav next" id="lbNext" aria-label="Suivant">›</button>
+        <div class="img-counter" id="lbCounter">1/1</div>
+      `;
+      document.body.appendChild(el);
+      LB.el = el;
+      LB.stage = el.querySelector('#lbStage');
+      LB.canvas = el.querySelector('#lbCanvas');
+      LB.img = el.querySelector('#lbImg');
+      LB.btnClose = el.querySelector('#lbClose');
+      LB.btnPrev = el.querySelector('#lbPrev');
+      LB.btnNext = el.querySelector('#lbNext');
+      LB.counter = el.querySelector('#lbCounter');
 
-  LB.btnClose.onclick = closeLightbox;
-  LB.btnPrev.onclick = ()=>showLB(LB.idx-1);
-  LB.btnNext.onclick = ()=>showLB(LB.idx+1);
-  el.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape') closeLightbox();
-    else if(e.key==='ArrowLeft') showLB(LB.idx-1);
-    else if(e.key==='ArrowRight') showLB(LB.idx+1);
-  });
+      LB.btnClose.onclick = closeLightbox;
+      LB.btnPrev.onclick = ()=>showLB(LB.idx-1);
+      LB.btnNext.onclick = ()=>showLB(LB.idx+1);
+      el.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape') closeLightbox();
+        else if(e.key==='ArrowLeft') showLB(LB.idx-1);
+        else if(e.key==='ArrowRight') showLB(LB.idx+1);
+      });
 
-  // Gestes sur toute la surface (stage)
-  LB.stage.addEventListener('pointerdown', e=>{
-    LB.stage.setPointerCapture?.(e.pointerId);
-    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    if (LB.pointers.size===1){
-      LB.panStartX = LB.x; LB.panStartY = LB.y;
-      LB.startX = LB.tapStartX = e.clientX;
-      LB.startY = LB.tapStartY = e.clientY;
-      LB.startS = LB.s;
-      LB.tapMoved = false;
-    }else if(LB.pointers.size===2){
-      const pts=[...LB.pointers.values()];
-      LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
-      LB.startS = LB.s;
-      LB.tapMoved = true; // pinch ≠ clic
-    }
-    e.preventDefault();
-  });
-
-  LB.stage.addEventListener('pointermove', e=>{
-    if(!LB.pointers.has(e.pointerId)) return;
-    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-
-    const dx = e.clientX - LB.startX;
-    const dy = e.clientY - LB.startY;
-    if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
-
-    if(LB.pointers.size>=2){
-      // Pinch -> zoom centré écran (viewport)
-      const pts=[...LB.pointers.values()];
-      const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
-      setLBScaleCentered(LB.startS * (dist/LB.startDist));
-    }else{
-      // 1 doigt = pan (sur toute la surface)
-      setLBPan(LB.panStartX + dx, LB.panStartY + dy);
-    }
-    e.preventDefault();
-  });
-
-  const endPtr = e=>{
-    if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
-    if(LB.pointers.size===0){
-      // Fin d'interaction: si c'était un "vrai" clic ET que clic dans le vide -> fermer
-      if (!LB.tapMoved){
-        const imgRect = LB.img.getBoundingClientRect();
-        if (!(e.clientX>=imgRect.left && e.clientX<=imgRect.right &&
-              e.clientY>=imgRect.top  && e.clientY<=imgRect.bottom)) {
-          closeLightbox();
+      // Gestes sur toute la surface (stage)
+      LB.stage.addEventListener('pointerdown', e=>{
+        LB.stage.setPointerCapture?.(e.pointerId);
+        LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+        if (LB.pointers.size===1){
+          LB.panStartX = LB.x; LB.panStartY = LB.y;
+          LB.startX = LB.tapStartX = e.clientX;
+          LB.startY = LB.tapStartY = e.clientY;
+          LB.startS = LB.s;
+          LB.tapMoved = false;
+        }else if(LB.pointers.size===2){
+          const pts=[...LB.pointers.values()];
+          LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
+          LB.startS = LB.s;
+          LB.tapMoved = true; // pinch ≠ clic
         }
+        e.preventDefault();
+      });
+
+      LB.stage.addEventListener('pointermove', e=>{
+        if(!LB.pointers.has(e.pointerId)) return;
+        LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+        const dx = e.clientX - LB.startX;
+        const dy = e.clientY - LB.startY;
+        if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
+
+        if(LB.pointers.size>=2){
+          // Pinch -> zoom centré écran (viewport)
+          const pts=[...LB.pointers.values()];
+          const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
+          setLBScaleCentered(LB.startS * (dist/LB.startDist));
+        }else{
+          // 1 doigt = pan (sur toute la surface)
+          setLBPan(LB.panStartX + dx, LB.panStartY + dy);
+        }
+        e.preventDefault();
+      });
+
+      const endPtr = e=>{
+        if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
+        if(LB.pointers.size===0){
+          // Fin d'interaction: si c'était un "vrai" clic ET que clic dans le vide -> fermer
+          if (!LB.tapMoved){
+            const imgRect = LB.img.getBoundingClientRect();
+            if (!(e.clientX>=imgRect.left && e.clientX<=imgRect.right &&
+                  e.clientY>=imgRect.top  && e.clientY<=imgRect.bottom)) {
+              closeLightbox();
+            }
+          }
+          LB.startDist=0;
+        }else if(LB.pointers.size===1){
+          const p=[...LB.pointers.values()][0];
+          LB.startX=p.x; LB.startY=p.y;
+          LB.panStartX = LB.x; LB.panStartY = LB.y;
+          LB.startS = LB.s; LB.startDist=0;
+        }
+      };
+      LB.stage.addEventListener('pointerup', endPtr);
+      LB.stage.addEventListener('pointercancel', endPtr);
+      LB.stage.addEventListener('lostpointercapture', endPtr);
+
+      // Double-tap/clic = toggle fit <-> zoom 2.2x centré écran
+      let lastTap=0;
+      LB.stage.addEventListener('pointerdown', e=>{
+        const now=Date.now();
+        if(now-lastTap<250){
+          if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
+          else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
+          LB.tapMoved = true; // pour éviter close juste après
+        }
+        lastTap=now;
+      });
+
+      // Molette = zoom centré écran (desktop)
+      LB.stage.addEventListener('wheel', e=>{
+        e.preventDefault();
+        const step = (e.deltaY>0 ? -0.15 : 0.15);
+        setLBScaleCentered(LB.s + step*LB.s);
+      }, {passive:false});
+
+      window.addEventListener('resize', ()=>{
+        if(LB.el.classList.contains('open')) refitLB();
+      });
+
+      return el;
+    }
+
+    function openLightboxFor(imgEl, scopeEl){
+      ensureLightbox();
+      // Liste d'images dans la carte (même scroller)
+      const list = Array.from(scopeEl.querySelectorAll('img'));
+      LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
+      LB.idx = Math.max(0, list.indexOf(imgEl));
+      LB.el.classList.add('open');
+      document.body.dataset._oriOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden'; // empêche le scroll derrière
+      LB.el.focus?.();
+      showLB(LB.idx, true);
+    }
+
+    function closeLightbox(){
+      LB.el.classList.remove('open');
+      LB.images=[]; LB.idx=0;
+      document.body.style.overflow = document.body.dataset._oriOverflow || '';
+    }
+
+    function showLB(idx, initial=false){
+      if(!LB.images.length) return;
+      LB.idx = (idx+LB.images.length) % LB.images.length;
+      const it = LB.images[LB.idx];
+      LB.img.src = it.src;
+      LB.img.alt = it.alt;
+      LB.baseW = it.w; LB.baseH = it.h;
+      LB.counter.textContent = `${LB.idx+1}/${LB.images.length}`;
+      refitLB(initial);
+    }
+
+    function refitLB(initial=false){
+      const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
+      const fit = Math.min(sw/LB.baseW, sh/LB.baseH);
+      LB.minS = fit;
+      if (initial){
+        LB.s = fit;
+        LB.x = (sw - LB.s*LB.baseW)/2;
+        LB.y = (sh - LB.s*LB.baseH)/2;
+        applyLB();
+      }else{
+        setLBScaleCentered(fit, true);
       }
-      LB.startDist=0;
-    }else if(LB.pointers.size===1){
-      const p=[...LB.pointers.values()][0];
-      LB.startX=p.x; LB.startY=p.y;
-      LB.panStartX = LB.x; LB.panStartY = LB.y;
-      LB.startS = LB.s; LB.startDist=0;
     }
-  };
-  LB.stage.addEventListener('pointerup', endPtr);
-  LB.stage.addEventListener('pointercancel', endPtr);
-  LB.stage.addEventListener('lostpointercapture', endPtr);
 
-  // Double-tap/clic = toggle fit <-> zoom 2.2x centré écran
-  let lastTap=0;
-  LB.stage.addEventListener('pointerdown', e=>{
-    const now=Date.now();
-    if(now-lastTap<250){
-      if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
-      else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
-      LB.tapMoved = true; // pour éviter close juste après
+    function applyLB(){
+      // contraint le pan pour rester dans l'écran
+      const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight;
+      const w=LB.s*LB.baseW, h=LB.s*LB.baseH;
+      if (w <= sw) LB.x = (sw - w)/2; else LB.x = clamp(LB.x, sw - w, 0);
+      if (h <= sh) LB.y = (sh - h)/2; else LB.y = clamp(LB.y, sh - h, 0);
+      LB.canvas.style.width = LB.baseW + 'px';
+      LB.canvas.style.height = LB.baseH + 'px';
+      LB.canvas.style.transform = `translate(${LB.x}px, ${LB.y}px) scale(${LB.s})`;
     }
-    lastTap=now;
-  });
 
-  // Molette = zoom centré écran (desktop)
-  LB.stage.addEventListener('wheel', e=>{
-    e.preventDefault();
-    const step = (e.deltaY>0 ? -0.15 : 0.15);
-    setLBScaleCentered(LB.s + step*LB.s);
-  }, {passive:false});
+    function setLBPan(nx, ny){
+      LB.x = nx; LB.y = ny;
+      applyLB();
+    }
 
-  window.addEventListener('resize', ()=>{
-    if(LB.el.classList.contains('open')) refitLB();
-  });
-
-  return el;
-}
-
-function openLightboxFor(imgEl, scopeEl){
-  ensureLightbox();
-  // Liste d'images dans la carte (même scroller)
-  const list = Array.from(scopeEl.querySelectorAll('img'));
-  LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
-  LB.idx = Math.max(0, list.indexOf(imgEl));
-  LB.el.classList.add('open');
-  document.body.dataset._oriOverflow = document.body.style.overflow || '';
-  document.body.style.overflow = 'hidden'; // empêche le scroll derrière
-  LB.el.focus?.();
-  showLB(LB.idx, true);
-}
-
-function closeLightbox(){
-  LB.el.classList.remove('open');
-  LB.images=[]; LB.idx=0;
-  document.body.style.overflow = document.body.dataset._oriOverflow || '';
-}
-
-function showLB(idx, initial=false){
-  if(!LB.images.length) return;
-  LB.idx = (idx+LB.images.length) % LB.images.length;
-  const it = LB.images[LB.idx];
-  LB.img.src = it.src;
-  LB.img.alt = it.alt;
-  LB.baseW = it.w; LB.baseH = it.h;
-  LB.counter.textContent = `${LB.idx+1}/${LB.images.length}`;
-  refitLB(initial);
-}
-
-function refitLB(initial=false){
-  const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
-  const fit = Math.min(sw/LB.baseW, sh/LB.baseH);
-  LB.minS = fit;
-  if (initial){
-    LB.s = fit;
-    LB.x = (sw - LB.s*LB.baseW)/2;
-    LB.y = (sh - LB.s*LB.baseH)/2;
-    applyLB();
-  }else{
-    setLBScaleCentered(fit, true);
-  }
-}
-
-function applyLB(){
-  // contraint le pan pour rester dans l'écran
-  const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight;
-  const w=LB.s*LB.baseW, h=LB.s*LB.baseH;
-  if (w <= sw) LB.x = (sw - w)/2; else LB.x = clamp(LB.x, sw - w, 0);
-  if (h <= sh) LB.y = (sh - h)/2; else LB.y = clamp(LB.y, sh - h, 0);
-  LB.canvas.style.width = LB.baseW + 'px';
-  LB.canvas.style.height = LB.baseH + 'px';
-  LB.canvas.style.transform = `translate(${LB.x}px, ${LB.y}px) scale(${LB.s})`;
-}
-
-function setLBPan(nx, ny){
-  LB.x = nx; LB.y = ny;
-  applyLB();
-}
-
-function setLBScaleCentered(newS, force=false){
-  const oldS = LB.s;
-  let s = clamp(newS, LB.minS, LB.maxS);
-  if (!force && Math.abs(s-oldS)<1e-4) return;
-  const cx = LB.stage.clientWidth/2, cy = LB.stage.clientHeight/2;
-  const imgCx = (cx - LB.x) / oldS;
-  const imgCy = (cy - LB.y) / oldS;
-  LB.s = s;
-  LB.x = cx - LB.s * imgCx;
-  LB.y = cy - LB.s * imgCy;
-  applyLB();
-}
+    function setLBScaleCentered(newS, force=false){
+      const oldS = LB.s;
+      let s = clamp(newS, LB.minS, LB.maxS);
+      if (!force && Math.abs(s-oldS)<1e-4) return;
+      const cx = LB.stage.clientWidth/2, cy = LB.stage.clientHeight/2;
+      const imgCx = (cx - LB.x) / oldS;
+      const imgCy = (cy - LB.y) / oldS;
+      LB.s = s;
+      LB.x = cx - LB.s * imgCx;
+      LB.y = cy - LB.s * imgCy;
+      applyLB();
+    }
 
     // Parsing générique multi-matières
     function parseCardsRaw(raw){
@@ -2446,7 +2411,7 @@ function setLBScaleCentered(newS, force=false){
           const delta=now-c.dueAt;
           dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
         }else{ dueBoost=1.15; }
-        const ema=typeof c.perfEma==='number' ? c.perfEma : 0.5;
+        const ema=typeof c.perfEma=='number' ? c.perfEma : 0.5;
         const perfBoost=1+(1-ema)*1.6;
         const s=c.streak||0;
         const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
@@ -2940,7 +2905,6 @@ function setLBScaleCentered(newS, force=false){
       saveData();
     }
 
-    // [CORRIGÉ] La fonction initReviewGestures était manquante.
     function initReviewGestures(){
         const view = document.getElementById('view');
         if (!view) return;
@@ -3108,28 +3072,26 @@ function setLBScaleCentered(newS, force=false){
       saveData(); alert('Chapitre réinitialisé.');
     }
 
-    enableImageLightboxInReview(scroller);
-
-function enableImageLightboxInReview(scroller){
-  const imgs = Array.from(scroller.querySelectorAll('img'));
-  imgs.forEach(img=>{
-    img._moved = false;
-    img.addEventListener('pointerdown', e=>{
-      img._moved = false;
-      img._sx = e.clientX; img._sy = e.clientY;
-    });
-    img.addEventListener('pointermove', e=>{
-      if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){
-        img._moved = true;
-      }
-    });
-    img.addEventListener('click', e=>{
-      if (img._moved) return; // c'était un drag -> ne pas ouvrir
-      e.preventDefault();
-      openLightboxFor(img, scroller);
-    });
-  });
-}
+    function enableImageLightboxInReview(scroller){
+      const imgs = Array.from(scroller.querySelectorAll('img'));
+      imgs.forEach(img=>{
+        img._moved = false;
+        img.addEventListener('pointerdown', e=>{
+          img._moved = false;
+          img._sx = e.clientX; img._sy = e.clientY;
+        });
+        img.addEventListener('pointermove', e=>{
+          if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){
+            img._moved = true;
+          }
+        });
+        img.addEventListener('click', e=>{
+          if (img._moved) return; // c'était un drag -> ne pas ouvrir
+          e.preventDefault();
+          openLightboxFor(img, scroller);
+        });
+      });
+    }
 
     function resetAll(){
       if(!confirm('Réinitialiser toute l’application ?')) return;
