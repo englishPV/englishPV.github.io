@@ -417,6 +417,33 @@
 
 /* Optionnel: ne suggère plus visuellement le "ns-resize" (qui faisait penser à un zoom vertical) */
 .review-card { cursor: auto; }
+/* Scroller vertical/horizontal dans la carte */
+.review-card { min-height: 0; }
+.review-card .review-scroller {
+  max-height: 100%;
+  overflow: auto;                 /* X et Y */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Images zoomables */
+.review-card img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 10px auto;
+  border-radius: 8px;
+  background: var(--border);
+  -webkit-user-drag: none;
+  user-select: none;
+  touch-action: none;            /* on capture le drag pour zoom */
+  cursor: zoom-in;               /* visuel */
+}
+
+/* Wrapper qui porte la largeur "zoomée" (sert à créer de la scroll-area) */
+.zoom-wrap {
+  display: inline-block;
+  max-width: none;               /* autorise largeur > conteneur */
+}
   </style>
 </head>
 <body>
@@ -2119,7 +2146,7 @@ function typesetLatex(container){
     <div class="review-wrap">
       <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
       <div class="review-card">
-        <div>
+        <div class="review-scroller">
           ${!r.flipped
             ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
             : `<div class="stack"><div class="term" data-face="front">${frontHTML}</div><div class="definition" data-face="back" style="margin-top:6px">${backHTML}</div></div>`
@@ -2130,10 +2157,10 @@ function typesetLatex(container){
   `;
 
   // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
-  typesetLatex(v);
-
-  bindReviewSizeControls();
-  renderReviewFooter();
+  typesetLatex(v).then(()=>{
+  initReviewGestures(); // nouveau: gère texte, images, swipe
+});
+renderReviewFooter();
 }
 
     // Recap
@@ -2699,6 +2726,216 @@ function typesetLatex(container){
     }
 
     // ---------- Contrôles taille texte ----------
+    function initReviewGestures(){
+  const v = document.getElementById('view');
+  const scroller = v.querySelector('.review-scroller, .review-card > div');
+  if (!scroller) return;
+
+  const hasImages = !!scroller.querySelector('img');
+
+  prepareZoomableImages(scroller);   // wrap les <img> dans .zoom-wrap
+  bindImageZoom(scroller);           // drag/pinch/wheel = zoom image
+  bindTextSizeDrag(scroller);        // drag sur texte = change fs
+  bindBackgroundDragScroll(scroller, hasImages); // drag sur fond = pan si images
+}
+
+/* 1) Wrap toutes les images visibles pour que le zoom agrandisse la largeur réelle (scrollable) */
+function prepareZoomableImages(scroller){
+  const imgs = Array.from(scroller.querySelectorAll('img'));
+  imgs.forEach(img=>{
+    if (img.closest('.zoom-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'zoom-wrap';
+    // Base = largeur affichée actuelle: point de départ de l’échelle
+    const baseW = Math.max(10, img.clientWidth || img.naturalWidth || 300);
+    wrap.style.width = baseW + 'px';
+    wrap.dataset.baseWidth = String(baseW);
+    wrap.dataset.scale = '1';
+
+    img.parentNode.insertBefore(wrap, img);
+    wrap.appendChild(img);
+    img.style.width = '100%';
+    img.style.height = 'auto';
+
+    // Sécurité: recalibre quand l’image a fini de charger (si besoin)
+    if (!img.complete) {
+      img.addEventListener('load', ()=>{
+        const w = img.clientWidth || img.naturalWidth || baseW;
+        wrap.dataset.baseWidth = String(w);
+        if (parseFloat(wrap.dataset.scale||'1') === 1) wrap.style.width = w + 'px';
+      }, {once:true});
+    }
+  });
+}
+
+/* 2) Zoom image: drag vertical, pinch (2 doigts), wheel (desktop) */
+function bindImageZoom(scroller){
+  const imgs = Array.from(scroller.querySelectorAll('.zoom-wrap > img'));
+  imgs.forEach(img=>{
+    const wrap = img.parentElement;
+    let pointers = new Map();     // pointerId -> {x,y}
+    let startY = 0, startScale = 1, startDist = 0;
+    const minS = 1, maxS = 5;
+
+    const getScale = ()=> parseFloat(wrap.dataset.scale || '1') || 1;
+    const setScale = (s)=>{
+      s = clamp(s, minS, maxS);
+      wrap.dataset.scale = String(s);
+      const base = parseFloat(wrap.dataset.baseWidth || String(img.clientWidth || 300));
+      wrap.style.width = (base * s) + 'px';
+      img.style.cursor = s>1 ? 'zoom-out' : 'zoom-in';
+    };
+
+    // Double tap/click = reset
+    let lastDown = 0;
+
+    img.addEventListener('pointerdown', (e)=>{
+      const now = Date.now();
+      if (now - lastDown < 250) { setScale(1); }
+      lastDown = now;
+
+      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      img.setPointerCapture?.(e.pointerId);
+      if (pointers.size === 1){
+        startY = e.clientY;
+        startScale = getScale();
+      } else if (pointers.size === 2){
+        startScale = getScale();
+        const pts = [...pointers.values()];
+        startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      }
+      e.preventDefault();
+    });
+
+    img.addEventListener('pointermove', (e)=>{
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+      let s = startScale;
+      if (pointers.size === 1){
+        const dy = startY - e.clientY;
+        s = startScale + (dy / 150);  // drag vers le haut => zoom +
+      } else if (pointers.size >= 2 && startDist > 0){
+        const pts = [...pointers.values()];
+        const dist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+        s = startScale * (dist / startDist);
+      }
+      setScale(s);
+      e.preventDefault();
+    });
+
+    const end = (e)=>{
+      if (pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+      if (pointers.size === 1){
+        // recale le point de départ pour continuer en 1 doigt
+        const p = [...pointers.values()][0];
+        startY = p.y;
+        startScale = getScale();
+      }
+    };
+    img.addEventListener('pointerup', end);
+    img.addEventListener('pointercancel', end);
+    img.addEventListener('lostpointercapture', end);
+
+    // Wheel = zoom desktop
+    img.addEventListener('wheel', (e)=>{
+      e.preventDefault();
+      const s = getScale() + (e.deltaY>0 ? -0.15 : 0.15);
+      setScale(s);
+    }, {passive:false});
+  });
+}
+
+/* 3) Drag sur TEXTE: ajuste la taille (Recto/Verso) */
+function bindTextSizeDrag(scroller){
+  const P=data.app.prefs||{};
+  const applyVars=()=>{
+    document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
+    document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
+  };
+  const attach = (el, which)=>{ // which: 'term' | 'def'
+    let startY=null, startVal=null;
+    const getVal=()=> which==='term' ? (P.fsTerm||20) : (P.fsDef||24);
+    const setVal=v=>{
+      if(which==='term') P.fsTerm=clamp(v,12,60);
+      else               P.fsDef=clamp(v,14,72);
+      applyVars();
+    };
+    const commit=()=>saveData();
+
+    el.addEventListener('pointerdown',(e)=>{
+      // On ne déclenche PAS si on commence sur une image
+      if (e.target.closest('img, video, svg, canvas')) return;
+      startY=e.clientY;
+      startVal=getVal();
+      el.setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    el.addEventListener('pointermove',(e)=>{
+      if(startY==null) return;
+      const dy=startY-e.clientY;
+      const delta=Math.round(dy/6);
+      setVal(startVal+delta);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    const end=(e)=>{
+      if(startY!=null) commit();
+      startY=null; startVal=null;
+    };
+    el.addEventListener('pointerup',end);
+    el.addEventListener('pointercancel',end);
+
+    // Wheel pour confort desktop
+    el.addEventListener('wheel',(e)=>{
+      e.preventDefault();
+      const dir=e.deltaY>0?-1:1;
+      setVal(getVal()+dir);
+      commit();
+    },{passive:false});
+  };
+
+  scroller.querySelectorAll('.term').forEach(el=>attach(el,'term'));
+  scroller.querySelectorAll('.definition').forEach(el=>attach(el,'def'));
+}
+
+/* 4) Drag sur le “fond” = pan (uniquement si images visibles) */
+function bindBackgroundDragScroll(scroller, hasImages){
+  if(!hasImages) return; // exigence: seulement si la face possède des images
+
+  let active=false, startX=0, startY=0, sTop=0, sLeft=0;
+
+  scroller.addEventListener('pointerdown',(e)=>{
+    // On ne démarre pas si on est sur texte (term/definition) ou image
+    if (e.target.closest('img, .term, .definition, a, button')) return;
+
+    // Mobile a déjà le scroll natif, on ajoute surtout pour souris
+    if (e.pointerType==='mouse'){
+      active=true;
+      scroller.setPointerCapture?.(e.pointerId);
+      startX=e.clientX; startY=e.clientY;
+      sTop=scroller.scrollTop; sLeft=scroller.scrollLeft;
+      scroller.style.cursor='grabbing';
+      e.preventDefault();
+    }
+  });
+
+  scroller.addEventListener('pointermove',(e)=>{
+    if(!active) return;
+    scroller.scrollTop  = sTop  - (e.clientY - startY);
+    scroller.scrollLeft = sLeft - (e.clientX - startX);
+  });
+
+  const end=(e)=>{
+    if(!active) return;
+    active=false;
+    scroller.releasePointerCapture?.(e.pointerId);
+    scroller.style.cursor='';
+  };
+  scroller.addEventListener('pointerup',end);
+  scroller.addEventListener('pointercancel',end);
+}
     function bindReviewSizeControls(){
   const faces = document.querySelectorAll('.review-card [data-face]');
   if (!faces.length) return;
