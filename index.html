@@ -396,6 +396,27 @@
     .subject-item .name{ font-weight:800; flex:1 }
     .subject-item .meta{ font-size:12px; color:var(--muted) }
     :root[data-theme="light"] .subject-item:hover{ background: rgba(0,0,0,.06) }
+    /* La carte elle-même peut se réduire et laisser défiler son contenu */
+.review-card { min-height: 0; }
+
+/* Le 1er enfant de .review-card (ton wrapper <div>) devient le scroller vertical */
+.review-card > div {
+  max-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* inertie iOS */
+  width: 100%;
+}
+
+/* Pour éviter le "drag d'image" (ghost drag) côté desktop et favoriser le scroll */
+.review-card img,
+.card-block img {
+  -webkit-user-drag: none;
+  user-select: none;
+  touch-action: pan-y; /* favorise le scroll vertical */
+}
+
+/* Optionnel: ne suggère plus visuellement le "ns-resize" (qui faisait penser à un zoom vertical) */
+.review-card { cursor: auto; }
   </style>
 </head>
 <body>
@@ -2679,30 +2700,70 @@ function typesetLatex(container){
 
     // ---------- Contrôles taille texte ----------
     function bindReviewSizeControls(){
-      const faces=document.querySelectorAll('.review-card [data-face]'); if(!faces.length) return;
-      const P=data.app.prefs||{};
-      const applyVars=()=>{
-        document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
-        document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
-      };
-      faces.forEach(el=>{
-        const face=el.getAttribute('data-face');
-        let startY=null,startVal=null;
-        const getVal=()=> face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
-        const setVal=v=>{
-          if(face==='front') P.fsTerm=clamp(v,12,60);
-          else P.fsDef=clamp(v,14,72);
-          applyVars();
-        };
-        const commit=()=>saveData();
+  const faces = document.querySelectorAll('.review-card [data-face]');
+  if (!faces.length) return;
 
-        el.addEventListener('pointerdown',e=>{startY=e.clientY; startVal=getVal(); el.setPointerCapture?.(e.pointerId); e.preventDefault(); e.stopPropagation();});
-        el.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6); setVal(startVal+delta); e.preventDefault(); e.stopPropagation();});
-        const end=e=>{if(startY!=null) commit(); startY=null; startVal=null; e.preventDefault(); e.stopPropagation();};
-        el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
-        el.addEventListener('wheel',e=>{e.preventDefault(); const dir=e.deltaY>0?-1:1; setVal(getVal()+dir); commit();},{passive:false});
-      });
-    }
+  const P = data.app.prefs || {};
+  const applyVars = ()=>{
+    document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
+    document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
+  };
+
+  faces.forEach(el=>{
+    const face = el.getAttribute('data-face');
+
+    let startY=null, startVal=null;
+    const getVal = () => face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
+    const setVal = v => {
+      if (face==='front') P.fsTerm = clamp(v,12,60);
+      else               P.fsDef = clamp(v,14,72);
+      applyVars();
+    };
+    const commit = ()=>saveData();
+
+    el.addEventListener('pointerdown', e=>{
+      // 1) Si on part d’une image / média / MathJax: on laisse défiler
+      if (e.target.closest('img, video, svg, canvas, mjx-container, a, pre, code')) return;
+
+      // 2) Si le wrapper est scrollable en Y, on privilégie le scroll
+      const scroller = el.closest('.review-card')?.querySelector('.review-scroller, .review-card > div');
+      if (scroller && scroller.scrollHeight > scroller.clientHeight) return;
+
+      // Sinon: on active le drag de redimensionnement
+      startY=e.clientY;
+      startVal=getVal();
+      el.setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    el.addEventListener('pointermove', e=>{
+      if (startY==null) return;
+      const dy = startY - e.clientY;
+      const delta = Math.round(dy/6);
+      setVal(startVal + delta);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    const end = e=>{
+      if (startY!=null) commit();
+      startY=null; startVal=null;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+
+    // Wheel = ok pour desktop (garde le confort du réglage à la molette)
+    el.addEventListener('wheel', e=>{
+      e.preventDefault();
+      const dir = e.deltaY>0 ? -1 : 1;
+      setVal(getVal()+dir);
+      commit();
+    },{passive:false});
+  });
+}
 
     function bindTypoPreviewDrag(){
       const box=$('#typoPreview'); if(!box) return;
