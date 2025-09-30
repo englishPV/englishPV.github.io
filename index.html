@@ -2733,20 +2733,20 @@ renderReviewFooter();
 
   const hasImages = !!scroller.querySelector('img');
 
-  prepareZoomableImages(scroller);   // wrap les <img> dans .zoom-wrap
-  bindImageZoom(scroller);           // drag/pinch/wheel = zoom image
-  bindTextSizeDrag(scroller);        // drag sur texte = change fs
-  bindBackgroundDragScroll(scroller, hasImages); // drag sur fond = pan si images
+  prepareZoomableImages(scroller);
+  bindImageZoomAndPan(scroller);        // <- nouveau: zoom centré écran + pan
+  bindTextSizeDrag(scroller);           // drag sur texte = change fs
+  bindBackgroundDragScroll(scroller, hasImages); // fond = pan si images
 }
 
-/* 1) Wrap toutes les images visibles pour que le zoom agrandisse la largeur réelle (scrollable) */
+/* Wrap toutes les images pour que l’échelle change leur largeur réelle (scrollable) */
 function prepareZoomableImages(scroller){
   const imgs = Array.from(scroller.querySelectorAll('img'));
   imgs.forEach(img=>{
     if (img.closest('.zoom-wrap')) return;
+
     const wrap = document.createElement('div');
     wrap.className = 'zoom-wrap';
-    // Base = largeur affichée actuelle: point de départ de l’échelle
     const baseW = Math.max(10, img.clientWidth || img.naturalWidth || 300);
     wrap.style.width = baseW + 'px';
     wrap.dataset.baseWidth = String(baseW);
@@ -2757,103 +2757,165 @@ function prepareZoomableImages(scroller){
     img.style.width = '100%';
     img.style.height = 'auto';
 
-    // Sécurité: recalibre quand l’image a fini de charger (si besoin)
     if (!img.complete) {
       img.addEventListener('load', ()=>{
         const w = img.clientWidth || img.naturalWidth || baseW;
         wrap.dataset.baseWidth = String(w);
-        if (parseFloat(wrap.dataset.scale||'1') === 1) wrap.style.width = w + 'px';
+        if ((wrap.dataset.scale||'1') === '1') wrap.style.width = w + 'px';
       }, {once:true});
     }
   });
 }
 
-/* 2) Zoom image: drag vertical, pinch (2 doigts), wheel (desktop) */
-function bindImageZoom(scroller){
+/* Zoom autour du centre du viewport (pas du doigt) + pan si geste horizontal sur l’image */
+function bindImageZoomAndPan(scroller){
   const imgs = Array.from(scroller.querySelectorAll('.zoom-wrap > img'));
+
   imgs.forEach(img=>{
     const wrap = img.parentElement;
-    let pointers = new Map();     // pointerId -> {x,y}
-    let startY = 0, startScale = 1, startDist = 0;
-    const minS = 1, maxS = 5;
+    let pointers = new Map(); // pointerId -> {x,y}
+    let mode = 'undecided';   // 'undecided' | 'zoom' | 'pan'
+    let startX=0, startY=0, sLeft=0, sTop=0;
+    let startScale=1, startDist=0;
+    const minS=1, maxS=5;
 
     const getScale = ()=> parseFloat(wrap.dataset.scale || '1') || 1;
-    const setScale = (s)=>{
-      s = clamp(s, minS, maxS);
-      wrap.dataset.scale = String(s);
-      const base = parseFloat(wrap.dataset.baseWidth || String(img.clientWidth || 300));
-      wrap.style.width = (base * s) + 'px';
-      img.style.cursor = s>1 ? 'zoom-out' : 'zoom-in';
+
+    const setScaleAroundViewportCenter = (newS, oldS)=>{
+      newS = clamp(newS, minS, maxS);
+      const scRect  = scroller.getBoundingClientRect();
+      const wrRect0 = wrap.getBoundingClientRect(); // avant update
+
+      // Position du centre du viewport en coords wrap (ratios)
+      const cx = scRect.left + scRect.width/2;
+      const cy = scRect.top  + scRect.height/2;
+      const relX = (cx - wrRect0.left) / wrRect0.width;
+      const relY = (cy - wrRect0.top)  / wrRect0.height;
+      const ax = Math.max(0, Math.min(1, relX));
+      const ay = Math.max(0, Math.min(1, relY));
+
+      // Applique l’échelle via la largeur réelle
+      wrap.dataset.scale = String(newS);
+      const baseW = parseFloat(wrap.dataset.baseWidth || String(wrRect0.width));
+      wrap.style.width = (baseW * newS) + 'px';
+
+      // Dimensions attendues après la mise à jour (proportionnelles à l’échelle)
+      const scaleRatio = newS / (oldS || 1);
+      const wNew = wrRect0.width  * scaleRatio;
+      const hNew = wrRect0.height * scaleRatio;
+
+      // Position du wrap dans le contenu (coord. "content")
+      const contentLeft = scroller.scrollLeft + (wrRect0.left - scRect.left);
+      const contentTop  = scroller.scrollTop  + (wrRect0.top  - scRect.top);
+
+      const targetLeft = contentLeft + ax * wNew - (scRect.width  / 2);
+      const targetTop  = contentTop  + ay * hNew - (scRect.height / 2);
+
+      // Applique le scroll au frame suivant (après layout)
+      requestAnimationFrame(()=>{
+        scroller.scrollLeft = clamp(targetLeft, 0, scroller.scrollWidth - scroller.clientWidth);
+        scroller.scrollTop  = clamp(targetTop,  0, scroller.scrollHeight - scroller.clientHeight);
+      });
     };
 
-    // Double tap/click = reset
-    let lastDown = 0;
+    // Double-tap/clic = reset zoom + recentrage
+    let lastDownTs = 0;
+    const resetAndCenter = ()=>{
+      const oldS = getScale();
+      setScaleAroundViewportCenter(1, oldS);
+    };
 
     img.addEventListener('pointerdown', (e)=>{
       const now = Date.now();
-      if (now - lastDown < 250) { setScale(1); }
-      lastDown = now;
+      if (now - lastDownTs < 250) { resetAndCenter(); e.preventDefault(); return; }
+      lastDownTs = now;
+
+      mode = 'undecided';
+      startX = e.clientX; startY = e.clientY;
+      sLeft = scroller.scrollLeft; sTop = scroller.scrollTop;
+      startScale = getScale();
 
       pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
       img.setPointerCapture?.(e.pointerId);
-      if (pointers.size === 1){
-        startY = e.clientY;
-        startScale = getScale();
-      } else if (pointers.size === 2){
-        startScale = getScale();
-        const pts = [...pointers.values()];
-        startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      }
+
       e.preventDefault();
+      e.stopPropagation();
     });
 
     img.addEventListener('pointermove', (e)=>{
-      if (!pointers.has(e.pointerId)) return;
+      if(!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
 
-      let s = startScale;
-      if (pointers.size === 1){
-        const dy = startY - e.clientY;
-        s = startScale + (dy / 150);  // drag vers le haut => zoom +
-      } else if (pointers.size >= 2 && startDist > 0){
+      if (pointers.size >= 2){
+        // Pinch = zoom
         const pts = [...pointers.values()];
         const dist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-        s = startScale * (dist / startDist);
+        if (startDist===0) startDist = dist || 1;
+        const s = startScale * (dist / startDist);
+        setScaleAroundViewportCenter(s, startScale);
+        mode = 'zoom';
+        e.preventDefault();
+        return;
       }
-      setScale(s);
+
+      // 1 doigt: on choisit le mode
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (mode==='undecided'){
+        if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) mode='zoom';
+        else if (Math.abs(dx) > 8) mode='pan';
+        else return;
+      }
+
+      if (mode==='zoom'){
+        const s = startScale + (-dy / 150); // vers le haut => zoom +
+        setScaleAroundViewportCenter(s, startScale);
+      }else if (mode==='pan'){
+        scroller.scrollLeft = sLeft - dx;
+        scroller.scrollTop  = sTop  - dy;
+      }
+
       e.preventDefault();
     });
 
     const end = (e)=>{
       if (pointers.has(e.pointerId)) pointers.delete(e.pointerId);
       if (pointers.size === 1){
-        // recale le point de départ pour continuer en 1 doigt
+        // recalage pour continuer en 1 doigt
         const p = [...pointers.values()][0];
-        startY = p.y;
+        startX = p.x; startY = p.y;
+        sLeft = scroller.scrollLeft; sTop = scroller.scrollTop;
         startScale = getScale();
+        startDist = 0;
+        mode = 'undecided';
+      }else if (pointers.size === 0){
+        startDist = 0;
+        mode = 'undecided';
       }
     };
     img.addEventListener('pointerup', end);
     img.addEventListener('pointercancel', end);
     img.addEventListener('lostpointercapture', end);
 
-    // Wheel = zoom desktop
+    // Wheel = zoom (desktop) centré écran
     img.addEventListener('wheel', (e)=>{
       e.preventDefault();
-      const s = getScale() + (e.deltaY>0 ? -0.15 : 0.15);
-      setScale(s);
+      const oldS = getScale();
+      const newS = oldS + (e.deltaY>0 ? -0.15 : 0.15);
+      setScaleAroundViewportCenter(newS, oldS);
     }, {passive:false});
   });
 }
 
-/* 3) Drag sur TEXTE: ajuste la taille (Recto/Verso) */
+/* Drag sur TEXTE: ajuste la taille (Recto/Verso) */
 function bindTextSizeDrag(scroller){
   const P=data.app.prefs||{};
   const applyVars=()=>{
     document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
     document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
   };
-  const attach = (el, which)=>{ // which: 'term' | 'def'
+  const attach = (el, which)=>{
     let startY=null, startVal=null;
     const getVal=()=> which==='term' ? (P.fsTerm||20) : (P.fsDef||24);
     const setVal=v=>{
@@ -2864,10 +2926,8 @@ function bindTextSizeDrag(scroller){
     const commit=()=>saveData();
 
     el.addEventListener('pointerdown',(e)=>{
-      // On ne déclenche PAS si on commence sur une image
       if (e.target.closest('img, video, svg, canvas')) return;
-      startY=e.clientY;
-      startVal=getVal();
+      startY=e.clientY; startVal=getVal();
       el.setPointerCapture?.(e.pointerId);
       e.preventDefault();
       e.stopPropagation();
@@ -2887,7 +2947,6 @@ function bindTextSizeDrag(scroller){
     el.addEventListener('pointerup',end);
     el.addEventListener('pointercancel',end);
 
-    // Wheel pour confort desktop
     el.addEventListener('wheel',(e)=>{
       e.preventDefault();
       const dir=e.deltaY>0?-1:1;
@@ -2900,17 +2959,14 @@ function bindTextSizeDrag(scroller){
   scroller.querySelectorAll('.definition').forEach(el=>attach(el,'def'));
 }
 
-/* 4) Drag sur le “fond” = pan (uniquement si images visibles) */
+/* Drag sur le “fond” = pan (uniquement si images présentes) */
 function bindBackgroundDragScroll(scroller, hasImages){
-  if(!hasImages) return; // exigence: seulement si la face possède des images
+  if(!hasImages) return;
 
   let active=false, startX=0, startY=0, sTop=0, sLeft=0;
 
   scroller.addEventListener('pointerdown',(e)=>{
-    // On ne démarre pas si on est sur texte (term/definition) ou image
     if (e.target.closest('img, .term, .definition, a, button')) return;
-
-    // Mobile a déjà le scroll natif, on ajoute surtout pour souris
     if (e.pointerType==='mouse'){
       active=true;
       scroller.setPointerCapture?.(e.pointerId);
@@ -2923,8 +2979,8 @@ function bindBackgroundDragScroll(scroller, hasImages){
 
   scroller.addEventListener('pointermove',(e)=>{
     if(!active) return;
-    scroller.scrollTop  = sTop  - (e.clientY - startY);
     scroller.scrollLeft = sLeft - (e.clientX - startX);
+    scroller.scrollTop  = sTop  - (e.clientY - startY);
   });
 
   const end=(e)=>{
@@ -2936,6 +2992,9 @@ function bindBackgroundDragScroll(scroller, hasImages){
   scroller.addEventListener('pointerup',end);
   scroller.addEventListener('pointercancel',end);
 }
+
+/* 4) Drag sur le “fond” = pan (uniquement si images visibles) */
+
     function bindReviewSizeControls(){
   const faces = document.querySelectorAll('.review-card [data-face]');
   if (!faces.length) return;
