@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Flashcards 9:16</title>
@@ -480,7 +483,7 @@
   <script>
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
-
+    const APP_VERSION = '2025-10-02-1'; // incrémente à chaque publication de contenu
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
@@ -3075,50 +3078,40 @@ function setLBScaleCentered(newS, force=false){
       alert('Application réinitialisée.');
     }
 
-    // ---------- Init ----------
-enableImageLightboxInReview(v.querySelector('.review-scroller') || v);
 
-function enableImageLightboxInReview(scroller){
-  const imgs = Array.from(scroller.querySelectorAll('img'));
-  imgs.forEach(img=>{
-    img._moved = false;
-    img.addEventListener('pointerdown', e=>{
-      img._moved = false;
-      img._sx = e.clientX; img._sy = e.clientY;
-    });
-    img.addEventListener('pointermove', e=>{
-      if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){
-        img._moved = true;
-      }
-    });
-    img.addEventListener('click', e=>{
-      if (img._moved) return; // drag inline -> ne pas ouvrir
-      e.preventDefault();
-      openLightboxFor(img, scroller);
-    });
-  });
-}
+
     function init(){
-      if(navigator.storage && navigator.storage.persist){
-        navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
-      }
-      window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
-      window.addEventListener('pagehide',saveData);
-      window.addEventListener('beforeunload',saveData);
-      setInterval(saveData,15000);
-      window.addEventListener('storage',(e)=>{
-        if(e.key===STORAGE_KEY && e.newValue){
-          try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
-        }
-      });
-
-      reconcileAllSubjectsWithCanonical();
-      upgradeData();
-      applyTheme();
-      applyUI();
-      Nav.clear();
-      goDeck(false);
+  if(navigator.storage && navigator.storage.persist){
+    navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
+  }
+  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
+  window.addEventListener('pagehide',saveData);
+  window.addEventListener('beforeunload',saveData);
+  setInterval(saveData,15000);
+  window.addEventListener('storage',(e)=>{
+    if(e.key===STORAGE_KEY && e.newValue){
+      try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
     }
+  });
+
+  // Forcer migration + fusion avec le contenu canonique à chaque nouvelle version
+  const prevVersion = localStorage.getItem('flash9x16_version');
+  if (prevVersion !== APP_VERSION) {
+    upgradeData();                          // migrer l'ancien schéma si besoin
+    reconcileAllSubjectsWithCanonical();    // fusionner avec les nouvelles cartes/chapitres
+    saveData();
+    localStorage.setItem('flash9x16_version', APP_VERSION);
+  } else {
+    // Assurer la cohérence même sans changement de version
+    upgradeData();
+    reconcileAllSubjectsWithCanonical();
+  }
+
+  applyTheme();
+  applyUI();
+  Nav.clear();
+  goDeck(false);
+}
     init();
   </script>
   <script id="MathJax-script" async
