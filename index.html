@@ -1424,58 +1424,7 @@
 919|l’égalitarisme|egalitarianism|${CF}
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
 `.trim();
-<!--
-================================================================================
- [!] GUIDE INFALLIBLE POUR L'AJOUT D'IMAGES DANS LES CARTES [!]
-================================================================================
 
- Pour éviter toute erreur d'affichage (point d'interrogation à la place de l'image),
- suivre OBLIGATOIREMENT les deux règles suivantes à la lettre.
-
---------------------------------------------------------------------------------
- Règle n°1 : L'EMPLACEMENT du fichier image
---------------------------------------------------------------------------------
- TOUTES les images, sans exception, doivent être placées physiquement
- DANS le dossier `images` du projet.
-
-     ✅ BON EMPLACEMENT : /images/mon-image.jpg
-     ❌ MAUVAIS EMPLACEMENT : /mon-image.jpg (à la racine)
-
-
---------------------------------------------------------------------------------
- Règle n°2 : Le CHEMIN dans le code de la carte
---------------------------------------------------------------------------------
- Dans le code de la carte (ex: la variable 'physicsRawText'), le chemin
- dans la balise <img src="..."> doit TOUJOURS commencer par "images/".
-
- Exemple pour un fichier nommé "schema-meca.png" :
-
-     ✅ CHEMIN CORRECT :
-        <img src="images/schema-meca.png">
-
-     ❌ CHEMIN INCORRECT (manque "images/") :
-        <img src="schema-meca.png">
-
-     ❌ CHEMIN INCORRECT (le "/" au début est une erreur) :
-        <img src="/images/schema-meca.png">
-
-
---------------------------------------------------------------------------------
- Checklist rapide pour chaque nouvelle image :
---------------------------------------------------------------------------------
- 1. PREPARER : J'ai mon fichier image (ex: "nouveau-diagramme.jpg").
-
- 2. UPLOADER : Je le téléverse sur GitHub DANS le dossier /images.
-
- 3. CODER : Dans la carte, j'écris le code <img src="images/nouveau-diagramme.jpg">.
-
- 4. VERIFIER : Sur la page web, je fais un "Hard Refresh" (Ctrl+Shift+R ou Cmd+Shift+R)
-               pour m'assurer de voir la dernière version du site.
-
-================================================================================
- FIN DU GUIDE
-================================================================================
--->
     const physicsRawText = `10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
 10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<b>en translation rectiligne et uniforme par</b>|${PM}
 10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
