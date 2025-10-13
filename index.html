@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Flashcards 9:16</title>
@@ -214,7 +217,12 @@
     /* Review view */
     .review-wrap{position:relative; flex:1; min-height:0; display:flex; flex-direction:column; padding-bottom:0}
     .review-top{display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px}
-    .review-card{flex:1; display:flex; align-items:center; justify-content:center; padding:8px; text-align:center; cursor:ns-resize}
+    .review-card{flex:1; display:flex; align-items:center; justify-content:center; padding:8px; text-align:center; min-height:0; cursor:auto;}
+    .review-card .review-scroller {
+      max-height:100%; width:100%;
+      overflow:auto; -webkit-overflow-scrolling:touch;
+    }
+
     .size-toast{
       position:absolute; left:50%; transform:translateX(-50%);
       bottom:calc(64px + env(safe-area-inset-bottom) + 8px);
@@ -277,7 +285,7 @@
     .cards-grid{display:grid; grid-template-columns:1fr; gap:10px}
     @media(min-width:480px){.cards-grid{grid-template-columns:1fr 1fr}}
     @media(min-width:900px){.cards-grid{grid-template-columns:1fr 1fr 1fr}}
-    .card-block{position:relative; border:2px solid transparent; border-radius:14px; padding:14px; background:transparent}
+    .card-block{position:relative; border:2px solid transparent; border-radius:14px; padding:14px; background:transparent; overflow-x: auto;}
     .card-block .term{text-align:center}
     .card-block .definition{display:none; text-align:center; margin-top:6px}
     .card-block.flipped .definition{display:block}
@@ -288,25 +296,31 @@
     .card-block.grade-facile{border-color:var(--green)}
     .card-block.grade-unseen{border-color:#9ca3af}
 
-
-    /* NOUVEAU : Rendre les images des cartes responsives */
+    /* Styles consolidés pour les images */
     .review-card img,
     .card-block img {
-      max-width: 100%;       /* Ne jamais déborder du conteneur */
-      height: auto;          /* Garder les bonnes proportions */
-      display: block;        /* Éviter les espaces indésirables sous l'image */
-      margin: 10px auto;     /* Ajouter un espacement vertical et centrer horizontalement */
-      border-radius: 8px;    /* Coins arrondis pour correspondre au design */
-      background: var(--border); /* Fond subtil pour les transparences/chargement */
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 10px auto;
+      border-radius: 8px;
+      background: var(--border);
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+    .review-card img {
+      cursor: zoom-in;
+      touch-action: none; /* Les gestes sont gérés par JS pour la Lightbox */
+    }
+    .card-block img {
+       touch-action: pan-y; /* Permet le scroll vertical dans la liste de cartes */
     }
 
-    /* NOUVEAU : Gérer le contenu trop large (LaTeX, etc.) */
-    .review-card > div,
-    .card-block {
-      overflow-x: auto;  /* Ajoute un scroll horizontal SI et seulement SI le contenu déborde */
-      max-width: 100%;   /* S'assure que le conteneur lui-même ne grandit pas trop */
+    /* Wrapper pour le zoom d'image en révision */
+    .zoom-wrap {
+      display: inline-block;
+      max-width: none;
     }
-
 
     /* Light theme boosts */
     :root[data-theme="light"] .definition,
@@ -314,8 +328,9 @@
     :root[data-theme="light"] .muted{color:#475569!important}
     :root[data-theme="light"] .legend-item{color:#0f172a!important; border-color:#e2e8f0!important; background:transparent!important}
     :root[data-theme="light"] .chip{color:#334155!important; border-color:#cbd5e1!important; background:#f8fafc!important}
-    :root[data-theme="light"] .revision-bar{
-      background:linear-gradient(180deg,rgba(248,250,252,0),rgba(241,245,249,.9))!important;
+    :root[data-theme="light"] .revision-bar,
+    :root[data-theme="light"] .review-actions-bar {
+      background:rgba(241,245,249,.9) !important;
       border-top:1px solid #e2e8f0!important;
     }
     :root[data-theme="light"] .topbar{
@@ -396,6 +411,49 @@
     .subject-item .name{ font-weight:800; flex:1 }
     .subject-item .meta{ font-size:12px; color:var(--muted) }
     :root[data-theme="light"] .subject-item:hover{ background: rgba(0,0,0,.06) }
+
+    /* === LIGHTBOX IMAGE VIEWER === */
+    .img-lightbox{
+      position:fixed; inset:0;
+      display:none; /* on affiche via .open */
+      background:transparent; /* pas de flou, pas d'assombrissement */
+      z-index:10000;
+    }
+    .img-lightbox.open{ display:block; }
+
+    /* Surface de geste: 100% de l’écran, drag/pinch/zoom partout */
+    .img-stage{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      overflow:hidden;
+      touch-action:none;      /* on gère le pan/zoom nous-mêmes */
+      cursor:grab;
+    }
+
+    /* Canvas transformé (pan/zoom via translate+scale) */
+    .img-canvas{
+      position:absolute; top:0; left:0;
+      transform:translate(0px,0px) scale(1);
+      transform-origin:0 0;
+      will-change:transform;
+    }
+    .img-canvas img{
+      display:block;
+      width:100%; height:auto;
+      user-select:none; -webkit-user-drag:none;
+      pointer-events:none; /* toute la surface sert aux gestes */
+    }
+.img-counter{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:16px; z-index:2;
+      background:rgba(255,255,255,.9); color:#0f172a;
+      padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px;
+    }
+    
+    /* Light/clair */
+    :root[data-theme="light"] .img-close,
+    :root[data-theme="light"] .img-nav{ color:#0f172a; background:rgba(255,255,255,.9); border-color:#e2e8f0; }
+    :root[data-theme="light"] .img-counter{ background:rgba(255,255,255,.9); color:#0f172a; }
   </style>
 </head>
 <body>
@@ -425,18 +483,21 @@
   <script>
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
-
+    const APP_VERSION = '2025-10-02-1'; // incrémente à chaque publication de contenu
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
+    const PM3 = "M3";
 
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
       'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
       // === Physique (nouvelles matières/chapitres) ===
-      'M2':'⚙️'
+      'M2':'⚙️',
+      'M3':'🌍',
+
     };
 
     // Liste brute Anglais (id|fr|en|chap)
@@ -1364,8 +1425,7 @@
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
 `.trim();
 
-    const physicsRawText = `
-10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
+    const physicsRawText = `10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
 10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<b>en translation rectiligne et uniforme par</b>|${PM}
 10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
 10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<b>n’est jamais galiléen.</b>|${PM}
@@ -1378,7 +1438,204 @@
 10010|<span style="color: rgb(0, 255, 0);">(INC)</span> TEM dans R' repère non galiléen|<br>[latex] Si $\\vec{f_{ie}} $ est conservative, $\\vec{f_{ie}}$ dérive d'une énergie potentielle $E_{p,f_{ie}}$ qui est contenue dans $E_m$ et qui est tq: $W(\\vec{f_{ie}})=-\\Delta E_{p,f_{ie}}$ \\newline<br><br>Alors TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'}) $ \\newline<br><br>Si $\\vec{f}_{ie}$ est non conservative \\newline<br>TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'})+W(\\vec{f_{ie/R'}}) $[/latex]<br>|${PM}
 10011|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un réfrentiel R' non galileen.|On part de la loi de composition des vitesses $m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + \\vec{a_c} + \\vec{a_e}&nbsp;&nbsp;$<br>de plus $m \\vec{a}_{M/R} = \\sum_i \\vec{F_i} $<br>En réarrangant les termes on a $m \\vec{a}_{M/R'} = \\sum_i \\vec{F_i} -m \\vec{a_c} - m \\vec{a_e} $<br>avec $ - m \\vec{a_e} $ qui est la force d'inertie d'entrainement et $&nbsp;- m \\vec{a_c} $ qui est la force d'inertie de coriolis|${PM}
 10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $ \\vec{f_{ic}} $ et $ \\vec{f_{ie}} $ dans le cas d'une translation de R' par rapport à R|&nbsp;$ \\vec{f_{ic}} = \\vec{0} $ et&nbsp;&nbsp;$ \\vec{a_c} = \\vec{0} $ dans ce cas<br>et<br>$ \\vec{f_{ie}} = -m(\\frac{d^2 \\vec{OO'}}{dt^2})_R $|${PM}
+10013|<span style="color: rgb(255, 170, 0);">(LPB)</span><span style="color: rgb(0, 255, 0);"> </span>Comment est défini réellement le poids?|On def le poids d'un corps M de masse m de manière expérimentale: C'est la force opposée à la tension d'un fil au bout duquel est accroché le corps, ce dernier étant en équilibre dans le référentiel terrestre (\\(\\vec{P} = \\vec{F_G}+\\vec{f_{ie}}\\)&nbsp;)|${PM3}
+10014|<span style="color: rgb(0, 255, 0);">(LPB)</span>Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique|L'existence de deux marées hautes et deux marées basses par jour sur Terre<br>&nbsp;<img src="Capture d’écran 2023-10-07 161935.png">|${PM3}
+10015|<span style="color: rgb(0, 255, 0);">(TS) </span>Donner des exemples qui mettent en évidence le caractère non galiléen du référentiel terrestre.|La déviation vers l'est,<br>Le sens de rotation des cyclones,<br>Le pendule de Foucault|${PM3}
+10016|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire de rotation du référentiel terrestre par rapport au référentiel géocentrique|\\(\\omega\\)= \\(\\frac{2\\pi}{24×3600}\\)rad/s=7.3×10\\(^{-5}\\) rad/s|${PM3}
+10017|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire caractérisant la translation elliptique du référentiel géocentrique par rapport au référentiel de Copernic|\\(\\Omega\\)=\\(\\frac{2\\pi}{365×24×3600}\\)rad/s=2.0×10\\(^{-7}\\) rad/s|${PM3}
+10018|<span style="color: rgb(255, 170, 0);">(TS) </span>Quelles forces fera apparaitre le PFD dans R<sub>T</sub> non galiléen|Le poids (qui contient [$] \\overrightarrow {f_{ie}}[/$])<br>La force d'inertie de Cariolis [$] \\overrightarrow {f_{ic}}[/$]<br>D'éventuelles autres forces|${PM3}
+10019|(B.K.)<img src="paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg"><br>Qu'est-ce qui est à l'origine de cette déviation vers l'Est?<br>Dans l'hémisphère Sud, cette déviation se ferait-elle également vers l'Est?|C'est la force d'inertie de Coriolis qui est responsable de cette déviation vers l'Est.<br>La déviation se ferait également vers l'Est dans l'hémisphère sud.|${PM3}
+10020|<span style="color: rgb(0, 255, 0);">(enzo m) </span><u>Contexte : Appli 3 Pendule de Foucault</u><br><br>On a les deux équations suivantes :<br>&nbsp;&nbsp;\\(\\begin{cases} \\ddot x +\\omega_0^2 x \\approx 2\\Omega sin(\\lambda)\\dot y \\space\\space\\space\\space\\space\\space\\space\\space(1)\\\\  \\ddot y +\\omega_0^2 y \\approx  -2\\Omega sin(\\lambda)\\dot x\\space\\space\\space\\space\\space(2)  \\end{cases}\\)<br><br>Quelle est la <b>méthode </b>afin d'obtenir une équation différentielle selon&nbsp;<u>Z</u>&nbsp;= x+jy où j<sup>2&nbsp;</sup>= -1 ?|<u>Méthode</u> : il faut faire (1)+j(2)&nbsp;<br><br>Ce qui nous donne&nbsp;\\(\\underline {\\ddot Z} + \\omega_0^2\\underline{Z} = -2j\\Omega sin(\\lambda)\\underline{\\dot Z}\\)<br><br>Après avoir résolu cette équation différentielle, on peut trouver x et y avec x=Re(<u>Z</u>) et y=Im(<u>Z</u>).|${PM3}
+10021|<span style="color: rgb(0, 255, 0);">(enzo m)</span>&nbsp;<u>Contexte : Appli 3 Pendule de Foucault</u>&nbsp;<br><br><img src="paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg" width="495"><br><br>On obtient pour les équations du mouvement du pendule de Foucault :<br><br>\\(\\begin{cases} x(t) = x_0cos(\\omega_0t)cos(-\\Omega sin\\lambda t)\\\\  y(t) = x_0cos(\\omega_0t)sin(-\\Omega sin\\lambda t)\\end{cases}\\)<br><br>Quelle est alors l'expression de la période T de rotation du plan d'oscillation du pendule? et la période T<sub>0 </sub>propre des oscillations ?|On a&nbsp;\\(T = \\left|\\frac{2\\pi}{\\Omega sin\\lambda}\\right|\\)&nbsp;&lt;-- période de rotation du plan d'oscillation<br><br>et&nbsp;\\(T = \\frac{2\\pi}{\\omega_0}\\)&nbsp;&lt;-- période propre des oscillations.|${PM3}
+10022|<img src="anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad&nbsp;SABRI<br></span><img src="paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Donner en fonction de&nbsp;\\(\\lambda \\)&nbsp;l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude&nbsp;\\(\\lambda\\). A quel endroit&nbsp;\\(g\\)&nbsp;est-elle max? min?<br><br>Référentiel terrestre: non gal<br>Référentiel géocentrique: gal<br>Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:&nbsp;&nbsp;\\(\\Omega\\)<br>Masse et rayon de la Terre:&nbsp;\\(m_T\\)&nbsp;et&nbsp;\\(R_T\\)|Poids d'un objet de masse&nbsp;\\(m\\)&nbsp;à la surface de la Terre:<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)<br>Or&nbsp;\\(HM=R_T \\ cos(\\lambda)\\)&nbsp;et&nbsp;\\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)<br><br>\\(g\\)&nbsp;est max au pôle sud et min à l'équateur.|${PM3}
+10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre?|C'est la force d'inertie d'entrainement due au fait que le référentiel géocentrique (en translation elliptique dans le réf. Héliocentrique) est considéré comme non galiléen (en considérant le réf. Héliocentrique galiléen).|${PM3}
+10024|(B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?<br>Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.|C'est la force d'inertie de Coriolis (en considérant le ref. Terrestre non galiléen et le réf géocentrique galiléen).<br>Dans le Nord: rotation dans le sens trigo.<br>Dans le Sud: Rotation dans le sens horaire<br><img src="paste-71cc5358ce5c51ce02d2e1d9d2e63300dba80598.jpg">|${PM3}
 `.trim();
+
+    // === LIGHTBOX IMAGE VIEWER ===
+    // === LIGHTBOX IMAGE VIEWER (overlay sombre léger, pas de boutons) ===
+const LB = {
+  el:null, stage:null, canvas:null, img:null,
+  counter:null,
+  images:[], idx:0,
+  baseW:0, baseH:0,
+  s:1, minS:1, maxS:5, x:0, y:0,
+  pointers:new Map(), startDist:0, startS:1, startX:0, startY:0, panStartX:0, panStartY:0,
+  tapMoved:false
+};
+
+function ensureLightbox(){
+  if (LB.el) return LB.el;
+  const el = document.createElement('div');
+  el.className = 'img-lightbox';
+  el.innerHTML = `
+    <div class="img-stage" id="lbStage" tabindex="-1" aria-label="Image viewer">
+      <div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div>
+    </div>
+    <div class="img-counter" id="lbCounter">1/1</div>
+  `;
+  document.body.appendChild(el);
+  LB.el = el;
+  LB.stage = el.querySelector('#lbStage');
+  LB.canvas = el.querySelector('#lbCanvas');
+  LB.img = el.querySelector('#lbImg');
+  LB.counter = el.querySelector('#lbCounter');
+
+  // Gestes (pan/zoom partout)
+  LB.stage.addEventListener('pointerdown', e=>{
+    LB.stage.setPointerCapture?.(e.pointerId);
+    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (LB.pointers.size===1){
+      LB.panStartX = LB.x; LB.panStartY = LB.y;
+      LB.startX = e.clientX; LB.startY = e.clientY;
+      LB.startS = LB.s; LB.tapMoved = false;
+    }else if(LB.pointers.size===2){
+      const pts=[...LB.pointers.values()];
+      LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
+      LB.startS = LB.s; LB.tapMoved = true; // pinch ≠ clic
+    }
+    e.preventDefault();
+  });
+
+  LB.stage.addEventListener('pointermove', e=>{
+    if(!LB.pointers.has(e.pointerId)) return;
+    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    const dx = e.clientX - LB.startX;
+    const dy = e.clientY - LB.startY;
+    if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
+
+    if(LB.pointers.size>=2){
+      // Pinch = zoom centré écran
+      const pts=[...LB.pointers.values()];
+      const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
+      setLBScaleCentered(LB.startS * (dist/LB.startDist));
+    }else{
+      // 1 doigt = pan
+      setLBPan(LB.panStartX + dx, LB.panStartY + dy);
+    }
+    e.preventDefault();
+  });
+
+  const endPtr = e=>{
+    if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
+    if(LB.pointers.size===0){
+      // Clic dans le vide -> fermer
+      if (!LB.tapMoved){
+        const r = LB.img.getBoundingClientRect();
+        if (!(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom)) {
+          closeLightbox();
+        }
+      }
+      LB.startDist=0;
+    }else if(LB.pointers.size===1){
+      const p=[...LB.pointers.values()][0];
+      LB.startX=p.x; LB.startY=p.y;
+      LB.panStartX = LB.x; LB.panStartY = LB.y;
+      LB.startS = LB.s; LB.startDist=0;
+    }
+  };
+  LB.stage.addEventListener('pointerup', endPtr);
+  LB.stage.addEventListener('pointercancel', endPtr);
+  LB.stage.addEventListener('lostpointercapture', endPtr);
+
+  // Double-tap/clic = toggle fit <-> zoom 2.2x (centré écran)
+  let lastTap=0;
+  LB.stage.addEventListener('pointerdown', e=>{
+    const now=Date.now();
+    if(now-lastTap<250){
+      if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
+      else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
+      LB.tapMoved = true; // éviter la fermeture juste après
+    }
+    lastTap=now;
+  });
+
+  // Molette = zoom centré écran (desktop)
+  LB.stage.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const step = (e.deltaY>0 ? -0.15 : 0.15);
+    setLBScaleCentered(LB.s + step*LB.s);
+  }, {passive:false});
+
+  // Refit sur resize
+  window.addEventListener('resize', ()=>{
+    if(LB.el.classList.contains('open')) refitLB();
+  });
+
+  return el;
+}
+
+function openLightboxFor(imgEl, scopeEl){
+  ensureLightbox();
+  // Images présentes dans la carte en cours
+  const list = Array.from(scopeEl.querySelectorAll('img'));
+  LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
+  LB.idx = Math.max(0, list.indexOf(imgEl));
+  LB.el.classList.add('open');
+  document.body.dataset._oriOverflow = document.body.style.overflow || '';
+  document.body.style.overflow = 'hidden'; // bloque le scroll derrière
+  LB.el.focus?.();
+  showLB(LB.idx, true);
+}
+
+function closeLightbox(){
+  LB.el.classList.remove('open');
+  LB.images=[]; LB.idx=0;
+  document.body.style.overflow = document.body.dataset._oriOverflow || '';
+}
+
+function showLB(idx, initial=false){
+  if(!LB.images.length) return;
+  LB.idx = (idx+LB.images.length) % LB.images.length;
+  const it = LB.images[LB.idx];
+  LB.img.src = it.src;
+  LB.img.alt = it.alt;
+  LB.baseW = it.w; LB.baseH = it.h;
+  if (LB.counter) LB.counter.textContent = `${LB.idx+1}/${LB.images.length}`;
+  refitLB(initial);
+}
+
+function refitLB(initial=false){
+  const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
+  const fit = Math.min(sw/LB.baseW, sh/LB.baseH);
+  LB.minS = fit;
+  if (initial){
+    LB.s = fit;
+    LB.x = (sw - LB.s*LB.baseW)/2;
+    LB.y = (sh - LB.s*LB.baseH)/2;
+    applyLB();
+  }else{
+    setLBScaleCentered(fit, true);
+  }
+}
+
+function applyLB(){
+  const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight;
+  const w=LB.s*LB.baseW, h=LB.s*LB.baseH;
+  if (w <= sw) LB.x = (sw - w)/2; else LB.x = clamp(LB.x, sw - w, 0);
+  if (h <= sh) LB.y = (sh - h)/2; else LB.y = clamp(LB.y, sh - h, 0);
+  LB.canvas.style.width = LB.baseW + 'px';
+  LB.canvas.style.height = LB.baseH + 'px';
+  LB.canvas.style.transform = `translate(${LB.x}px, ${LB.y}px) scale(${LB.s})`;
+}
+
+function setLBPan(nx, ny){
+  LB.x = nx; LB.y = ny;
+  applyLB();
+}
+
+function setLBScaleCentered(newS, force=false){
+  const oldS = LB.s;
+  let s = clamp(newS, LB.minS, LB.maxS);
+  if (!force && Math.abs(s-oldS)<1e-4) return;
+  const cx = LB.stage.clientWidth/2, cy = LB.stage.clientHeight/2;
+  const imgCx = (cx - LB.x) / oldS;
+  const imgCy = (cy - LB.y) / oldS;
+  LB.s = s;
+  LB.x = cx - LB.s * imgCx;
+  LB.y = cy - LB.s * imgCy;
+  applyLB();
+}
 
     // Parsing générique multi-matières
     function parseCardsRaw(raw){
@@ -1405,44 +1662,40 @@
     const deepClone = o=>JSON.parse(JSON.stringify(o));
     const pickN = (arr,n)=>{const c=arr.slice(); for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]];} return c.slice(0,n);};
     const isSuccess = g=>g==='facile'||g==='bien';
-    
+
     function preprocessLaTeX(s){
-  if (!s) return s;
-  // NOTE : J'ai adapté la regex pour correspondre à vos balises [latex] et non ```math...
-  return s
-    .replace(/\[latex\]/gi, '')         // on enlève [latex]
-    .replace(/\[\/latex\]/gi, '')       // on enlève [/latex]
-    .replace(/\\newline\s*/g, '<br/>'); // \newline -> <br> (en dehors des maths)
-}
-
-// Typeset MathJax dans un conteneur donné
-function typesetLatex(container){
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    // On s'assure que le conteneur est bien un élément du DOM
-    const el = (typeof container === 'string') ? $(container) : container;
-    if (el) {
-      return window.MathJax.typesetPromise([el]).catch(err=>console.warn('MathJax error:', err));
+      if (!s) return s;
+      return s
+        .replace(/\[latex\]/gi, '')
+        .replace(/\[\/latex\]/gi, '')
+        .replace(/\\newline\s*/g, '<br/>');
     }
-  }
-  return Promise.resolve(); // Retourne une promesse résolue si MathJax n'est pas prêt
-}
 
-    
+    function typesetLatex(container){
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        const el = (typeof container === 'string') ? $(container) : container;
+        if (el) {
+          return window.MathJax.typesetPromise([el]).catch(err=>console.warn('MathJax error:', err));
+        }
+      }
+      return Promise.resolve();
+    }
+
+
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$','$$'], ['\\[', '\\]']],
         processEscapes: true,
-        packages: {'[+]': ['noerrors', 'noundefined']} // évite les plantages si une macro manque
+        packages: {'[+]': ['noerrors', 'noundefined']}
       },
       options: {
         skipHtmlTags: ['script','noscript','style','textarea','pre','code']
       },
-      startup: { typeset: false } // on déclenche manuellement après chaque rendu
+      startup: { typeset: false }
     };
-    
+
     function formatDayKeyFR(key){
-      // key = "YYYY-MM-DD"
       const [Y,M,D]=key.split('-').map(Number);
       const d=new Date(Y, M-1, D);
       const jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
@@ -1453,7 +1706,6 @@ function typesetLatex(container){
     const slugify=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     const emojiFor=title=>CHAPTER_EMOJIS[title]||'';
 
-    // --- Helper: extrait l'ID numérique (rowId) à la fin d'un card.id (ex: "democracy-123" -> "123")
     function extractRowId(cardId) {
       const m = String(cardId).match(/-(\d+)$/);
       return m ? m[1] : null;
@@ -1483,13 +1735,11 @@ function typesetLatex(container){
       return {chapters, app:{currentChapterId:chapters[0]?.id||null, theme:'dark', prefs:{fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14}}};
     }
 
-    // Construit un "Subject" (matière) à partir d'une liste raw
     function buildSubjectFromList(title, list){
-      const built = buildChaptersFromFlashcards(list); // réutilise votre builder existant
+      const built = buildChaptersFromFlashcards(list);
       return { id: slugify(title), title, chapters: built.chapters };
     }
 
-    // Canonique: matières disponibles (Anglais, Physique)
     function buildCanonicalSubjects(){
       const en  = buildSubjectFromList('Anglais',  flashcardDataEN);
       const phy = buildSubjectFromList('Physique', flashcardDataPHY);
@@ -1497,14 +1747,11 @@ function typesetLatex(container){
     }
 
     function loadData(){
-      // 1) Tente localStorage
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
         if(raw){
           const parsed = JSON.parse(raw);
-          // Si déjà en mode "subjects", on renvoie tel quel
           if (Array.isArray(parsed.subjects)) return parsed;
-          // Sinon (legacy): on enveloppe l'ancien format "chapters" dans une matière "Anglais"
           if (Array.isArray(parsed.chapters)) {
             return {
               subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters }],
@@ -1514,7 +1761,6 @@ function typesetLatex(container){
         }
       }catch(e){}
 
-      // 2) Tente cookie backup (ancienne version) et applique la même logique
       try{
         const c = readCookieBackup();
         if(c){
@@ -1529,7 +1775,6 @@ function typesetLatex(container){
         }
       }catch(e){}
 
-      // 3) Première exécution: crée les deux matières à partir des données canoniques
       const subjects = buildCanonicalSubjects();
       return {
         subjects,
@@ -1667,7 +1912,6 @@ function typesetLatex(container){
       if(m.contains(e.target) || e.target===titleEl) return;
       closeSubjectMenu();
     }
-    // Ouvre le menu quand on est sur "Deck" (sinon on revient au Deck)
     titleEl.addEventListener('click', ()=>{
       if(State.view!=='deck'){ goDeck(false); return; }
       const m = document.getElementById(subjectMenuId);
@@ -1741,7 +1985,7 @@ function typesetLatex(container){
 
     function renderDeck(){
       const v=$('#view');
-      const chapters=getCurrentChapters(); // <-- au lieu de data.chapters
+      const chapters=getCurrentChapters();
 
       v.innerHTML = `
         <div class="card flexcol" style="flex:1;">
@@ -1846,12 +2090,10 @@ function typesetLatex(container){
         </div>
       `;
 
-      // Chart donut
       drawGradeChart('gradeChart',counts,chap.filters.grades);
       const canvas=$('#gradeChart'); canvas.style.cursor='pointer';
       canvas.onclick=(ev)=>handleChartClick(ev,'gradeChart',chap,counts);
 
-      // Légende clic
       $$('#legend .legend-item').forEach(el=>{
         const key=el.getAttribute('data-key');
         const act=()=>{handleLegendClick(key,chap);};
@@ -1861,22 +2103,17 @@ function typesetLatex(container){
         el.setAttribute('role','button');
       });
 
-      // Révision bar refresh
       updateRevisionBarForChapter(chap);
-
-      // 7-day bars
       drawBars7('bar7', getLastNDaysArray(chap,7));
       const lbl=$('#bar7Labels');
       if(lbl){const noms=getLastNDaysLabelsFR(7); lbl.innerHTML=noms.map(j=>`<div>${j.substring(0,3)}</div>`).join('');}
 
-      // Clic sur le canvas bar-chart
       const barCanvas = document.getElementById('bar7');
       if (barCanvas) {
         barCanvas.style.cursor = 'pointer';
         barCanvas.onclick = (ev) => openDayFromBarClick(ev, 'bar7', chap.id, 7);
       }
 
-      // Clic sur les labels
       const labelsWrap = document.getElementById('bar7Labels');
       if (labelsWrap) {
         Array.from(labelsWrap.children).forEach((el, i) => {
@@ -1886,7 +2123,6 @@ function typesetLatex(container){
         });
       }
 
-      // Redraw on resize (debounced)
       (function(){
         let t; const redraw=()=>drawBars7('bar7',getLastNDaysArray(chap,7));
         window.removeEventListener('resize', window._bar7ResizeHandler || (()=>{}));
@@ -1912,45 +2148,42 @@ function typesetLatex(container){
     }
 
     function renderCards(chapterId){
-  const v=$('#view'); const chap=getChapter(chapterId);
-  const sel=chap.filters.grades||{};
-  const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
+      const v=$('#view'); const chap=getChapter(chapterId);
+      const sel=chap.filters.grades||{};
+      const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
 
-  v.innerHTML = `
-    <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
-      <div class="section-title">Cartes (${pool.length})</div>
-      <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-        <div class="cards-grid">
-          ${pool.map(c=>{
-            // MODIFICATION : Utiliser preprocessLaTeX
-            const {frontText,backText}=getCardSides(c,chap);
-            const f = preprocessLaTeX(frontText);
-            const b = preprocessLaTeX(backText);
-            const gradeClass=`grade-${c.grade||'unseen'}`;
-            const timeStr=c.avgMs?formatDuration(c.avgMs):'';
-            return `
-              <div class="card-block ${gradeClass}" data-id="${c.id}">
-                <div class="term">${f}</div>
-                <div class="definition">${b}</div>
-                ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
-              </div>
-            `;
-          }).join('')}
+      v.innerHTML = `
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="section-title">Cartes (${pool.length})</div>
+          <div id="cardsGrid" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+            <div class="cards-grid">
+              ${pool.map(c=>{
+                const {frontText,backText}=getCardSides(c,chap);
+                const f = preprocessLaTeX(frontText);
+                const b = preprocessLaTeX(backText);
+                const gradeClass=`grade-${c.grade||'unseen'}`;
+                const timeStr=c.avgMs?formatDuration(c.avgMs):'';
+                return `
+                  <div class="card-block ${gradeClass}" data-id="${c.id}">
+                    <div class="term">${f}</div>
+                    <div class="definition">${b}</div>
+                    ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  `;
+      `;
 
-  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
-  typesetLatex(v);
-
-  const grid=$('#cardsGrid');
-  grid.addEventListener('click',e=>{
-    const block=e.target.closest('.card-block'); if(!block) return;
-    $$('.card-block').forEach(b=>{if(b!==block) b.classList.remove('flipped');});
-    block.classList.toggle('flipped');
-  });
-}
+      typesetLatex(v);
+      const grid=$('#cardsGrid');
+      grid.addEventListener('click',e=>{
+        const block=e.target.closest('.card-block'); if(!block) return;
+        $$('.card-block').forEach(b=>{if(b!==block) b.classList.remove('flipped');});
+        block.classList.toggle('flipped');
+      });
+    }
     // Daily Activity View
     function goDaily(chapterId, dayKey, push=true){
       if (push) Nav.push();
@@ -1965,97 +2198,91 @@ function typesetLatex(container){
     }
 
     function renderDaily(chap, dayKey){
-  const v = document.getElementById('view');
-  const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
-  if (!log.length){
-    v.innerHTML = `
-      <div class="card" style="flex:1; display:flex; flex-direction:column;">
-        <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
-        <div class="muted">Aucune donnée pour ce jour.</div>
-      </div>
-    `;
-    return;
-  }
+      const v = document.getElementById('view');
+      const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
+      if (!log.length){
+        v.innerHTML = `
+          <div class="card" style="flex:1; display:flex; flex-direction:column;">
+            <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
+            <div class="muted">Aucune donnée pour ce jour.</div>
+          </div>
+        `;
+        return;
+      }
 
-  log.sort((a,b)=>a.ts-b.ts);
-  const byCard = new Map();
-  for (const e of log){
-    const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
-    if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
-    if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
-    curr.events.push(e);
-    byCard.set(e.cardId, curr);
-  }
+      log.sort((a,b)=>a.ts-b.ts);
+      const byCard = new Map();
+      for (const e of log){
+        const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
+        if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
+        if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
+        curr.events.push(e);
+        byCard.set(e.cardId, curr);
+      }
 
-  const rows = [];
-  for (const [cardId, info] of byCard){
-    const card = chap.cards.find(c=>c.id===cardId);
-    if (!card) continue;
-    
-    // MODIFICATION : Utiliser preprocessLaTeX ici
-    const {frontText, backText} = getCardSides(card, chap);
-    rows.push({
-      id: cardId,
-      term: preprocessLaTeX(frontText),
-      def:  preprocessLaTeX(backText),
-      before: info.firstPrev || 'unseen',
-      after: info.lastNext || (card.grade || 'unseen')
-    });
-  }
+      const rows = [];
+      for (const [cardId, info] of byCard){
+        const card = chap.cards.find(c=>c.id===cardId);
+        if (!card) continue;
 
-  rows.sort((a,b)=>{
-    const ca = (a.before!==a.after), cb=(b.before!==b.after);
-    if (ca!==cb) return ca? -1: 1;
-    // On compare sur la version texte brut pour le tri, pas HTML
-    const cardA = chap.cards.find(c=>c.id===a.id);
-    const cardB = chap.cards.find(c=>c.id===b.id);
-    return cardA.front.localeCompare(cardB.front, 'fr');
-  });
+        const {frontText, backText} = getCardSides(card, chap);
+        rows.push({
+          id: cardId,
+          term: preprocessLaTeX(frontText),
+          def:  preprocessLaTeX(backText),
+          before: info.firstPrev || 'unseen',
+          after: info.lastNext || (card.grade || 'unseen')
+        });
+      }
 
-  v.innerHTML = `
-    <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
-      <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
-      <div id="dailyList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-        <div class="list" style="gap:10px">
-          ${rows.map(r=>`
-            <div class="grid2">
-              <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
-                <div class="term">${r.term}</div>
-                <div class="definition">${r.def}</div>
-              </div>
-              <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
-                <div class="term">${r.term}</div>
-                <div class="definition">${r.def}</div>
-              </div>
+      rows.sort((a,b)=>{
+        const ca = (a.before!==a.after), cb=(b.before!==b.after);
+        if (ca!==cb) return ca? -1: 1;
+        const cardA = chap.cards.find(c=>c.id===a.id);
+        const cardB = chap.cards.find(c=>c.id===b.id);
+        return cardA.front.localeCompare(cardB.front, 'fr');
+      });
+
+      v.innerHTML = `
+        <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
+          <div id="dailyList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+            <div class="list" style="gap:10px">
+              ${rows.map(r=>`
+                <div class="grid2">
+                  <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
+                    <div class="term">${r.term}</div>
+                    <div class="definition">${r.def}</div>
+                  </div>
+                  <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
+                    <div class="term">${r.term}</div>
+                    <div class="definition">${r.def}</div>
+                  </div>
+                </div>
+              `).join('')}
             </div>
-          `).join('')}
+          </div>
+          <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
         </div>
-      </div>
-      <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
-    </div>
-  `;
+      `;
 
-  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
-  typesetLatex(v);
-
-  const list = document.getElementById('dailyList');
-  list.addEventListener('click', (e)=>{
-    const block = e.target.closest('.card-block');
-    if (!block) return;
-    block.classList.toggle('flipped');
-  });
-}
+      typesetLatex(v);
+      const list = document.getElementById('dailyList');
+      list.addEventListener('click', (e)=>{
+        const block = e.target.closest('.card-block');
+        if (!block) return;
+        block.classList.toggle('flipped');
+      });
+    }
 
     // Review
     function goReview(push=true){
       if(push) Nav.push();
       State.view='review';
       setTopbar({title:'Révision'});
-
-      setBottomVisibility({actions:false, revision:true}); // réserve la rangée
-      revisionBar.style.display='none'; // masque bouton
-      $('#reviewActionsBar').style.display='block'; // affiche barre d'actions
-
+      setBottomVisibility({actions:false, revision:true});
+      revisionBar.style.display='none';
+      $('#reviewActionsBar').style.display='block';
       renderReview();
     }
 
@@ -2081,38 +2308,36 @@ function typesetLatex(container){
     }
 
     function renderReview(){
-  const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
-  const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
+      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
+      const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
 
-  // MODIFICATION : Utiliser preprocessLaTeX pour toutes les faces
-  const {frontText,backText}=getCardSides(current,chap);
-  const frontHTML = preprocessLaTeX(frontText);
-  const backHTML  = preprocessLaTeX(backText);
+      const {frontText,backText}=getCardSides(current,chap);
+      const frontHTML = preprocessLaTeX(frontText);
+      const backHTML  = preprocessLaTeX(backText);
 
-  const frontFirst = chap.settings.reviewOrder!=='back-first';
-  const prompt = frontFirst ? frontHTML : backHTML;
-  const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
+      const frontFirst = chap.settings.reviewOrder!=='back-first';
+      const prompt = frontFirst ? frontHTML : backHTML;
+      const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
 
-  v.innerHTML = `
-    <div class="review-wrap">
-      <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
-      <div class="review-card">
-        <div>
-          ${!r.flipped
-            ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
-            : `<div class="stack"><div class="term" data-face="front">${frontHTML}</div><div class="definition" data-face="back" style="margin-top:6px">${backHTML}</div></div>`
-          }
+      v.innerHTML = `
+        <div class="review-wrap">
+          <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
+          <div class="review-card">
+            <div class="review-scroller">
+              ${!r.flipped
+                ? `<div class="${promptClass}" data-face="${promptFace}">${prompt}</div>`
+                : `<div class="stack"><div class="term" data-face="front">${frontHTML}</div><div class="definition" data-face="back" style="margin-top:6px">${backHTML}</div></div>`
+              }
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  `;
+      `;
 
-  // AJOUT : Lancer le rendu MathJax sur la nouvelle vue
-  typesetLatex(v);
-
-  bindReviewSizeControls();
-  renderReviewFooter();
-}
+      typesetLatex(v).then(()=>{
+        initReviewGestures();
+      });
+      renderReviewFooter();
+    }
 
     // Recap
     function goRecap(push=true){
@@ -2171,7 +2396,7 @@ function typesetLatex(container){
           const delta=now-c.dueAt;
           dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
         }else{ dueBoost=1.15; }
-        const ema=typeof c.perfEma==='number' ? c.perfEma : 0.5;
+        const ema=typeof c.perfEma=='number' ? c.perfEma : 0.5;
         const perfBoost=1+(1-ema)*1.6;
         const s=c.streak||0;
         const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
@@ -2197,18 +2422,15 @@ function typesetLatex(container){
       card.grade=next;
       syncGradeCounts(chap);
 
-      // Perf + planification
       const alpha=0.3; const q01=gradeNorm01(next);
       card.perfEma = (1-alpha)*(card.perfEma??0.5) + alpha*q01;
       scheduleNext(card,next,now);
 
-      // Temps + counters
       card.lastReviewed=now; card.lastMs=duration;
       card.avgMs = card.avgMs ? Math.round(card.avgMs*0.7 + duration*0.3) : duration;
       card.timesReviewed=(card.timesReviewed||0)+1;
       if(isSuccess(next)) card.successes+=1; else card.failures+=1;
 
-      // Stats jour
       chap.stats.totalReviews += 1;
       const tk=todayKey();
       chap.stats.dailyReviews[tk]=(chap.stats.dailyReviews[tk]||0)+1;
@@ -2217,14 +2439,12 @@ function typesetLatex(container){
       const dc=chap.stats.dailyChanges[tk]||{changed:0,total:0};
       dc.total+=1; if(prevGrade!==next) dc.changed+=1; chap.stats.dailyChanges[tk]=dc;
 
-      // journal détaillé par carte
       const log = chap.stats.dailyLog[tk] || [];
       log.push({ cardId: card.id, prev: prevGrade, next, ms: duration, ts: now });
       chap.stats.dailyLog[tk] = log;
 
       if(wasZeroBeforeNext && next!=='unseen'){ chap.filters.grades[next]=true; }
 
-      // Trace + nav
       r.answers.push({cardId:card.id, prev:prevGrade, next, ms:duration});
       if(r.index < r.queue.length-1){
         r.index+=1; r.flipped=false; r.cardStart=Date.now();
@@ -2293,7 +2513,7 @@ function typesetLatex(container){
 
     function dayKeyFromIndex(n, index) {
       const base = new Date();
-      const offset = (n - 1) - index; // ex: n=7, index 0 => offset 6 jours
+      const offset = (n - 1) - index;
       const d = new Date(base);
       d.setHours(0,0,0,0);
       d.setDate(base.getDate() - offset);
@@ -2472,7 +2692,6 @@ function typesetLatex(container){
       if(typeof data.app.prefs.radius!=='number') data.app.prefs.radius=14;
 
       if(!Array.isArray(data.subjects)){
-        // Migration depuis ancien format
         data.subjects = [{ id:'anglais', title:'Anglais', chapters: data.chapters||[] }];
         delete data.chapters;
         if(!data.app.currentSubjectId) data.app.currentSubjectId='anglais';
@@ -2599,9 +2818,6 @@ function typesetLatex(container){
       bindTypoPreviewDrag();
     }
 
-    /**
-     * Réconciliation
-     */
     function reconcileChaptersWithCanonical(canonChapters, oldChapters){
       const savedCardByRowId = new Map();
       for (const ch of (oldChapters||[])) {
@@ -2653,7 +2869,6 @@ function typesetLatex(container){
       const oldSubjects = Array.isArray(data.subjects) ? data.subjects : [];
 
       const newSubjects = [];
-      // Aligne les sujets existants avec les canoniques (par titre/id)
       canonSubjects.forEach(cSub=>{
         const sSub = oldSubjects.find(s => s.id===cSub.id || s.title===cSub.title);
         const merged = {
@@ -2664,7 +2879,6 @@ function typesetLatex(container){
         newSubjects.push(merged);
       });
 
-      // Ajoute (rare) les sujets non-canoniques conservés (si vous en ajoutez plus tard côté code)
       oldSubjects.forEach(sSub=>{
         if(!newSubjects.find(ns=>ns.id===sSub.id)) newSubjects.push(sSub);
       });
@@ -2676,30 +2890,71 @@ function typesetLatex(container){
       saveData();
     }
 
-    // ---------- Contrôles taille texte ----------
+    function initReviewGestures(){
+        const view = document.getElementById('view');
+        if (!view) return;
+        const scroller = view.querySelector('.review-scroller, .review-card > div');
+        if (!scroller) return;
+
+        bindReviewSizeControls();
+        enableImageLightboxInReview(scroller);
+    }
+
     function bindReviewSizeControls(){
-      const faces=document.querySelectorAll('.review-card [data-face]'); if(!faces.length) return;
-      const P=data.app.prefs||{};
-      const applyVars=()=>{
+      const faces = document.querySelectorAll('.review-card [data-face]');
+      if (!faces.length) return;
+
+      const P = data.app.prefs || {};
+      const applyVars = ()=>{
         document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
         document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
       };
+
       faces.forEach(el=>{
-        const face=el.getAttribute('data-face');
-        let startY=null,startVal=null;
-        const getVal=()=> face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
-        const setVal=v=>{
-          if(face==='front') P.fsTerm=clamp(v,12,60);
-          else P.fsDef=clamp(v,14,72);
+        const face = el.getAttribute('data-face');
+        let startY=null, startVal=null;
+        const getVal = () => face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
+        const setVal = v => {
+          if (face==='front') P.fsTerm = clamp(v,12,60);
+          else               P.fsDef = clamp(v,14,72);
           applyVars();
         };
-        const commit=()=>saveData();
+        const commit = ()=>saveData();
 
-        el.addEventListener('pointerdown',e=>{startY=e.clientY; startVal=getVal(); el.setPointerCapture?.(e.pointerId); e.preventDefault(); e.stopPropagation();});
-        el.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6); setVal(startVal+delta); e.preventDefault(); e.stopPropagation();});
-        const end=e=>{if(startY!=null) commit(); startY=null; startVal=null; e.preventDefault(); e.stopPropagation();};
-        el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
-        el.addEventListener('wheel',e=>{e.preventDefault(); const dir=e.deltaY>0?-1:1; setVal(getVal()+dir); commit();},{passive:false});
+        el.addEventListener('pointerdown', e=>{
+          if (e.target.closest('img, video, svg, canvas, mjx-container, a, pre, code')) return;
+          const scroller = el.closest('.review-card')?.querySelector('.review-scroller, .review-card > div');
+          if (scroller && scroller.scrollHeight > scroller.clientHeight) return;
+
+          startY=e.clientY;
+          startVal=getVal();
+          el.setPointerCapture?.(e.pointerId);
+          e.preventDefault();
+          e.stopPropagation();
+        });
+
+        el.addEventListener('pointermove', e=>{
+          if (startY==null) return;
+          const dy = startY - e.clientY;
+          const delta = Math.round(dy/6);
+          setVal(startVal + delta);
+          e.preventDefault();
+          e.stopPropagation();
+        });
+
+        const end = e=>{
+          if (startY!=null) commit();
+          startY=null; startVal=null;
+        };
+        el.addEventListener('pointerup', end);
+        el.addEventListener('pointercancel', end);
+
+        el.addEventListener('wheel', e=>{
+          e.preventDefault();
+          const dir = e.deltaY>0 ? -1 : 1;
+          setVal(getVal()+dir);
+          commit();
+        },{passive:false});
       });
     }
 
@@ -2761,7 +3016,7 @@ function typesetLatex(container){
       let startY=null,startV=null;
       node.addEventListener('pointerdown',e=>{startY=e.clientY; startV=get(); node.setPointerCapture?.(e.pointerId); pd(e);});
       node.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6)*step; setVal(startV+delta); pd(e);});
-      const end=e=>{if(startY!=null) commit(); startY=null; startV=null; pd(e);};
+      const end=e=>{if(startY!=null) commit(); startY=null; startV=null;};
       node.addEventListener('pointerup',end); node.addEventListener('pointercancel',end);
       node.addEventListener('wheel',e=>{e.preventDefault(); const dir=e.deltaY>0?-step:step; setVal(get()+dir); commit();},{passive:false});
       render();
@@ -2802,6 +3057,27 @@ function typesetLatex(container){
       saveData(); alert('Chapitre réinitialisé.');
     }
 
+    function enableImageLightboxInReview(scroller){
+      const imgs = Array.from(scroller.querySelectorAll('img'));
+      imgs.forEach(img=>{
+        img._moved = false;
+        img.addEventListener('pointerdown', e=>{
+          img._moved = false;
+          img._sx = e.clientX; img._sy = e.clientY;
+        });
+        img.addEventListener('pointermove', e=>{
+          if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){
+            img._moved = true;
+          }
+        });
+        img.addEventListener('click', e=>{
+          if (img._moved) return; // c'était un drag -> ne pas ouvrir
+          e.preventDefault();
+          openLightboxFor(img, scroller);
+        });
+      });
+    }
+
     function resetAll(){
       if(!confirm('Réinitialiser toute l’application ?')) return;
       const theme=data.app?.theme||'dark';
@@ -2816,31 +3092,40 @@ function typesetLatex(container){
       alert('Application réinitialisée.');
     }
 
-    // ---------- Init ----------
+
+
     function init(){
-      if(navigator.storage && navigator.storage.persist){
-        navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
-      }
-      window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
-      window.addEventListener('pagehide',saveData);
-      window.addEventListener('beforeunload',saveData);
-      setInterval(saveData,15000);
-      window.addEventListener('storage',(e)=>{
-        if(e.key===STORAGE_KEY && e.newValue){
-          try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
-        }
-      });
-
-      // IMPORTANT: réconcilier d'abord avec le voc canonique (multi-matières)
-      reconcileAllSubjectsWithCanonical();
-
-      // S'assure que les champs manquants sont complétés après la fusion
-      upgradeData();
-      applyTheme();
-      applyUI();
-      Nav.clear();
-      goDeck(false);
+  if(navigator.storage && navigator.storage.persist){
+    navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
+  }
+  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
+  window.addEventListener('pagehide',saveData);
+  window.addEventListener('beforeunload',saveData);
+  setInterval(saveData,15000);
+  window.addEventListener('storage',(e)=>{
+    if(e.key===STORAGE_KEY && e.newValue){
+      try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
     }
+  });
+
+  // Forcer migration + fusion avec le contenu canonique à chaque nouvelle version
+  const prevVersion = localStorage.getItem('flash9x16_version');
+  if (prevVersion !== APP_VERSION) {
+    upgradeData();                          // migrer l'ancien schéma si besoin
+    reconcileAllSubjectsWithCanonical();    // fusionner avec les nouvelles cartes/chapitres
+    saveData();
+    localStorage.setItem('flash9x16_version', APP_VERSION);
+  } else {
+    // Assurer la cohérence même sans changement de version
+    upgradeData();
+    reconcileAllSubjectsWithCanonical();
+  }
+
+  applyTheme();
+  applyUI();
+  Nav.clear();
+  goDeck(false);
+}
     init();
   </script>
   <script id="MathJax-script" async
