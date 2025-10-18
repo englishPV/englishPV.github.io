@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -545,7 +544,9 @@
   <script>
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
-    const APP_VERSION = '2025-10-18-3'; // incrémente à chaque publication de contenu
+    // *** PATCH APPLIQUÉ *** : C'est cette ligne que vous devez changer à chaque modification du contenu.
+    const APP_VERSION = '2025-10-18-4'; // J'ai incrémenté votre version de 3 à 4.
+    
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
@@ -2404,10 +2405,6 @@
 
     function saveData(){
       try{
-        // On s'assure que l'objet app et la version existent avant de sauvegarder
-        if (!data.app) data.app = {};
-        data.app.version = APP_VERSION; 
-
         const str=JSON.stringify(data);
         localStorage.setItem(STORAGE_KEY,str);
         StateStore.set('state', str).catch(e => console.warn("IDB save failed", e));
@@ -2450,7 +2447,7 @@
     function getCookie(name){try{const m=document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'=')); return m?decodeURIComponent(m.split('=').slice(1).join('=')):null;}catch(e){return null;}}
     function delCookie(name){document.cookie=`${name}=; max-age=0; path=/; SameSite=Lax;`;}
     
-    let data = loadData();
+    let data; // Déclaré ici, initialisé dans init()
 
     // ---------- Helpers de matière ----------
     function getCurrentSubject(){
@@ -4037,6 +4034,7 @@
       goDeck(false); alert('Application réinitialisée.');
     }
 
+    // *** PATCH APPLIQUÉ *** : Logique d'initialisation améliorée
     function init(){
       nukeCookieBackup();
 
@@ -4048,45 +4046,43 @@
       setInterval(saveData,15000);
       window.addEventListener('storage',(e)=>{ if(e.key===STORAGE_KEY && e.newValue){ try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){} } });
     
-      pruneStats();
-
-      // On charge les données existantes d'abord
+      // 1. Charger les données existantes de l'utilisateur
       data = loadData();
       const savedVersion = data?.app?.version;
+      console.log(`Version sauvegardée: ${savedVersion || 'aucune'}, Version du code: ${APP_VERSION}`);
 
-      // Si la version sauvegardée est différente de la version du code, on met à jour !
-      if (savedVersion !== APP_VERSION) {
-        console.log(`Mise à jour détectée: De ${savedVersion || 'aucune'} vers ${APP_VERSION}. Réconciliation des données...`);
-        
-        // Cette fonction est la clé : elle compare le nouveau contenu (dans votre code)
-        // avec l'ancien (dans le localStorage) et fusionne la progression.
-        reconcileAllSubjectsWithCanonical();
-        
-        // On met à jour la version dans l'objet `data` et on sauvegarde immédiatement.
-        if (!data.app) data.app = {};
-        data.app.version = APP_VERSION;
-        saveData();
-        data.app.version = APP_VERSION;
-    saveData(); // Et sauvegarde le tout
-    
-        console.log("Mise à jour terminée.");
-      }
+      // 2. Systématiquement réconcilier le contenu du code avec les données sauvegardées
+      //    Ceci garantit que les nouvelles cartes/chapitres sont toujours ajoutés.
+      console.log("Réconciliation des données...");
+      reconcileAllSubjectsWithCanonical();
+      
+      // 3. Mettre à jour la version dans l'objet de données et sauvegarder
+      //    C'est la SEULE fois où nous modifions la version.
+      if (!data.app) data.app = {};
+      data.app.version = APP_VERSION;
+      saveData();
+      console.log("Données à jour et sauvegardées.");
 
-      // Le reste de l'initialisation se fait sur les données potentiellement mises à jour
+      // 4. Continuer le démarrage normal de l'application
+      pruneStats();
       upgradeData();
       applyTheme();
       applyUI();
       Nav.clear();
       goDeck(false);
       
+      // Logique de secours pour IndexedDB
       StateStore.get('state').then(raw=>{
         if (!localStorage.getItem(STORAGE_KEY) && raw) {
           try{
-            console.log("Restoring state from IndexedDB backup.");
+            console.log("Restauration depuis la sauvegarde IndexedDB.");
             data = JSON.parse(raw);
+            // On re-réconcilie au cas où la sauvegarde IDB soit ancienne
+            reconcileAllSubjectsWithCanonical();
+            data.app.version = APP_VERSION;
             saveData();
             renderByState(false);
-          } catch(e){ console.warn('Restore from IDB failed', e); }
+          } catch(e){ console.warn('Échec de la restauration depuis IDB', e); }
         }
       });
     }
