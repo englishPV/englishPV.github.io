@@ -4066,7 +4066,9 @@
         if (!data.app) data.app = {};
         data.app.version = APP_VERSION;
         saveData();
-        
+        data.app.version = APP_VERSION;
+    saveData(); // Et sauvegarde le tout
+    
         console.log("Mise à jour terminée.");
       }
 
