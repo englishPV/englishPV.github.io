@@ -3638,10 +3638,38 @@
 
     function submitGrade(nextGrade){
       const r=State.review; const now=Date.now();
-      const {card: currentCard, chap: currentChap} = getCurrentCard();
-      const origin = currentCard._origin || { chapId: r.chapterId, cardId: currentCard.id };
-      const chap = _getChapterReal(origin.chapId);
-      const card = chap.cards.find(c => c.id === origin.cardId);
+      
+      // *** CORRECTION APPLIQUÉE ***
+      // L'ancienne méthode ne fonctionnait pas pour les révisions multi-chapitres (fichiers)
+      // car `r.chapterId` est null dans ce cas. La nouvelle logique lit directement
+      // l'origine de la carte depuis la file d'attente de la révision.
+      let originChapId, originCardId;
+
+      if (r.mode === 'multi') {
+        const queueItem = r.queue[r.index];
+        originChapId = queueItem.chapId;
+        originCardId = queueItem.cardId;
+      } else {
+        originChapId = r.chapterId;
+        originCardId = r.queue[r.index];
+      }
+      
+      const chap = _getChapterReal(originChapId);
+      if (!chap) {
+        console.error("Erreur critique : Chapitre d'origine introuvable.", {originChapId, originCardId});
+        alert("Une erreur s'est produite, impossible de continuer la révision.");
+        goDeck(false); // Retour au deck pour éviter de rester bloqué
+        return;
+      }
+      const card = chap.cards.find(c => c.id === originCardId);
+      if (!card) {
+        console.error("Erreur critique : Carte d'origine introuvable.", {originChapId, originCardId});
+        alert("Une erreur s'est produite, impossible de continuer la révision.");
+        goDeck(false);
+        return;
+      }
+      // --- Fin de la correction de la logique ---
+
       const duration=Math.max(0, now-(r.cardStart||now));
       const prevGrade=card.grade||'unseen'; const next=nextGrade;
       const wasZeroBeforeNext=(chap.stats.gradeCounts[next]||0)===0;
@@ -3668,9 +3696,9 @@
       if(r.index < r.queue.length-1){
         r.index+=1; r.flipped=false; r.cardStart=Date.now();
         saveData(); renderReview();
-      }else{ 
-        r.end=Date.now(); 
-        saveData(); 
+      }else{
+        r.end=Date.now();
+        saveData();
         goRecap(false);
       }
     }
