@@ -2595,8 +2595,8 @@
         // =========================================================
         const moveGhost = (x, y) => {
             if (!ghost) return;
-            // Nouvel offset plus grand pour une meilleure visibilité sur écran tactile.
-            ghost.style.transform = `translate(${x - 40}px, ${y - 40}px) scale(1.02)`;
+            // NOUVEL OFFSET : 75px pour un décalage très prononcé.
+            ghost.style.transform = `translate(${x - 75}px, ${y - 75}px) scale(1.02)`;
         };
 
         const onDown = e => {
