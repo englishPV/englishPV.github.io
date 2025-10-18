@@ -545,7 +545,7 @@
   <script>
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
-    const APP_VERSION = '2025-10-02-1'; // incrémente à chaque publication de contenu
+    const APP_VERSION = '2025-10-18-1'; // incrémente à chaque publication de contenu
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
@@ -2168,6 +2168,10 @@
 
     function saveData(){
       try{
+        // On s'assure que l'objet app et la version existent avant de sauvegarder
+        if (!data.app) data.app = {};
+        data.app.version = APP_VERSION; 
+
         const str=JSON.stringify(data);
         localStorage.setItem(STORAGE_KEY,str);
         StateStore.set('state', str).catch(e => console.warn("IDB save failed", e));
@@ -3810,17 +3814,28 @@
     
       pruneStats();
 
-      const prevVersion = localStorage.getItem('flash9x16_version');
-      // MODIFIÉ : reconcileAllSubjectsWithCanonical n'est appelé que lors d'une mise à jour de version.
-      if (prevVersion !== APP_VERSION) {
-        upgradeData();
+      // On charge les données existantes d'abord
+      data = loadData();
+      const savedVersion = data?.app?.version;
+
+      // Si la version sauvegardée est différente de la version du code, on met à jour !
+      if (savedVersion !== APP_VERSION) {
+        console.log(`Mise à jour détectée: De ${savedVersion || 'aucune'} vers ${APP_VERSION}. Réconciliation des données...`);
+        
+        // Cette fonction est la clé : elle compare le nouveau contenu (dans votre code)
+        // avec l'ancien (dans le localStorage) et fusionne la progression.
         reconcileAllSubjectsWithCanonical();
+        
+        // On met à jour la version dans l'objet `data` et on sauvegarde immédiatement.
+        if (!data.app) data.app = {};
+        data.app.version = APP_VERSION;
         saveData();
-        localStorage.setItem('flash9x16_version', APP_VERSION);
-      } else {
-        upgradeData();
+        
+        console.log("Mise à jour terminée.");
       }
-    
+
+      // Le reste de l'initialisation se fait sur les données potentiellement mises à jour
+      upgradeData();
       applyTheme();
       applyUI();
       Nav.clear();
