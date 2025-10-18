@@ -465,7 +465,12 @@
     /* En-tête deck */
     .deck-head{ display:flex; align-items:center; justify-content:space-between; gap:8px }
     .deck-head .actions{ display:flex; gap:6px }
-
+    .deck-item .title-line {
+  -webkit-user-select: none; /* Safari, Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+}
     /* Indicateur groupe */
     .deck-item .folder-badge{ font-size:12px; color:var(--muted) }
 
