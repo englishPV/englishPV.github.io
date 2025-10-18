@@ -543,16 +543,16 @@
     // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
     const PM3 = "M3";
+    const PM4 = "M4";
+    const PM5 = "M5";
 
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
       'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
-      // === Physique (nouvelles matières/chapitres) ===
-      'M2':'⚙️',
-      'M3':'🌍',
-
+      'M2':'⚙️', 'M3':'🌍', 'M4':'🤝', 'M5':'⚡️',
     };
+    
 
     // Liste brute Anglais (id|fr|en|chap)
     const cardsRawText = `
@@ -1504,10 +1504,47 @@
 10022|<img src="images/anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad&nbsp;SABRI<br></span><img src="images/paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Donner en fonction de&nbsp;\\(\\lambda \\)&nbsp;l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude&nbsp;\\(\\lambda\\). A quel endroit&nbsp;\\(g\\)&nbsp;est-elle max? min?<br><br>Référentiel terrestre: non gal<br>Référentiel géocentrique: gal<br>Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:&nbsp;&nbsp;\\(\\Omega\\)<br>Masse et rayon de la Terre:&nbsp;\\(m_T\\)&nbsp;et&nbsp;\\(R_T\\)|Poids d'un objet de masse&nbsp;\\(m\\)&nbsp;à la surface de la Terre:<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)<br>Or&nbsp;\\(HM=R_T \\ cos(\\lambda)\\)&nbsp;et&nbsp;\\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)<br><br>\\(g\\)&nbsp;est max au pôle sud et min à l'équateur.|${PM3}
 10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre?|C'est la force d'inertie d'entrainement due au fait que le référentiel géocentrique (en translation elliptique dans le réf. Héliocentrique) est considéré comme non galiléen (en considérant le réf. Héliocentrique galiléen).|${PM3}
 10024|(B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?<br>Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.|C'est la force d'inertie de Coriolis (en considérant le ref. Terrestre non galiléen et le réf géocentrique galiléen).<br>Dans le Nord: rotation dans le sens trigo.<br>Dans le Sud: Rotation dans le sens horaire<br><img src="images/paste-71cc5358ce5c51ce02d2e63300dba80598.jpg">|${PM3}
+10025|<br>Valeur de \\(\\vec{v}_{gs_2/s_1}\\) dans le cas de non glissement (i.e. cas de l'adhérence) :<br>|On a : \\(\\vec{v}_{gs_2/s_1} = \\vec{0}\\)|${PM4}
+10026|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb dans le cas d'un non-glissement :|\\[\\|\\vec{T}\\| \\le f_s \\|\\vec{N}\\|\\] avec \\(f_s\\) le coefficient de frottement statique.|${PM4}
+10027|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le cas d'un glissement :|\\[\\|\\vec{T}\\| = f_d \\|\\vec{N}\\|\\] avec \\(f_d\\) le coefficient de frottement dynamique.<br>|${PM4}
+10028|<span style="color: rgb(0, 255, 0);">(Yannick) </span>Les forces de frottement sont elles conservatives ?|Non, elles ne sont en général pas conservatives.|${PM4}
+10029|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Quel peut-être le signe de la puissance d'une force de contact ?|Généralement négatif : cas où la réaction tangentielle / force de frottement est une force de freinage.<br>Parfois positif : cas où la force de frottement est motrice. Par exemple, cas d'un solide S2 fixe par rapport à un solide S1 (adhérence) et que S1, mis en mouvement, met S2 en mouvement.<br><img src="images/paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg" width="265">|${PM4}
+10030|Que dire sur la puissance totale \\(P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R}\\) des forces mises en jeu dans un contact entre 2 solides ?|<br>\\(P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R})=\\vec{T}_{1 \\rightarrow 2} . \\vec{v_g}_{2/1} \\leq 0\\)<br>Elle est nulle s'il y a adhérence des 2 solides (\\(\\vec{v_g}_{2/1}=0\\)) ou si le glissement se fait sans frottement (\\(\\vec{T}_{1 \\rightarrow 2}=0\\)).<br>Elle est négative s'il y a glissement avec frottement.|${PM4}
+10031|<span style="color: rgb(255, 170, 0);">(Yannick) </span>On modélise l'action de contact de S1 sur S2 par une force \\(\\overrightarrow{R_{1->2}}\\) appliquée en un point I de la région de contact, comment se décompose \\(\\overrightarrow{R_{1->2}}\\) ?|<div>\\(\\overrightarrow{R_{1->2}}\\) se décompose en :</div><ul><li>Une composante orthogonale au plan tangent π commun aux 2 solides, dirigée de <strong>S1</strong> vers <strong>S2</strong>, notée \\(\\overrightarrow{N}\\) et appelée réaction normale.</li><li>Une composante appartenant au plan π, notée \\(\\overrightarrow{T}\\) et appelée réaction tangentielle ou force de frottement. En absence de frottements: \\(\\overrightarrow{T}=\\overrightarrow{0}\\)</li></ul>|${PM4}
+10032|<span style="color: rgb(255, 170, 0);">(INC)</span> Qu’est-ce que <b>la vitesse de glissement</b> ?|La vitesse de glissement de \\(S_2 / S_1\\) s'écrit : \\(\\vec{v_g}_{S_2/S_1} = \\vec{v_{I_2}} - \\vec{v_{I_1}} \\)<br><br>(avec \\(I\\) le point de contact entre les deux solides et \\(I_1\\) (resp. \\(I_2\\)) le point de \\(S_1\\) (resp. \\(S_2\\)) confondu avec \\(I\\) à l'instant \\(t\\) )<br><br>Remarque: Elle ne dépend pas du référentiel du moment que \\(\\vec{v_{I_2}}\\) et \\(\\vec{v_{I_1}}\\) sont exprimés dans le même référentiel.|${PM4}
+10033|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br> <img src="images/paste-15e45e099744e7f013048018acad29cb70089200.jpg">|<img src="images/paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg"><br><img src="images/paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg">|${PM4}
+10034|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br><img src="images/paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg">|<img src="images/paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg">|${PM4}
+10035|(INC)<br>Énoncer le principe de Curie|Les éléments d'invariance et de symétrie des causes doivent se retrouver dans les effets produits.|${PM5}
+10036|(INC)<br>Quelles sont les dimensions de la densité volumique/surfacique/linéique de charge ?|densité volumique de charge ρ homogène à une charge divisée par un volume<br>unité:&nbsp;\\(C.m^{-3}\\)<br>densité surfacique de charge&nbsp;\\(\\sigma\\)&nbsp;homogène à une charge divisée par une surface<br>unité:&nbsp;\\(C.m^{-2}\\)<br>densité linéique de charge&nbsp;\\(\\lambda\\)&nbsp;homogène à une charge divisée par une longueur<br>unité:&nbsp;\\(C.m^{-1}\\)|${PM5}
+10037|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quelle est la charge d'un volume élémentaire dV? d'une surface élémentaire dS? d'une longueur élémentaire dl?|La charge d'un volume élémentaire est&nbsp;\\[dq = \\rho.dV\\]<br>La charge d'une surface élémentaire est&nbsp;\\[dq = \\sigma.dS\\]<br>La charge d'une longueur élémentaire est&nbsp;\\[dq = \\lambda.dl\\]|${PM5}
+10038|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Quelle condition est nécessaire pour qu'une distribution de charges&nbsp;soit invariante par rotation autour d'un axe Δ ?|Il faut que pour tout point M appartenant à cette distribution, sa densité de charge vérifie ρ(M′) = ρ(M) (cas volumique) avec M′ l'image de M par rotation d'un angle quelconque autour de Δ.|${PM5}
+10039|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Quelle condition est nécessaire pour qu'une distribution de charges illimitée dans la direction d'un axe Δ soit invariante par translation suivant Δ ?|Il faut que pour tout point M appartenant à cette distribution et son translaté M', sa densité de charge vérifie : ρ(M') = ρ(M) (cas volumique)|${PM5}
+10040|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quel choix de coordonnées est adapté à une invariance par translation ? Puis par rotation ?|•&nbsp;Invariances par translation → coordonnées cartésiennes ou cylindriques.<br>• Invariances par rotation → coordonnées cylindriques ou sphériques.|${PM5}
+10041|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire du champ électrostatique en un point P' symétrique de P par rapport à un plan d’antisymétrie<br>d’une distribution de charges ? (n’appartenant pas forcément à cette distribution de charges)|Le champ électrostatique en P' est l’opposé du symétrique de celui en P par rapport au<br>plan d’antisymétrie de la distribution de charges.|${PM5}
+10042|(INC)<br>Que dire du champ électrostatique en P', point symétrique de P par rapport à un plan de symétrie<br>d’une distribution de charges ?|Le champ électrostatique en P' est le symétrique de celui en P par rapport au plan de symétrie de la distribution de charge.|${PM5}
+10043|(INC)<br>Que dire du champ électrostatique d'un point M d'un plan de symétrie d’une distribution de charges ?&nbsp;|Le champ électrostatique créé en un point M d’un plan de symétrie d’une distribution de charges appartient à ce plan.|${PM5}
+10044|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire d'un champ&nbsp;\\(\\vec{E}\\) créé par une distribution volumique de charge ?&nbsp;&nbsp;(Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\)&nbsp;créé par une distribution volumique de charge est défini et continu en tout point de l’espace.|${PM5}
+10045|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire d'un champ&nbsp;\\(\\vec{E}\\) créé par une distribution surfacique de charge ?&nbsp;&nbsp;(Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\) créé par une distribution surfacique de charge est défini et continu en tout point de l’espace, sauf au niveau des points de la distribution. Il est donc discontinu à la traversée de la surface chargée.|${PM5}
+10046|(INC)<br>Que dire d'un champ \\(\\vec{E}\\) créé par un ensemble de charges ponctuelles ? (Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\)&nbsp;créé par un ensemble de charges ponctuelles est défini et continu en tout point de<br>l’espace, sauf sur les charges.|${PM5}
+10047|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Qu'est-ce qu'un plan de symétrie d'une distribution de charges ?|Un plan de symétrie d'une distribution de charges est un plan tel que la distribution de charges obtenue en déplaçant les charges selon une symétrie par rapport à ce plan est identique à la<br>distribution initiale.|${PM5}
+10048|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Qu'est-ce qu'un plan d'antisymétrie d'une distribution de charges ?|On appelle plan d’antisymétrie d'une distribution de charges un plan tel que la distribution de charges obtenue en déplaçant les charges selon une symétrie par rapport à ce plan est opposée (changement de signe) à la distribution initiale.|${PM5}
+10049|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la loi de Coulomb qui s'exerce entre deux charges ponctuelles q1 et q2 séparées d'une distance r.|\\(\\vec{F}_{2 \\rightarrow 1} = - \\vec{F}_{1 \\rightarrow 2} = \\frac{1}{4 \\pi \\epsilon _0} \\frac{q_1 q_2}{r^2} \\vec{u}_{2 \\rightarrow 1}\\)|${PM5}
+10050|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Comment est décrite la répartition de la charge d'une distribution volumique/ surfacique/ linéique de charges ?|[latex]Elle est décrite par une fonction scalaire appelée densité volumique/ surfacique/ linéique de charge&nbsp; $\\rho$/ $\\sigma$/$\\lambda$, qui dépend des coordonnées (x', y', z') des points de la distribution de charges.[/latex]|${PM5}
+10051|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Comment calcule-t-on le champ électrique total en un point en utilisant le principe de superposition ?|Le champ électrique total en un point est calculé en faisant la somme vectorielle des champs électriques créés par chaque charge prise individuellement.|${PM5}
+10052|(INC)<br>Comment calcule-t-on la force totale exercée sur une charge de la part d'un ensemble de charges ponctuelles?|On utilise le théorème de superposition en sommant la contribution de chaque charge ponctuelle prise séparément.|${PM5}
+10053|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Donner le champ électrostatique crée en un point P par une charge ponctuelle q située en S|\\(\\vec{E} (P) = \\frac{q}{4 \\pi \\epsilon _0} \\frac{\\vec{u}_r}{r^2} = \\frac{q}{4 \\pi \\epsilon _0}&nbsp;&nbsp;\\frac{\\vec{SP}}{SP^3}\\)|${PM5}
+10054|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la direction de \\(\\vec{E}\\) dans le cas où \\(q >0\\)|Le champ \\(\\vec{E}\\) créé par une charge ponctuelle positive part de la charge. Il diverge à partir de la charge<img src="images/paste-c1726407b90adfa409f559a158eb8b1a740d476c.jpg">|${PM5}
+10055|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la direction de \\(\\vec{E}\\) dans le cas où \\(q <0\\)|Le champ \\(\\vec{E}\\) créé par une charge ponctuelle négative se dirige vers la charge. Il converge vers la charge<img src="images/paste-001a83783b8dd4b04bb9bb0d44ca862c9303f523.jpg">|${PM5}
+10056|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Deux charges \\(q_1, q_2\\) qui sont de signe différent interagissent entre elles. S'attirent-elles ou se repoussent-elles ? Pourquoi ?|Elles s'attirent. En effet, \\(q_1 q_2 < 0\\), donc la force d'interaction électrostatique est attractive.|${PM5}
+10057|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Deux charges \\(q_1, q_2\\) qui sont de même signe interagissent entre elles. S'attirent-elles ou se repoussent-elles ? Pourquoi ?|Elles se repoussent. En effet, \\(q_1 q_2 > 0\\), donc la force d'interaction électrostatique est répulsive.|${PM5}
+10058|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Comment s'appelle la constante \\(\\epsilon_0\\) dans la loi de Coulomb ?|C'est la permittivité du vide&nbsp;|${PM5}
+10059|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quand peut-on considérer une distribution de charges comme surfacique ?|Une distribution de charges peut être considérée comme surfacique lorsque l'une de ses dimensions spatiales est beaucoup plus petite que les deux autres dimensions.|${PM5}
+10060|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quand peut-on considérer une distribution de charges comme linéique ?|Une distribution de charges peut être considérée comme linéique lorsque deux de ses dimensions spatiales sont beaucoup plus petites que la troisième dimension.|${PM5}
+10061|<img src="images/paste-de3005b71b3b26e6cbfb7bc7e487288057e44965.jpg">|<img src="images/paste-4e5b864acd14971b75ee4cfa20de066c86177c58.jpg">|${PM5}
+10062|<img src="images/paste-036e005e8785d46a0d662e7e88fa5533bfe23c98.jpg">|<img src="images/paste-75d5efd4f249c0e30de16f6754802351a3a09811.jpg">|${PM5}
 `.trim();
 
     // === LIGHTBOX IMAGE VIEWER ===
-    // === LIGHTBOX IMAGE VIEWER (overlay sombre léger, pas de boutons) ===
     const LB = {
       el:null, stage:null, canvas:null, img:null,
       counter:null,
@@ -1535,7 +1572,6 @@
       LB.img = el.querySelector('#lbImg');
       LB.counter = el.querySelector('#lbCounter');
 
-      // Gestes (pan/zoom partout)
       LB.stage.addEventListener('pointerdown', e=>{
         LB.stage.setPointerCapture?.(e.pointerId);
         LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
@@ -1546,7 +1582,7 @@
         }else if(LB.pointers.size===2){
           const pts=[...LB.pointers.values()];
           LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
-          LB.startS = LB.s; LB.tapMoved = true; // pinch ≠ clic
+          LB.startS = LB.s; LB.tapMoved = true;
         }
         e.preventDefault();
       });
@@ -1559,12 +1595,10 @@
         if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
 
         if(LB.pointers.size>=2){
-          // Pinch = zoom centré écran
           const pts=[...LB.pointers.values()];
           const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
           setLBScaleCentered(LB.startS * (dist/LB.startDist));
         }else{
-          // 1 doigt = pan
           setLBPan(LB.panStartX + dx, LB.panStartY + dy);
         }
         e.preventDefault();
@@ -1573,7 +1607,6 @@
       const endPtr = e=>{
         if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
         if(LB.pointers.size===0){
-          // Clic dans le vide -> fermer
           if (!LB.tapMoved){
             const r = LB.img.getBoundingClientRect();
             if (!(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom)) {
@@ -1592,26 +1625,23 @@
       LB.stage.addEventListener('pointercancel', endPtr);
       LB.stage.addEventListener('lostpointercapture', endPtr);
 
-      // Double-tap/clic = toggle fit <-> zoom 2.2x (centré écran)
       let lastTap=0;
       LB.stage.addEventListener('pointerdown', e=>{
         const now=Date.now();
         if(now-lastTap<250){
           if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
           else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
-          LB.tapMoved = true; // éviter la fermeture juste après
+          LB.tapMoved = true;
         }
         lastTap=now;
       });
 
-      // Molette = zoom centré écran (desktop)
       LB.stage.addEventListener('wheel', e=>{
         e.preventDefault();
         const step = (e.deltaY>0 ? -0.15 : 0.15);
         setLBScaleCentered(LB.s + step*LB.s);
       }, {passive:false});
 
-      // Refit sur resize
       window.addEventListener('resize', ()=>{
         if(LB.el.classList.contains('open')) refitLB();
       });
@@ -1621,13 +1651,12 @@
 
     function openLightboxFor(imgEl, scopeEl){
       ensureLightbox();
-      // Images présentes dans la carte en cours
       const list = Array.from(scopeEl.querySelectorAll('img'));
       LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
       LB.idx = Math.max(0, list.indexOf(imgEl));
       LB.el.classList.add('open');
       document.body.dataset._oriOverflow = document.body.style.overflow || '';
-      document.body.style.overflow = 'hidden'; // bloque le scroll derrière
+      document.body.style.overflow = 'hidden';
       LB.el.focus?.();
       showLB(LB.idx, true);
     }
@@ -1691,7 +1720,6 @@
       applyLB();
     }
 
-    // Parsing générique multi-matières
     function parseCardsRaw(raw){
       return raw.split(/\r?\n/).map(l=>{
         const p=l.split('|'); if(p.length!==4) return null;
@@ -1702,10 +1730,41 @@
     const flashcardDataEN  = parseCardsRaw(cardsRawText);
     const flashcardDataPHY = parseCardsRaw(physicsRawText);
     
+    // NOUVEAU : Store IndexedDB pour l'état de l'application
+    const StateStore = {
+      db: null,
+      async open(){
+        if (this.db) return this.db;
+        return this.db = await new Promise((res, rej)=>{
+          const req = indexedDB.open('flash9x16_state', 1);
+          req.onupgradeneeded = ()=> req.result.createObjectStore('kv');
+          req.onsuccess = ()=> res(req.result);
+          req.onerror = ()=> rej(req.error);
+        });
+      },
+      async set(key, value){
+        const db = await this.open();
+        await new Promise((res, rej)=>{
+          const tx = db.transaction('kv','readwrite');
+          tx.objectStore('kv').put(value, key);
+          tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
+        });
+      },
+      async get(key){
+        const db = await this.open();
+        return await new Promise((res, rej)=>{
+          const tx = db.transaction('kv','readonly');
+          const rq = tx.objectStore('kv').get(key);
+          rq.onsuccess = ()=>res(rq.result);
+          rq.onerror = ()=>rej(rq.error);
+        });
+      }
+    };
+    
     // ---------- Utils ----------
     const Media = {
       db:null,
-      cache:new Map(), // key -> objectURL
+      cache:new Map(),
       async open(){
         if (this.db) return this.db;
         this.db = await new Promise((resolve,reject)=>{
@@ -1728,7 +1787,7 @@
           tx.objectStore('files').put({ key, blob, meta, ts:Date.now() });
           tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
         });
-        data.mediaIndex = data.mediaIndex || {}; // petite index light côté localStorage
+        data.mediaIndex = data.mediaIndex || {};
         data.mediaIndex[key] = { name: meta.name||key, type: blob.type, size: blob.size };
         saveData();
       },
@@ -1763,7 +1822,6 @@
       },
       rewriteHTMLToPlaceholders(html, nameMap){
         if (!html) return html;
-        // remplace src="fichier" par src="media://clé" si connu
         return String(html).replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (m,prefix,src,suffix)=>{
           const clean = src.replace(/^.*[\\\/]/, '').replace(/^_+/, '');
           const key = nameMap[clean] || nameMap[decodeURIComponent(clean)] || null;
@@ -1797,151 +1855,98 @@
       }
     }
 
-    // Remplacez votre fonction importApkg existante par celle-ci
-async function importApkg(file) {
-    try {
-        // 1) Dézipper
-        const buf = await file.arrayBuffer();
-        const zip = await JSZip.loadAsync(buf);
-
-        // 2) Media map (pas de changement ici, la méthode est déjà robuste)
-        let mediaMap = {};
-        const mediaEntry = zip.file(/^media(\.json)?$/i)[0];
-        if (mediaEntry) {
-            try {
-                mediaMap = JSON.parse(await mediaEntry.async('string'));
-            } catch (e) {
-                console.warn('media.json parse error', e);
-            }
-        }
-
-        const importId = `apkg-${slugify(file.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
-        const mediaNameToKey = {};
-        for (const [numStr, realName] of Object.entries(mediaMap)) {
-            const num = String(numStr);
-            const entry = zip.file(new RegExp(`^${num}$`))[0];
-            if (!entry) continue;
-            const blob = await entry.async('blob');
-            const key = `${importId}/${realName||num}`;
-            await Media.save(key, blob, { name: realName || num });
-            mediaNameToKey[realName] = key;
-            mediaNameToKey[num] = key;
-        }
-
-        // 3) SQLite - Recherche de la base de données de manière plus flexible
-        // MODIFICATION 1 : Regex plus tolérante
-        // Elle cherche 'collection.anki2' ou 'collection.anki21', et autorise une extension optionnelle comme '.db'
-        const colEntry = zip.file(/collection\.anki2(1|\.db)?/i)[0];
-
-        if (!colEntry) {
-            // Si on ne trouve rien, on liste les fichiers pour aider au débogage
-            const fileList = Object.keys(zip.files).join('\n - ');
-            throw new Error(`Fichier de base de données (collection.anki2 ou similaire) introuvable dans le .apkg.\n\nFichiers présents :\n - ${fileList}`);
-        }
-
-        const dbBytes = new Uint8Array(await colEntry.async('uint8array'));
-        const SQL = await ensureSQL();
-        const db = new SQL.Database(dbBytes);
-
-        // 4) Decks
-        let deckById = {};
-        try {
-            const res = db.exec('select decks from col limit 1');
-            if (res && res[0] && res[0].values && res[0].values[0] && res[0].values[0][0]) {
-                deckById = JSON.parse(res[0].values[0][0] || '{}');
-            }
-        } catch (e) {
-            console.warn('col.decks JSON parse error', e);
-        }
-
-        // 5) Cartes (join cards+notes)
-        // MODIFICATION 2 : Gestion d'erreur améliorée pour la requête SQL
-        let rows;
-        try {
-            const q = `select cards.id as cid, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id = cards.nid`;
-            rows = db.exec(q);
-        } catch(e) {
-            // Si la requête échoue, c'est probablement que les noms des tables/colonnes sont différents.
-            // On aide l'utilisateur en listant les tables disponibles.
-            const tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
-            const tableNames = tablesRes[0].values.map(v => v[0]).join(', ');
-            throw new Error(`Erreur lors de la lecture des cartes. Le format de la base de données est peut-être différent.\n\nErreur technique : ${e.message}\n\nTables trouvées : ${tableNames}`);
-        }
-
-        if (!rows || !rows[0] || !rows[0].values.length) {
-            db.close();
-            // Pas besoin de lancer une erreur, on peut juste importer un deck vide
-             console.warn('Aucune carte trouvée dans la base de données.');
-        }
-        
-        const cols = rows[0].columns;
-        const vals = rows[0].values;
-        const byDeck = new Map();
-
-        for (const r of vals) {
-            const row = Object.fromEntries(cols.map((c, i) => [c, r[i]]));
-            const did = String(row.did);
-            const deckName = (deckById[did]?.name) || (`Deck ${did}`);
-            const name = deckName.replace(/::/g, ' › ');
-            
-            // Le séparateur \x1f est un standard très fort d'Anki, peu de chances qu'il change
-            const flds = String(row.flds || '').split('\x1f');
-            const frontRaw = flds[0] || '';
-            const backRaw = flds[1] || '';
-            
-            const front = Media.rewriteHTMLToPlaceholders(frontRaw, mediaNameToKey);
-            const back = Media.rewriteHTMLToPlaceholders(backRaw, mediaNameToKey);
-            
-            const chapArr = byDeck.get(name) || [];
-            chapArr.push({ id: String(row.cid), front, back, deckName: name });
-            byDeck.set(name, chapArr);
-        }
-        db.close();
-
-        if (byDeck.size === 0) {
-            alert("Avertissement : Le fichier .apkg a été traité, mais aucune carte n'a pu être extraite. Le format est peut-être non standard.");
-            return; // On arrête ici pour ne pas créer de sujet vide
-        }
-
-        // 6) Construire un Subject + chapitres (pas de changement ici)
-        const subjectId = `import-${slugify(file.name.replace(/\.[^.]+$/,''))}`;
-        const chapters = [];
-        for (const [name, arr] of byDeck.entries()) {
-            const cards = arr.map(r => ({
-                id: `${slugify(name)}-${r.id}`,
-                front: r.front, back: r.back, grade: 'unseen',
-                timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0,
-                perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0
-            }));
-            const ch = {
-                id: 'chap-' + slugify(name),
-                title: name,
-                description: `${emojiFor(name)||'📦'} ${name}`,
-                settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false },
-                filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } },
-                stats: {
-                    gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 },
-                    totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {}
-                },
-                cards
-            };
-            chapters.push(ch);
-        }
-        
-        const subject = { id: subjectId, title: file.name.replace(/\.[^.]+$/, ''), chapters, imported: true };
-        chapters.forEach(ch => ch.imported = true);
-
-        data.subjects = data.subjects || [];
-        data.subjects.push(subject);
-        data.app.currentSubjectId = subjectId;
-        saveData();
-
-    } catch (err) {
-        // MODIFICATION 3 : On propage l'erreur pour qu'elle soit affichée à l'utilisateur
-        console.error("Erreur détaillée lors de l'import APGK:", err);
-        throw err; // On relance l'erreur pour la catcher plus haut
+    async function importApkg(file) {
+      try {
+          const buf = await file.arrayBuffer();
+          const zip = await JSZip.loadAsync(buf);
+          let mediaMap = {};
+          const mediaEntry = zip.file(/^media(\.json)?$/i)[0];
+          if (mediaEntry) {
+              try { mediaMap = JSON.parse(await mediaEntry.async('string')); } catch (e) { console.warn('media.json parse error', e); }
+          }
+          const importId = `apkg-${slugify(file.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
+          const mediaNameToKey = {};
+          for (const [numStr, realName] of Object.entries(mediaMap)) {
+              const num = String(numStr);
+              const entry = zip.file(new RegExp(`^${num}$`))[0];
+              if (!entry) continue;
+              const blob = await entry.async('blob');
+              const key = `${importId}/${realName||num}`;
+              await Media.save(key, blob, { name: realName || num });
+              mediaNameToKey[realName] = key;
+              mediaNameToKey[num] = key;
+          }
+          const colEntry = zip.file(/collection\.anki2(1|\.db)?/i)[0];
+          if (!colEntry) {
+              const fileList = Object.keys(zip.files).join('\n - ');
+              throw new Error(`Fichier de base de données (collection.anki2 ou similaire) introuvable dans le .apkg.\n\nFichiers présents :\n - ${fileList}`);
+          }
+          const dbBytes = new Uint8Array(await colEntry.async('uint8array'));
+          const SQL = await ensureSQL();
+          const db = new SQL.Database(dbBytes);
+          let deckById = {};
+          try {
+              const res = db.exec('select decks from col limit 1');
+              if (res && res[0] && res[0].values && res[0].values[0] && res[0].values[0][0]) {
+                  deckById = JSON.parse(res[0].values[0][0] || '{}');
+              }
+          } catch (e) { console.warn('col.decks JSON parse error', e); }
+          let rows;
+          try {
+              const q = `select cards.id as cid, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id = cards.nid`;
+              rows = db.exec(q);
+          } catch(e) {
+              const tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+              const tableNames = tablesRes[0].values.map(v => v[0]).join(', ');
+              throw new Error(`Erreur lors de la lecture des cartes. Le format de la base de données est peut-être différent.\n\nErreur technique : ${e.message}\n\nTables trouvées : ${tableNames}`);
+          }
+          if (!rows || !rows[0] || !rows[0].values.length) { db.close(); console.warn('Aucune carte trouvée dans la base de données.'); }
+          const cols = rows[0].columns;
+          const vals = rows[0].values;
+          const byDeck = new Map();
+          for (const r of vals) {
+              const row = Object.fromEntries(cols.map((c, i) => [c, r[i]]));
+              const did = String(row.did);
+              const deckName = (deckById[did]?.name) || (`Deck ${did}`);
+              const name = deckName.replace(/::/g, ' › ');
+              const flds = String(row.flds || '').split('\x1f');
+              const frontRaw = flds[0] || '';
+              const backRaw = flds[1] || '';
+              const front = Media.rewriteHTMLToPlaceholders(frontRaw, mediaNameToKey);
+              const back = Media.rewriteHTMLToPlaceholders(backRaw, mediaNameToKey);
+              const chapArr = byDeck.get(name) || [];
+              chapArr.push({ id: String(row.cid), front, back, deckName: name });
+              byDeck.set(name, chapArr);
+          }
+          db.close();
+          if (byDeck.size === 0) { alert("Avertissement : Le fichier .apkg a été traité, mais aucune carte n'a pu être extraite. Le format est peut-être non standard."); return; }
+          const subjectId = `import-${slugify(file.name.replace(/\.[^.]+$/,''))}`;
+          const chapters = [];
+          for (const [name, arr] of byDeck.entries()) {
+              const cards = arr.map(r => ({
+                  id: `${slugify(name)}-${r.id}`, front: r.front, back: r.back, grade: 'unseen',
+                  timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0, perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0
+              }));
+              const ch = {
+                  id: 'chap-' + slugify(name), title: name, description: `${emojiFor(name)||'📦'} ${name}`,
+                  settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false },
+                  filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } },
+                  stats: { gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 },
+                      totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {} },
+                  cards };
+              chapters.push(ch);
+          }
+          const subject = { id: subjectId, title: file.name.replace(/\.[^.]+$/, ''), chapters, imported: true };
+          chapters.forEach(ch => ch.imported = true);
+          data.subjects = data.subjects || [];
+          data.subjects.push(subject);
+          data.app.currentSubjectId = subjectId;
+          saveData();
+      } catch (err) {
+          console.error("Erreur détaillée lors de l'import APGK:", err);
+          throw err;
+      }
     }
-}
 
     async function importDelimited(file){
       const text = await file.text();
@@ -1951,20 +1956,12 @@ async function importApkg(file) {
       let header = lines[0].split(sep).map(s=>s.trim().toLowerCase());
       let start = 0;
       let hasHeader = header.includes('front') && header.includes('back');
-      if (!hasHeader){
-        header = ['front','back','chapter'];
-      } else {
-        start = 1;
-      }
+      if (!hasHeader){ header = ['front','back','chapter']; } else { start = 1; }
       const recs = [];
       for (let i=start;i<lines.length;i++){
         const cols = lines[i].split(sep);
         const row = Object.fromEntries(header.map((h,j)=>[h, cols[j]||'']));
-        recs.push({
-          front: row.front||cols[0]||'',
-          back: row.back||cols[1]||'',
-          chapter: row.chapter||'Général'
-        });
+        recs.push({ front: row.front||cols[0]||'', back: row.back||cols[1]||'', chapter: row.chapter||'Général' });
       }
       await importAsSimpleSubject(file.name.replace(/\.[^.]+$/,''), recs);
     }
@@ -1975,9 +1972,7 @@ async function importApkg(file) {
         await importAsSimpleSubject(file.name.replace(/\.[^.]+$/,''), obj);
       } else if (obj && Array.isArray(obj.cards)){
         await importAsSimpleSubject(obj.subject||file.name.replace(/\.[^.]+$/,''), obj.cards);
-      } else {
-        throw new Error('JSON non reconnu');
-      }
+      } else { throw new Error('JSON non reconnu'); }
     }
 
     async function importAsSimpleSubject(subjectName, list){
@@ -1992,21 +1987,15 @@ async function importApkg(file) {
       const subjectId = `import-${slugify(subjectName)}-${Date.now()}`;
       const chapters = Object.entries(byChap).map(([name, arr])=>{
         const cards = arr.map((r,i)=>({
-          id:`${slugify(name)}-${i}-${Date.now()}`,
-          front:r.front, back:r.back, grade:'unseen',
-          timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0,
-          perfEma:0.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
+          id:`${slugify(name)}-${i}-${Date.now()}`, front:r.front, back:r.back, grade:'unseen',
+          timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:0.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
         }));
         return {
-          id:'chap-'+slugify(name),
-          title:name,
-          description:`📦 ${name}`,
+          id:'chap-'+slugify(name), title:name, description:`📦 ${name}`,
           settings:{sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:false},
           filters:{grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true}},
-          stats:{
-            gradeCounts:{unseen:cards.length,echec:0,difficile:0,bien:0,facile:0},
-            totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}
-          },
+          stats:{ gradeCounts:{unseen:cards.length,echec:0,difficile:0,bien:0,facile:0},
+            totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{} },
           cards
         };
       });
@@ -2017,11 +2006,44 @@ async function importApkg(file) {
       saveData();
       goDeck(false);
     }
+    
+    // NOUVEAU : Fonctions d'export/import de la progression complète
+    function exportProgress(){
+      const blob = new Blob([JSON.stringify(data)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `flashcards-progress-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    }
+    
+    async function importProgressFile(file){
+      if (!confirm("Attention : l'importation d'une progression remplacera toutes vos données actuelles. Voulez-vous continuer ?")) {
+        return;
+      }
+      const text = await file.text();
+      try{
+        const obj = JSON.parse(text);
+        if (obj && Array.isArray(obj.subjects) && obj.app){
+          data = obj;
+          upgradeData();
+          applyTheme();
+          applyUI();
+          saveData();
+          renderByState(false);
+          alert('Progression importée ✅');
+        }else{
+          alert('Fichier de progression invalide.');
+        }
+      }catch(e){
+        alert('Erreur lors de l\'importation du JSON: '+e.message);
+      }
+    }
 
     const $ = s=>document.querySelector(s);
     const $$ = s=>Array.from(document.querySelectorAll(s));
-    const ChartHit = {}; // hitmap donut
-    const Bar7Hit = {}; // { [canvasId]: { cssW, cssH, bars: [{x,w}] } }
+    const ChartHit = {};
+    const Bar7Hit = {};
 
     const dateKey = (d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const todayKey = ()=>dateKey(new Date());
@@ -2052,15 +2074,8 @@ async function importApkg(file) {
 
 
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$','$$'], ['\\[', '\\]']],
-        processEscapes: true,
-        packages: {'[+]': ['noerrors', 'noundefined']}
-      },
-      options: {
-        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
-      },
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[', '\\]']], processEscapes: true, packages: {'[+]': ['noerrors', 'noundefined']} },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
       startup: { typeset: false }
     };
 
@@ -2129,20 +2144,9 @@ async function importApkg(file) {
           }
         }
       }catch(e){}
-
-      try{
-        const c = readCookieBackup();
-        if(c){
-          const parsed = JSON.parse(c);
-          if (Array.isArray(parsed.subjects)) return parsed;
-          if (Array.isArray(parsed.chapters)) {
-            return {
-              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters, groups:[] }],
-              app: parsed.app || { theme:'dark', prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }, currentSubjectId:'anglais' }
-            };
-          }
-        }
-      }catch(e){}
+      
+      // MODIFIÉ : la restauration depuis les cookies a été retirée
+      // La restauration se fait désormais depuis IndexedDB à la fin de init()
 
       const subjects = buildCanonicalSubjects();
       return {
@@ -2159,16 +2163,62 @@ async function importApkg(file) {
       try{
         const str=JSON.stringify(data);
         localStorage.setItem(STORAGE_KEY,str);
-        writeCookieBackup(str);
+        // NOUVEAU : Sauvegarde dans IndexedDB en plus de localStorage
+        StateStore.set('state', str).catch(e => console.warn("IDB save failed", e));
+        // MODIFIÉ : La sauvegarde dans les cookies est désactivée
+        // writeCookieBackup(str);
       }catch(e){console.warn('Save error',e);}
     }
 
-    // Cookies backup
+    // NOUVEAU: Fonction pour nettoyer les anciens cookies de backup
+    function nukeCookieBackup(){
+      try{
+        const n = parseInt(getCookie('F9X16_BN')||'0',10);
+        for (let i=0; i<Math.max(100,n); i++) delCookie('F9X16_B'+i);
+        delCookie('F9X16_BN');
+      }catch(e){}
+    }
+
+    // NOUVEAU: Fonction de nettoyage des statistiques
+    function pruneStats({maxDays=180, maxLogsPerDay=200}={}){
+      const cutoff = new Date();
+      cutoff.setHours(0,0,0,0);
+      cutoff.setDate(cutoff.getDate() - maxDays);
+      const cutoffKey = dateKey(cutoff);
+
+      (data.subjects||[]).forEach(subj=>{
+        (subj.chapters||[]).forEach(ch=>{
+          const S = ch.stats || {};
+          // Supprimer jours trop anciens
+          ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(k=>{
+            const m = S[k] || {};
+            Object.keys(m).forEach(day=>{
+              if (day < cutoffKey) delete m[day];
+            });
+          });
+          // Limiter la taille des logs par jour
+          const logs = S.dailyLog || {};
+          Object.keys(logs).forEach(day=>{
+            const arr = logs[day];
+            if (Array.isArray(arr) && arr.length > maxLogsPerDay){
+              logs[day] = arr.slice(-maxLogsPerDay);
+            }
+          });
+        });
+      });
+      saveData();
+    }
+
+
+    // Fonctions de gestion des cookies (conservées pour le nettoyage)
     function setCookie(name,value,days=365){try{document.cookie=`${name}=${encodeURIComponent(value)}; max-age=${days*86400}; path=/; SameSite=Lax;`;}catch(e){}}
     function getCookie(name){try{const m=document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'=')); return m?decodeURIComponent(m.split('=').slice(1).join('=')):null;}catch(e){return null;}}
     function delCookie(name){document.cookie=`${name}=; max-age=0; path=/; SameSite=Lax;`;}
-    function writeCookieBackup(str){const CHUNK=3400; const parts=Math.ceil(str.length/CHUNK); for(let i=0;i<parts;i++) setCookie(`F9X16_B${i}`,str.slice(i*CHUNK,(i+1)*CHUNK)); for(let i=parts;i<10;i++) delCookie(`F9X16_B${i}`); setCookie('F9X16_BN',String(parts));}
-    function readCookieBackup(){const n=parseInt(getCookie('F9X16_BN')||'0',10); if(!n) return null; let out=''; for(let i=0;i<n;i++){const p=getCookie(`F9X16_B${i}`); if(p==null) return null; out+=p;} return out;}
+    
+    // La fonction writeCookieBackup n'est plus appelée mais on peut la garder pour référence ou la supprimer
+    // function writeCookieBackup(str){const CHUNK=3400; const parts=Math.ceil(str.length/CHUNK); for(let i=0;i<parts;i++) setCookie(`F9X16_B${i}`,str.slice(i*CHUNK,(i+1)*CHUNK)); for(let i=parts;i<10;i++) delCookie(`F9X16_B${i}`); setCookie('F9X16_BN',String(parts));}
+    // La fonction readCookieBackup n'est plus utilisée dans le flux normal de chargement
+    // function readCookieBackup(){const n=parseInt(getCookie('F9X16_BN')||'0',10); if(!n) return null; let out=''; for(let i=0;i<n;i++){const p=getCookie(`F9X16_B${i}`); if(p==null) return null; out+=p;} return out;}
 
     let data = loadData();
 
@@ -2284,7 +2334,6 @@ async function importApkg(file) {
     const State = {view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey: null};
     State.virtualChapter = null;
 
-    // getChapter doit aussi renvoyer un chapitre virtuel si actif
     const _getChapterReal = (id) => getCurrentChapters().find(c=>c.id===id);
     function getChapter(id){
       if (State.virtualChapter && State.virtualChapter.id===id) return State.virtualChapter;
@@ -2299,15 +2348,12 @@ async function importApkg(file) {
       if (!ch.imported){ alert('Seuls les chapitres importés peuvent être supprimés.'); return false; }
       if (!confirm(`Supprimer le chapitre "${ch.title}" ?`)) return false;
 
-      // retirer des groupes
       ensureGroups(subj).forEach(g=>{
         g.chapIds = g.chapIds.filter(id=>id!==chId);
       });
       ensureValidGroups(subj);
-
       subj.chapters.splice(idx,1);
 
-      // supprimer le sujet s'il devient vide (pour sujets importés)
       if (subj.chapters.length===0 && subj.imported){
         data.subjects = (data.subjects||[]).filter(s=>s.id!==subj.id);
         if (data.app.currentSubjectId === subj.id){
@@ -2329,7 +2375,7 @@ async function importApkg(file) {
       },
       back(){
         if(!this.stack.length) return;
-        State.virtualChapter = null; // Important: quitter un chapitre virtuel le détruit
+        State.virtualChapter = null;
         const prev=this.stack.pop();
         State.view=prev.view; State.chapterId=prev.chapterId; State.review=prev.review;
         State.cardsIndex=prev.cardsIndex||0; State.dailyKey=prev.dailyKey||null;
@@ -2338,14 +2384,12 @@ async function importApkg(file) {
       clear(){this.stack=[];}
     };
 
-    // ---------- DOM persistants ----------
     const backBtn=$('#backBtn');
     const titleEl=$('#title');
     const bottomActions=$('#bottomActions');
     const revisionBar=$('#revisionBar');
     const startReviewBtn=$('#startReviewBtn');
 
-    // ----- Subject menu (UI) -----
     const subjectMenuId = 'subjectMenu';
     function ensureSubjectMenu(){
       let m = document.getElementById(subjectMenuId);
@@ -2475,365 +2519,195 @@ async function importApkg(file) {
       renderDeck();
     }
     
-    // ====================================================================
-    // MODIFICATION: renderDeck() entièrement révisée
-    // ====================================================================
     function renderDeck() {
-    const v = $('#view');
-    const subj = getCurrentSubject();
-    if (!subj) {
-        v.innerHTML = `<div class="card center muted">Aucun deck sélectionné.</div>`;
-        return;
-    }
-    
-    const groups = ensureGroups(subj);
-    const allChapters = (subj.chapters || []).slice();
+      const v = $('#view');
+      const subj = getCurrentSubject();
+      if (!subj) { v.innerHTML = `<div class="card center muted">Aucun deck sélectionné.</div>`; return; }
+      
+      const groups = ensureGroups(subj);
+      const allChapters = (subj.chapters || []).slice();
+      const chapterIdsInGroups = new Set(groups.flatMap(g => g.chapIds));
 
-    const chapterIdsInGroups = new Set(groups.flatMap(g => g.chapIds));
-
-    v.innerHTML = `
-    <div class="card flexcol" style="flex:1;">
-      <div class="deck-head">
-        <div class="section-title">Chapitres & Fichiers</div>
-        <div class="actions">
-          <button class="btn btn--ghost btn--tiny" id="importBtn">Importer</button>
-          <input id="importInput" type="file" class="hidden" accept=".apkg,.csv,.tsv,.json" multiple />
+      v.innerHTML = `
+      <div class="card flexcol" style="flex:1;">
+        <div class="deck-head">
+          <div class="section-title">Chapitres & Fichiers</div>
+          <div class="actions">
+            <button class="btn btn--ghost btn--tiny" id="importBtn">Importer</button>
+            <input id="importInput" type="file" class="hidden" accept=".apkg,.csv,.tsv,.json" multiple />
+          </div>
         </div>
-      </div>
-
-      <div id="deckList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-        <div class="list">
-          
-          <!-- Rendu des Fichiers (Groupes) -->
-          ${groups.map(g => {
-            const { counts } = buildGroupStats(subj, g);
-            const total = counts.unseen + counts.echec + counts.difficile + counts.bien + counts.facile;
-            const viewed = Math.max(0, total - counts.unseen);
-            const pct = total ? Math.round(viewed * 100 / total) : 0;
-            const emojis = groupEmojiList(subj, g);
-
-            // --- NOUVELLE LOGIQUE : Créer la chaîne de caractères avec les noms des chapitres ---
-            const chapterNamesList = g.chapIds
-                .map(chapId => {
-                    const chapter = allChapters.find(ch => ch.id === chapId);
-                    return chapter ? chapter.title : null; // Récupère le titre ou null si le chapitre n'est pas trouvé
-                })
-                .filter(Boolean) // Retire les éventuels chapitres non trouvés (null)
-                .join(', '); // Assemble les noms avec une virgule
-
-            return `
-              <div class="deck-item" data-type="group" data-id="${g.id}">
-                <div class="slide">
-                  <div style="min-width:0; flex:1">
-                    <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
-                      📁 Fichier (${emojis})
-                    </div>
-                    
-                    <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
-                      <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
-                      <span class="chip">🟥 ${counts.echec}</span>
-                      <span class="chip">🟨 ${counts.difficile}</span>
-                      <span class="chip">🟦 ${counts.bien}</span>
-                      <span class="chip">🟩 ${counts.facile}</span>
-                      <span class="folder-badge">• ${g.chapIds.length} chap.</span>
-                    </div>
-
-                    <!-- MODIFICATION : Ajout de la liste des noms de chapitres ici -->
-                    <div class="muted chapter-list mt6" title="${chapterNamesList}">
-                      ${chapterNamesList}
-                    </div>
-
-                  </div>
-                  <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-
-          <!-- Rendu des Chapitres non groupés -->
-          ${allChapters
-            .filter(ch => !chapterIdsInGroups.has(ch.id))
-            .map(ch => {
-              const counts = getLiveGradeCounts(ch);
-              const total = ch.cards?.length ?? 0;
+        <div id="deckList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+          <div class="list">
+            ${groups.map(g => {
+              const { counts } = buildGroupStats(subj, g);
+              const total = counts.unseen + counts.echec + counts.difficile + counts.bien + counts.facile;
               const viewed = Math.max(0, total - counts.unseen);
-              const pct = total ? Math.round((viewed / total) * 100) : 0;
-              
-              const deleteButtonHTML = ch.imported 
-                ? `<div class="right-action"><button class="btn btn--solid btn--red btn--tiny deleteChBtn" data-chap-id="${ch.id}">Supprimer</button></div>` 
-                : '';
-
+              const pct = total ? Math.round(viewed * 100 / total) : 0;
+              const emojis = groupEmojiList(subj, g);
+              const chapterNamesList = g.chapIds.map(chapId => {
+                  const chapter = allChapters.find(ch => ch.id === chapId); return chapter ? chapter.title : null;
+              }).filter(Boolean).join(', ');
               return `
-                <div class="deck-item" data-type="chapter" data-id="${ch.id}">
-                  ${deleteButtonHTML}
+                <div class="deck-item" data-type="group" data-id="${g.id}">
                   <div class="slide">
                     <div style="min-width:0; flex:1">
                       <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
-                        ${ch.description || ch.title}
+                        📁 Fichier (${emojis})
                       </div>
                       <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
                         <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
-                        <span class="chip">🟥 ${counts.echec}</span>
-                        <span class="chip">🟨 ${counts.difficile}</span>
-                        <span class="chip">🟦 ${counts.bien}</span>
-                        <span class="chip">🟩 ${counts.facile}</span>
+                        <span class="chip">🟥 ${counts.echec}</span> <span class="chip">🟨 ${counts.difficile}</span> <span class="chip">🟦 ${counts.bien}</span> <span class="chip">🟩 ${counts.facile}</span>
+                        <span class="folder-badge">• ${g.chapIds.length} chap.</span>
                       </div>
+                      <div class="muted chapter-list mt6" title="${chapterNamesList}">${chapterNamesList}</div>
                     </div>
                     <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
                   </div>
-                </div>
-              `;
+                </div>`;
             }).join('')}
+            ${allChapters
+              .filter(ch => !chapterIdsInGroups.has(ch.id))
+              .map(ch => {
+                const counts = getLiveGradeCounts(ch);
+                const total = ch.cards?.length ?? 0;
+                const viewed = Math.max(0, total - counts.unseen);
+                const pct = total ? Math.round((viewed / total) * 100) : 0;
+                const deleteButtonHTML = ch.imported ? `<div class="right-action"><button class="btn btn--solid btn--red btn--tiny deleteChBtn" data-chap-id="${ch.id}">Supprimer</button></div>` : '';
+                return `
+                  <div class="deck-item" data-type="chapter" data-id="${ch.id}">
+                    ${deleteButtonHTML}
+                    <div class="slide">
+                      <div style="min-width:0; flex:1">
+                        <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
+                          ${ch.description || ch.title}
+                        </div>
+                        <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
+                          <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
+                          <span class="chip">🟥 ${counts.echec}</span> <span class="chip">🟨 ${counts.difficile}</span> <span class="chip">🟦 ${counts.bien}</span> <span class="chip">🟩 ${counts.facile}</span>
+                        </div>
+                      </div>
+                      <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
+                    </div>
+                  </div>`;
+              }).join('')}
+          </div>
         </div>
-      </div>
-    </div>
-    `;
+      </div>`;
 
-    // Logique pour le bouton d'importation (inchangée)
-    const importBtn = $('#importBtn');
-    const importInput = $('#importInput');
-    if (importBtn && importInput) {
-        importBtn.addEventListener('click', () => importInput.click());
-        importInput.addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files || []);
-            if (!files.length) return;
-            try {
-                await Promise.all(files.map(file => importFiles([file])));
-                alert('Import terminé ✅');
-                saveData();
-                goDeck(false);
-            } catch (err) {
-                console.error(err);
-                alert('Erreur lors de l\'importation : ' + (err?.message || 'Erreur inconnue.'));
-            } finally {
-                importInput.value = '';
-            }
-        });
+      const importBtn = $('#importBtn'); const importInput = $('#importInput');
+      if (importBtn && importInput) {
+          importBtn.addEventListener('click', () => importInput.click());
+          importInput.addEventListener('change', async (e) => {
+              const files = Array.from(e.target.files || []);
+              if (!files.length) return;
+              try {
+                  await Promise.all(files.map(file => importFiles([file])));
+                  alert('Import terminé ✅'); saveData(); goDeck(false);
+              } catch (err) { console.error(err); alert('Erreur lors de l\'importation : ' + (err?.message || 'Erreur inconnue.'));
+              } finally { importInput.value = ''; }
+          });
+      }
+      bindDeckInteractions();
+    }
+    
+    function bindDeckInteractions() {
+      const list = $('#deckList'); if (!list) return; const subj = getCurrentSubject();
+      list.addEventListener('click', (e) => {
+          if (e.target.matches('.deleteChBtn')) {
+              e.stopPropagation(); const id = e.target.getAttribute('data-chap-id');
+              if (deleteImportedChapter(id)) renderDeck();
+          }
+      });
+      const items = $$('.deck-item');
+      items.forEach(el => {
+          el.style.webkitUserSelect = 'none'; el.style.userSelect = 'none'; el.style.webkitTouchCallout = 'none';
+          const type = el.getAttribute('data-type'); const id = el.getAttribute('data-id');
+          let sx = 0, sy = 0, dx = 0, dy = 0; let interactionState = 'idle'; let longPressTimer = null; let ghost = null;
+          let animationFrameId = null; let scrollDirection = 0; const scrollSpeed = 6; const scrollContainer = list;
+          const autoScroll = () => { if (scrollDirection !== 0) { scrollContainer.scrollTop += scrollSpeed * scrollDirection; } if (interactionState === 'dragging') { animationFrameId = requestAnimationFrame(autoScroll); } };
+          const startDrag = (e) => {
+              if (interactionState !== 'pressed' || type !== 'chapter') return;
+              interactionState = 'dragging'; el.classList.add('dragging-origin'); document.body.classList.add('dragging-active');
+              scrollContainer.classList.add('scroll-lock'); ghost = el.cloneNode(true); ghost.classList.add('drag-ghost');
+              ghost.style.width = el.getBoundingClientRect().width + 'px'; document.body.appendChild(ghost); moveGhost(e.clientX, e.clientY);
+              animationFrameId = requestAnimationFrame(autoScroll);
+          };
+          const moveGhost = (x, y) => { if (!ghost) return; ghost.style.transform = `translate(${x - 75}px, ${y - 75}px) scale(1.02)`; };
+          const onDown = e => {
+              if (e.target.closest('button')) return; sx = e.clientX; sy = e.clientY; dx = 0; dy = 0;
+              interactionState = 'pressed'; el.setPointerCapture?.(e.pointerId); clearTimeout(longPressTimer);
+              if (type === 'chapter') { longPressTimer = setTimeout(() => startDrag(e), 500); } 
+              else if (type === 'group') { longPressTimer = setTimeout(() => { interactionState = 'idle'; handleDecompose(id); }, 700); }
+          };
+          const onMove = e => {
+              if (interactionState === 'idle' || interactionState === 'swiping') return;
+              dx = e.clientX - sx; dy = e.clientY - sy;
+              if (interactionState === 'pressed' && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+                  clearTimeout(longPressTimer);
+                  if (Math.abs(dx) > Math.abs(dy) * 1.5) {
+                      if (dx < 0 && el.querySelector('.right-action')) { interactionState = 'swiping'; el.classList.add('reveal-delete'); e.preventDefault(); }
+                  }
+              }
+              if (interactionState === 'dragging') {
+                  e.preventDefault(); moveGhost(e.clientX, e.clientY);
+                  const rect = scrollContainer.getBoundingClientRect(); const edgeSize = rect.height * 0.20;
+                  if (e.clientY < rect.top + edgeSize) scrollDirection = -1; else if (e.clientY > rect.bottom - edgeSize) scrollDirection = 1; else scrollDirection = 0;
+                  $$('.deck-item').forEach(n => n.classList.remove('drop-target')); const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
+                  if (target && target !== el) { target.classList.add('drop-target'); }
+              }
+          };
+          const onUp = e => {
+              clearTimeout(longPressTimer); const distanceMoved = Math.hypot(dx, dy); const CLICK_THRESHOLD = 10;
+              if (interactionState === 'dragging') {
+                  const targetEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
+                  if (targetEl && targetEl !== el) {
+                      const tType = targetEl.getAttribute('data-type'); const tId = targetEl.getAttribute('data-id');
+                      handleDrop(subj, { type, id }, { type: tType, id: tId });
+                  }
+              } else if (interactionState === 'pressed' && distanceMoved < CLICK_THRESHOLD) {
+                  if (type === 'group') openGroup(subj, id); else goChapter(id);
+              }
+              cancelAnimationFrame(animationFrameId); scrollDirection = 0; scrollContainer.classList.remove('scroll-lock');
+              interactionState = 'idle'; if (ghost) ghost.remove(); ghost = null;
+              el.classList.remove('dragging-origin'); document.body.classList.remove('dragging-active'); $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
+          };
+          el.addEventListener('pointerdown', onDown); el.addEventListener('pointermove', onMove);
+          el.addEventListener('pointerup', onUp); el.addEventListener('pointercancel', onUp);
+          el.addEventListener('contextmenu', e => e.preventDefault());
+      });
+      list.addEventListener('scroll', () => { $$('.deck-item.reveal-delete').forEach(n => n.classList.remove('reveal-delete')); }, { passive: true });
     }
 
-    // Attacher les gestionnaires d'événements (inchangé)
-    bindDeckInteractions();
-}
-    
-    // ====================================================================
-    // MODIFICATION: bindDeckInteractions() entièrement réécrite
-    // ====================================================================
-    function bindDeckInteractions() {
-    const list = $('#deckList');
-    if (!list) return;
-    const subj = getCurrentSubject();
-
-    list.addEventListener('click', (e) => {
-        if (e.target.matches('.deleteChBtn')) {
-            e.stopPropagation();
-            const id = e.target.getAttribute('data-chap-id');
-            if (deleteImportedChapter(id)) renderDeck();
-        }
-    });
-
-    const items = $$('.deck-item');
-    items.forEach(el => {
-        el.style.webkitUserSelect = 'none';
-        el.style.userSelect = 'none';
-        el.style.webkitTouchCallout = 'none';
-
-        const type = el.getAttribute('data-type');
-        const id = el.getAttribute('data-id');
-        
-        let sx = 0, sy = 0, dx = 0, dy = 0;
-        let interactionState = 'idle';
-        let longPressTimer = null;
-        let ghost = null;
-        
-        let animationFrameId = null;
-        let scrollDirection = 0;
-        const scrollSpeed = 6;
-        const scrollContainer = list;
-
-        const autoScroll = () => {
-            if (scrollDirection !== 0) {
-                scrollContainer.scrollTop += scrollSpeed * scrollDirection;
-            }
-            if (interactionState === 'dragging') {
-                animationFrameId = requestAnimationFrame(autoScroll);
-            }
-        };
-
-        const startDrag = (e) => {
-            if (interactionState !== 'pressed' || type !== 'chapter') return;
-            interactionState = 'dragging';
-            el.classList.add('dragging-origin');
-            document.body.classList.add('dragging-active');
-            scrollContainer.classList.add('scroll-lock');
-            ghost = el.cloneNode(true);
-            ghost.classList.add('drag-ghost');
-            ghost.style.width = el.getBoundingClientRect().width + 'px';
-            document.body.appendChild(ghost);
-            moveGhost(e.clientX, e.clientY);
-            animationFrameId = requestAnimationFrame(autoScroll);
-        };
-        
-        const moveGhost = (x, y) => {
-            if (!ghost) return;
-            ghost.style.transform = `translate(${x - 75}px, ${y - 75}px) scale(1.02)`;
-        };
-
-        const onDown = e => {
-            // NOTE : On retire e.preventDefault() d'ici pour permettre le scroll natif !
-            if (e.target.closest('button')) return;
-            
-            sx = e.clientX;
-            sy = e.clientY;
-            dx = 0;
-            dy = 0;
-            interactionState = 'pressed';
-            el.setPointerCapture?.(e.pointerId);
-
-            clearTimeout(longPressTimer);
-            if (type === 'chapter') {
-                longPressTimer = setTimeout(() => startDrag(e), 500);
-            } else if (type === 'group') {
-                longPressTimer = setTimeout(() => {
-                    interactionState = 'idle';
-                    handleDecompose(id);
-                }, 700);
-            }
-        };
-
-        const onMove = e => {
-            if (interactionState === 'idle' || interactionState === 'swiping') return;
-            
-            dx = e.clientX - sx;
-            dy = e.clientY - sy;
-
-            if (interactionState === 'pressed' && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
-                clearTimeout(longPressTimer);
-                
-                // Si le mouvement est principalement horizontal, on le traite comme un swipe
-                if (Math.abs(dx) > Math.abs(dy) * 1.5) {
-                    if (dx < 0 && el.querySelector('.right-action')) {
-                        interactionState = 'swiping';
-                        el.classList.add('reveal-delete');
-                        e.preventDefault(); // On bloque le scroll UNIQUEMENT si c'est un swipe horizontal
-                    }
-                }
-            }
-            
-            if (interactionState === 'dragging') {
-                e.preventDefault(); // On bloque le scroll UNIQUEMENT si on est en train de glisser
-                moveGhost(e.clientX, e.clientY);
-                const rect = scrollContainer.getBoundingClientRect();
-                const edgeSize = rect.height * 0.20;
-
-                if (e.clientY < rect.top + edgeSize) scrollDirection = -1;
-                else if (e.clientY > rect.bottom - edgeSize) scrollDirection = 1;
-                else scrollDirection = 0;
-
-                $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
-                const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
-                if (target && target !== el) {
-                    target.classList.add('drop-target');
-                }
-            }
-        };
-
-        const onUp = e => {
-            clearTimeout(longPressTimer);
-
-            // --- MODIFICATION CLÉ : Détecter un vrai clic ---
-            // On calcule la distance totale parcourue par le doigt.
-            const distanceMoved = Math.hypot(dx, dy);
-            const CLICK_THRESHOLD = 10; // 10 pixels de tolérance
-
-            if (interactionState === 'dragging') {
-                const targetEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
-                if (targetEl && targetEl !== el) {
-                    const tType = targetEl.getAttribute('data-type');
-                    const tId = targetEl.getAttribute('data-id');
-                    handleDrop(subj, { type, id }, { type: tType, id: tId });
-                }
-            } else if (interactionState === 'pressed' && distanceMoved < CLICK_THRESHOLD) {
-                // C'est un vrai clic seulement si le doigt n'a pas bougé de plus de 10px.
-                if (type === 'group') openGroup(subj, id);
-                else goChapter(id);
-            }
-            // Si le doigt a bougé de plus de 10px (pour scroller), on ne fait rien, 
-            // laissant le navigateur gérer le scroll.
-            
-            cancelAnimationFrame(animationFrameId);
-            scrollDirection = 0;
-            scrollContainer.classList.remove('scroll-lock');
-
-            interactionState = 'idle';
-            if (ghost) ghost.remove();
-            ghost = null;
-            el.classList.remove('dragging-origin');
-            document.body.classList.remove('dragging-active');
-            $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
-        };
-
-        el.addEventListener('pointerdown', onDown);
-        el.addEventListener('pointermove', onMove);
-        el.addEventListener('pointerup', onUp);
-        el.addEventListener('pointercancel', onUp);
-        el.addEventListener('contextmenu', e => e.preventDefault());
-    });
-
-    list.addEventListener('scroll', () => {
-        $$('.deck-item.reveal-delete').forEach(n => n.classList.remove('reveal-delete'));
-    }, { passive: true });
-}
-
-    // NOUVELLE FONCTION: Gérer la décomposition d'un fichier
     function handleDecompose(groupId) {
-        const subj = getCurrentSubject();
-        const group = findGroupById(subj, groupId);
-        if (!group) return;
-        
+        const subj = getCurrentSubject(); const group = findGroupById(subj, groupId); if (!group) return;
         if (confirm("Décomposer ce fichier ? Les chapitres deviendront indépendants.")) {
-            deleteGroup(subj, groupId); // `deleteGroup` retire juste le groupe, les chapitres réapparaîtront
-            saveData();
-            renderDeck();
+            deleteGroup(subj, groupId); saveData(); renderDeck();
         }
     }
 
 
     function handleDrop(subj, src, dst){
-      // src: {type:'chapter', id:chapId}, dst: {type:'chapter'|'group', id}
       if (src.type!=='chapter') return;
       const srcG = findGroupByChapter(subj, src.id);
-
       if (dst.type==='chapter'){
         if (src.id === dst.id) return;
         const dstG = findGroupByChapter(subj, dst.id);
-        if (!srcG && !dstG){
-          // créer un nouveau fichier avec 2 chapitres
-          addGroup(subj, [src.id, dst.id]);
-        }else if (srcG && !dstG){
-          // ajouter dst au fichier source
-          addToGroup(subj, srcG.id, dst.id);
-        }else if (!srcG && dstG){
-          // ajouter src au fichier cible
-          addToGroup(subj, dstG.id, src.id);
-        }else if (srcG && dstG && srcG.id!==dstG.id){
-          // déplacer src dans le fichier de dst
+        if (!srcG && !dstG){ addGroup(subj, [src.id, dst.id]); }
+        else if (srcG && !dstG){ addToGroup(subj, srcG.id, dst.id); }
+        else if (!srcG && dstG){ addToGroup(subj, dstG.id, src.id); }
+        else if (srcG && dstG && srcG.id!==dstG.id){
           removeFromGroup(subj, srcG.id, [src.id]);
           addToGroup(subj, dstG.id, src.id);
           ensureValidGroups(subj);
         }
       }else if (dst.type==='group'){
-        const g = findGroupById(subj, dst.id);
-        if (!g) return;
+        const g = findGroupById(subj, dst.id); if (!g) return;
         const srcG = findGroupByChapter(subj, src.id);
-        if (srcG && srcG.id!==g.id){
-          removeFromGroup(subj, srcG.id, [src.id]);
-          ensureValidGroups(subj);
-        }
+        if (srcG && srcG.id!==g.id){ removeFromGroup(subj, srcG.id, [src.id]); ensureValidGroups(subj); }
         addToGroup(subj, g.id, src.id);
       }
-      ensureValidGroups(subj);
-      saveData();
-      renderDeck();
+      ensureValidGroups(subj); saveData(); renderDeck();
     }
 
     function openGroup(subj, groupId){
@@ -2880,9 +2754,7 @@ async function importApkg(file) {
             <div class="k"><div class="label">Cartes non vues</div><div class="value">${unseen}</div></div>
             <div class="k"><div class="label">Total cartes</div><div class="value">${chap.cards.length}</div></div>
           </div>
-
           <div class="chart-wrap"><canvas id="gradeChart" width="180" height="180" aria-label="Diagramme des scores"></canvas></div>
-
           <div class="legend" id="legend">
             <div class="legend-item ${sel.unseen?'':'inactive'}" data-key="unseen"><span class="dot gray"></span> Non vus: <b class="count">${unseen}</b></div>
             <div class="legend-item ${sel.echec?'':'inactive'}" data-key="echec"><span class="dot red"></span> Échec: <b class="count">${echec}</b></div>
@@ -2890,7 +2762,6 @@ async function importApkg(file) {
             <div class="legend-item ${sel.bien?'':'inactive'}" data-key="bien"><span class="dot blue"></span> Bien: <b class="count">${bien}</b></div>
             <div class="legend-item ${sel.facile?'':'inactive'}" data-key="facile"><span class="dot green"></span> Facile: <b class="count">${facile}</b></div>
           </div>
-
           <div class="kpi mt8">
             <div class="k"><div class="label">Aujourd'hui</div><div class="value">${today}</div></div>
             <div class="k"><div class="label">Cette semaine</div><div class="value">${week}</div></div>
@@ -2903,48 +2774,37 @@ async function importApkg(file) {
             <div class="k"><div class="label">À réviser maintenant</div><div class="value">${dueNow}</div></div>
             <div class="k"><div class="label">Série (jours)</div><div class="value">${streak}</div></div>
           </div>
-
           <div class="bar7-wrap">
             <div class="label" style="color:var(--primary)">Activité 7 jours</div>
             <canvas id="bar7" width="220" height="60"></canvas>
             <div class="bar7-labels" id="bar7Labels"></div>
           </div>
-        </div>
-      `;
+        </div>`;
 
       drawGradeChart('gradeChart',counts,chap.filters.grades);
       const canvas=$('#gradeChart'); canvas.style.cursor='pointer';
       canvas.onclick=(ev)=>handleChartClick(ev,'gradeChart',chap,counts);
 
       $$('#legend .legend-item').forEach(el=>{
-        const key=el.getAttribute('data-key');
-        const act=()=>{handleLegendClick(key,chap);};
+        const key=el.getAttribute('data-key'); const act=()=>{handleLegendClick(key,chap);};
         el.addEventListener('click',act);
         el.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' ') {e.preventDefault(); act();}});
-        el.setAttribute('tabindex','0');
-        el.setAttribute('role','button');
+        el.setAttribute('tabindex','0'); el.setAttribute('role','button');
       });
 
       updateRevisionBarForChapter(chap);
       drawBars7('bar7', getLastNDaysArray(chap,7));
       const lbl=$('#bar7Labels');
       if(lbl){const noms=getLastNDaysLabelsFR(7); lbl.innerHTML=noms.map(j=>`<div>${j.substring(0,3)}</div>`).join('');}
-
-      const barCanvas = document.getElementById('bar7');
-      if (barCanvas) {
-        barCanvas.style.cursor = 'pointer';
-        barCanvas.onclick = (ev) => openDayFromBarClick(ev, 'bar7', chap.id, 7);
-      }
-
-      const labelsWrap = document.getElementById('bar7Labels');
+      const barCanvas = $('#bar7');
+      if (barCanvas) { barCanvas.style.cursor = 'pointer'; barCanvas.onclick = (ev) => openDayFromBarClick(ev, 'bar7', chap.id, 7); }
+      const labelsWrap = $('#bar7Labels');
       if (labelsWrap) {
         Array.from(labelsWrap.children).forEach((el, i) => {
-          el.style.cursor = 'pointer';
-          el.title = 'Voir les cartes de ce jour';
+          el.style.cursor = 'pointer'; el.title = 'Voir les cartes de ce jour';
           el.onclick = () => goDaily(chap.id, dayKeyFromIndex(7, i));
         });
       }
-
       (function(){
         let t; const redraw=()=>drawBars7('bar7',getLastNDaysArray(chap,7));
         window.removeEventListener('resize', window._bar7ResizeHandler || (()=>{}));
@@ -2974,7 +2834,6 @@ async function importApkg(file) {
       const v=$('#view'); const chap=getChapter(chapterId);
       const sel=chap.filters.grades||{};
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
-
       v.innerHTML = `
         <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
           <div class="section-title">Cartes (${pool.length})</div>
@@ -2991,14 +2850,11 @@ async function importApkg(file) {
                     <div class="term">${f}</div>
                     <div class="definition">${b}</div>
                     ${timeStr?`<div class="cb-time">${timeStr}</div>`:''}
-                  </div>
-                `;
+                  </div>`;
               }).join('')}
             </div>
           </div>
-        </div>
-      `;
-
+        </div>`;
       await Media.resolveMediaInElement(v);
       await typesetLatex(v);
       const grid=$('#cardsGrid');
@@ -3031,9 +2887,7 @@ async function importApkg(file) {
     async function goDaily(chapterId, dayKey, push=true){
       Media.revokeAll();
       if (push) Nav.push();
-      State.view='daily';
-      State.chapterId=chapterId;
-      State.dailyKey=dayKey;
+      State.view='daily'; State.chapterId=chapterId; State.dailyKey=dayKey;
       const chap=getChapter(chapterId);
       setTopbar({ title:`Activité • ${formatDayKeyFR(dayKey)}` });
       setBottomVisibility({ actions:false, revision:false });
@@ -3048,53 +2902,36 @@ async function importApkg(file) {
         const gid = chap.id.slice('group-'.length);
         const g = findGroupById(subj, gid);
         log = g ? getCombinedDailyLogForGroup(subj, g, dayKey) : [];
-      } else {
-        log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
-      }
-
+      } else { log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : []; }
       const v = document.getElementById('view');
       if (!log.length){
         v.innerHTML = `
           <div class="card" style="flex:1; display:flex; flex-direction:column;">
             <div class="section-title">Activité du ${formatDayKeyFR(dayKey)}</div>
             <div class="muted">Aucune donnée pour ce jour.</div>
-          </div>
-        `;
+          </div>`;
         return;
       }
-
       log.sort((a,b)=>a.ts-b.ts);
       const byCard = new Map();
       for (const e of log){
         const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[], _chapId: e._chapId };
         if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
         if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
-        curr.events.push(e);
-        byCard.set(e.cardId, curr);
+        curr.events.push(e); byCard.set(e.cardId, curr);
       }
-
       const rows = [];
       for (const [cardId, info] of byCard){
         const baseChap = chap.virtual ? _getChapterReal(info._chapId) : chap;
-        const card = baseChap.cards.find(c=>c.id===cardId);
-        if (!card) continue;
-
+        const card = baseChap.cards.find(c=>c.id===cardId); if (!card) continue;
         const {frontText, backText} = getCardSides(card, baseChap);
-        rows.push({
-          id: cardId,
-          term: preprocessLaTeX(frontText),
-          def:  preprocessLaTeX(backText),
-          before: info.firstPrev || 'unseen',
-          after: info.lastNext || (card.grade || 'unseen')
-        });
+        rows.push({ id: cardId, term: preprocessLaTeX(frontText), def:  preprocessLaTeX(backText),
+          before: info.firstPrev || 'unseen', after: info.lastNext || (card.grade || 'unseen') });
       }
-
       rows.sort((a,b)=>{
-        const ca = (a.before!==a.after), cb=(b.before!==b.after);
-        if (ca!==cb) return ca? -1: 1;
+        const ca = (a.before!==a.after), cb=(b.before!==b.after); if (ca!==cb) return ca? -1: 1;
         return a.term.localeCompare(b.term, 'fr');
       });
-
       v.innerHTML = `
         <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
           <div class="section-title">Activité du ${formatDayKeyFR(dayKey)} • ${rows.length} carte(s)</div>
@@ -3103,27 +2940,21 @@ async function importApkg(file) {
               ${rows.map(r=>`
                 <div class="grid2">
                   <div class="card-block grade-${r.before}" data-id="${r.id}" data-side="before" title="Avant ce jour">
-                    <div class="term">${r.term}</div>
-                    <div class="definition">${r.def}</div>
+                    <div class="term">${r.term}</div><div class="definition">${r.def}</div>
                   </div>
                   <div class="card-block grade-${r.after}" data-id="${r.id}" data-side="after" title="Après ce jour">
-                    <div class="term">${r.term}</div>
-                    <div class="definition">${r.def}</div>
+                    <div class="term">${r.term}</div><div class="definition">${r.def}</div>
                   </div>
-                </div>
-              `).join('')}
+                </div>`).join('')}
             </div>
           </div>
           <div class="small muted mt6">Astuce: touchez une carte pour afficher/masquer la définition.</div>
-        </div>
-      `;
-
+        </div>`;
       await Media.resolveMediaInElement(v);
       await typesetLatex(v);
       const list = document.getElementById('dailyList');
       list.addEventListener('click', (e)=>{
-        const block = e.target.closest('.card-block');
-        if (!block) return;
+        const block = e.target.closest('.card-block'); if (!block) return;
         block.classList.toggle('flipped');
       });
     }
@@ -3165,15 +2996,12 @@ async function importApkg(file) {
       const v=$('#view'); const r=State.review;
       const { card: current, chap } = getCurrentCard();
       const total=r.queue.length; const idx=r.index+1;
-
       const {frontText,backText}=getCardSides(current,chap);
       const frontHTML = preprocessLaTeX(frontText);
       const backHTML  = preprocessLaTeX(backText);
-
       const frontFirst = chap.settings.reviewOrder!=='back-first';
       const prompt = frontFirst ? frontHTML : backHTML;
       const isPromptFront=frontFirst; const promptClass=isPromptFront?'term':'definition'; const promptFace=isPromptFront?'front':'back';
-
       v.innerHTML = `
         <div class="review-wrap">
           <div class="review-top"><div>${r.mode==='multi' ? ('Multi • '+chap.title) : chap.title}</div><div>${idx} / ${total}</div></div>
@@ -3185,9 +3013,7 @@ async function importApkg(file) {
               }
             </div>
           </div>
-        </div>
-      `;
-
+        </div>`;
       typesetLatex(v).then(async ()=>{
         await Media.resolveMediaInElement(v);
         initReviewGestures();
@@ -3208,8 +3034,14 @@ async function importApkg(file) {
     }
 
     function renderRecap(chap){
-      const v=$('#view'); const r=State.review;
-      const totalSession=r.answers.length; const duration=r.end-r.start; const avgPerCard=totalSession?duration/totalSession:0;
+      const v = $('#view'); const r = State.review;
+      const duration = (() => {
+        if (r && Array.isArray(r.answers) && r.answers.length) return r.answers.reduce((sum, a) => sum + (a.ms || 0), 0);
+        if (r?.end && r?.start && r.end > r.start) return r.end - r.start;
+        return 0;
+      })();
+      const totalSession = r.answers.length;
+      const avgPerCard = totalSession ? duration / totalSession : 0;
       const todayChange=getTodayChange(chap); const todayReviews=getTodayCount(chap);
       v.innerHTML = `
         <div class="card recap" style="flex:1">
@@ -3226,47 +3058,29 @@ async function importApkg(file) {
             <div class="stat"><div class="label">Temps moyen/carte</div><div class="val">${formatDuration(avgPerCard)}</div></div>
           </div>
           <div class="cta"><button class="btn btn--solid btn--primary" id="continueBtn">Continuer</button></div>
-        </div>
-      `;
-      $('#continueBtn').addEventListener('click',()=>startReview(r.chapterId));
+        </div>`;
+      $('#continueBtn').addEventListener('click',()=>startReview(chap.id));
     }
 
     function startReviewMulti(chapIds){
-      const all = chapIds.map(_getChapterReal).filter(Boolean);
-      if (!all.length) return;
-      // pool filtré par filtres propres à chaque chapitre
+      const all = chapIds.map(_getChapterReal).filter(Boolean); if (!all.length) return;
       const pool = [];
-      all.forEach(ch=>{
-        const sel = ch.filters.grades;
-        ch.cards.forEach(c=>{ if (sel[c.grade||'unseen']) pool.push({ chapId: ch.id, card: c }); });
-      });
+      all.forEach(ch=>{ const sel = ch.filters.grades; ch.cards.forEach(c=>{ if (sel[c.grade||'unseen']) pool.push({ chapId: ch.id, card: c }); }); });
       if (!pool.length){ alert('Aucune carte disponible avec les filtres actuels.'); return; }
-
       const scored = pool.map(({chapId,card})=>{
-        const g=card.grade||'unseen';
-        const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
-        const now=Date.now();
-        const baseW=baseWMap[g]??1;
-        let dueBoost=1;
-        if(card.dueAt && card.dueAt>0){
-          const delta=now-card.dueAt;
-          dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
-        }else{ dueBoost=1.15; }
-        const ema=typeof card.perfEma=='number' ? card.perfEma : 0.5;
-        const perfBoost=1+(1-ema)*1.6;
-        const s=card.streak||0;
-        const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
-        const t=card.avgMs||0; const timeBoost=1+Math.min(2,t/3000);
-        const jitter=0.9+Math.random()*0.2;
+        const g=card.grade||'unseen'; const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+        const now=Date.now(); const baseW=baseWMap[g]??1; let dueBoost=1;
+        if(card.dueAt && card.dueAt>0){ const delta=now-card.dueAt; dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85; }else{ dueBoost=1.15; }
+        const ema=typeof card.perfEma=='number' ? card.perfEma : 0.5; const perfBoost=1+(1-ema)*1.6;
+        const s=card.streak||0; const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
+        const t=card.avgMs||0; const timeBoost=1+Math.min(2,t/3000); const jitter=0.9+Math.random()*0.2;
         const weight=baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter;
         return { chapId, cardId: card.id, weight };
       });
       scored.sort((a,b)=>b.weight-a.weight);
-      // Taille session: moyenne des sessionSize des chapitres, plafonnée par le disponible
       const avgSize = Math.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length);
       const size = Math.min(avgSize||10, scored.length);
       const queue = scored.slice(0,size).map(x=>({ chapId:x.chapId, cardId:x.cardId }));
-
       State.review = { mode:'multi', chapterId:null, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
       goReview();
     }
@@ -3274,10 +3088,7 @@ async function importApkg(file) {
     function startReview(chapterId){
       if(!chapterId) return;
       const chap=getChapter(chapterId);
-      if (chap && chap.virtual && Array.isArray(chap._ids)) {
-        return startReviewMulti(chap._ids);
-      }
-      
+      if (chap && chap.virtual && Array.isArray(chap._ids)) { return startReviewMulti(chap._ids); }
       const sel=chap.filters.grades;
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
       const size=Math.min(chap.settings.sessionSize,pool.length);
@@ -3288,37 +3099,25 @@ async function importApkg(file) {
     }
 
     function buildSmartQueue(chap,pool,size){
-      const now=Date.now();
-      const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+      const now=Date.now(); const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
       const scored=pool.map(c=>{
-        const g=c.grade||'unseen'; const baseW=baseWMap[g]??1;
-        let dueBoost=1;
-        if(c.dueAt && c.dueAt>0){
-          const delta=now-c.dueAt;
-          dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
-        }else{ dueBoost=1.15; }
-        const ema=typeof c.perfEma=='number' ? c.perfEma : 0.5;
-        const perfBoost=1+(1-ema)*1.6;
-        const s=c.streak||0;
-        const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
-        const t=c.avgMs||0; const timeBoost=1+Math.min(2,t/3000);
-        const jitter=0.9+Math.random()*0.2;
+        const g=c.grade||'unseen'; const baseW=baseWMap[g]??1; let dueBoost=1;
+        if(c.dueAt && c.dueAt>0){ const delta=now-c.dueAt; dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85; }else{ dueBoost=1.15; }
+        const ema=typeof c.perfEma=='number' ? c.perfEma : 0.5; const perfBoost=1+(1-ema)*1.6;
+        const s=c.streak||0; const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
+        const t=c.avgMs||0; const timeBoost=1+Math.min(2,t/3000); const jitter=0.9+Math.random()*0.2;
         return {card:c, weight:baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter};
       });
-      scored.sort((a,b)=>b.weight-a.weight);
-      return scored.slice(0,size).map(x=>x.card);
+      scored.sort((a,b)=>b.weight-a.weight); return scored.slice(0,size).map(x=>x.card);
     }
 
     function getCurrentCard(){
       const r=State.review;
       if (r?.mode==='multi'){
-        const item = r.queue[r.index];
-        const chap = _getChapterReal(item.chapId);
-        const card = chap.cards.find(c=>c.id===item.cardId);
-        return { card, chap };
+        const item = r.queue[r.index]; const chap = _getChapterReal(item.chapId);
+        const card = chap.cards.find(c=>c.id===item.cardId); return { card, chap };
       }else{
-        const chap=getChapter(r.chapterId);
-        const id=r.queue[r.index];
+        const chap=getChapter(r.chapterId); const id=r.queue[r.index];
         return { card: chap.cards.find(c=>c.id===id), chap };
       }
     }
@@ -3326,28 +3125,20 @@ async function importApkg(file) {
     function submitGrade(nextGrade){
       const r=State.review; const now=Date.now();
       const {card: currentCard, chap: currentChap} = getCurrentCard();
-
       const origin = currentCard._origin || { chapId: r.chapterId, cardId: currentCard.id };
       const chap = _getChapterReal(origin.chapId);
       const card = chap.cards.find(c => c.id === origin.cardId);
-
       const duration=Math.max(0, now-(r.cardStart||now));
-      const prevGrade=card.grade||'unseen';
-      const next=nextGrade;
-
+      const prevGrade=card.grade||'unseen'; const next=nextGrade;
       const wasZeroBeforeNext=(chap.stats.gradeCounts[next]||0)===0;
-      card.grade=next;
-      syncGradeCounts(chap);
-
+      card.grade=next; syncGradeCounts(chap);
       const alpha=0.3; const q01=gradeNorm01(next);
       card.perfEma = (1-alpha)*(card.perfEma??0.5) + alpha*q01;
       scheduleNext(card,next,now);
-
       card.lastReviewed=now; card.lastMs=duration;
       card.avgMs = card.avgMs ? Math.round(card.avgMs*0.7 + duration*0.3) : duration;
       card.timesReviewed=(card.timesReviewed||0)+1;
       if(isSuccess(next)) card.successes+=1; else card.failures+=1;
-
       chap.stats.totalReviews += 1;
       const tk=todayKey();
       chap.stats.dailyReviews[tk]=(chap.stats.dailyReviews[tk]||0)+1;
@@ -3355,20 +3146,15 @@ async function importApkg(file) {
       chap.stats.dailyDurCount[tk]=(chap.stats.dailyDurCount[tk]||0)+1;
       const dc=chap.stats.dailyChanges[tk]||{changed:0,total:0};
       dc.total+=1; if(prevGrade!==next) dc.changed+=1; chap.stats.dailyChanges[tk]=dc;
-
       const log = chap.stats.dailyLog[tk] || [];
       log.push({ cardId: card.id, prev: prevGrade, next, ms: duration, ts: now });
       chap.stats.dailyLog[tk] = log;
-
       if(wasZeroBeforeNext && next!=='unseen'){ chap.filters.grades[next]=true; }
-
       r.answers.push({cardId:card.id, prev:prevGrade, next, ms:duration});
       if(r.index < r.queue.length-1){
         r.index+=1; r.flipped=false; r.cardStart=Date.now();
         saveData(); renderReview();
-      }else{
-        r.end=Date.now(); saveData(); goRecap();
-      }
+      }else{ r.end=Date.now(); saveData(); goRecap(false); }
     }
 
     // ---------- Helpers chapitres/stats ----------
@@ -3381,7 +3167,6 @@ async function importApkg(file) {
       return c;
     }
     function syncGradeCounts(chap){chap.stats=chap.stats||{}; chap.stats.gradeCounts=getLiveGradeCounts(chap);}
-
     function getTodayCount(chap){return chap.stats.dailyReviews[todayKey()]||0;}
     function getTodayChange(chap){return chap.stats.dailyChanges[todayKey()]||{changed:0,total:0};}
     function get7DayAverage(chap){
@@ -3403,10 +3188,7 @@ async function importApkg(file) {
     function get7DayAvgMs(chap){
       if(!chap.stats.dailyDurMs||!chap.stats.dailyDurCount) return 0;
       const base=new Date(); let sum=0,cnt=0;
-      for(let i=0;i<7;i++){
-        const d=new Date(base); d.setDate(base.getDate()-i);
-        const k=dateKey(d); sum+=(chap.stats.dailyDurMs[k]||0); cnt+=(chap.stats.dailyDurCount[k]||0);
-      }
+      for(let i=0;i<7;i++){ const d=new Date(base); d.setDate(base.getDate()-i); const k=dateKey(d); sum+=(chap.stats.dailyDurMs[k]||0); cnt+=(chap.stats.dailyDurCount[k]||0); }
       return cnt?Math.round(sum/cnt):0;
     }
     function countAvailable(chap){const sel=chap.filters.grades; return chap.cards.filter(c=>sel[(c.grade||'unseen')]).length;}
@@ -3416,7 +3198,6 @@ async function importApkg(file) {
       for(let i=0;i<365;i++){const d=new Date(base); d.setDate(base.getDate()-i); const n=chap.stats.dailyReviews[dateKey(d)]||0; if(n>0) streak++; else break;}
       return streak;
     }
-
     function getLastNDaysArray(chap,n){
       const arr=[]; const base=new Date();
       for(let i=n-1;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); arr.push(chap.stats.dailyReviews[dateKey(d)]||0);}
@@ -3427,94 +3208,43 @@ async function importApkg(file) {
       for(let i=n-1;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); noms.push(J[d.getDay()]);}
       return noms;
     }
-
     function dayKeyFromIndex(n, index) {
-      const base = new Date();
-      const offset = (n - 1) - index;
-      const d = new Date(base);
-      d.setHours(0,0,0,0);
-      d.setDate(base.getDate() - offset);
-      return dateKey(d);
+      const base = new Date(); const offset = (n - 1) - index; const d = new Date(base);
+      d.setHours(0,0,0,0); d.setDate(base.getDate() - offset); return dateKey(d);
     }
-
     function openDayFromBarClick(evt, canvasId, chapId, n=7) {
-      const hit = Bar7Hit[canvasId];
-      if (!hit) return;
-      const rect = evt.target.getBoundingClientRect();
-      const xCSS = (evt.clientX - rect.left) * (hit.cssW / rect.width);
+      const hit = Bar7Hit[canvasId]; if (!hit) return;
+      const rect = evt.target.getBoundingClientRect(); const xCSS = (evt.clientX - rect.left) * (hit.cssW / rect.width);
       const i = hit.bars.findIndex(b => xCSS >= b.x && xCSS <= b.x + b.w);
-      if (i < 0) return;
-      const key = dayKeyFromIndex(n, i);
-      goDaily(chapId, key);
+      if (i < 0) return; const key = dayKeyFromIndex(n, i); goDaily(chapId, key);
     }
 
     // ---------- Bar chart ----------
     function drawBars7(canvasId, values) {
-      const el = document.getElementById(canvasId);
-      if (!el) return;
+      const el = document.getElementById(canvasId); if (!el) return;
       const ctx = el.getContext('2d');
-
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       const cssW = Math.round(el.clientWidth || el.getBoundingClientRect().width || 220);
       const cssH = Math.round(parseFloat(getComputedStyle(el).height) || el.height || 60);
-
-      if (el.width !== cssW * dpr || el.height !== cssH * dpr) {
-        el.width = cssW * dpr;
-        el.height = cssH * dpr;
-      }
-
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, el.width, el.height);
-      ctx.scale(dpr, dpr);
-
-      const w = cssW, h = cssH;
-      const max = Math.max(1, ...values);
-      const n = values.length;
-      const gap = 6;
-      const totalGap = gap * (n - 1);
-      const barW = Math.max(6, Math.floor((w - totalGap) / n));
-
+      if (el.width !== cssW * dpr || el.height !== cssH * dpr) { el.width = cssW * dpr; el.height = cssH * dpr; }
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, el.width, el.height); ctx.scale(dpr, dpr);
+      const w = cssW, h = cssH; const max = Math.max(1, ...values); const n = values.length; const gap = 6;
+      const totalGap = gap * (n - 1); const barW = Math.max(6, Math.floor((w - totalGap) / n));
       const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#6366f1';
       const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#0f172a';
-
-      const fontPx = Math.max(9, Math.min(10, Math.floor(barW * 0.7)));
-      const textPad = fontPx + 4;
-      const baseY = h - textPad - 2;
-      const minH = 3;
-
-      ctx.strokeStyle = 'rgba(148,163,184,0.35)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, baseY + 0.5);
-      ctx.lineTo(w, baseY + 0.5);
-      ctx.stroke();
-
-      ctx.font = `bold ${fontPx}px ui-sans-serif, system-ui`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-
-      let x = 0;
-      const bars = [];
+      const fontPx = Math.max(9, Math.min(10, Math.floor(barW * 0.7))); const textPad = fontPx + 4;
+      const baseY = h - textPad - 2; const minH = 3;
+      ctx.strokeStyle = 'rgba(148,163,184,0.35)'; ctx.lineWidth = 1; ctx.beginPath();
+      ctx.moveTo(0, baseY + 0.5); ctx.lineTo(w, baseY + 0.5); ctx.stroke();
+      ctx.font = `bold ${fontPx}px ui-sans-serif, system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      let x = 0; const bars = [];
       values.forEach(v => {
-        const bhRaw = Math.round((v / max) * (h - textPad - 8));
-        const bh = Math.max(minH, bhRaw);
-        const y = baseY - bh;
-
-        ctx.fillStyle = primary;
-        ctx.globalAlpha = 0.95;
-        ctx.fillRect(x, y, barW, bh);
-        ctx.globalAlpha = 1;
-
-        ctx.fillStyle = textColor;
-        ctx.fillText(String(v), x + barW / 2, baseY + 2);
-
-        ctx.fillStyle = 'rgba(0,0,0,0.15)';
-        ctx.fillRect(x, baseY, barW, 2);
-
-        bars.push({ x, w: barW });
-        x += barW + gap;
+        const bhRaw = Math.round((v / max) * (h - textPad - 8)); const bh = Math.max(minH, bhRaw);
+        const y = baseY - bh; ctx.fillStyle = primary; ctx.globalAlpha = 0.95; ctx.fillRect(x, y, barW, bh);
+        ctx.globalAlpha = 1; ctx.fillStyle = textColor; ctx.fillText(String(v), x + barW / 2, baseY + 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(x, baseY, barW, 2);
+        bars.push({ x, w: barW }); x += barW + gap;
       });
-
       Bar7Hit[canvasId] = { cssW: w, cssH: h, bars };
     }
 
@@ -3523,17 +3253,9 @@ async function importApkg(file) {
     function drawGradeChart(canvasId,counts,activeKeys=null){
       const el=document.getElementById(canvasId); if(!el) return;
       const ctx=el.getContext('2d'); const w=el.width,h=el.height;
-      ctx.clearRect(0,0,w,h);
-      const cx=w/2, cy=h/2; const outerR=Math.min(w,h)/2-6; const innerR=outerR*0.65;
-
+      ctx.clearRect(0,0,w,h); const cx=w/2, cy=h/2; const outerR=Math.min(w,h)/2-6; const innerR=outerR*0.65;
       const css=getComputedStyle(document.documentElement);
-      const segments=[
-        {key:'unseen',color:'#9ca3af'},
-        {key:'echec',color:css.getPropertyValue('--red').trim()},
-        {key:'difficile',color:css.getPropertyValue('--amber').trim()},
-        {key:'bien',color:css.getPropertyValue('--blue').trim()},
-        {key:'facile',color:css.getPropertyValue('--green').trim()},
-      ];
+      const segments=[ {key:'unseen',color:'#9ca3af'}, {key:'echec',color:css.getPropertyValue('--red').trim()}, {key:'difficile',color:css.getPropertyValue('--amber').trim()}, {key:'bien',color:css.getPropertyValue('--blue').trim()}, {key:'facile',color:css.getPropertyValue('--green').trim()}, ];
       const total=segments.reduce((s,seg)=>s+(counts[seg.key]||0),0);
       const arcs=[];
       if(total===0){
@@ -3548,17 +3270,13 @@ async function importApkg(file) {
         const val=counts[seg.key]||0; if(val<=0) return;
         const a=(val/total)*Math.PI*2; const end=start+a;
         const active=!activeKeys || !!activeKeys[seg.key];
-
         ctx.beginPath(); ctx.arc(cx,cy,outerR,start,end); ctx.arc(cx,cy,innerR,end,start,true);
         ctx.fillStyle=seg.color; ctx.globalAlpha=active?0.9:0.22; ctx.fill(); ctx.globalAlpha=1;
-
         arcs.push({key:seg.key,start,end}); start=end;
       });
-
       ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px ui-sans-serif, system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(String(total),cx,cy-4);
       ctx.fillStyle='#64748b'; ctx.font='10px ui-sans-serif, system-ui'; ctx.fillText('cartes',cx,cy+10);
-
       ChartHit[canvasId]={cx,cy,innerR,outerR,arcs};
     }
 
@@ -3566,10 +3284,7 @@ async function importApkg(file) {
       const sel=chap.filters.grades; const total=Object.keys(sel).length; const active=Object.keys(sel).filter(k=>sel[k]); const isSelected=!!sel[key];
       if(active.length===total){Object.keys(sel).forEach(k=>sel[k]=false); sel[key]=true;}
       else if(active.length===1 && isSelected){sel[key]=true;}
-      else{
-        sel[key]=!isSelected;
-        if(Object.keys(sel).filter(k=>sel[k]).length===0){sel[key]=true;}
-      }
+      else{ sel[key]=!isSelected; if(Object.keys(sel).filter(k=>sel[k]).length===0){sel[key]=true;} }
     }
     function handleChartClick(evt,canvasId,chap){
       const map=ChartHit[canvasId]; if(!map||!map.arcs.length) return;
@@ -3589,10 +3304,7 @@ async function importApkg(file) {
       document.documentElement.style.setProperty('--fs-term',(p.fsTerm||20)+'px');
       document.documentElement.style.setProperty('--fs-def',(p.fsDef||24)+'px');
       document.documentElement.style.setProperty('--radius-md',(p.radius||14)+'px');
-      const palette={
-        indigo:['#6366f1','#5457e6'], blue:['#3b82f6','#2563eb'], teal:['#14b8a6','#0d9488'],
-        emerald:['#10b981','#059669'], rose:['#f43f5e','#e11d48'], amber:['#f59e0b','#d97706'], violet:['#8b5cf6','#7c3aed']
-      };
+      const palette={ indigo:['#6366f1','#5457e6'], blue:['#3b82f6','#2563eb'], teal:['#14b8a6','#0d9488'], emerald:['#10b981','#059669'], rose:['#f43f5e','#e11d48'], amber:['#f59e0b','#d97706'], violet:['#8b5cf6','#7c3aed'] };
       const acc=palette[p.accent]||palette.indigo;
       document.documentElement.style.setProperty('--primary',acc[0]);
       document.documentElement.style.setProperty('--primary-600',acc[1]);
@@ -3608,13 +3320,11 @@ async function importApkg(file) {
       if(typeof data.app.prefs.showEmoji!=='boolean') data.app.prefs.showEmoji=true;
       if(typeof data.app.prefs.radius!=='number') data.app.prefs.radius=14;
       if (!data.mediaIndex) data.mediaIndex = {};
-
       if(!Array.isArray(data.subjects)){
         data.subjects = [{ id:'anglais', title:'Anglais', chapters: data.chapters||[], groups: [] }];
         delete data.chapters;
         if(!data.app.currentSubjectId) data.app.currentSubjectId='anglais';
       }
-
       data.subjects.forEach(subj=>{
         if (!Array.isArray(subj.groups)) subj.groups = [];
         ensureValidGroups(subj);
@@ -3624,13 +3334,9 @@ async function importApkg(file) {
           ch.stats=ch.stats||{};
           if (!ch.stats.dailyLog) ch.stats.dailyLog = {};
           (ch.cards||[]).forEach(c=>{
-            if(typeof c.perfEma!=='number') c.perfEma=0.5;
-            if(typeof c.ef!=='number') c.ef=2.5;
-            if(typeof c.intervalDays!=='number') c.intervalDays=0;
-            if(typeof c.dueAt!=='number') c.dueAt=0;
-            if(typeof c.streak!=='number') c.streak=0;
-            if(typeof c.successes!=='number') c.successes=0;
-            if(typeof c.failures!=='number') c.failures=0;
+            if(typeof c.perfEma!=='number') c.perfEma=0.5; if(typeof c.ef!=='number') c.ef=2.5;
+            if(typeof c.intervalDays!=='number') c.intervalDays=0; if(typeof c.dueAt!=='number') c.dueAt=0;
+            if(typeof c.streak!=='number') c.streak=0; if(typeof c.successes!=='number') c.successes=0; if(typeof c.failures!=='number') c.failures=0;
           });
           syncGradeCounts(ch);
         });
@@ -3656,31 +3362,23 @@ async function importApkg(file) {
             <div class="settings-hero">Paramètres</div>
             <div class="settings-sub">Personnalisez l’affichage, les langues et vos objectifs</div>
           </div>
-
           <div class="settings-section">
             <div class="section-title">Apparence</div>
             <div class="mt6 muted" style="font-size:13px">• Thème: <b id="themeLbl">${data.app.theme==='light'?'Clair':'Sombre'}</b></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button class="btn" id="toggleTheme">Basculer Clair/Sombre</button>
-            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap"> <button class="btn" id="toggleTheme">Basculer Clair/Sombre</button> </div>
             <div class="mt6 muted" style="font-size:13px">Couleur d’accent</div>
             <div class="swatches" id="accentSwatches">
-              <button class="swatch" data-accent="indigo" style="--sw:#6366f1" aria-label="Indigo"></button>
-              <button class="swatch" data-accent="blue" style="--sw:#3b82f6" aria-label="Bleu"></button>
-              <button class="swatch" data-accent="teal" style="--sw:#14b8a6" aria-label="Teal"></button>
-              <button class="swatch" data-accent="emerald" style="--sw:#10b981" aria-label="Émeraude"></button>
-              <button class="swatch" data-accent="rose" style="--sw:#f43f5e" aria-label="Rose"></button>
-              <button class="swatch" data-accent="amber" style="--sw:#f59e0b" aria-label="Ambre"></button>
+              <button class="swatch" data-accent="indigo" style="--sw:#6366f1" aria-label="Indigo"></button> <button class="swatch" data-accent="blue" style="--sw:#3b82f6" aria-label="Bleu"></button>
+              <button class="swatch" data-accent="teal" style="--sw:#14b8a6" aria-label="Teal"></button> <button class="swatch" data-accent="emerald" style="--sw:#10b981" aria-label="Émeraude"></button>
+              <button class="swatch" data-accent="rose" style="--sw:#f43f5e" aria-label="Rose"></button> <button class="swatch" data-accent="amber" style="--sw:#f59e0b" aria-label="Ambre"></button>
               <button class="swatch" data-accent="violet" style="--sw:#8b5cf6" aria-label="Violet"></button>
             </div>
           </div>
-
           <div class="settings-section">
             <div class="section-title">Langues</div>
             <div class="mt6 muted" style="font-size:13px">Recto → Verso: <b id="langOrderLbl">${chap.settings.langSwap?'EN → FR':'FR → EN'}</b></div>
             <button class="btn" id="toggleLangSwap">Basculer FR ↔ EN</button>
           </div>
-
           <div class="settings-section">
             <div class="section-title">Typographie</div>
             <div class="card" id="typoPreview" style="margin-bottom:8px; padding:10px; position:relative;">
@@ -3692,13 +3390,23 @@ async function importApkg(file) {
             <div class="wheel" id="wheelFsTerm"><div class="name">Recto (Front)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
             <div class="wheel mt6" id="wheelFsDef"><div class="name">Verso (Back)</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
           </div>
-
           <div class="settings-section">
             <div class="section-title">Session & Objectif</div>
             <div class="wheel" id="wheelSession"><div class="name">Taille session</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
             <div class="wheel mt6" id="wheelGoal"><div class="name">Objectif quotidien</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
           </div>
-
+          
+          <!-- NOUVEAU : Section de gestion des données -->
+          <div class="settings-section">
+            <div class="section-title">Gestion des données</div>
+            <div class="mt6 muted" style="font-size:13px">Sauvegardez ou restaurez manuellement votre progression.</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px">
+              <button class="btn" id="exportProgressBtn">Exporter ma progression</button>
+              <button class="btn" id="importProgressBtn">Importer une progression</button>
+              <input type="file" id="importProgressInput" class="hidden" accept="application/json">
+            </div>
+          </div>
+          
           <div class="settings-section">
             <div class="section-title">Réinitialiser</div>
             <div class="mt6 muted" style="font-size:13px">Remettre à zéro la progression (grades, stats, temps).</div>
@@ -3707,17 +3415,13 @@ async function importApkg(file) {
               <button class="btn btn--solid btn--red" id="resetAllBtn">Reset application</button>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
 
       const P=data.app.prefs;
-
       const refreshTheme=()=>{$('#themeLbl').textContent=data.app.theme==='light'?'Clair':'Sombre';};
       const refreshLang=()=>{$('#langOrderLbl').textContent=chap.settings.langSwap?'EN → FR':'FR → EN';};
-
       $('#toggleLangSwap').onclick=()=>{chap.settings.langSwap=!chap.settings.langSwap; saveData(); refreshLang(); renderByState(false);};
       $('#toggleTheme').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light'; saveData(); applyTheme(); refreshTheme();};
-
       const activeAccent=data.app.prefs.accent||'indigo';
       $$('#accentSwatches .swatch').forEach(sw=>{
         const key=sw.getAttribute('data-accent');
@@ -3730,12 +3434,21 @@ async function importApkg(file) {
       bindWheel($('#wheelSession'),{get:()=>chap.settings.sessionSize,set:v=>{chap.settings.sessionSize=v}, min:5,max:200,step:5,unit:' cartes'});
       bindWheel($('#wheelGoal'),{get:()=>chap.settings.dailyGoal,set:v=>{chap.settings.dailyGoal=v}, min:5,max:500,step:5,unit:' cartes'});
 
+      // NOUVEAU : Event listeners pour l'import/export
+      $('#exportProgressBtn').onclick = exportProgress;
+      $('#importProgressBtn').onclick = () => $('#importProgressInput').click();
+      $('#importProgressInput').onchange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+          importProgressFile(e.target.files[0]);
+        }
+        e.target.value = ''; // Reset pour permettre de re-sélectionner le même fichier
+      };
+
       $('#resetChapterBtn').onclick=()=>{
         if(!confirm('Réinitialiser la progression de ce chapitre ?')) return;
         resetChapter(chap.id); saveData(); openSettings(chapterId,false);
       };
       $('#resetAllBtn').onclick=resetAll;
-
       bindTypoPreviewDrag();
     }
 
@@ -3747,65 +3460,42 @@ async function importApkg(file) {
           if (rid != null && !savedCardByRowId.has(rid)) savedCardByRowId.set(rid, c);
         }
       }
-      const PROG_KEYS = [
-        'grade','timesReviewed','lastReviewed','lastMs','avgMs',
-        'perfEma','ef','intervalDays','dueAt','streak','successes','failures'
-      ];
-
+      const PROG_KEYS = [ 'grade','timesReviewed','lastReviewed','lastMs','avgMs', 'perfEma','ef','intervalDays','dueAt','streak','successes','failures' ];
       return canonChapters.map(cCh => {
         const sCh = (oldChapters||[]).find(x => x.title === cCh.title) || null;
         const merged = {
-          id: cCh.id,
-          title: cCh.title,
-          description: cCh.description,
+          id: cCh.id, title: cCh.title, description: cCh.description,
           settings: { ...cCh.settings, ...(sCh?.settings || {}) },
           filters: { grades: { ...cCh.filters.grades, ...(sCh?.filters?.grades || {}) } },
           stats: sCh?.stats ? { ...sCh.stats } : { ...cCh.stats },
           cards: []
         };
         const byRowId = new Map();
-        if (sCh) {
-          (sCh.cards||[]).forEach(sc => {
-            const rid = extractRowId(sc.id);
-            if (rid!=null) byRowId.set(rid, sc);
-          });
-        }
+        if (sCh) { (sCh.cards||[]).forEach(sc => { const rid = extractRowId(sc.id); if (rid!=null) byRowId.set(rid, sc); }); }
         merged.cards = cCh.cards.map(cc=>{
           const rid = extractRowId(cc.id);
           const sc = byRowId.get(rid) || savedCardByRowId.get(rid);
-          if (sc){
-            const copy = { ...cc };
-            PROG_KEYS.forEach(k => { if (sc[k] !== undefined) copy[k] = sc[k]; });
-            return copy;
-          }
+          if (sc){ const copy = { ...cc }; PROG_KEYS.forEach(k => { if (sc[k] !== undefined) copy[k] = sc[k]; }); return copy; }
           return { ...cc };
         });
-        merged.stats.gradeCounts = getLiveGradeCounts(merged);
-        return merged;
+        merged.stats.gradeCounts = getLiveGradeCounts(merged); return merged;
       });
     }
 
     function reconcileAllSubjectsWithCanonical(){
       const canonSubjects = buildCanonicalSubjects();
       const oldSubjects = Array.isArray(data.subjects) ? data.subjects : [];
-
       const newSubjects = [];
       canonSubjects.forEach(cSub=>{
         const sSub = oldSubjects.find(s => s.id===cSub.id || s.title===cSub.title);
         const merged = {
-          id: cSub.id,
-          title: cSub.title,
+          id: cSub.id, title: cSub.title,
           chapters: reconcileChaptersWithCanonical(cSub.chapters, sSub?.chapters || []),
           groups: Array.isArray(sSub?.groups) ? sSub.groups.slice() : []
         };
-        ensureValidGroups(merged);
-        newSubjects.push(merged);
+        ensureValidGroups(merged); newSubjects.push(merged);
       });
-
-      oldSubjects.forEach(sSub=>{
-        if(!newSubjects.find(ns=>ns.id===sSub.id)) newSubjects.push(sSub);
-      });
-
+      oldSubjects.forEach(sSub=>{ if(!newSubjects.find(ns=>ns.id===sSub.id)) newSubjects.push(sSub); });
       data.subjects = newSubjects;
       if (!data.app.currentSubjectId || !data.subjects.find(s=>s.id===data.app.currentSubjectId)) {
         data.app.currentSubjectId = data.subjects[0]?.id || null;
@@ -3814,69 +3504,40 @@ async function importApkg(file) {
     }
 
     function initReviewGestures(){
-        const view = document.getElementById('view');
-        if (!view) return;
-        const scroller = view.querySelector('.review-scroller, .review-card > div');
-        if (!scroller) return;
-
-        bindReviewSizeControls();
-        enableImageLightboxInReview(scroller);
+        const view = document.getElementById('view'); if (!view) return;
+        const scroller = view.querySelector('.review-scroller, .review-card > div'); if (!scroller) return;
+        bindReviewSizeControls(); enableImageLightboxInReview(scroller);
     }
 
     function bindReviewSizeControls(){
-      const faces = document.querySelectorAll('.review-card [data-face]');
-      if (!faces.length) return;
-
+      const faces = document.querySelectorAll('.review-card [data-face]'); if (!faces.length) return;
       const P = data.app.prefs || {};
       const applyVars = ()=>{
         document.documentElement.style.setProperty('--fs-term',(P.fsTerm||20)+'px');
         document.documentElement.style.setProperty('--fs-def',(P.fsDef||24)+'px');
       };
-
       faces.forEach(el=>{
-        const face = el.getAttribute('data-face');
-        let startY=null, startVal=null;
+        const face = el.getAttribute('data-face'); let startY=null, startVal=null;
         const getVal = () => face==='front' ? (P.fsTerm||20) : (P.fsDef||24);
-        const setVal = v => {
-          if (face==='front') P.fsTerm = clamp(v,12,60);
-          else               P.fsDef = clamp(v,14,72);
-          applyVars();
-        };
+        const setVal = v => { if (face==='front') P.fsTerm = clamp(v,12,60); else P.fsDef = clamp(v,14,72); applyVars(); };
         const commit = ()=>saveData();
-
         el.addEventListener('pointerdown', e=>{
           if (e.target.closest('img, video, svg, canvas, mjx-container, a, pre, code')) return;
           const scroller = el.closest('.review-card')?.querySelector('.review-scroller, .review-card > div');
           if (scroller && scroller.scrollHeight > scroller.clientHeight) return;
-
-          startY=e.clientY;
-          startVal=getVal();
-          el.setPointerCapture?.(e.pointerId);
-          e.preventDefault();
-          e.stopPropagation();
+          startY=e.clientY; startVal=getVal(); el.setPointerCapture?.(e.pointerId);
+          e.preventDefault(); e.stopPropagation();
         });
-
         el.addEventListener('pointermove', e=>{
           if (startY==null) return;
-          const dy = startY - e.clientY;
-          const delta = Math.round(dy/6);
-          setVal(startVal + delta);
-          e.preventDefault();
-          e.stopPropagation();
+          const dy = startY - e.clientY; const delta = Math.round(dy/6);
+          setVal(startVal + delta); e.preventDefault(); e.stopPropagation();
         });
-
-        const end = e=>{
-          if (startY!=null) commit();
-          startY=null; startVal=null;
-        };
-        el.addEventListener('pointerup', end);
-        el.addEventListener('pointercancel', end);
-
+        const end = e=>{ if (startY!=null) commit(); startY=null; startVal=null; };
+        el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
         el.addEventListener('wheel', e=>{
-          e.preventDefault();
-          const dir = e.deltaY>0 ? -1 : 1;
-          setVal(getVal()+dir);
-          commit();
+          e.preventDefault(); const dir = e.deltaY>0 ? -1 : 1;
+          setVal(getVal()+dir); commit();
         },{passive:false});
       });
     }
@@ -3909,18 +3570,14 @@ async function importApkg(file) {
         if(startY!=null) saveData();
         startY=null; startTerm=null; startDef=null; target='both'; setTimeout(hideToast,200);
       };
-      box.addEventListener('pointerdown',start);
-      box.addEventListener('pointermove',move);
-      box.addEventListener('pointerup',end);
-      box.addEventListener('pointercancel',end);
+      box.addEventListener('pointerdown',start); box.addEventListener('pointermove',move);
+      box.addEventListener('pointerup',end); box.addEventListener('pointercancel',end);
       box.addEventListener('touchstart',start,{passive:false});
       box.addEventListener('touchmove',move,{passive:false});
       box.addEventListener('touchend',end,{passive:false});
-
       const wheelOn=(el,which)=>{
         el.addEventListener('wheel',(e)=>{
-          e.preventDefault();
-          const dir=e.deltaY>0?-1:1;
+          e.preventDefault(); const dir=e.deltaY>0?-1:1;
           if(which==='term'||which==='both') P.fsTerm=clamp((P.fsTerm||20)+dir,12,60);
           if(which==='def'||which==='both') P.fsDef=clamp((P.fsDef||24)+dir,14,72);
           updateVars(); saveData(); showToast(`Recto ${P.fsTerm}px • Verso ${P.fsDef}px`); setTimeout(hideToast,250);
@@ -3935,7 +3592,6 @@ async function importApkg(file) {
       const commit=()=>{saveData(); applyUI(); if(onApply) onApply();};
       const setVal=v=>{set(clamp(v,min,max)); render(); applyUI();};
       const pd=e=>{e.preventDefault(); e.stopPropagation();};
-
       let startY=null,startV=null;
       node.addEventListener('pointerdown',e=>{startY=e.clientY; startV=get(); node.setPointerCapture?.(e.pointerId); pd(e);});
       node.addEventListener('pointermove',e=>{if(startY==null) return; const dy=startY-e.clientY; const delta=Math.round(dy/6)*step; setVal(startV+delta); pd(e);});
@@ -3971,12 +3627,8 @@ async function importApkg(file) {
         c.ef=2.5; c.intervalDays=0; c.dueAt=0; c.streak=0; c.successes=0; c.failures=0;
       });
       chap.stats.gradeCounts={unseen:chap.cards.length,echec:0,difficile:0,bien:0,facile:0};
-      chap.stats.totalReviews=0;
-      chap.stats.dailyReviews = {};
-      chap.stats.dailyChanges = {};
-      chap.stats.dailyDurMs = {};
-      chap.stats.dailyDurCount = {};
-      chap.stats.dailyLog = {};
+      chap.stats.totalReviews=0; chap.stats.dailyReviews = {}; chap.stats.dailyChanges = {};
+      chap.stats.dailyDurMs = {}; chap.stats.dailyDurCount = {}; chap.stats.dailyLog = {};
       saveData(); alert('Chapitre réinitialisé.');
     }
 
@@ -3984,20 +3636,9 @@ async function importApkg(file) {
       const imgs = Array.from(scroller.querySelectorAll('img'));
       imgs.forEach(img=>{
         img._moved = false;
-        img.addEventListener('pointerdown', e=>{
-          img._moved = false;
-          img._sx = e.clientX; img._sy = e.clientY;
-        });
-        img.addEventListener('pointermove', e=>{
-          if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){
-            img._moved = true;
-          }
-        });
-        img.addEventListener('click', e=>{
-          if (img._moved) return; // c'était un drag -> ne pas ouvrir
-          e.preventDefault();
-          openLightboxFor(img, scroller);
-        });
+        img.addEventListener('pointerdown', e=>{ img._moved = false; img._sx = e.clientX; img._sy = e.clientY; });
+        img.addEventListener('pointermove', e=>{ if (img._sx!=null && (Math.abs(e.clientX - img._sx)>6 || Math.abs(e.clientY - img._sy)>6)){ img._moved = true; } });
+        img.addEventListener('click', e=>{ if (img._moved) return; e.preventDefault(); openLightboxFor(img, scroller); });
       });
     }
 
@@ -4008,40 +3649,32 @@ async function importApkg(file) {
       const prefs=deepClone(data.app?.prefs||{});
       const subjects = buildCanonicalSubjects();
       data = { subjects, app: { theme, prefs, currentSubjectId: subjects[0]?.id || null } };
-      upgradeData();
-      applyTheme();
-      applyUI();
-      saveData();
-      goDeck(false);
-      alert('Application réinitialisée.');
+      upgradeData(); applyTheme(); applyUI(); saveData();
+      goDeck(false); alert('Application réinitialisée.');
     }
 
-
-
     function init(){
+      // NOUVEAU: Nettoyage des anciens cookies au démarrage
+      nukeCookieBackup();
+
       Media.open().catch(console.warn);
-      if(navigator.storage && navigator.storage.persist){
-        navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
-      }
+      if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().then(granted=>console.log('persist granted?',granted)); }
       window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
       window.addEventListener('pagehide',saveData);
       window.addEventListener('beforeunload',saveData);
       setInterval(saveData,15000);
-      window.addEventListener('storage',(e)=>{
-        if(e.key===STORAGE_KEY && e.newValue){
-          try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
-        }
-      });
+      window.addEventListener('storage',(e)=>{ if(e.key===STORAGE_KEY && e.newValue){ try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){} } });
     
-      // Forcer migration + fusion avec le contenu canonique à chaque nouvelle version
+      // NOUVEAU: Appel au nettoyage des stats après le chargement des données
+      pruneStats();
+
       const prevVersion = localStorage.getItem('flash9x16_version');
       if (prevVersion !== APP_VERSION) {
-        upgradeData();                          // migrer l'ancien schéma si besoin
-        reconcileAllSubjectsWithCanonical();    // fusionner avec les nouvelles cartes/chapitres
+        upgradeData();
+        reconcileAllSubjectsWithCanonical();
         saveData();
         localStorage.setItem('flash9x16_version', APP_VERSION);
       } else {
-        // Assurer la cohérence même sans changement de version
         upgradeData();
         reconcileAllSubjectsWithCanonical();
       }
@@ -4050,7 +3683,20 @@ async function importApkg(file) {
       applyUI();
       Nav.clear();
       goDeck(false);
+      
+      // NOUVEAU: Tentative de restauration depuis IndexedDB si localStorage est vide
+      StateStore.get('state').then(raw=>{
+        if (!localStorage.getItem(STORAGE_KEY) && raw) {
+          try{
+            console.log("Restoring state from IndexedDB backup.");
+            data = JSON.parse(raw);
+            saveData(); // re-synchronise localStorage
+            renderByState(false);
+          } catch(e){ console.warn('Restore from IDB failed', e); }
+        }
+      });
     }
+    
     init();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
