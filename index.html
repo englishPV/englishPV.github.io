@@ -395,7 +395,16 @@
       .topbar, main#view, .bottom-actions, .revision-bar{max-width:1200px; margin:0 auto; width:100%}
       main#view{padding:16px 20px}
     }
-
+    .review-card a[href^="media:"],
+.review-card a[href^="blob:"],
+.review-card a[href^="file:"],
+.review-card a[href^="data:"],
+.cards-grid a[href^="media:"],
+.cards-grid a[href^="blob:"],
+.cards-grid a[href^="file:"],
+.cards-grid a[href^="data:"]{
+  pointer-events: none;
+}
     /* Subject menu (sélecteur de matière) */
     .subject-menu{
       position: absolute;
@@ -3015,6 +3024,7 @@ async function importApkg(file) {
     }
 
     async function renderCards(chapterId){
+      neutralizeLinksIn(v);
       const v=$('#view'); const chap=getChapter(chapterId);
       const sel=chap.filters.grades||{};
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
@@ -3086,6 +3096,7 @@ async function importApkg(file) {
     }
 
     async function renderDaily(chap, dayKey){
+      neutralizeLinksIn(v);
       const subj = getCurrentSubject();
       let log;
       if (chap.virtual && chap.id.startsWith('group-')){
@@ -3206,6 +3217,7 @@ async function importApkg(file) {
     }
 
     function renderReview(){
+      neutralizeLinksIn(v);
       const v=$('#view'); const r=State.review;
       const { card: current, chap } = getCurrentCard();
       const total=r.queue.length; const idx=r.index+1;
@@ -4081,8 +4093,36 @@ async function importApkg(file) {
     }
 
 
+    function guardUnsafeLinks(){
+  const isUnsafe = href =>
+    /^(media|blob|file|data):/i.test(href) ||
+    href === '#' ||
+    href.startsWith('javascript:');
 
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (isUnsafe(href)) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Optionnel: si le lien enveloppe une image, ouvre le lightbox au lieu de naviguer
+      const img = a.querySelector('img');
+      if (img) {
+        try { openLightboxFor(img, document); } catch(_) {}
+      }
+    }
+  }, true);
+}
+function neutralizeLinksIn(el){
+  el.querySelectorAll('a[href^="media://"],a[href^="blob:"],a[href^="file:"],a[href^="data:"],a[href="#"]').forEach(a=>{
+    a.addEventListener('click', e => e.preventDefault());
+    a.removeAttribute('target');
+    a.setAttribute('role','button');
+  });
+}
     function init(){
+      
       Media.open().catch(console.warn);
       if(navigator.storage && navigator.storage.persist){
         navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
@@ -4114,6 +4154,7 @@ async function importApkg(file) {
       applyUI();
       Nav.clear();
       goDeck(false);
+      guardUnsafeLinks();
     }
     init();
   </script>
