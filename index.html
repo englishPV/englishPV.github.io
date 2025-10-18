@@ -2811,7 +2811,19 @@
       },
       back(){
         if(!this.stack.length) return;
-        State.virtualChapter = null;
+
+        // *** CORRECTION APPLIQUÉE ***
+        // On regarde l'état vers lequel on va revenir SANS le retirer de la pile.
+        const stateToRestore = this.stack[this.stack.length - 1];
+
+        // Si l'état de destination n'est PAS un chapitre virtuel (fichier),
+        // alors on peut effacer sans risque la mémoire du chapitre virtuel.
+        // Sinon, on la conserve pour que la page de stats du fichier puisse se réafficher.
+        if (!stateToRestore.chapterId || !stateToRestore.chapterId.startsWith('group-')) {
+          State.virtualChapter = null;
+        }
+        // --- Fin de la correction ---
+
         const prev=this.stack.pop();
         State.view=prev.view; State.chapterId=prev.chapterId; State.review=prev.review;
         State.cardsIndex=prev.cardsIndex||0; State.dailyKey=prev.dailyKey||null;
