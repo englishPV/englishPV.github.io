@@ -2549,6 +2549,11 @@
 
     const items = $$('.deck-item');
     items.forEach(el => {
+        // Ajout du CSS pour désactiver la sélection de texte directement ici
+        el.style.webkitUserSelect = 'none';
+        el.style.userSelect = 'none';
+        el.style.webkitTouchCallout = 'none';
+
         const type = el.getAttribute('data-type');
         const id = el.getAttribute('data-id');
         
@@ -2585,13 +2590,16 @@
             animationFrameId = requestAnimationFrame(autoScroll);
         };
         
+        // =========================================================
+        // === C'est ici que se trouve la modification demandée ===
+        // =========================================================
         const moveGhost = (x, y) => {
             if (!ghost) return;
-            ghost.style.transform = `translate(${x - 18}px, ${y - 18}px) scale(1.02)`;
+            // Nouvel offset plus grand pour une meilleure visibilité sur écran tactile.
+            ghost.style.transform = `translate(${x - 40}px, ${y - 40}px) scale(1.02)`;
         };
 
         const onDown = e => {
-            // *** MODIFICATION CLÉ 1 : Bloquer l'action par défaut ***
             // Empêche le navigateur de sélectionner le texte ou de montrer le menu contextuel.
             e.preventDefault();
 
@@ -2625,7 +2633,8 @@
                 clearTimeout(longPressTimer);
                 
                 if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 20) {
-                    if (dx < 0 && (type === 'chapter' && el.querySelector('.deleteChBtn') || type === 'group')) {
+                    // La logique de swipe pour la suppression reste la même
+                    if (dx < 0 && el.querySelector('.right-action')) {
                         interactionState = 'swiping';
                         el.classList.add('reveal-delete');
                     }
@@ -2660,6 +2669,7 @@
                     handleDrop(subj, { type, id }, { type: tType, id: tId });
                 }
             } else if (interactionState === 'pressed') {
+                // Un clic simple (pas de mouvement, pas de long press)
                 if (type === 'group') openGroup(subj, id);
                 else goChapter(id);
             }
@@ -2680,8 +2690,6 @@
         el.addEventListener('pointermove', onMove);
         el.addEventListener('pointerup', onUp);
         el.addEventListener('pointercancel', onUp);
-
-        // *** MODIFICATION CLÉ 2 : Bloquer le menu contextuel explicitement ***
         el.addEventListener('contextmenu', e => e.preventDefault());
     });
 
