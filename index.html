@@ -2730,10 +2730,17 @@
       const avgSize = Math.round(chs.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/Math.max(1,chs.length))||10;
       const avgGoal = Math.round(chs.reduce((s,ch)=>s+(ch.settings.dailyGoal||10),0)/Math.max(1,chs.length))||10;
       const { counts, stats } = buildGroupStats(subj, group);
-      const title = `Fichier (${groupEmojiList(subj, group)})`;
+      
+      // *** CORRECTION APPLIQUÉE *** : Utilise le nom/emoji personnalisé ou un nom par défaut.
+      const finalTitle = group.title || `Fichier (${groupEmojiList(subj, group)})`;
+      const finalEmoji = group.emoji || '';
+      
       return {
         id: 'group-'+group.id,
-        title, description: title,
+        _groupId: group.id, // Ajout d'une référence à l'ID du groupe original
+        title: finalTitle,
+        emoji: finalEmoji,
+        description: (finalEmoji ? finalEmoji + ' ' : '') + finalTitle,
         virtual:true, _ids: group.chapIds.slice(),
         settings:{ sessionSize:avgSize, dailyGoal:avgGoal, reviewOrder:'front-first', langSwap:false },
         filters:{ grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true} },
@@ -2746,7 +2753,8 @@
       const ids = Array.from(new Set(chapIds)).filter(Boolean);
       if (ids.length<2) return null;
       const id = 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-      const g = { id, chapIds: ids, createdAt: Date.now() };
+      // *** CORRECTION APPLIQUÉE *** : On ajoute des champs pour un nom et un emoji personnalisés
+      const g = { id, chapIds: ids, createdAt: Date.now(), title: '', emoji: '' };
       ensureGroups(subj).push(g); return g;
     }
     function addToGroup(subj, groupId, chapId){
@@ -3073,7 +3081,7 @@
                   <div class="slide">
                     <div style="min-width:0; flex:1">
                       <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
-                        📁 Fichier (${emojis})
+                        ${g.title ? ((g.emoji ? g.emoji + ' ' : '') + g.title) : `📁 Fichier (${emojis})`}
                       </div>
                       <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
                         <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
@@ -4020,12 +4028,31 @@
       $('#saveChapterIdentity').onclick = ()=>{
         const newTitle = (chTitleInput.value||'').trim();
         const newEmoji = (chEmojiInput.value||'').trim();
-        if (newTitle) chap.title = newTitle;
-        chap.emoji = newEmoji;
-        updateChapterDescription(chap);
+
+        // *** CORRECTION APPLIQUÉE *** : Gère le cas d'un chapitre virtuel (fichier)
+        if (chap.virtual && chap._groupId) {
+          const subj = getCurrentSubject();
+          const group = findGroupById(subj, chap._groupId);
+          if (group) {
+            // On modifie le groupe original
+            group.title = newTitle;
+            group.emoji = newEmoji;
+            
+            // On met aussi à jour le chapitre virtuel pour une actualisation immédiate
+            chap.title = newTitle; 
+            chap.emoji = newEmoji;
+            updateChapterDescription(chap); // Met à jour la description
+          }
+        } else {
+          // Comportement normal pour un chapitre réel
+          if (newTitle) chap.title = newTitle;
+          chap.emoji = newEmoji;
+          updateChapterDescription(chap);
+        }
+
         saveData();
-        setTopbar({title:`${chap.title} • Paramètres`});
-        renderByState(false);
+        // On rafraîchit la vue actuelle pour voir le nom mis à jour
+        goChapter(chap.id, false); 
       };
 
       const P=data.app.prefs;
