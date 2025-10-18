@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -177,7 +178,7 @@
     /* Deck list */
     .deck-wrap{display:flex; align-items:center; gap:8px}
     .decks{display:grid; grid-template-columns:1fr; gap:8px; flex:1}
-    .deck-item{display:flex; align-items:center; justify-content:space-between; padding:8px 0; cursor:pointer}
+    .deck-item{display:flex; align-items:center; justify-content:space-between; padding:0 8px; cursor:pointer; user-select:none; touch-action:pan-y;}
     .deck-item:hover{outline:none}
     .deck-meta{color:var(--muted); font-size:13px}
 
@@ -230,7 +231,14 @@
       pointer-events:none; z-index:3; display:none;
     }
     :root[data-theme="light"] .size-toast{background:rgba(0,0,0,.15); color:#0f172a}
-
+    .chapter-list {
+  font-size: 12px;
+  white-space: nowrap;      /* Assure que le texte reste sur une seule ligne */
+  overflow: hidden;         /* Masque le texte qui dépasse */
+  text-overflow: ellipsis;  /* Ajoute "..." à la fin du texte qui dépasse */
+  opacity: 0.8;
+  padding-left: 2px; /* Petit ajustement pour l'alignement */
+}
     /* Cards view */
     .cards-wrap{display:flex; flex-direction:column; gap:8px; height:100%}
     .cards-top{display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:12px}
@@ -443,7 +451,7 @@
       user-select:none; -webkit-user-drag:none;
       pointer-events:none; /* toute la surface sert aux gestes */
     }
-.img-counter{
+    .img-counter{
       position:absolute; left:50%; transform:translateX(-50%);
       bottom:16px; z-index:2;
       background:rgba(255,255,255,.9); color:#0f172a;
@@ -454,6 +462,52 @@
     :root[data-theme="light"] .img-close,
     :root[data-theme="light"] .img-nav{ color:#0f172a; background:rgba(255,255,255,.9); border-color:#e2e8f0; }
     :root[data-theme="light"] .img-counter{ background:rgba(255,255,255,.9); color:#0f172a; }
+
+    /* NOUVEAUX STYLES */
+    /* Boutons decks minimalistes */
+    .btn--ghost { --btn-bg:transparent; --btn-bg-h:rgba(255,255,255,.06); --btn-fg:var(--muted); --btn-bd:var(--border); }
+    :root[data-theme="light"] .btn--ghost{ --btn-bg-h:rgba(0,0,0,.06); }
+    .btn--tiny { padding:6px 8px; font-size:13px; border-radius:8px; }
+
+    /* En-tête deck */
+    .deck-head{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+    .deck-head .actions{ display:flex; gap:6px }
+    .deck-item {
+  -webkit-user-select: none; /* Safari, Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+  -webkit-touch-callout: none; /* Désactive le menu contextuel sur iOS Safari */
+}
+    /* Indicateur groupe */
+    .deck-item .folder-badge{ font-size:12px; color:var(--muted) }
+
+    /* Swipe gauche pour supprimer */
+    .deck-item{ position:relative; overflow:hidden; }
+    .deck-item .slide{ display:flex; align-items:center; gap:8px; padding:8px 0; transition: transform .18s ease; will-change: transform; }
+    .deck-item .right-action{ position:absolute; top:0; right:0; height:100%; width:92px; display:flex; align-items:center; justify-content:center; }
+    .deck-item.reveal-delete .slide{ transform: translateX(-92px); }
+    .scroll-lock {
+  overflow: hidden; /* Fallback pour certains navigateurs */
+  touch-action: none !important; /* La règle la plus importante ! */
+}
+    /* Drag & drop */
+    .drag-ghost{
+      position: fixed; left:0; top:0; pointer-events:none; z-index: 9999;
+      transform: translate(-9999px,-9999px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      border-radius: var(--radius-md);
+      background: rgba(0,0,0,.08);
+    }
+    :root[data-theme="light"] .drag-ghost{ background: rgba(0,0,0,.06) }
+
+    .deck-item.drop-target{ outline: 2px dashed var(--primary); outline-offset: -2px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+    .deck-item.dragging-origin{ opacity:.3 }
+
+    body.dragging-active, .dragging-active * {
+      cursor: grabbing !important;
+    }
+
   </style>
 </head>
 <body>
@@ -487,8 +541,10 @@
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
+    // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
     const PM3 = "M3";
+    const PM4 = "M4"; // <--- AJOUTEZ CETTE LIGNE
 
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
@@ -497,6 +553,7 @@
       // === Physique (nouvelles matières/chapitres) ===
       'M2':'⚙️',
       'M3':'🌍',
+      'M4':'🤝', // <--- AJOUTEZ CETTE LIGNE (🤝 pour liaisons/contact)
 
     };
 
@@ -1439,203 +1496,213 @@
 10011|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un réfrentiel R' non galileen.|On part de la loi de composition des vitesses $m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + \\vec{a_c} + \\vec{a_e}&nbsp;&nbsp;$<br>de plus $m \\vec{a}_{M/R} = \\sum_i \\vec{F_i} $<br>En réarrangant les termes on a $m \\vec{a}_{M/R'} = \\sum_i \\vec{F_i} -m \\vec{a_c} - m \\vec{a_e} $<br>avec $ - m \\vec{a_e} $ qui est la force d'inertie d'entrainement et $&nbsp;- m \\vec{a_c} $ qui est la force d'inertie de coriolis|${PM}
 10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $ \\vec{f_{ic}} $ et $ \\vec{f_{ie}} $ dans le cas d'une translation de R' par rapport à R|&nbsp;$ \\vec{f_{ic}} = \\vec{0} $ et&nbsp;&nbsp;$ \\vec{a_c} = \\vec{0} $ dans ce cas<br>et<br>$ \\vec{f_{ie}} = -m(\\frac{d^2 \\vec{OO'}}{dt^2})_R $|${PM}
 10013|<span style="color: rgb(255, 170, 0);">(LPB)</span><span style="color: rgb(0, 255, 0);"> </span>Comment est défini réellement le poids?|On def le poids d'un corps M de masse m de manière expérimentale: C'est la force opposée à la tension d'un fil au bout duquel est accroché le corps, ce dernier étant en équilibre dans le référentiel terrestre (\\(\\vec{P} = \\vec{F_G}+\\vec{f_{ie}}\\)&nbsp;)|${PM3}
-10014|<span style="color: rgb(0, 255, 0);">(LPB)</span>Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique|L'existence de deux marées hautes et deux marées basses par jour sur Terre<br>&nbsp;<img src="Capture d’écran 2023-10-07 161935.png">|${PM3}
+10014|<span style="color: rgb(0, 255, 0);">(LPB)</span>Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique|L'existence de deux marées hautes et deux marées basses par jour sur Terre<br>&nbsp;<img src="images/Capture d’écran 2023-10-07 161935.png">|${PM3}
 10015|<span style="color: rgb(0, 255, 0);">(TS) </span>Donner des exemples qui mettent en évidence le caractère non galiléen du référentiel terrestre.|La déviation vers l'est,<br>Le sens de rotation des cyclones,<br>Le pendule de Foucault|${PM3}
 10016|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire de rotation du référentiel terrestre par rapport au référentiel géocentrique|\\(\\omega\\)= \\(\\frac{2\\pi}{24×3600}\\)rad/s=7.3×10\\(^{-5}\\) rad/s|${PM3}
 10017|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire caractérisant la translation elliptique du référentiel géocentrique par rapport au référentiel de Copernic|\\(\\Omega\\)=\\(\\frac{2\\pi}{365×24×3600}\\)rad/s=2.0×10\\(^{-7}\\) rad/s|${PM3}
 10018|<span style="color: rgb(255, 170, 0);">(TS) </span>Quelles forces fera apparaitre le PFD dans R<sub>T</sub> non galiléen|Le poids (qui contient [$] \\overrightarrow {f_{ie}}[/$])<br>La force d'inertie de Cariolis [$] \\overrightarrow {f_{ic}}[/$]<br>D'éventuelles autres forces|${PM3}
-10019|(B.K.)<img src="paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg"><br>Qu'est-ce qui est à l'origine de cette déviation vers l'Est?<br>Dans l'hémisphère Sud, cette déviation se ferait-elle également vers l'Est?|C'est la force d'inertie de Coriolis qui est responsable de cette déviation vers l'Est.<br>La déviation se ferait également vers l'Est dans l'hémisphère sud.|${PM3}
+10019|(B.K.)<img src="images/paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg"><br>Qu'est-ce qui est à l'origine de cette déviation vers l'Est?<br>Dans l'hémisphère Sud, cette déviation se ferait-elle également vers l'Est?|C'est la force d'inertie de Coriolis qui est responsable de cette déviation vers l'Est.<br>La déviation se ferait également vers l'Est dans l'hémisphère sud.|${PM3}
 10020|<span style="color: rgb(0, 255, 0);">(enzo m) </span><u>Contexte : Appli 3 Pendule de Foucault</u><br><br>On a les deux équations suivantes :<br>&nbsp;&nbsp;\\(\\begin{cases} \\ddot x +\\omega_0^2 x \\approx 2\\Omega sin(\\lambda)\\dot y \\space\\space\\space\\space\\space\\space\\space\\space(1)\\\\  \\ddot y +\\omega_0^2 y \\approx  -2\\Omega sin(\\lambda)\\dot x\\space\\space\\space\\space\\space(2)  \\end{cases}\\)<br><br>Quelle est la <b>méthode </b>afin d'obtenir une équation différentielle selon&nbsp;<u>Z</u>&nbsp;= x+jy où j<sup>2&nbsp;</sup>= -1 ?|<u>Méthode</u> : il faut faire (1)+j(2)&nbsp;<br><br>Ce qui nous donne&nbsp;\\(\\underline {\\ddot Z} + \\omega_0^2\\underline{Z} = -2j\\Omega sin(\\lambda)\\underline{\\dot Z}\\)<br><br>Après avoir résolu cette équation différentielle, on peut trouver x et y avec x=Re(<u>Z</u>) et y=Im(<u>Z</u>).|${PM3}
-10021|<span style="color: rgb(0, 255, 0);">(enzo m)</span>&nbsp;<u>Contexte : Appli 3 Pendule de Foucault</u>&nbsp;<br><br><img src="paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg" width="495"><br><br>On obtient pour les équations du mouvement du pendule de Foucault :<br><br>\\(\\begin{cases} x(t) = x_0cos(\\omega_0t)cos(-\\Omega sin\\lambda t)\\\\  y(t) = x_0cos(\\omega_0t)sin(-\\Omega sin\\lambda t)\\end{cases}\\)<br><br>Quelle est alors l'expression de la période T de rotation du plan d'oscillation du pendule? et la période T<sub>0 </sub>propre des oscillations ?|On a&nbsp;\\(T = \\left|\\frac{2\\pi}{\\Omega sin\\lambda}\\right|\\)&nbsp;&lt;-- période de rotation du plan d'oscillation<br><br>et&nbsp;\\(T = \\frac{2\\pi}{\\omega_0}\\)&nbsp;&lt;-- période propre des oscillations.|${PM3}
-10022|<img src="anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad&nbsp;SABRI<br></span><img src="paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Donner en fonction de&nbsp;\\(\\lambda \\)&nbsp;l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude&nbsp;\\(\\lambda\\). A quel endroit&nbsp;\\(g\\)&nbsp;est-elle max? min?<br><br>Référentiel terrestre: non gal<br>Référentiel géocentrique: gal<br>Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:&nbsp;&nbsp;\\(\\Omega\\)<br>Masse et rayon de la Terre:&nbsp;\\(m_T\\)&nbsp;et&nbsp;\\(R_T\\)|Poids d'un objet de masse&nbsp;\\(m\\)&nbsp;à la surface de la Terre:<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)<br>Or&nbsp;\\(HM=R_T \\ cos(\\lambda)\\)&nbsp;et&nbsp;\\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)<br><br>\\(g\\)&nbsp;est max au pôle sud et min à l'équateur.|${PM3}
+10021|<span style="color: rgb(0, 255, 0);">(enzo m)</span>&nbsp;<u>Contexte : Appli 3 Pendule de Foucault</u>&nbsp;<br><br><img src="images/paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg" width="495"><br><br>On obtient pour les équations du mouvement du pendule de Foucault :<br><br>\\(\\begin{cases} x(t) = x_0cos(\\omega_0t)cos(-\\Omega sin\\lambda t)\\\\  y(t) = x_0cos(\\omega_0t)sin(-\\Omega sin\\lambda t)\\end{cases}\\)<br><br>Quelle est alors l'expression de la période T de rotation du plan d'oscillation du pendule? et la période T<sub>0 </sub>propre des oscillations ?|On a&nbsp;\\(T = \\left|\\frac{2\\pi}{\\Omega sin\\lambda}\\right|\\)&nbsp;&lt;-- période de rotation du plan d'oscillation<br><br>et&nbsp;\\(T = \\frac{2\\pi}{\\omega_0}\\)&nbsp;&lt;-- période propre des oscillations.|${PM3}
+10022|<img src="images/anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad&nbsp;SABRI<br></span><img src="images/paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Donner en fonction de&nbsp;\\(\\lambda \\)&nbsp;l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude&nbsp;\\(\\lambda\\). A quel endroit&nbsp;\\(g\\)&nbsp;est-elle max? min?<br><br>Référentiel terrestre: non gal<br>Référentiel géocentrique: gal<br>Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:&nbsp;&nbsp;\\(\\Omega\\)<br>Masse et rayon de la Terre:&nbsp;\\(m_T\\)&nbsp;et&nbsp;\\(R_T\\)|Poids d'un objet de masse&nbsp;\\(m\\)&nbsp;à la surface de la Terre:<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)<br>Or&nbsp;\\(HM=R_T \\ cos(\\lambda)\\)&nbsp;et&nbsp;\\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)<br><br>\\(g\\)&nbsp;est max au pôle sud et min à l'équateur.|${PM3}
 10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre?|C'est la force d'inertie d'entrainement due au fait que le référentiel géocentrique (en translation elliptique dans le réf. Héliocentrique) est considéré comme non galiléen (en considérant le réf. Héliocentrique galiléen).|${PM3}
-10024|(B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?<br>Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.|C'est la force d'inertie de Coriolis (en considérant le ref. Terrestre non galiléen et le réf géocentrique galiléen).<br>Dans le Nord: rotation dans le sens trigo.<br>Dans le Sud: Rotation dans le sens horaire<br><img src="paste-71cc5358ce5c51ce02d2e1d9d2e63300dba80598.jpg">|${PM3}
+10024|(B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?<br>Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.|C'est la force d'inertie de Coriolis (en considérant le ref. Terrestre non galiléen et le réf géocentrique galiléen).<br>Dans le Nord: rotation dans le sens trigo.<br>Dans le Sud: Rotation dans le sens horaire<br><img src="images/paste-71cc5358ce5c51ce02d2e63300dba80598.jpg">|${PM3}
+10025|<br>\\[(F.H)~Valeur~de~\\vec{v}_gs_2/s_1~dans~le~cas~de~non~glissement (i.e. cas~de~l'adhérence) :\\]<br>|\\(On~a :\\vec{v}_gs_2/s_1 = \\vec{0}\\)|${PM4}
+10026|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb dans le cas d'un non-glissement :|\\[\\|\\vec{T}\\| \\le fs \\|\\vec{N}\\|~avec~fs~le~coefficient~de~frottement ~statique \\]|${PM4}
+10027|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le cas d'un glissement :|\\[\\|\\vec{T}\\| = fd \\|\\vec{N}\\|~avec~fd~le~coefficient~de~frottement ~dynamique\\]<br>|${PM4}
+10028|<span style="color: rgb(0, 255, 0);">(Yannick) </span>Les forces de frottement sont elles conservatives ?|Non elles ne sont en général pas conservatives.|${PM4}
+10029|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Quel peut-être le signe de la puissance d'une force de contact ?|[latex]Généralement négatif : cas où la réaction tangentielle / force de frottement est une force de freinage \\newline<br>Parfois positif : cas où la force de frottement est motrice. Par expl cas d'un solide S2 fixe par rapport à un solide S1 (adhérence) et que S1, mis en mouvement, met S2 en mouvement.[/latex]<br><img src="images/paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg" width="265">|${PM4}
+10030|[latex] Que dire sur la puissance totale ( $P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R}$) des forces mises en jeu dans un contact entre 2 solides ? [/latex]|[latex]<br>$P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R})=\\vec{T}_{1 \\rightarrow 2} . \\vec{v_g}_{2/1} \\leq 0$ \\newline<br>Elle est nulle s'il y a adhérence des 2 solides ($\\vec{v_g}_{2/1} =0$) ou si le glissement se fait sans frottement ($\\vec{T}_{1 \\rightarrow 2}=0$).\\newline<br>Elle est négative s'il y a glissement avec frottement.[/latex]|${PM4}
+10031|<span style="color: rgb(255, 170, 0);">(Yannick) </span>On modélise l'action de contact de S1 sur S2 par une force \\(\\overrightarrow {R_{1->2}}\\) appliqué en un point I de la région de contact, comment se décompose \\(\\overrightarrow {R_{1->2}}\\) ?|<div>\\(\\overrightarrow {R_{1->2}}\\) se décompose en :</div><ul><li>Une composante orthogonale au plan tangent π commun aux 2 solides, dirigée de <strong>S1</strong> vers <strong>S2</strong>, notée \\(\\overrightarrow {N}\\) et appelée réaction normale.</li><li>Une composante appartenant au plan π, notée \\(\\overrightarrow {T}\\) et appelée réaction tangentielle ou force de frottement. En absence de frottements: \\(\\overrightarrow {T}=\\overrightarrow{0}\\)</li></ul>|${PM4}
+10032|<span style="color: rgb(255, 170, 0);">(INC)</span> Qu’est-ce que <b>la vitesse de glissement </b>?|La vitesse de glissement de \\(S_2 / S_1 \\) s'écrit : \\(\\vec{v_g}_{S_2/S_1} = \\vec{v_{I_2}} - \\vec{v_{I_1}} \\)<br><br>(avec \\(I\\) le point de contact entre les deux solides et \\(I_1 \\) (resp. \\(I_2\\)) le point de \\(S_1\\) (resp. \\(S_2\\)) confondu avec \\(I \\) a l'instant \\(t\\) )<br><br>Rem: Elle ne dépend par du référentiel du moment que \\(\\vec{v_{I_2}}\\) et \\( \\vec{v_{I_1}}\\)sont exprimés dans le même référentiel.|${PM4}
+10033|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br> <img src="images/paste-15e45e099744e7f013048018acad29cb70089200.jpg">|<img src="images/paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg"><br><img src="images/paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg">|${PM4}
+10034|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br><img src="images/paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg">|<img src="images/paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg">|${PM4}
 `.trim();
 
     // === LIGHTBOX IMAGE VIEWER ===
     // === LIGHTBOX IMAGE VIEWER (overlay sombre léger, pas de boutons) ===
-const LB = {
-  el:null, stage:null, canvas:null, img:null,
-  counter:null,
-  images:[], idx:0,
-  baseW:0, baseH:0,
-  s:1, minS:1, maxS:5, x:0, y:0,
-  pointers:new Map(), startDist:0, startS:1, startX:0, startY:0, panStartX:0, panStartY:0,
-  tapMoved:false
-};
+    const LB = {
+      el:null, stage:null, canvas:null, img:null,
+      counter:null,
+      images:[], idx:0,
+      baseW:0, baseH:0,
+      s:1, minS:1, maxS:5, x:0, y:0,
+      pointers:new Map(), startDist:0, startS:1, startX:0, startY:0, panStartX:0, panStartY:0,
+      tapMoved:false
+    };
 
-function ensureLightbox(){
-  if (LB.el) return LB.el;
-  const el = document.createElement('div');
-  el.className = 'img-lightbox';
-  el.innerHTML = `
-    <div class="img-stage" id="lbStage" tabindex="-1" aria-label="Image viewer">
-      <div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div>
-    </div>
-    <div class="img-counter" id="lbCounter">1/1</div>
-  `;
-  document.body.appendChild(el);
-  LB.el = el;
-  LB.stage = el.querySelector('#lbStage');
-  LB.canvas = el.querySelector('#lbCanvas');
-  LB.img = el.querySelector('#lbImg');
-  LB.counter = el.querySelector('#lbCounter');
+    function ensureLightbox(){
+      if (LB.el) return LB.el;
+      const el = document.createElement('div');
+      el.className = 'img-lightbox';
+      el.innerHTML = `
+        <div class="img-stage" id="lbStage" tabindex="-1" aria-label="Image viewer">
+          <div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div>
+        </div>
+        <div class="img-counter" id="lbCounter">1/1</div>
+      `;
+      document.body.appendChild(el);
+      LB.el = el;
+      LB.stage = el.querySelector('#lbStage');
+      LB.canvas = el.querySelector('#lbCanvas');
+      LB.img = el.querySelector('#lbImg');
+      LB.counter = el.querySelector('#lbCounter');
 
-  // Gestes (pan/zoom partout)
-  LB.stage.addEventListener('pointerdown', e=>{
-    LB.stage.setPointerCapture?.(e.pointerId);
-    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    if (LB.pointers.size===1){
-      LB.panStartX = LB.x; LB.panStartY = LB.y;
-      LB.startX = e.clientX; LB.startY = e.clientY;
-      LB.startS = LB.s; LB.tapMoved = false;
-    }else if(LB.pointers.size===2){
-      const pts=[...LB.pointers.values()];
-      LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
-      LB.startS = LB.s; LB.tapMoved = true; // pinch ≠ clic
-    }
-    e.preventDefault();
-  });
-
-  LB.stage.addEventListener('pointermove', e=>{
-    if(!LB.pointers.has(e.pointerId)) return;
-    LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    const dx = e.clientX - LB.startX;
-    const dy = e.clientY - LB.startY;
-    if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
-
-    if(LB.pointers.size>=2){
-      // Pinch = zoom centré écran
-      const pts=[...LB.pointers.values()];
-      const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
-      setLBScaleCentered(LB.startS * (dist/LB.startDist));
-    }else{
-      // 1 doigt = pan
-      setLBPan(LB.panStartX + dx, LB.panStartY + dy);
-    }
-    e.preventDefault();
-  });
-
-  const endPtr = e=>{
-    if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
-    if(LB.pointers.size===0){
-      // Clic dans le vide -> fermer
-      if (!LB.tapMoved){
-        const r = LB.img.getBoundingClientRect();
-        if (!(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom)) {
-          closeLightbox();
+      // Gestes (pan/zoom partout)
+      LB.stage.addEventListener('pointerdown', e=>{
+        LB.stage.setPointerCapture?.(e.pointerId);
+        LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+        if (LB.pointers.size===1){
+          LB.panStartX = LB.x; LB.panStartY = LB.y;
+          LB.startX = e.clientX; LB.startY = e.clientY;
+          LB.startS = LB.s; LB.tapMoved = false;
+        }else if(LB.pointers.size===2){
+          const pts=[...LB.pointers.values()];
+          LB.startDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || 1;
+          LB.startS = LB.s; LB.tapMoved = true; // pinch ≠ clic
         }
+        e.preventDefault();
+      });
+
+      LB.stage.addEventListener('pointermove', e=>{
+        if(!LB.pointers.has(e.pointerId)) return;
+        LB.pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+        const dx = e.clientX - LB.startX;
+        const dy = e.clientY - LB.startY;
+        if (Math.abs(dx)>6 || Math.abs(dy)>6) LB.tapMoved = true;
+
+        if(LB.pointers.size>=2){
+          // Pinch = zoom centré écran
+          const pts=[...LB.pointers.values()];
+          const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y) || LB.startDist;
+          setLBScaleCentered(LB.startS * (dist/LB.startDist));
+        }else{
+          // 1 doigt = pan
+          setLBPan(LB.panStartX + dx, LB.panStartY + dy);
+        }
+        e.preventDefault();
+      });
+
+      const endPtr = e=>{
+        if(LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
+        if(LB.pointers.size===0){
+          // Clic dans le vide -> fermer
+          if (!LB.tapMoved){
+            const r = LB.img.getBoundingClientRect();
+            if (!(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom)) {
+              closeLightbox();
+            }
+          }
+          LB.startDist=0;
+        }else if(LB.pointers.size===1){
+          const p=[...LB.pointers.values()][0];
+          LB.startX=p.x; LB.startY=p.y;
+          LB.panStartX = LB.x; LB.panStartY = LB.y;
+          LB.startS = LB.s; LB.startDist=0;
+        }
+      };
+      LB.stage.addEventListener('pointerup', endPtr);
+      LB.stage.addEventListener('pointercancel', endPtr);
+      LB.stage.addEventListener('lostpointercapture', endPtr);
+
+      // Double-tap/clic = toggle fit <-> zoom 2.2x (centré écran)
+      let lastTap=0;
+      LB.stage.addEventListener('pointerdown', e=>{
+        const now=Date.now();
+        if(now-lastTap<250){
+          if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
+          else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
+          LB.tapMoved = true; // éviter la fermeture juste après
+        }
+        lastTap=now;
+      });
+
+      // Molette = zoom centré écran (desktop)
+      LB.stage.addEventListener('wheel', e=>{
+        e.preventDefault();
+        const step = (e.deltaY>0 ? -0.15 : 0.15);
+        setLBScaleCentered(LB.s + step*LB.s);
+      }, {passive:false});
+
+      // Refit sur resize
+      window.addEventListener('resize', ()=>{
+        if(LB.el.classList.contains('open')) refitLB();
+      });
+
+      return el;
+    }
+
+    function openLightboxFor(imgEl, scopeEl){
+      ensureLightbox();
+      // Images présentes dans la carte en cours
+      const list = Array.from(scopeEl.querySelectorAll('img'));
+      LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
+      LB.idx = Math.max(0, list.indexOf(imgEl));
+      LB.el.classList.add('open');
+      document.body.dataset._oriOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden'; // bloque le scroll derrière
+      LB.el.focus?.();
+      showLB(LB.idx, true);
+    }
+
+    function closeLightbox(){
+      LB.el.classList.remove('open');
+      LB.images=[]; LB.idx=0;
+      document.body.style.overflow = document.body.dataset._oriOverflow || '';
+    }
+
+    function showLB(idx, initial=false){
+      if(!LB.images.length) return;
+      LB.idx = (idx+LB.images.length) % LB.images.length;
+      const it = LB.images[LB.idx];
+      LB.img.src = it.src;
+      LB.img.alt = it.alt;
+      LB.baseW = it.w; LB.baseH = it.h;
+      if (LB.counter) LB.counter.textContent = `${LB.idx+1}/${LB.images.length}`;
+      refitLB(initial);
+    }
+
+    function refitLB(initial=false){
+      const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
+      const fit = Math.min(sw/LB.baseW, sh/LB.baseH);
+      LB.minS = fit;
+      if (initial){
+        LB.s = fit;
+        LB.x = (sw - LB.s*LB.baseW)/2;
+        LB.y = (sh - LB.s*LB.baseH)/2;
+        applyLB();
+      }else{
+        setLBScaleCentered(fit, true);
       }
-      LB.startDist=0;
-    }else if(LB.pointers.size===1){
-      const p=[...LB.pointers.values()][0];
-      LB.startX=p.x; LB.startY=p.y;
-      LB.panStartX = LB.x; LB.panStartY = LB.y;
-      LB.startS = LB.s; LB.startDist=0;
     }
-  };
-  LB.stage.addEventListener('pointerup', endPtr);
-  LB.stage.addEventListener('pointercancel', endPtr);
-  LB.stage.addEventListener('lostpointercapture', endPtr);
 
-  // Double-tap/clic = toggle fit <-> zoom 2.2x (centré écran)
-  let lastTap=0;
-  LB.stage.addEventListener('pointerdown', e=>{
-    const now=Date.now();
-    if(now-lastTap<250){
-      if (LB.s > LB.minS+0.001) setLBScaleCentered(LB.minS);
-      else setLBScaleCentered(Math.min(LB.maxS, LB.minS*2.2));
-      LB.tapMoved = true; // éviter la fermeture juste après
+    function applyLB(){
+      const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight;
+      const w=LB.s*LB.baseW, h=LB.s*LB.baseH;
+      if (w <= sw) LB.x = (sw - w)/2; else LB.x = clamp(LB.x, sw - w, 0);
+      if (h <= sh) LB.y = (sh - h)/2; else LB.y = clamp(LB.y, sh - h, 0);
+      LB.canvas.style.width = LB.baseW + 'px';
+      LB.canvas.style.height = LB.baseH + 'px';
+      LB.canvas.style.transform = `translate(${LB.x}px, ${LB.y}px) scale(${LB.s})`;
     }
-    lastTap=now;
-  });
 
-  // Molette = zoom centré écran (desktop)
-  LB.stage.addEventListener('wheel', e=>{
-    e.preventDefault();
-    const step = (e.deltaY>0 ? -0.15 : 0.15);
-    setLBScaleCentered(LB.s + step*LB.s);
-  }, {passive:false});
+    function setLBPan(nx, ny){
+      LB.x = nx; LB.y = ny;
+      applyLB();
+    }
 
-  // Refit sur resize
-  window.addEventListener('resize', ()=>{
-    if(LB.el.classList.contains('open')) refitLB();
-  });
-
-  return el;
-}
-
-function openLightboxFor(imgEl, scopeEl){
-  ensureLightbox();
-  // Images présentes dans la carte en cours
-  const list = Array.from(scopeEl.querySelectorAll('img'));
-  LB.images = list.map(i=>({src:i.currentSrc||i.src, alt:i.alt||'', w:i.naturalWidth||i.width||800, h:i.naturalHeight||i.height||600}));
-  LB.idx = Math.max(0, list.indexOf(imgEl));
-  LB.el.classList.add('open');
-  document.body.dataset._oriOverflow = document.body.style.overflow || '';
-  document.body.style.overflow = 'hidden'; // bloque le scroll derrière
-  LB.el.focus?.();
-  showLB(LB.idx, true);
-}
-
-function closeLightbox(){
-  LB.el.classList.remove('open');
-  LB.images=[]; LB.idx=0;
-  document.body.style.overflow = document.body.dataset._oriOverflow || '';
-}
-
-function showLB(idx, initial=false){
-  if(!LB.images.length) return;
-  LB.idx = (idx+LB.images.length) % LB.images.length;
-  const it = LB.images[LB.idx];
-  LB.img.src = it.src;
-  LB.img.alt = it.alt;
-  LB.baseW = it.w; LB.baseH = it.h;
-  if (LB.counter) LB.counter.textContent = `${LB.idx+1}/${LB.images.length}`;
-  refitLB(initial);
-}
-
-function refitLB(initial=false){
-  const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
-  const fit = Math.min(sw/LB.baseW, sh/LB.baseH);
-  LB.minS = fit;
-  if (initial){
-    LB.s = fit;
-    LB.x = (sw - LB.s*LB.baseW)/2;
-    LB.y = (sh - LB.s*LB.baseH)/2;
-    applyLB();
-  }else{
-    setLBScaleCentered(fit, true);
-  }
-}
-
-function applyLB(){
-  const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight;
-  const w=LB.s*LB.baseW, h=LB.s*LB.baseH;
-  if (w <= sw) LB.x = (sw - w)/2; else LB.x = clamp(LB.x, sw - w, 0);
-  if (h <= sh) LB.y = (sh - h)/2; else LB.y = clamp(LB.y, sh - h, 0);
-  LB.canvas.style.width = LB.baseW + 'px';
-  LB.canvas.style.height = LB.baseH + 'px';
-  LB.canvas.style.transform = `translate(${LB.x}px, ${LB.y}px) scale(${LB.s})`;
-}
-
-function setLBPan(nx, ny){
-  LB.x = nx; LB.y = ny;
-  applyLB();
-}
-
-function setLBScaleCentered(newS, force=false){
-  const oldS = LB.s;
-  let s = clamp(newS, LB.minS, LB.maxS);
-  if (!force && Math.abs(s-oldS)<1e-4) return;
-  const cx = LB.stage.clientWidth/2, cy = LB.stage.clientHeight/2;
-  const imgCx = (cx - LB.x) / oldS;
-  const imgCy = (cy - LB.y) / oldS;
-  LB.s = s;
-  LB.x = cx - LB.s * imgCx;
-  LB.y = cy - LB.s * imgCy;
-  applyLB();
-}
+    function setLBScaleCentered(newS, force=false){
+      const oldS = LB.s;
+      let s = clamp(newS, LB.minS, LB.maxS);
+      if (!force && Math.abs(s-oldS)<1e-4) return;
+      const cx = LB.stage.clientWidth/2, cy = LB.stage.clientHeight/2;
+      const imgCx = (cx - LB.x) / oldS;
+      const imgCy = (cy - LB.y) / oldS;
+      LB.s = s;
+      LB.x = cx - LB.s * imgCx;
+      LB.y = cy - LB.s * imgCy;
+      applyLB();
+    }
 
     // Parsing générique multi-matières
     function parseCardsRaw(raw){
@@ -1647,8 +1714,323 @@ function setLBScaleCentered(newS, force=false){
     }
     const flashcardDataEN  = parseCardsRaw(cardsRawText);
     const flashcardDataPHY = parseCardsRaw(physicsRawText);
-
+    
     // ---------- Utils ----------
+    const Media = {
+      db:null,
+      cache:new Map(), // key -> objectURL
+      async open(){
+        if (this.db) return this.db;
+        this.db = await new Promise((resolve,reject)=>{
+          const req = indexedDB.open('flash9x16_media', 1);
+          req.onupgradeneeded = e=>{
+            const db = req.result;
+            if (!db.objectStoreNames.contains('files')){
+              db.createObjectStore('files', { keyPath:'key' });
+            }
+          };
+          req.onsuccess = ()=>resolve(req.result);
+          req.onerror = ()=>reject(req.error);
+        });
+        return this.db;
+      },
+      async save(key, blob, meta={}){
+        const db = await this.open();
+        await new Promise((res,rej)=>{
+          const tx = db.transaction('files','readwrite');
+          tx.objectStore('files').put({ key, blob, meta, ts:Date.now() });
+          tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
+        });
+        data.mediaIndex = data.mediaIndex || {}; // petite index light côté localStorage
+        data.mediaIndex[key] = { name: meta.name||key, type: blob.type, size: blob.size };
+        saveData();
+      },
+      async urlFor(key){
+        if (this.cache.has(key)) return this.cache.get(key);
+        const db = await this.open();
+        const rec = await new Promise((res,rej)=>{
+          const tx = db.transaction('files','readonly');
+          const rq = tx.objectStore('files').get(key);
+          rq.onsuccess = ()=>res(rq.result);
+          rq.onerror = ()=>rej(rq.error);
+        });
+        if (!rec || !rec.blob) throw new Error('Media manquant: '+key);
+        const url = URL.createObjectURL(rec.blob);
+        this.cache.set(key, url);
+        return url;
+      },
+      revokeAll(){
+        for (const url of this.cache.values()) URL.revokeObjectURL(url);
+        this.cache.clear();
+      },
+      async clearAll(){
+        const db = await this.open();
+        await new Promise((res,rej)=>{
+          const tx = db.transaction('files','readwrite');
+          tx.objectStore('files').clear();
+          tx.oncomplete=res; tx.onerror=()=>rej(tx.error);
+        });
+        this.revokeAll();
+        data.mediaIndex = {};
+        saveData();
+      },
+      rewriteHTMLToPlaceholders(html, nameMap){
+        if (!html) return html;
+        // remplace src="fichier" par src="media://clé" si connu
+        return String(html).replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (m,prefix,src,suffix)=>{
+          const clean = src.replace(/^.*[\\\/]/, '').replace(/^_+/, '');
+          const key = nameMap[clean] || nameMap[decodeURIComponent(clean)] || null;
+          return key ? `${prefix}media://${key}${suffix}` : m;
+        });
+      },
+      async resolveMediaInElement(el){
+        const imgs = Array.from(el.querySelectorAll('img[src^="media://"]'));
+        await Promise.all(imgs.map(async img=>{
+          const key = img.getAttribute('src').replace(/^media:\/\//,'');
+          try { img.src = await Media.urlFor(key); } catch(e){ console.warn('media url fail', key, e); }
+        }));
+      }
+    };
+    const ensureSQL = (()=> {
+      let p=null;
+      return ()=> {
+        if (p) return p;
+        p = initSqlJs({ locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}` });
+        return p;
+      };
+    })();
+
+    async function importFiles(files){
+      for (const file of files){
+        const name=file.name.toLowerCase();
+        if (name.endsWith('.apkg')) await importApkg(file);
+        else if (name.endsWith('.csv') || name.endsWith('.tsv')) await importDelimited(file);
+        else if (name.endsWith('.json')) await importJSON(file);
+        else console.warn('Format non géré:', file.name);
+      }
+    }
+
+    // Remplacez votre fonction importApkg existante par celle-ci
+async function importApkg(file) {
+    try {
+        // 1) Dézipper
+        const buf = await file.arrayBuffer();
+        const zip = await JSZip.loadAsync(buf);
+
+        // 2) Media map (pas de changement ici, la méthode est déjà robuste)
+        let mediaMap = {};
+        const mediaEntry = zip.file(/^media(\.json)?$/i)[0];
+        if (mediaEntry) {
+            try {
+                mediaMap = JSON.parse(await mediaEntry.async('string'));
+            } catch (e) {
+                console.warn('media.json parse error', e);
+            }
+        }
+
+        const importId = `apkg-${slugify(file.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
+        const mediaNameToKey = {};
+        for (const [numStr, realName] of Object.entries(mediaMap)) {
+            const num = String(numStr);
+            const entry = zip.file(new RegExp(`^${num}$`))[0];
+            if (!entry) continue;
+            const blob = await entry.async('blob');
+            const key = `${importId}/${realName||num}`;
+            await Media.save(key, blob, { name: realName || num });
+            mediaNameToKey[realName] = key;
+            mediaNameToKey[num] = key;
+        }
+
+        // 3) SQLite - Recherche de la base de données de manière plus flexible
+        // MODIFICATION 1 : Regex plus tolérante
+        // Elle cherche 'collection.anki2' ou 'collection.anki21', et autorise une extension optionnelle comme '.db'
+        const colEntry = zip.file(/collection\.anki2(1|\.db)?/i)[0];
+
+        if (!colEntry) {
+            // Si on ne trouve rien, on liste les fichiers pour aider au débogage
+            const fileList = Object.keys(zip.files).join('\n - ');
+            throw new Error(`Fichier de base de données (collection.anki2 ou similaire) introuvable dans le .apkg.\n\nFichiers présents :\n - ${fileList}`);
+        }
+
+        const dbBytes = new Uint8Array(await colEntry.async('uint8array'));
+        const SQL = await ensureSQL();
+        const db = new SQL.Database(dbBytes);
+
+        // 4) Decks
+        let deckById = {};
+        try {
+            const res = db.exec('select decks from col limit 1');
+            if (res && res[0] && res[0].values && res[0].values[0] && res[0].values[0][0]) {
+                deckById = JSON.parse(res[0].values[0][0] || '{}');
+            }
+        } catch (e) {
+            console.warn('col.decks JSON parse error', e);
+        }
+
+        // 5) Cartes (join cards+notes)
+        // MODIFICATION 2 : Gestion d'erreur améliorée pour la requête SQL
+        let rows;
+        try {
+            const q = `select cards.id as cid, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id = cards.nid`;
+            rows = db.exec(q);
+        } catch(e) {
+            // Si la requête échoue, c'est probablement que les noms des tables/colonnes sont différents.
+            // On aide l'utilisateur en listant les tables disponibles.
+            const tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+            const tableNames = tablesRes[0].values.map(v => v[0]).join(', ');
+            throw new Error(`Erreur lors de la lecture des cartes. Le format de la base de données est peut-être différent.\n\nErreur technique : ${e.message}\n\nTables trouvées : ${tableNames}`);
+        }
+
+        if (!rows || !rows[0] || !rows[0].values.length) {
+            db.close();
+            // Pas besoin de lancer une erreur, on peut juste importer un deck vide
+             console.warn('Aucune carte trouvée dans la base de données.');
+        }
+        
+        const cols = rows[0].columns;
+        const vals = rows[0].values;
+        const byDeck = new Map();
+
+        for (const r of vals) {
+            const row = Object.fromEntries(cols.map((c, i) => [c, r[i]]));
+            const did = String(row.did);
+            const deckName = (deckById[did]?.name) || (`Deck ${did}`);
+            const name = deckName.replace(/::/g, ' › ');
+            
+            // Le séparateur \x1f est un standard très fort d'Anki, peu de chances qu'il change
+            const flds = String(row.flds || '').split('\x1f');
+            const frontRaw = flds[0] || '';
+            const backRaw = flds[1] || '';
+            
+            const front = Media.rewriteHTMLToPlaceholders(frontRaw, mediaNameToKey);
+            const back = Media.rewriteHTMLToPlaceholders(backRaw, mediaNameToKey);
+            
+            const chapArr = byDeck.get(name) || [];
+            chapArr.push({ id: String(row.cid), front, back, deckName: name });
+            byDeck.set(name, chapArr);
+        }
+        db.close();
+
+        if (byDeck.size === 0) {
+            alert("Avertissement : Le fichier .apkg a été traité, mais aucune carte n'a pu être extraite. Le format est peut-être non standard.");
+            return; // On arrête ici pour ne pas créer de sujet vide
+        }
+
+        // 6) Construire un Subject + chapitres (pas de changement ici)
+        const subjectId = `import-${slugify(file.name.replace(/\.[^.]+$/,''))}`;
+        const chapters = [];
+        for (const [name, arr] of byDeck.entries()) {
+            const cards = arr.map(r => ({
+                id: `${slugify(name)}-${r.id}`,
+                front: r.front, back: r.back, grade: 'unseen',
+                timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0,
+                perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0
+            }));
+            const ch = {
+                id: 'chap-' + slugify(name),
+                title: name,
+                description: `${emojiFor(name)||'📦'} ${name}`,
+                settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false },
+                filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } },
+                stats: {
+                    gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 },
+                    totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {}
+                },
+                cards
+            };
+            chapters.push(ch);
+        }
+        
+        const subject = { id: subjectId, title: file.name.replace(/\.[^.]+$/, ''), chapters, imported: true };
+        chapters.forEach(ch => ch.imported = true);
+
+        data.subjects = data.subjects || [];
+        data.subjects.push(subject);
+        data.app.currentSubjectId = subjectId;
+        saveData();
+
+    } catch (err) {
+        // MODIFICATION 3 : On propage l'erreur pour qu'elle soit affichée à l'utilisateur
+        console.error("Erreur détaillée lors de l'import APGK:", err);
+        throw err; // On relance l'erreur pour la catcher plus haut
+    }
+}
+
+    async function importDelimited(file){
+      const text = await file.text();
+      const isTSV = file.name.toLowerCase().endsWith('.tsv');
+      const sep = isTSV ? '\t' : (text.includes('\t') ? '\t' : (text.includes(';')?';':','));
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      let header = lines[0].split(sep).map(s=>s.trim().toLowerCase());
+      let start = 0;
+      let hasHeader = header.includes('front') && header.includes('back');
+      if (!hasHeader){
+        header = ['front','back','chapter'];
+      } else {
+        start = 1;
+      }
+      const recs = [];
+      for (let i=start;i<lines.length;i++){
+        const cols = lines[i].split(sep);
+        const row = Object.fromEntries(header.map((h,j)=>[h, cols[j]||'']));
+        recs.push({
+          front: row.front||cols[0]||'',
+          back: row.back||cols[1]||'',
+          chapter: row.chapter||'Général'
+        });
+      }
+      await importAsSimpleSubject(file.name.replace(/\.[^.]+$/,''), recs);
+    }
+
+    async function importJSON(file){
+      const obj = JSON.parse(await file.text());
+      if (Array.isArray(obj)) {
+        await importAsSimpleSubject(file.name.replace(/\.[^.]+$/,''), obj);
+      } else if (obj && Array.isArray(obj.cards)){
+        await importAsSimpleSubject(obj.subject||file.name.replace(/\.[^.]+$/,''), obj.cards);
+      } else {
+        throw new Error('JSON non reconnu');
+      }
+    }
+
+    async function importAsSimpleSubject(subjectName, list){
+      const byChap = {};
+      list.forEach(x=>{
+        const ch = (x.chapter||'Général').trim() || 'Général';
+        (byChap[ch]=byChap[ch]||[]).push({
+          front: Media.rewriteHTMLToPlaceholders(String(x.front||''), {}),
+          back: Media.rewriteHTMLToPlaceholders(String(x.back||''), {})
+        });
+      });
+      const subjectId = `import-${slugify(subjectName)}-${Date.now()}`;
+      const chapters = Object.entries(byChap).map(([name, arr])=>{
+        const cards = arr.map((r,i)=>({
+          id:`${slugify(name)}-${i}-${Date.now()}`,
+          front:r.front, back:r.back, grade:'unseen',
+          timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0,
+          perfEma:0.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
+        }));
+        return {
+          id:'chap-'+slugify(name),
+          title:name,
+          description:`📦 ${name}`,
+          settings:{sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:false},
+          filters:{grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true}},
+          stats:{
+            gradeCounts:{unseen:cards.length,echec:0,difficile:0,bien:0,facile:0},
+            totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}
+          },
+          cards
+        };
+      });
+      const subject = { id:subjectId, title:subjectName, chapters, imported:true };
+      chapters.forEach(ch=> ch.imported = true);
+      data.subjects.push(subject);
+      data.app.currentSubjectId = subjectId;
+      saveData();
+      goDeck(false);
+    }
+
     const $ = s=>document.querySelector(s);
     const $$ = s=>Array.from(document.querySelectorAll(s));
     const ChartHit = {}; // hitmap donut
@@ -1737,7 +2119,7 @@ function setLBScaleCentered(newS, force=false){
 
     function buildSubjectFromList(title, list){
       const built = buildChaptersFromFlashcards(list);
-      return { id: slugify(title), title, chapters: built.chapters };
+      return { id: slugify(title), title, chapters: built.chapters, groups: [] };
     }
 
     function buildCanonicalSubjects(){
@@ -1754,7 +2136,7 @@ function setLBScaleCentered(newS, force=false){
           if (Array.isArray(parsed.subjects)) return parsed;
           if (Array.isArray(parsed.chapters)) {
             return {
-              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters }],
+              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters, groups:[] }],
               app: parsed.app || { theme:'dark', prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }, currentSubjectId:'anglais' }
             };
           }
@@ -1768,7 +2150,7 @@ function setLBScaleCentered(newS, force=false){
           if (Array.isArray(parsed.subjects)) return parsed;
           if (Array.isArray(parsed.chapters)) {
             return {
-              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters }],
+              subjects: [{ id:'anglais', title:'Anglais', chapters: parsed.chapters, groups:[] }],
               app: parsed.app || { theme:'dark', prefs:{ fsTerm:22, fsDef:24, accent:'indigo', showEmoji:true, radius:14 }, currentSubjectId:'anglais' }
             };
           }
@@ -1818,12 +2200,138 @@ function setLBScaleCentered(newS, force=false){
       const s=getCurrentSubject();
       return s?.chapters || [];
     }
-    function getChapter(id){
-      return getCurrentChapters().find(c=>c.id===id);
+
+    // ===== GROUPES ("fichiers") =====
+    function getSubject(){ return getCurrentSubject(); }
+    function ensureGroups(subj){ if (!Array.isArray(subj.groups)) subj.groups = []; return subj.groups; }
+    function findGroupById(subj, gid){ return ensureGroups(subj).find(g=>g.id===gid)||null; }
+    function findGroupByChapter(subj, chapId){ return ensureGroups(subj).find(g=>g.chapIds.includes(chapId))||null; }
+
+    function groupEmojiList(subj, group){
+      const set = new Set();
+      group.chapIds.forEach(id=>{
+        const ch = subj.chapters.find(c=>c.id===id);
+        const em = ch ? emojiFor(ch.title) : '';
+        if (em) set.add(em);
+      });
+      return Array.from(set).join(', ');
     }
 
+    function buildGroupStats(subj, group){
+      const chs = group.chapIds.map(id=>subj.chapters.find(c=>c.id===id)).filter(Boolean);
+      const counts={unseen:0,echec:0,difficile:0,bien:0,facile:0};
+      chs.forEach(ch=>{
+        const g=getLiveGradeCounts(ch);
+        counts.unseen+=g.unseen; counts.echec+=g.echec; counts.difficile+=g.difficile; counts.bien+=g.bien; counts.facile+=g.facile;
+      });
+      const stats={ totalReviews:0, dailyReviews:{}, dailyDurMs:{}, dailyDurCount:{}, dailyChanges:{} };
+      const base=new Date();
+      stats.totalReviews = chs.reduce((s,ch)=>s+(ch.stats.totalReviews||0),0);
+      for(let i=0;i<60;i++){
+        const d=new Date(base); d.setDate(base.getDate()-i); const k=dateKey(d);
+        stats.dailyReviews[k]=chs.reduce((s,ch)=>s+(ch.stats.dailyReviews[k]||0),0);
+        stats.dailyDurMs[k]=chs.reduce((s,ch)=>s+(ch.stats.dailyDurMs[k]||0),0);
+        stats.dailyDurCount[k]=chs.reduce((s,ch)=>s+(ch.stats.dailyDurCount[k]||0),0);
+        const agg = chs.reduce((acc,ch)=>{ const v=ch.stats.dailyChanges[k];
+        if(v){acc.changed+=v.changed||0; acc.total+=v.total||0;} return acc;},{changed:0,total:0});
+        stats.dailyChanges[k]=agg;
+      }
+      return { counts, stats };
+    }
+
+    function buildVirtualFromGroup(subj, group){
+      const chs = group.chapIds.map(id=>subj.chapters.find(c=>c.id===id)).filter(Boolean);
+      const cards=[];
+      chs.forEach(ch=>{
+        ch.cards.forEach(c=>{
+          cards.push({
+            id:`virt-${ch.id}-${c.id}`,
+            front:c.front, back:c.back, grade:c.grade||'unseen',
+            timesReviewed:c.timesReviewed||0, lastReviewed:c.lastReviewed||0, lastMs:c.lastMs||0, avgMs:c.avgMs||0,
+            perfEma:c.perfEma||0.5, ef:c.ef||2.5, intervalDays:c.intervalDays||0, dueAt:c.dueAt||0,
+            streak:c.streak||0, successes:c.successes||0, failures:c.failures||0,
+            _origin: { chapId: ch.id, cardId: c.id }
+          });
+        });
+      });
+      const avgSize = Math.round(chs.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/Math.max(1,chs.length))||10;
+      const avgGoal = Math.round(chs.reduce((s,ch)=>s+(ch.settings.dailyGoal||10),0)/Math.max(1,chs.length))||10;
+      const { counts, stats } = buildGroupStats(subj, group);
+      const title = `Fichier (${groupEmojiList(subj, group)})`;
+      return {
+        id: 'group-'+group.id,
+        title, description: title,
+        virtual:true, _ids: group.chapIds.slice(),
+        settings:{ sessionSize:avgSize, dailyGoal:avgGoal, reviewOrder:'front-first', langSwap:false },
+        filters:{ grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true} },
+        stats: { gradeCounts: counts, ...stats },
+        cards
+      };
+    }
+
+    function addGroup(subj, chapIds){
+      const ids = Array.from(new Set(chapIds)).filter(Boolean);
+      if (ids.length<2) return null;
+      const id = 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      const g = { id, chapIds: ids, createdAt: Date.now() };
+      ensureGroups(subj).push(g); return g;
+    }
+    function addToGroup(subj, groupId, chapId){
+      const g = findGroupById(subj, groupId); if(!g) return;
+      if(!g.chapIds.includes(chapId)) g.chapIds.push(chapId);
+    }
+    function removeFromGroup(subj, groupId, chapIds){
+      const g = findGroupById(subj, groupId); if(!g) return;
+      g.chapIds = g.chapIds.filter(id=>!chapIds.includes(id));
+    }
+    function deleteGroup(subj, groupId){
+      subj.groups = ensureGroups(subj).filter(g=>g.id!==groupId);
+    }
+    function ensureValidGroups(subj){
+      const set = new Set((subj.chapters||[]).map(c=>c.id));
+      subj.groups = ensureGroups(subj).map(g=>({...g, chapIds: g.chapIds.filter(id=>set.has(id))}))
+        .filter(g=>g.chapIds.length>=2);
+    }
+    
     // ---------- État UI + Nav ----------
     const State = {view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey: null};
+    State.virtualChapter = null;
+
+    // getChapter doit aussi renvoyer un chapitre virtuel si actif
+    const _getChapterReal = (id) => getCurrentChapters().find(c=>c.id===id);
+    function getChapter(id){
+      if (State.virtualChapter && State.virtualChapter.id===id) return State.virtualChapter;
+      return _getChapterReal(id);
+    }
+
+    function deleteImportedChapter(chId){
+      const subj = getCurrentSubject();
+      const idx = subj?.chapters?.findIndex(c=>c.id===chId) ?? -1;
+      if (idx<0) return false;
+      const ch = subj.chapters[idx];
+      if (!ch.imported){ alert('Seuls les chapitres importés peuvent être supprimés.'); return false; }
+      if (!confirm(`Supprimer le chapitre "${ch.title}" ?`)) return false;
+
+      // retirer des groupes
+      ensureGroups(subj).forEach(g=>{
+        g.chapIds = g.chapIds.filter(id=>id!==chId);
+      });
+      ensureValidGroups(subj);
+
+      subj.chapters.splice(idx,1);
+
+      // supprimer le sujet s'il devient vide (pour sujets importés)
+      if (subj.chapters.length===0 && subj.imported){
+        data.subjects = (data.subjects||[]).filter(s=>s.id!==subj.id);
+        if (data.app.currentSubjectId === subj.id){
+          data.app.currentSubjectId = data.subjects[0]?.id || null;
+        }
+      }
+      saveData();
+      return true;
+    }
+
+
     const Nav = {
       stack:[],
       push(){
@@ -1834,6 +2342,7 @@ function setLBScaleCentered(newS, force=false){
       },
       back(){
         if(!this.stack.length) return;
+        State.virtualChapter = null; // Important: quitter un chapitre virtuel le détruit
         const prev=this.stack.pop();
         State.view=prev.view; State.chapterId=prev.chapterId; State.review=prev.review;
         State.cardsIndex=prev.cardsIndex||0; State.dailyKey=prev.dailyKey||null;
@@ -1924,16 +2433,11 @@ function setLBScaleCentered(newS, force=false){
       if(State.view==='review' && State.review && State.review.end==null){
         if(!confirm('Quitter la révision en cours ?')) return;
       }
-      if(State.view!=='chapter'){
-        if(State.chapterId) return goChapter(State.chapterId,false);
-        return goDeck(false);
-      }else{
-        return goDeck(false);
-      }
+      Nav.back();
     });
     $('#cardsBtn').addEventListener('click',()=>goCards(State.chapterId));
     $('#settingsBtn').addEventListener('click',()=>openSettings(State.chapterId));
-    startReviewBtn.addEventListener('click',()=>startReview(State.chapterId));
+    startReviewBtn.addEventListener('click',() => startReview(State.chapterId));
 
     // ---------- Rendu ----------
     function setTopbar({title,showBack}={}){
@@ -1973,6 +2477,7 @@ function setLBScaleCentered(newS, force=false){
 
     // Deck
     function goDeck(push=true){
+      Media.revokeAll();
       if(push) Nav.push();
       State.view='deck';
       State.chapterId=null;
@@ -1982,51 +2487,381 @@ function setLBScaleCentered(newS, force=false){
       hideReviewActionsBar();
       renderDeck();
     }
+    
+    // ====================================================================
+    // MODIFICATION: renderDeck() entièrement révisée
+    // ====================================================================
+    function renderDeck() {
+    const v = $('#view');
+    const subj = getCurrentSubject();
+    if (!subj) {
+        v.innerHTML = `<div class="card center muted">Aucun deck sélectionné.</div>`;
+        return;
+    }
+    
+    const groups = ensureGroups(subj);
+    const allChapters = (subj.chapters || []).slice();
 
-    function renderDeck(){
-      const v=$('#view');
-      const chapters=getCurrentChapters();
+    const chapterIdsInGroups = new Set(groups.flatMap(g => g.chapIds));
 
-      v.innerHTML = `
-        <div class="card flexcol" style="flex:1;">
-          <div class="section-title">Chapitres</div>
-          <div id="deckList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
-            <div class="list">
-              ${chapters.map(ch=>{
-                const {unseen,echec,difficile,bien,facile}=getLiveGradeCounts(ch);
-                const total=ch.cards?.length??0;
-                const viewed=Math.max(0,total-unseen);
-                const pct= total ? Math.round((viewed/total)*100):0;
-                return `
-                  <div class="deck-item" data-id="${ch.id}">
-                    <div style="min-width:0">
-                      <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
-                        ${ch.description||ch.title}
+    v.innerHTML = `
+    <div class="card flexcol" style="flex:1;">
+      <div class="deck-head">
+        <div class="section-title">Chapitres & Fichiers</div>
+        <div class="actions">
+          <button class="btn btn--ghost btn--tiny" id="importBtn">Importer</button>
+          <input id="importInput" type="file" class="hidden" accept=".apkg,.csv,.tsv,.json" multiple />
+        </div>
+      </div>
+
+      <div id="deckList" class="scroll-y" style="flex:1; min-height:0; padding-right:4px;">
+        <div class="list">
+          
+          <!-- Rendu des Fichiers (Groupes) -->
+          ${groups.map(g => {
+            const { counts } = buildGroupStats(subj, g);
+            const total = counts.unseen + counts.echec + counts.difficile + counts.bien + counts.facile;
+            const viewed = Math.max(0, total - counts.unseen);
+            const pct = total ? Math.round(viewed * 100 / total) : 0;
+            const emojis = groupEmojiList(subj, g);
+
+            // --- NOUVELLE LOGIQUE : Créer la chaîne de caractères avec les noms des chapitres ---
+            const chapterNamesList = g.chapIds
+                .map(chapId => {
+                    const chapter = allChapters.find(ch => ch.id === chapId);
+                    return chapter ? chapter.title : null; // Récupère le titre ou null si le chapitre n'est pas trouvé
+                })
+                .filter(Boolean) // Retire les éventuels chapitres non trouvés (null)
+                .join(', '); // Assemble les noms avec une virgule
+
+            return `
+              <div class="deck-item" data-type="group" data-id="${g.id}">
+                <div class="slide">
+                  <div style="min-width:0; flex:1">
+                    <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
+                      📁 Fichier (${emojis})
+                    </div>
+                    
+                    <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
+                      <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
+                      <span class="chip">🟥 ${counts.echec}</span>
+                      <span class="chip">🟨 ${counts.difficile}</span>
+                      <span class="chip">🟦 ${counts.bien}</span>
+                      <span class="chip">🟩 ${counts.facile}</span>
+                      <span class="folder-badge">• ${g.chapIds.length} chap.</span>
+                    </div>
+
+                    <!-- MODIFICATION : Ajout de la liste des noms de chapitres ici -->
+                    <div class="muted chapter-list mt6" title="${chapterNamesList}">
+                      ${chapterNamesList}
+                    </div>
+
+                  </div>
+                  <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+
+          <!-- Rendu des Chapitres non groupés -->
+          ${allChapters
+            .filter(ch => !chapterIdsInGroups.has(ch.id))
+            .map(ch => {
+              const counts = getLiveGradeCounts(ch);
+              const total = ch.cards?.length ?? 0;
+              const viewed = Math.max(0, total - counts.unseen);
+              const pct = total ? Math.round((viewed / total) * 100) : 0;
+              
+              const deleteButtonHTML = ch.imported 
+                ? `<div class="right-action"><button class="btn btn--solid btn--red btn--tiny deleteChBtn" data-chap-id="${ch.id}">Supprimer</button></div>` 
+                : '';
+
+              return `
+                <div class="deck-item" data-type="chapter" data-id="${ch.id}">
+                  ${deleteButtonHTML}
+                  <div class="slide">
+                    <div style="min-width:0; flex:1">
+                      <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
+                        ${ch.description || ch.title}
                       </div>
                       <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
                         <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
-                        <span class="chip" title="Échec">🟥 ${echec}</span>
-                        <span class="chip" title="Difficile">🟨 ${difficile}</span>
-                        <span class="chip" title="Bien">🟦 ${bien}</span>
-                        <span class="chip" title="Facile">🟩 ${facile}</span>
+                        <span class="chip">🟥 ${counts.echec}</span>
+                        <span class="chip">🟨 ${counts.difficile}</span>
+                        <span class="chip">🟦 ${counts.bien}</span>
+                        <span class="chip">🟩 ${counts.facile}</span>
                       </div>
                     </div>
-                    <div class="muted" style="font-size:18px">›</div>
+                    <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
                   </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
+                </div>
+              `;
+            }).join('')}
         </div>
-      `;
-      $$('.deck-item').forEach(el=>el.addEventListener('click',()=>goChapter(el.getAttribute('data-id'))));
+      </div>
+    </div>
+    `;
+
+    // Logique pour le bouton d'importation (inchangée)
+    const importBtn = $('#importBtn');
+    const importInput = $('#importInput');
+    if (importBtn && importInput) {
+        importBtn.addEventListener('click', () => importInput.click());
+        importInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length) return;
+            try {
+                await Promise.all(files.map(file => importFiles([file])));
+                alert('Import terminé ✅');
+                saveData();
+                goDeck(false);
+            } catch (err) {
+                console.error(err);
+                alert('Erreur lors de l\'importation : ' + (err?.message || 'Erreur inconnue.'));
+            } finally {
+                importInput.value = '';
+            }
+        });
     }
 
+    // Attacher les gestionnaires d'événements (inchangé)
+    bindDeckInteractions();
+}
+    
+    // ====================================================================
+    // MODIFICATION: bindDeckInteractions() entièrement réécrite
+    // ====================================================================
+    function bindDeckInteractions() {
+    const list = $('#deckList');
+    if (!list) return;
+    const subj = getCurrentSubject();
+
+    list.addEventListener('click', (e) => {
+        if (e.target.matches('.deleteChBtn')) {
+            e.stopPropagation();
+            const id = e.target.getAttribute('data-chap-id');
+            if (deleteImportedChapter(id)) renderDeck();
+        }
+    });
+
+    const items = $$('.deck-item');
+    items.forEach(el => {
+        el.style.webkitUserSelect = 'none';
+        el.style.userSelect = 'none';
+        el.style.webkitTouchCallout = 'none';
+
+        const type = el.getAttribute('data-type');
+        const id = el.getAttribute('data-id');
+        
+        let sx = 0, sy = 0, dx = 0, dy = 0;
+        let interactionState = 'idle';
+        let longPressTimer = null;
+        let ghost = null;
+        
+        let animationFrameId = null;
+        let scrollDirection = 0;
+        const scrollSpeed = 6;
+        const scrollContainer = list;
+
+        const autoScroll = () => {
+            if (scrollDirection !== 0) {
+                scrollContainer.scrollTop += scrollSpeed * scrollDirection;
+            }
+            if (interactionState === 'dragging') {
+                animationFrameId = requestAnimationFrame(autoScroll);
+            }
+        };
+
+        const startDrag = (e) => {
+            if (interactionState !== 'pressed' || type !== 'chapter') return;
+            interactionState = 'dragging';
+            el.classList.add('dragging-origin');
+            document.body.classList.add('dragging-active');
+            scrollContainer.classList.add('scroll-lock');
+            ghost = el.cloneNode(true);
+            ghost.classList.add('drag-ghost');
+            ghost.style.width = el.getBoundingClientRect().width + 'px';
+            document.body.appendChild(ghost);
+            moveGhost(e.clientX, e.clientY);
+            animationFrameId = requestAnimationFrame(autoScroll);
+        };
+        
+        const moveGhost = (x, y) => {
+            if (!ghost) return;
+            ghost.style.transform = `translate(${x - 75}px, ${y - 75}px) scale(1.02)`;
+        };
+
+        const onDown = e => {
+            // NOTE : On retire e.preventDefault() d'ici pour permettre le scroll natif !
+            if (e.target.closest('button')) return;
+            
+            sx = e.clientX;
+            sy = e.clientY;
+            dx = 0;
+            dy = 0;
+            interactionState = 'pressed';
+            el.setPointerCapture?.(e.pointerId);
+
+            clearTimeout(longPressTimer);
+            if (type === 'chapter') {
+                longPressTimer = setTimeout(() => startDrag(e), 500);
+            } else if (type === 'group') {
+                longPressTimer = setTimeout(() => {
+                    interactionState = 'idle';
+                    handleDecompose(id);
+                }, 700);
+            }
+        };
+
+        const onMove = e => {
+            if (interactionState === 'idle' || interactionState === 'swiping') return;
+            
+            dx = e.clientX - sx;
+            dy = e.clientY - sy;
+
+            if (interactionState === 'pressed' && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+                clearTimeout(longPressTimer);
+                
+                // Si le mouvement est principalement horizontal, on le traite comme un swipe
+                if (Math.abs(dx) > Math.abs(dy) * 1.5) {
+                    if (dx < 0 && el.querySelector('.right-action')) {
+                        interactionState = 'swiping';
+                        el.classList.add('reveal-delete');
+                        e.preventDefault(); // On bloque le scroll UNIQUEMENT si c'est un swipe horizontal
+                    }
+                }
+            }
+            
+            if (interactionState === 'dragging') {
+                e.preventDefault(); // On bloque le scroll UNIQUEMENT si on est en train de glisser
+                moveGhost(e.clientX, e.clientY);
+                const rect = scrollContainer.getBoundingClientRect();
+                const edgeSize = rect.height * 0.20;
+
+                if (e.clientY < rect.top + edgeSize) scrollDirection = -1;
+                else if (e.clientY > rect.bottom - edgeSize) scrollDirection = 1;
+                else scrollDirection = 0;
+
+                $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
+                const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
+                if (target && target !== el) {
+                    target.classList.add('drop-target');
+                }
+            }
+        };
+
+        const onUp = e => {
+            clearTimeout(longPressTimer);
+
+            // --- MODIFICATION CLÉ : Détecter un vrai clic ---
+            // On calcule la distance totale parcourue par le doigt.
+            const distanceMoved = Math.hypot(dx, dy);
+            const CLICK_THRESHOLD = 10; // 10 pixels de tolérance
+
+            if (interactionState === 'dragging') {
+                const targetEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
+                if (targetEl && targetEl !== el) {
+                    const tType = targetEl.getAttribute('data-type');
+                    const tId = targetEl.getAttribute('data-id');
+                    handleDrop(subj, { type, id }, { type: tType, id: tId });
+                }
+            } else if (interactionState === 'pressed' && distanceMoved < CLICK_THRESHOLD) {
+                // C'est un vrai clic seulement si le doigt n'a pas bougé de plus de 10px.
+                if (type === 'group') openGroup(subj, id);
+                else goChapter(id);
+            }
+            // Si le doigt a bougé de plus de 10px (pour scroller), on ne fait rien, 
+            // laissant le navigateur gérer le scroll.
+            
+            cancelAnimationFrame(animationFrameId);
+            scrollDirection = 0;
+            scrollContainer.classList.remove('scroll-lock');
+
+            interactionState = 'idle';
+            if (ghost) ghost.remove();
+            ghost = null;
+            el.classList.remove('dragging-origin');
+            document.body.classList.remove('dragging-active');
+            $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
+        };
+
+        el.addEventListener('pointerdown', onDown);
+        el.addEventListener('pointermove', onMove);
+        el.addEventListener('pointerup', onUp);
+        el.addEventListener('pointercancel', onUp);
+        el.addEventListener('contextmenu', e => e.preventDefault());
+    });
+
+    list.addEventListener('scroll', () => {
+        $$('.deck-item.reveal-delete').forEach(n => n.classList.remove('reveal-delete'));
+    }, { passive: true });
+}
+
+    // NOUVELLE FONCTION: Gérer la décomposition d'un fichier
+    function handleDecompose(groupId) {
+        const subj = getCurrentSubject();
+        const group = findGroupById(subj, groupId);
+        if (!group) return;
+        
+        if (confirm("Décomposer ce fichier ? Les chapitres deviendront indépendants.")) {
+            deleteGroup(subj, groupId); // `deleteGroup` retire juste le groupe, les chapitres réapparaîtront
+            saveData();
+            renderDeck();
+        }
+    }
+
+
+    function handleDrop(subj, src, dst){
+      // src: {type:'chapter', id:chapId}, dst: {type:'chapter'|'group', id}
+      if (src.type!=='chapter') return;
+      const srcG = findGroupByChapter(subj, src.id);
+
+      if (dst.type==='chapter'){
+        if (src.id === dst.id) return;
+        const dstG = findGroupByChapter(subj, dst.id);
+        if (!srcG && !dstG){
+          // créer un nouveau fichier avec 2 chapitres
+          addGroup(subj, [src.id, dst.id]);
+        }else if (srcG && !dstG){
+          // ajouter dst au fichier source
+          addToGroup(subj, srcG.id, dst.id);
+        }else if (!srcG && dstG){
+          // ajouter src au fichier cible
+          addToGroup(subj, dstG.id, src.id);
+        }else if (srcG && dstG && srcG.id!==dstG.id){
+          // déplacer src dans le fichier de dst
+          removeFromGroup(subj, srcG.id, [src.id]);
+          addToGroup(subj, dstG.id, src.id);
+          ensureValidGroups(subj);
+        }
+      }else if (dst.type==='group'){
+        const g = findGroupById(subj, dst.id);
+        if (!g) return;
+        const srcG = findGroupByChapter(subj, src.id);
+        if (srcG && srcG.id!==g.id){
+          removeFromGroup(subj, srcG.id, [src.id]);
+          ensureValidGroups(subj);
+        }
+        addToGroup(subj, g.id, src.id);
+      }
+      ensureValidGroups(subj);
+      saveData();
+      renderDeck();
+    }
+
+    function openGroup(subj, groupId){
+      const g = findGroupById(subj, groupId); if(!g) return;
+      State.virtualChapter = buildVirtualFromGroup(subj, g);
+      goChapter(State.virtualChapter.id);
+    }
+    
     // Chapter
     function goChapter(chapterId,push=true){
+      Media.revokeAll();
       if(push) Nav.push();
       State.view='chapter'; State.chapterId=chapterId;
       const chap=getChapter(chapterId);
+      if(!chap) { console.warn("Chapitre non trouvé:", chapterId); Nav.back(); return; }
       setTopbar({title:chap?.title||'Statistiques'});
       setBottomVisibility({
         actions:true, revision:true, sessionSize:chap.settings.sessionSize,
@@ -2053,7 +2888,7 @@ function setLBScaleCentered(newS, force=false){
 
       v.innerHTML = `
         <div class="card" style="flex:1; display:flex; flex-direction:column;">
-          <div class="section-title">${emoji?emoji+' ':''}Statistiques</div>
+          <div class="section-title">${chap.virtual ? chap.description : (emoji?emoji+' ':'')}Statistiques</div>
           <div class="kpi">
             <div class="k"><div class="label">Cartes non vues</div><div class="value">${unseen}</div></div>
             <div class="k"><div class="label">Total cartes</div><div class="value">${chap.cards.length}</div></div>
@@ -2137,17 +2972,18 @@ function setLBScaleCentered(newS, force=false){
     }
 
     // Cards
-    function goCards(chapterId,push=true){
+    async function goCards(chapterId,push=true){
+      Media.revokeAll();
       if(push) Nav.push();
       State.view='cards'; State.chapterId=chapterId;
       const chap=getChapter(chapterId);
       setTopbar({title:`${chap.title} • Cartes`});
       setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
-      renderCards(chapterId);
+      await renderCards(chapterId);
     }
 
-    function renderCards(chapterId){
+    async function renderCards(chapterId){
       const v=$('#view'); const chap=getChapter(chapterId);
       const sel=chap.filters.grades||{};
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
@@ -2176,7 +3012,8 @@ function setLBScaleCentered(newS, force=false){
         </div>
       `;
 
-      typesetLatex(v);
+      await Media.resolveMediaInElement(v);
+      await typesetLatex(v);
       const grid=$('#cardsGrid');
       grid.addEventListener('click',e=>{
         const block=e.target.closest('.card-block'); if(!block) return;
@@ -2184,8 +3021,28 @@ function setLBScaleCentered(newS, force=false){
         block.classList.toggle('flipped');
       });
     }
+    
     // Daily Activity View
-    function goDaily(chapterId, dayKey, push=true){
+    function getCombinedDailyLogFor(chap, dayKey){
+      const logs=[];
+      (chap._ids||[]).forEach(cid=>{
+        const real = _getChapterReal(cid);
+        const arr = real?.stats?.dailyLog?.[dayKey] || [];
+        arr.forEach(e=> logs.push({ ...e, _chapId: cid }));
+      });
+      return logs;
+    }
+    function getCombinedDailyLogForGroup(subj, group, dayKey){
+      const logs=[];
+      (group.chapIds||[]).forEach(cid=>{
+        const ch = subj.chapters.find(c=>c.id===cid);
+        const arr = ch?.stats?.dailyLog?.[dayKey] || [];
+        arr.forEach(e=> logs.push({ ...e, _chapId: cid }));
+      });
+      return logs;
+    }
+    async function goDaily(chapterId, dayKey, push=true){
+      Media.revokeAll();
       if (push) Nav.push();
       State.view='daily';
       State.chapterId=chapterId;
@@ -2194,12 +3051,21 @@ function setLBScaleCentered(newS, force=false){
       setTopbar({ title:`Activité • ${formatDayKeyFR(dayKey)}` });
       setBottomVisibility({ actions:false, revision:false });
       hideReviewActionsBar();
-      renderDaily(chap, dayKey);
+      await renderDaily(chap, dayKey);
     }
 
-    function renderDaily(chap, dayKey){
+    async function renderDaily(chap, dayKey){
+      const subj = getCurrentSubject();
+      let log;
+      if (chap.virtual && chap.id.startsWith('group-')){
+        const gid = chap.id.slice('group-'.length);
+        const g = findGroupById(subj, gid);
+        log = g ? getCombinedDailyLogForGroup(subj, g, dayKey) : [];
+      } else {
+        log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
+      }
+
       const v = document.getElementById('view');
-      const log = (chap.stats.dailyLog && chap.stats.dailyLog[dayKey]) ? chap.stats.dailyLog[dayKey].slice() : [];
       if (!log.length){
         v.innerHTML = `
           <div class="card" style="flex:1; display:flex; flex-direction:column;">
@@ -2213,7 +3079,7 @@ function setLBScaleCentered(newS, force=false){
       log.sort((a,b)=>a.ts-b.ts);
       const byCard = new Map();
       for (const e of log){
-        const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[] };
+        const curr = byCard.get(e.cardId) || { firstPrev:null, firstTs:Infinity, lastNext:null, lastTs:-Infinity, events:[], _chapId: e._chapId };
         if (e.ts < curr.firstTs){ curr.firstTs = e.ts; curr.firstPrev = e.prev; }
         if (e.ts > curr.lastTs) { curr.lastTs = e.ts; curr.lastNext = e.next; }
         curr.events.push(e);
@@ -2222,10 +3088,11 @@ function setLBScaleCentered(newS, force=false){
 
       const rows = [];
       for (const [cardId, info] of byCard){
-        const card = chap.cards.find(c=>c.id===cardId);
+        const baseChap = chap.virtual ? _getChapterReal(info._chapId) : chap;
+        const card = baseChap.cards.find(c=>c.id===cardId);
         if (!card) continue;
 
-        const {frontText, backText} = getCardSides(card, chap);
+        const {frontText, backText} = getCardSides(card, baseChap);
         rows.push({
           id: cardId,
           term: preprocessLaTeX(frontText),
@@ -2238,9 +3105,7 @@ function setLBScaleCentered(newS, force=false){
       rows.sort((a,b)=>{
         const ca = (a.before!==a.after), cb=(b.before!==b.after);
         if (ca!==cb) return ca? -1: 1;
-        const cardA = chap.cards.find(c=>c.id===a.id);
-        const cardB = chap.cards.find(c=>c.id===b.id);
-        return cardA.front.localeCompare(cardB.front, 'fr');
+        return a.term.localeCompare(b.term, 'fr');
       });
 
       v.innerHTML = `
@@ -2266,7 +3131,8 @@ function setLBScaleCentered(newS, force=false){
         </div>
       `;
 
-      typesetLatex(v);
+      await Media.resolveMediaInElement(v);
+      await typesetLatex(v);
       const list = document.getElementById('dailyList');
       list.addEventListener('click', (e)=>{
         const block = e.target.closest('.card-block');
@@ -2277,6 +3143,7 @@ function setLBScaleCentered(newS, force=false){
 
     // Review
     function goReview(push=true){
+      Media.revokeAll();
       if(push) Nav.push();
       State.view='review';
       setTopbar({title:'Révision'});
@@ -2308,8 +3175,9 @@ function setLBScaleCentered(newS, force=false){
     }
 
     function renderReview(){
-      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
-      const total=r.queue.length; const current=getCurrentCard(); const idx=r.index+1;
+      const v=$('#view'); const r=State.review;
+      const { card: current, chap } = getCurrentCard();
+      const total=r.queue.length; const idx=r.index+1;
 
       const {frontText,backText}=getCardSides(current,chap);
       const frontHTML = preprocessLaTeX(frontText);
@@ -2321,7 +3189,7 @@ function setLBScaleCentered(newS, force=false){
 
       v.innerHTML = `
         <div class="review-wrap">
-          <div class="review-top"><div>${chap.title}</div><div>${idx} / ${total}</div></div>
+          <div class="review-top"><div>${r.mode==='multi' ? ('Multi • '+chap.title) : chap.title}</div><div>${idx} / ${total}</div></div>
           <div class="review-card">
             <div class="review-scroller">
               ${!r.flipped
@@ -2333,7 +3201,8 @@ function setLBScaleCentered(newS, force=false){
         </div>
       `;
 
-      typesetLatex(v).then(()=>{
+      typesetLatex(v).then(async ()=>{
+        await Media.resolveMediaInElement(v);
         initReviewGestures();
       });
       renderReviewFooter();
@@ -2341,16 +3210,18 @@ function setLBScaleCentered(newS, force=false){
 
     // Recap
     function goRecap(push=true){
+      Media.revokeAll();
       if(push) Nav.push();
       State.view='recap';
+      const chap = getChapter(State.review.chapterId) || State.virtualChapter || getChapter(State.review.multiChaps[0]);
       setTopbar({title:'Récapitulatif'});
       setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
-      renderRecap();
+      renderRecap(chap);
     }
 
-    function renderRecap(){
-      const v=$('#view'); const r=State.review; const chap=getChapter(r.chapterId);
+    function renderRecap(chap){
+      const v=$('#view'); const r=State.review;
       const totalSession=r.answers.length; const duration=r.end-r.start; const avgPerCard=totalSession?duration/totalSession:0;
       const todayChange=getTodayChange(chap); const todayReviews=getTodayCount(chap);
       v.innerHTML = `
@@ -2373,10 +3244,53 @@ function setLBScaleCentered(newS, force=false){
       $('#continueBtn').addEventListener('click',()=>startReview(r.chapterId));
     }
 
+    function startReviewMulti(chapIds){
+      const all = chapIds.map(_getChapterReal).filter(Boolean);
+      if (!all.length) return;
+      // pool filtré par filtres propres à chaque chapitre
+      const pool = [];
+      all.forEach(ch=>{
+        const sel = ch.filters.grades;
+        ch.cards.forEach(c=>{ if (sel[c.grade||'unseen']) pool.push({ chapId: ch.id, card: c }); });
+      });
+      if (!pool.length){ alert('Aucune carte disponible avec les filtres actuels.'); return; }
+
+      const scored = pool.map(({chapId,card})=>{
+        const g=card.grade||'unseen';
+        const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+        const now=Date.now();
+        const baseW=baseWMap[g]??1;
+        let dueBoost=1;
+        if(card.dueAt && card.dueAt>0){
+          const delta=now-card.dueAt;
+          dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85;
+        }else{ dueBoost=1.15; }
+        const ema=typeof card.perfEma=='number' ? card.perfEma : 0.5;
+        const perfBoost=1+(1-ema)*1.6;
+        const s=card.streak||0;
+        const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
+        const t=card.avgMs||0; const timeBoost=1+Math.min(2,t/3000);
+        const jitter=0.9+Math.random()*0.2;
+        const weight=baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter;
+        return { chapId, cardId: card.id, weight };
+      });
+      scored.sort((a,b)=>b.weight-a.weight);
+      // Taille session: moyenne des sessionSize des chapitres, plafonnée par le disponible
+      const avgSize = Math.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length);
+      const size = Math.min(avgSize||10, scored.length);
+      const queue = scored.slice(0,size).map(x=>({ chapId:x.chapId, cardId:x.cardId }));
+
+      State.review = { mode:'multi', chapterId:null, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
+      goReview();
+    }
     // ---------- Logique révision ----------
     function startReview(chapterId){
       if(!chapterId) return;
       const chap=getChapter(chapterId);
+      if (chap && chap.virtual && Array.isArray(chap._ids)) {
+        return startReviewMulti(chap._ids);
+      }
+      
       const sel=chap.filters.grades;
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
       const size=Math.min(chap.settings.sessionSize,pool.length);
@@ -2409,14 +3323,30 @@ function setLBScaleCentered(newS, force=false){
     }
 
     function getCurrentCard(){
-      const r=State.review; const chap=getChapter(r.chapterId);
-      const id=r.queue[r.index]; return chap.cards.find(c=>c.id===id);
+      const r=State.review;
+      if (r?.mode==='multi'){
+        const item = r.queue[r.index];
+        const chap = _getChapterReal(item.chapId);
+        const card = chap.cards.find(c=>c.id===item.cardId);
+        return { card, chap };
+      }else{
+        const chap=getChapter(r.chapterId);
+        const id=r.queue[r.index];
+        return { card: chap.cards.find(c=>c.id===id), chap };
+      }
     }
 
     function submitGrade(nextGrade){
-      const r=State.review; const chap=getChapter(r.chapterId); const card=getCurrentCard(); const now=Date.now();
+      const r=State.review; const now=Date.now();
+      const {card: currentCard, chap: currentChap} = getCurrentCard();
+
+      const origin = currentCard._origin || { chapId: r.chapterId, cardId: currentCard.id };
+      const chap = _getChapterReal(origin.chapId);
+      const card = chap.cards.find(c => c.id === origin.cardId);
+
       const duration=Math.max(0, now-(r.cardStart||now));
-      const prevGrade=card.grade||'unseen'; const next=nextGrade;
+      const prevGrade=card.grade||'unseen';
+      const next=nextGrade;
 
       const wasZeroBeforeNext=(chap.stats.gradeCounts[next]||0)===0;
       card.grade=next;
@@ -2690,14 +3620,17 @@ function setLBScaleCentered(newS, force=false){
       if(!data.app.prefs.accent) data.app.prefs.accent='indigo';
       if(typeof data.app.prefs.showEmoji!=='boolean') data.app.prefs.showEmoji=true;
       if(typeof data.app.prefs.radius!=='number') data.app.prefs.radius=14;
+      if (!data.mediaIndex) data.mediaIndex = {};
 
       if(!Array.isArray(data.subjects)){
-        data.subjects = [{ id:'anglais', title:'Anglais', chapters: data.chapters||[] }];
+        data.subjects = [{ id:'anglais', title:'Anglais', chapters: data.chapters||[], groups: [] }];
         delete data.chapters;
         if(!data.app.currentSubjectId) data.app.currentSubjectId='anglais';
       }
 
       data.subjects.forEach(subj=>{
+        if (!Array.isArray(subj.groups)) subj.groups = [];
+        ensureValidGroups(subj);
         (subj.chapters||[]).forEach(ch=>{
           ch.settings=ch.settings||{};
           if(typeof ch.settings.langSwap!=='boolean') ch.settings.langSwap=false;
@@ -2720,6 +3653,7 @@ function setLBScaleCentered(newS, force=false){
 
     // ---------- Paramètres ----------
     function openSettings(chapterId,push=true){
+      Media.revokeAll();
       if(!chapterId) chapterId=State.chapterId;
       const chap=getChapter(chapterId); if(!chap) return;
 
@@ -2874,8 +3808,10 @@ function setLBScaleCentered(newS, force=false){
         const merged = {
           id: cSub.id,
           title: cSub.title,
-          chapters: reconcileChaptersWithCanonical(cSub.chapters, sSub?.chapters || [])
+          chapters: reconcileChaptersWithCanonical(cSub.chapters, sSub?.chapters || []),
+          groups: Array.isArray(sSub?.groups) ? sSub.groups.slice() : []
         };
+        ensureValidGroups(merged);
         newSubjects.push(merged);
       });
 
@@ -3078,8 +4014,9 @@ function setLBScaleCentered(newS, force=false){
       });
     }
 
-    function resetAll(){
+    async function resetAll(){
       if(!confirm('Réinitialiser toute l’application ?')) return;
+      await Media.clearAll();
       const theme=data.app?.theme||'dark';
       const prefs=deepClone(data.app?.prefs||{});
       const subjects = buildCanonicalSubjects();
@@ -3095,39 +4032,42 @@ function setLBScaleCentered(newS, force=false){
 
 
     function init(){
-  if(navigator.storage && navigator.storage.persist){
-    navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
-  }
-  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
-  window.addEventListener('pagehide',saveData);
-  window.addEventListener('beforeunload',saveData);
-  setInterval(saveData,15000);
-  window.addEventListener('storage',(e)=>{
-    if(e.key===STORAGE_KEY && e.newValue){
-      try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
+      Media.open().catch(console.warn);
+      if(navigator.storage && navigator.storage.persist){
+        navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
+      }
+      window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
+      window.addEventListener('pagehide',saveData);
+      window.addEventListener('beforeunload',saveData);
+      setInterval(saveData,15000);
+      window.addEventListener('storage',(e)=>{
+        if(e.key===STORAGE_KEY && e.newValue){
+          try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){}
+        }
+      });
+    
+      // Forcer migration + fusion avec le contenu canonique à chaque nouvelle version
+      const prevVersion = localStorage.getItem('flash9x16_version');
+      if (prevVersion !== APP_VERSION) {
+        upgradeData();                          // migrer l'ancien schéma si besoin
+        reconcileAllSubjectsWithCanonical();    // fusionner avec les nouvelles cartes/chapitres
+        saveData();
+        localStorage.setItem('flash9x16_version', APP_VERSION);
+      } else {
+        // Assurer la cohérence même sans changement de version
+        upgradeData();
+        reconcileAllSubjectsWithCanonical();
+      }
+    
+      applyTheme();
+      applyUI();
+      Nav.clear();
+      goDeck(false);
     }
-  });
-
-  // Forcer migration + fusion avec le contenu canonique à chaque nouvelle version
-  const prevVersion = localStorage.getItem('flash9x16_version');
-  if (prevVersion !== APP_VERSION) {
-    upgradeData();                          // migrer l'ancien schéma si besoin
-    reconcileAllSubjectsWithCanonical();    // fusionner avec les nouvelles cartes/chapitres
-    saveData();
-    localStorage.setItem('flash9x16_version', APP_VERSION);
-  } else {
-    // Assurer la cohérence même sans changement de version
-    upgradeData();
-    reconcileAllSubjectsWithCanonical();
-  }
-
-  applyTheme();
-  applyUI();
-  Nav.clear();
-  goDeck(false);
-}
     init();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/sql-wasm.js"></script>
   <script id="MathJax-script" async
           src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>
