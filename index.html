@@ -544,11 +544,13 @@
   <script>
     // ---------- Données & stockage ----------
     const STORAGE_KEY = 'flash9x16_data_v3';
-    // *** PATCH APPLIQUÉ *** : C'est cette ligne que vous devez changer à chaque modification du contenu.
-    const APP_VERSION = '2025-10-18-4'; // J'ai incrémenté votre version de 3 à 4.
+    // *** PATCH APPLIQUÉ *** : J'ai mis à jour la version suite à l'ajout des nouveaux chapitres.
+    const APP_VERSION = '2025-10-18-5'; // Version incrémentée de 4 à 5.
     
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
+    const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM"; // <--- VOS DEUX NOUVEAUX CHAPITRES
+    
     // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
     const PM3 = "M3";
@@ -557,8 +559,8 @@
 
     // <--- NOUVELLE SECTION ÉLECTROMAGNÉTISME --- >
     const PEM2 = "EM2";
-    const PE345 = "E3-E4-E5"; // <-- NOUVELLE CONSTANTE POUR LE GROUPE
-    const PEM6 = "EM6"; // On garde les autres pour plus tard
+    const PE345 = "E3-E4-E5"; 
+    const PEM6 = "EM6"; 
     const PEM7 = "EM7", PEM8 = "EM8(Pas de E7)", PEM9 = "EM9", PEM10 = "EM10", PEM11 = "EM11";
     const PEM12 = "EM12", PEM13 = "EM13", PEM14 = "EM14", PEM15 = "EM15";
     // <--- NOUVELLE SECTION OPTIQUE --- >
@@ -567,6 +569,8 @@
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
+      [HI]:'⚕️', [IF]:'🗽', // <--- AJOUT DES EMOJIS CORRESPONDANTS
+      
       'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
       'M2':'⚙️',
       'M3':'🌍',
@@ -575,10 +579,10 @@
 
       // === Électromagnétisme (EM) ===
       'EM2':'🧲',
-    'E3-E4-E5':'🧲', // <-- NOUVELLE ENTRÉE POUR LE GROUPE
-    'EM6':'🧲',
-    'EM8(Pas de E7)':'🧲', 'EM9':'🧲', 'EM10':'🧲', 'EM11':'🧲',
-    'EM12':'🧲', 'EM13':'🧲', 'EM14':'🧲', 'EM15':'🧲',
+      'E3-E4-E5':'🧲',
+      'EM6':'🧲',
+      'EM8(Pas de E7)':'🧲', 'EM9':'🧲', 'EM10':'🧲', 'EM11':'🧲',
+      'EM12':'🧲', 'EM13':'🧲', 'EM14':'🧲', 'EM15':'🧲',
 
       // === Optique (O) ===
       'O1':'🌈', 'O2':'🌈', 'O3':'🌈', 'O4':'🌈',
@@ -1508,6 +1512,163 @@
 918|égalitaire|egalitarian|${CF}
 919|l’égalitarisme|egalitarianism|${CF}
 920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
+921|une maladie|a disease, an illness, a sickness|${HI}
+922|souffrir d’une maladie|to suffer from a disease|${HI}
+923|mourir d’une maladie|to die of, to die from a disease|${HI}
+924|une maladie grave|a serious disease|${HI}
+925|être dans un état critique|to be critically ill|${HI}
+926|un microbe, un germe|a germ|${HI}
+927|des bactéries|bacteria|${HI}
+928|attraper la grippe|to go down with the flu|${HI}
+929|un danger pour la santé|a health hazard|${HI}
+930|un fléau|a curse, a plague, a scourge|${HI}
+931|le cancer du poumon / du sein / de la peau|lung / breast / skin cancer|${HI}
+932|cancérigène|carcinogenic|${HI}
+933|le diabète|diabetes|${HI}
+934|l’hépatite|hepatitis|${HI}
+935|la malaria, le paludisme|malaria|${HI}
+936|une maladie sexuellement transmissible (MST)|a sexually transmitted disease (STD), a venereal disease (VD)|${HI}
+937|avoir une maladie cardiaque|to have a heart condition|${HI}
+938|la maladie d’Alzheimer / de Parkison|Alzeihemer’s / Parkinson’s disease|${HI}
+939|une maladie neurodégénérative|a neurodegenerative disease|${HI}
+940|un symptôme|a symptom|${HI}
+941|affecter, toucher un pays|to affect a country|${HI}
+942|toucher 20 % de la population|to afflict 20% of the population|${HI}
+943|la zone la plus durement touchée|the hardest-hit area|${HI}
+944|éradiquer|to eradicate|${HI}
+945|endémique|endemic|${HI}
+946|le SIDA|AIDS, acquired immune deficiency syndrome|${HI}
+947|contracter le SIDA|to develop AIDS|${HI}
+948|un malade du SIDA|an AIDS sufferer, an AIDS patient|${HI}
+949|séropositif|HIV-positive|${HI}
+950|faire passer un test de dépistage du SIDA à qn|to screen sb for AIDS|${HI}
+951|un centre de dépistage du SIDA|an HIV screening centre|${HI}
+952|un test de dépistage|a screening test|${HI}
+953|le sperme|sperm, semen|${HI}
+954|avoir des rapports non protégés|to have unprotected sex|${HI}
+955|un préservatif|a condom|${HI}
+956|l’abstinence|abstinence|${HI}
+957|la fidélité|faithfulness|${HI}
+958|une aiguille|a needle|${HI}
+959|les anti-rétroviraux|anti-retroviral drugs|${HI}
+960|la trithérapie|triple therapy, combination therapy|${HI}
+961|un traitement médical|medical treatment|${HI}
+962|secret médical|medical confidentiality|${HI}
+963|une infection nosocomiale|a hospital-acquired infection|${HI}
+964|MRSA, un staphylocoque résistant à la méthicilline|MRSA|${HI}
+965|une bactérie multi-résistante|a superbug|${HI}
+966|prescrire|to prescribe|${HI}
+967|une ordonnance|a prescription|${HI}
+968|un médecin généraliste|a general practitioner, a GP|${HI}
+969|un chirurgien|a surgeon|${HI}
+970|se faire opérer|to have surgery, go through surgery, have an operation|${HI}
+971|diagnostiquer|to diagnose|${HI}
+972|un diagnostic|a diagnosis|${HI}
+973|guérir un patient|to cure a patient|${HI}
+974|un remède|a remedy, a cure|${HI}
+975|un médicament|a drug, a medicine, a medication|${HI}
+976|un médicament générique|a generic drug|${HI}
+977|un antalgique, analgésique|a painkiller|${HI}
+978|un effet secondaire|a side effect|${HI}
+979|une piqûre|an injection, a shot|${HI}
+980|prendre des antibiotiques|to be on antibiotics|${HI}
+981|un laboratoire pharmaceutique|a pharmaceutical laboratory|${HI}
+982|des produits pharmaceutiques|pharmaceuticals|${HI}
+983|un vaccin|a vaccine|${HI}
+984|vacciner|to vaccinate|${HI}
+985|une campagne de vaccination|a vaccination campaign|${HI}
+986|se rétablir, guérir|to recover|${HI}
+987|guérison, rétablissement|recovery|${HI}
+988|rechuter|to relapse|${HI}
+989|une alerte à l’intoxication alimentaire|a food scare|${HI}
+990|un péril sanitaire, une alerte sanitaire|a health scare|${HI}
+991|épizootie|an epizootic disease|${HI}
+992|la fièvre aphteuse|food-and-mouth disease|${HI}
+993|l’encéphalopathie bovine spongiforme, l’ESB|bovine spongiform encephalopathy, BSE|${HI}
+994|la maladie de la vache folle|mad-cow disease|${HI}
+995|la maladie de Creutzfeldt Jacob (MCJ)|Creutzfeldt-Jacob Disease (CJD)|${HI}
+996|une maladie à prions|a prion disease|${HI}
+997|la dioxine|dioxin|${HI}
+998|le scandale du poulet à la dioxine|the dioxin chicken scandal|${HI}
+999|la traçabilité|traceability|${HI}
+1000|les soins médicaux / les services de santé|health care|${HI}
+1001|la santé publique|public health|${HI}
+1002|les responsables de la santé publique|public health officials|${HI}
+1003|les autorités sanitaires|the health authorities|${HI}
+1004|le système de santé|the health care system, the health system|${HI}
+1005|les services de santé|health services|${HI}
+1006|les dépenses de santé|health expenses|${HI}
+
+// === NOUVEAU CHAPITRE : INDIVIDUAL FREEDOM ===
+1007|la liberté d’expression, de parole|freedom of speech, free speech, freedom of expression|${IF}
+1008|la liberté de la presse|freedom of the press|${IF}
+1009|une presse libre|a free press|${IF}
+1010|la liberté de culte, la liberté religieuse|freedom of worship|${IF}
+1011|le pouvoir arbitraire|arbitrary power|${IF}
+1012|une lettre de cachet|a lettre de cachet|${IF}
+1013|empiéter sur les droits des gens|to infringe (on) people’s rights|${IF}
+1014|une atteinte, une entorse aux droits de qn|an infringement on sb’s rights|${IF}
+1015|empiéter sur les libertés fondamentales|to encroach on basic liberties|${IF}
+1016|un empiètement de l’État|an encroachment of the state|${IF}
+1017|restreindre, limiter la liberté d’expression|to restrict free speech|${IF}
+1018|rogner sur les libertés individuelles|to erode individual freedoms|${IF}
+1019|détenir un suspect sans l’inculper|to detain a suspect without charge|${IF}
+1020|être détenu sans être inculpé|to be held without charge|${IF}
+1021|placer qn en détention provisoire|to remand sb in custody|${IF}
+1022|emprisonner qn|to jail sb, to imprison sb|${IF}
+1023|le droit de vote|the right to vote|${IF}
+1024|les droits fondamentaux|basic rights|${IF}
+1025|les libertés fondamentales / individuelles|basic / individual liberties|${IF}
+1026|être garanti par la constitution|to be enshrined in the constitution|${IF}
+1027|les libertés civiques|civil liberties|${IF}
+1028|censurer|to censor|${IF}
+1029|la censure|censorship|${IF}
+1030|la surveillance|surveillance|${IF}
+1031|une société surveillée|a surveillance society|${IF}
+1032|un État policier|a police state|${IF}
+1033|la police, les forces de l’ordre|the police force|${IF}
+1034|interpeller et fouiller|to stop and search|${IF}
+1035|arrêter qn|to arrest sb|${IF}
+1036|(le droit à) la vie privée, l’intimité|privacy|${IF}
+1037|la vie privée de qn|sb’s private life|${IF}
+1038|violer la vie privée de qn|to breach, to violate sb’s privacy|${IF}
+1039|une atteinte à, une violation de la vie privée|a breach of privacy, an invasion of privacy, a privacy violation|${IF}
+1040|porter atteinte à la vie privée de qn|to intrude upon sb’s privacy|${IF}
+1041|la vidéosurveillance|video surveillance|${IF}
+1042|télévision en circuit fermé|CCTV, closed circuit television|${IF}
+1043|enregistrer|to record|${IF}
+1044|suivre de près les mouvements de qn|to monitor sb’s movements|${IF}
+1045|avoir qn à l’œil|to keep tabs on sb, to keep an eye on sb|${IF}
+1046|espionner qn|to spy on sb, to snoop on sb|${IF}
+1047|suivre la trace de qn|to track sb|${IF}
+1048|surveiller une frontière / le courrier de qn|to monitor a border / sb’s mail|${IF}
+1049|un micro caché|a bug|${IF}
+1050|placer des micros dans une pièce|to bug a room|${IF}
+1051|mettre qn sur écoute téléphonique|to (wire)tap sb’s phone|${IF}
+1052|les écoutes téléphoniques|phone tapping, wiretapping|${IF}
+1053|écouter les conversations téléphoniques de qn|to eavesdrop on sb’s phone conversations|${IF}
+1054|mettre son nez dans la vie personnelle de qn|to pry into sb’s personal life|${IF}
+1055|des données, des informations|data|${IF}
+1056|des informations personnelles|personal data, personal details|${IF}
+1057|les coordonnées de qn|sb’s contact details|${IF}
+1058|des données biométriques|biometric data|${IF}
+1059|les informations bancaires de qn|sb’s banking details|${IF}
+1060|un dossier médical / scolaire|a medical record / a school record|${IF}
+1061|un casier judiciaire|a criminal record|${IF}
+1062|un relevé de téléphone|a telephone bill|${IF}
+1063|un relevé bancaire|a bank statement|${IF}
+1064|rassembler, recueillir des informations|to collect, gather data|${IF}
+1065|glaner des informations|to glean infomation|${IF}
+1066|enregistrer, conserver des données|to record, store, retain data|${IF}
+1067|rechercher et extraire des données|to retrieve data|${IF}
+1068|ficher un suspect|to put a suspect on file|${IF}
+1069|une base de données|a database|${IF}
+1070|une base de données ADN|a DNA database|${IF}
+1071|une empreinte génétique|a DNA print, genetic print|${IF}
+1072|subir un test ADN|to be DNA-swabbed|${IF}
+1073|tirer la sonnette d’alarme|to sound, to ring the alarm bell|${IF}
+1074|dénoncer qn|to blow the whistle on sb|${IF}
+1075|un lanceur d’alerte|a whistleblower|${IF}
 `.trim();
 
     const physicsRawText = `10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
