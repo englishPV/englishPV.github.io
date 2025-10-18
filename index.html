@@ -3252,13 +3252,22 @@ async function importApkg(file) {
     }
 
     function renderRecap(chap){
-      const v=$('#view'); const r=State.review;
+  const v = $('#view');
+  const r = State.review;
 
-      // --- CORRECTION 1 : Calcul de durée sécurisé ---
-      const duration = (r.end && r.start && r.end > r.start) ? (r.end - r.start) : 0;
+  // Utiliser d’abord la somme des ms des réponses, sinon fallback sur end-start
+  const duration = (() => {
+    if (r && Array.isArray(r.answers) && r.answers.length) {
+      return r.answers.reduce((sum, a) => sum + (a.ms || 0), 0);
+    }
+    if (r?.end && r?.start && r.end > r.start) {
+      return r.end - r.start;
+    }
+    return 0;
+  })();
 
-      const totalSession=r.answers.length;
-      const avgPerCard=totalSession?duration/totalSession:0;
+  const totalSession = r.answers.length;
+  const avgPerCard = totalSession ? duration / totalSession : 0;
       const todayChange=getTodayChange(chap); const todayReviews=getTodayCount(chap);
       v.innerHTML = `
         <div class="card recap" style="flex:1">
@@ -3421,7 +3430,7 @@ async function importApkg(file) {
         saveData(); 
         
         // MODIFICATION : On change la manière de naviguer
-        Nav.back(); // On retire l'écran de révision de la pile, ce qui nous ramène à 'chapter'
+        
         goRecap(false);  // On pousse l'écran de récapitulatif par-dessus 'chapter'
       }
     }
