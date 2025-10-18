@@ -231,7 +231,14 @@
       pointer-events:none; z-index:3; display:none;
     }
     :root[data-theme="light"] .size-toast{background:rgba(0,0,0,.15); color:#0f172a}
-
+    .chapter-list {
+  font-size: 12px;
+  white-space: nowrap;      /* Assure que le texte reste sur une seule ligne */
+  overflow: hidden;         /* Masque le texte qui dépasse */
+  text-overflow: ellipsis;  /* Ajoute "..." à la fin du texte qui dépasse */
+  opacity: 0.8;
+  padding-left: 2px; /* Petit ajustement pour l'alignement */
+}
     /* Cards view */
     .cards-wrap{display:flex; flex-direction:column; gap:8px; height:100%}
     .cards-top{display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:12px}
@@ -2482,11 +2489,8 @@ async function importApkg(file) {
     const groups = ensureGroups(subj);
     const allChapters = (subj.chapters || []).slice();
 
-    // Créer un Set contenant les IDs de tous les chapitres qui sont déjà dans un fichier.
-    // C'est la logique clé pour ne les afficher qu'une seule fois (dans leur fichier).
     const chapterIdsInGroups = new Set(groups.flatMap(g => g.chapIds));
 
-    // Construction du HTML
     v.innerHTML = `
     <div class="card flexcol" style="flex:1;">
       <div class="deck-head">
@@ -2507,9 +2511,16 @@ async function importApkg(file) {
             const viewed = Math.max(0, total - counts.unseen);
             const pct = total ? Math.round(viewed * 100 / total) : 0;
             const emojis = groupEmojiList(subj, g);
-            
-            // Note : il n'y a plus de bouton "Supprimer" ici.
-            // La décomposition se fait par appui long, géré dans bindDeckInteractions.
+
+            // --- NOUVELLE LOGIQUE : Créer la chaîne de caractères avec les noms des chapitres ---
+            const chapterNamesList = g.chapIds
+                .map(chapId => {
+                    const chapter = allChapters.find(ch => ch.id === chapId);
+                    return chapter ? chapter.title : null; // Récupère le titre ou null si le chapitre n'est pas trouvé
+                })
+                .filter(Boolean) // Retire les éventuels chapitres non trouvés (null)
+                .join(', '); // Assemble les noms avec une virgule
+
             return `
               <div class="deck-item" data-type="group" data-id="${g.id}">
                 <div class="slide">
@@ -2517,6 +2528,7 @@ async function importApkg(file) {
                     <div class="title-line" style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:18px;">
                       📁 Fichier (${emojis})
                     </div>
+                    
                     <div class="mt6" style="display:flex; flex-wrap:wrap; gap:6px">
                       <span class="chip-pie" title="Progression : ${pct}%" style="--progress:${pct}%"></span>
                       <span class="chip">🟥 ${counts.echec}</span>
@@ -2525,6 +2537,12 @@ async function importApkg(file) {
                       <span class="chip">🟩 ${counts.facile}</span>
                       <span class="folder-badge">• ${g.chapIds.length} chap.</span>
                     </div>
+
+                    <!-- MODIFICATION : Ajout de la liste des noms de chapitres ici -->
+                    <div class="muted chapter-list mt6" title="${chapterNamesList}">
+                      ${chapterNamesList}
+                    </div>
+
                   </div>
                   <div class="muted" style="font-size:18px; padding-left: 8px;">›</div>
                 </div>
@@ -2534,14 +2552,13 @@ async function importApkg(file) {
 
           <!-- Rendu des Chapitres non groupés -->
           ${allChapters
-            .filter(ch => !chapterIdsInGroups.has(ch.id)) // On affiche SEULEMENT les chapitres qui ne sont pas dans un fichier.
+            .filter(ch => !chapterIdsInGroups.has(ch.id))
             .map(ch => {
               const counts = getLiveGradeCounts(ch);
               const total = ch.cards?.length ?? 0;
               const viewed = Math.max(0, total - counts.unseen);
               const pct = total ? Math.round((viewed / total) * 100) : 0;
               
-              // Le bouton "Supprimer" n'apparaît que pour les chapitres importés.
               const deleteButtonHTML = ch.imported 
                 ? `<div class="right-action"><button class="btn btn--solid btn--red btn--tiny deleteChBtn" data-chap-id="${ch.id}">Supprimer</button></div>` 
                 : '';
@@ -2572,7 +2589,7 @@ async function importApkg(file) {
     </div>
     `;
 
-    // Logique pour le bouton d'importation
+    // Logique pour le bouton d'importation (inchangée)
     const importBtn = $('#importBtn');
     const importInput = $('#importInput');
     if (importBtn && importInput) {
@@ -2581,7 +2598,6 @@ async function importApkg(file) {
             const files = Array.from(e.target.files || []);
             if (!files.length) return;
             try {
-                // On importe tous les fichiers sélectionnés
                 await Promise.all(files.map(file => importFiles([file])));
                 alert('Import terminé ✅');
                 saveData();
@@ -2590,12 +2606,12 @@ async function importApkg(file) {
                 console.error(err);
                 alert('Erreur lors de l\'importation : ' + (err?.message || 'Erreur inconnue.'));
             } finally {
-                importInput.value = ''; // Réinitialise le champ pour pouvoir réimporter le même fichier
+                importInput.value = '';
             }
         });
     }
 
-    // Attacher les gestionnaires d'événements (drag-drop, swipe, etc.)
+    // Attacher les gestionnaires d'événements (inchangé)
     bindDeckInteractions();
 }
     
