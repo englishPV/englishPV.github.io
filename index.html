@@ -541,12 +541,8 @@
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
     // Chapitres Physique (constantes pratiques pour le raw)
-    // Chapitres Physique (constantes pratiques pour le raw)
-    // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
     const PM3 = "M3";
-    const PM4 = "M4";
-    const PM5 = "M5"; // <--- AJOUTEZ CETTE LIGNE
 
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
@@ -555,10 +551,8 @@
       // === Physique (nouvelles matières/chapitres) ===
       'M2':'⚙️',
       'M3':'🌍',
-      'M4':'🤝', // <--- AJOUTEZ CETTE LIGNE (🤝 pour liaisons/contact)
-      'M5':'⚡️',
+
     };
-    
 
     // Liste brute Anglais (id|fr|en|chap)
     const cardsRawText = `
@@ -1510,44 +1504,6 @@
 10022|<img src="images/anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad&nbsp;SABRI<br></span><img src="images/paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Donner en fonction de&nbsp;\\(\\lambda \\)&nbsp;l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude&nbsp;\\(\\lambda\\). A quel endroit&nbsp;\\(g\\)&nbsp;est-elle max? min?<br><br>Référentiel terrestre: non gal<br>Référentiel géocentrique: gal<br>Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:&nbsp;&nbsp;\\(\\Omega\\)<br>Masse et rayon de la Terre:&nbsp;\\(m_T\\)&nbsp;et&nbsp;\\(R_T\\)|Poids d'un objet de masse&nbsp;\\(m\\)&nbsp;à la surface de la Terre:<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)<br>Or&nbsp;\\(HM=R_T \\ cos(\\lambda)\\)&nbsp;et&nbsp;\\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)<br>Donc&nbsp;\\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)<br><br>\\(g\\)&nbsp;est max au pôle sud et min à l'équateur.|${PM3}
 10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre?|C'est la force d'inertie d'entrainement due au fait que le référentiel géocentrique (en translation elliptique dans le réf. Héliocentrique) est considéré comme non galiléen (en considérant le réf. Héliocentrique galiléen).|${PM3}
 10024|(B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?<br>Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.|C'est la force d'inertie de Coriolis (en considérant le ref. Terrestre non galiléen et le réf géocentrique galiléen).<br>Dans le Nord: rotation dans le sens trigo.<br>Dans le Sud: Rotation dans le sens horaire<br><img src="images/paste-71cc5358ce5c51ce02d2e63300dba80598.jpg">|${PM3}
-10025|<br>Valeur de \\(\\vec{v}_{gs_2/s_1}\\) dans le cas de non glissement (i.e. cas de l'adhérence) :<br>|On a : \\(\\vec{v}_{gs_2/s_1} = \\vec{0}\\)|${PM4}
-10026|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb dans le cas d'un non-glissement :|\\[\\|\\vec{T}\\| \\le f_s \\|\\vec{N}\\|\\] avec \\(f_s\\) le coefficient de frottement statique.|${PM4}
-10027|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le cas d'un glissement :|\\[\\|\\vec{T}\\| = f_d \\|\\vec{N}\\|\\] avec \\(f_d\\) le coefficient de frottement dynamique.<br>|${PM4}
-10028|<span style="color: rgb(0, 255, 0);">(Yannick) </span>Les forces de frottement sont elles conservatives ?|Non, elles ne sont en général pas conservatives.|${PM4}
-10029|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Quel peut-être le signe de la puissance d'une force de contact ?|Généralement négatif : cas où la réaction tangentielle / force de frottement est une force de freinage.<br>Parfois positif : cas où la force de frottement est motrice. Par exemple, cas d'un solide S2 fixe par rapport à un solide S1 (adhérence) et que S1, mis en mouvement, met S2 en mouvement.<br><img src="images/paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg" width="265">|${PM4}
-10030|Que dire sur la puissance totale \\(P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R}\\) des forces mises en jeu dans un contact entre 2 solides ?|<br>\\(P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R})=\\vec{T}_{1 \\rightarrow 2} . \\vec{v_g}_{2/1} \\leq 0\\)<br>Elle est nulle s'il y a adhérence des 2 solides (\\(\\vec{v_g}_{2/1}=0\\)) ou si le glissement se fait sans frottement (\\(\\vec{T}_{1 \\rightarrow 2}=0\\)).<br>Elle est négative s'il y a glissement avec frottement.|${PM4}
-10031|<span style="color: rgb(255, 170, 0);">(Yannick) </span>On modélise l'action de contact de S1 sur S2 par une force \\(\\overrightarrow{R_{1->2}}\\) appliquée en un point I de la région de contact, comment se décompose \\(\\overrightarrow{R_{1->2}}\\) ?|<div>\\(\\overrightarrow{R_{1->2}}\\) se décompose en :</div><ul><li>Une composante orthogonale au plan tangent π commun aux 2 solides, dirigée de <strong>S1</strong> vers <strong>S2</strong>, notée \\(\\overrightarrow{N}\\) et appelée réaction normale.</li><li>Une composante appartenant au plan π, notée \\(\\overrightarrow{T}\\) et appelée réaction tangentielle ou force de frottement. En absence de frottements: \\(\\overrightarrow{T}=\\overrightarrow{0}\\)</li></ul>|${PM4}
-10032|<span style="color: rgb(255, 170, 0);">(INC)</span> Qu’est-ce que <b>la vitesse de glissement</b> ?|La vitesse de glissement de \\(S_2 / S_1\\) s'écrit : \\(\\vec{v_g}_{S_2/S_1} = \\vec{v_{I_2}} - \\vec{v_{I_1}} \\)<br><br>(avec \\(I\\) le point de contact entre les deux solides et \\(I_1\\) (resp. \\(I_2\\)) le point de \\(S_1\\) (resp. \\(S_2\\)) confondu avec \\(I\\) à l'instant \\(t\\) )<br><br>Remarque: Elle ne dépend pas du référentiel du moment que \\(\\vec{v_{I_2}}\\) et \\(\\vec{v_{I_1}}\\) sont exprimés dans le même référentiel.|${PM4}
-10033|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br> <img src="images/paste-15e45e099744e7f013048018acad29cb70089200.jpg">|<img src="images/paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg"><br><img src="images/paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg">|${PM4}
-10034|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><br><img src="images/paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg">|<img src="images/paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg">|${PM4}
-10035|(INC)<br>Énoncer le principe de Curie|Les éléments d'invariance et de symétrie des causes doivent se retrouver dans les effets produits.|${PM5}
-10036|(INC)<br>Quelles sont les dimensions de la densité volumique/surfacique/linéique de charge ?|densité volumique de charge ρ homogène à une charge divisée par un volume<br>unité:&nbsp;\\(C.m^{-3}\\)<br>densité surfacique de charge&nbsp;\\(\\sigma\\)&nbsp;homogène à une charge divisée par une surface<br>unité:&nbsp;\\(C.m^{-2}\\)<br>densité linéique de charge&nbsp;\\(\\lambda\\)&nbsp;homogène à une charge divisée par une longueur<br>unité:&nbsp;\\(C.m^{-1}\\)|${PM5}
-10037|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quelle est la charge d'un volume élémentaire dV? d'une surface élémentaire dS? d'une longueur élémentaire dl?|La charge d'un volume élémentaire est&nbsp;\\[dq = \\rho.dV\\]<br>La charge d'une surface élémentaire est&nbsp;\\[dq = \\sigma.dS\\]<br>La charge d'une longueur élémentaire est&nbsp;\\[dq = \\lambda.dl\\]|${PM5}
-10038|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Quelle condition est nécessaire pour qu'une distribution de charges&nbsp;soit invariante par rotation autour d'un axe Δ ?|Il faut que pour tout point M appartenant à cette distribution, sa densité de charge vérifie ρ(M′) = ρ(M) (cas volumique) avec M′ l'image de M par rotation d'un angle quelconque autour de Δ.|${PM5}
-10039|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Quelle condition est nécessaire pour qu'une distribution de charges illimitée dans la direction d'un axe Δ soit invariante par translation suivant Δ ?|Il faut que pour tout point M appartenant à cette distribution et son translaté M', sa densité de charge vérifie : ρ(M') = ρ(M) (cas volumique)|${PM5}
-10040|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quel choix de coordonnées est adapté à une invariance par translation ? Puis par rotation ?|•&nbsp;Invariances par translation → coordonnées cartésiennes ou cylindriques.<br>• Invariances par rotation → coordonnées cylindriques ou sphériques.|${PM5}
-10041|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire du champ électrostatique en un point P' symétrique de P par rapport à un plan d’antisymétrie<br>d’une distribution de charges ? (n’appartenant pas forcément à cette distribution de charges)|Le champ électrostatique en P' est l’opposé du symétrique de celui en P par rapport au<br>plan d’antisymétrie de la distribution de charges.|${PM5}
-10042|(INC)<br>Que dire du champ électrostatique en P', point symétrique de P par rapport à un plan de symétrie<br>d’une distribution de charges ?|Le champ électrostatique en P' est le symétrique de celui en P par rapport au plan de symétrie de la distribution de charge.|${PM5}
-10043|(INC)<br>Que dire du champ électrostatique d'un point M d'un plan de symétrie d’une distribution de charges ?&nbsp;|Le champ électrostatique créé en un point M d’un plan de symétrie d’une distribution de charges appartient à ce plan.|${PM5}
-10044|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire d'un champ&nbsp;\\(\\vec{E}\\) créé par une distribution volumique de charge ?&nbsp;&nbsp;(Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\)&nbsp;créé par une distribution volumique de charge est défini et continu en tout point de l’espace.|${PM5}
-10045|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Que dire d'un champ&nbsp;\\(\\vec{E}\\) créé par une distribution surfacique de charge ?&nbsp;&nbsp;(Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\) créé par une distribution surfacique de charge est défini et continu en tout point de l’espace, sauf au niveau des points de la distribution. Il est donc discontinu à la traversée de la surface chargée.|${PM5}
-10046|(INC)<br>Que dire d'un champ \\(\\vec{E}\\) créé par un ensemble de charges ponctuelles ? (Domaine de définition et continuité?)|Le champ \\(\\vec{E}\\)&nbsp;créé par un ensemble de charges ponctuelles est défini et continu en tout point de<br>l’espace, sauf sur les charges.|${PM5}
-10047|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Qu'est-ce qu'un plan de symétrie d'une distribution de charges ?|Un plan de symétrie d'une distribution de charges est un plan tel que la distribution de charges obtenue en déplaçant les charges selon une symétrie par rapport à ce plan est identique à la<br>distribution initiale.|${PM5}
-10048|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Qu'est-ce qu'un plan d'antisymétrie d'une distribution de charges ?|On appelle plan d’antisymétrie d'une distribution de charges un plan tel que la distribution de charges obtenue en déplaçant les charges selon une symétrie par rapport à ce plan est opposée (changement de signe) à la distribution initiale.|${PM5}
-10049|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la loi de Coulomb qui s'exerce entre deux charges ponctuelles q1 et q2 séparées d'une distance r.|\\(\\vec{F}_{2 \\rightarrow 1} = - \\vec{F}_{1 \\rightarrow 2} = \\frac{1}{4 \\pi \\epsilon _0} \\frac{q_1 q_2}{r^2} \\vec{u}_{2 \\rightarrow 1}\\)|${PM5}
-10050|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Comment est décrite la répartition de la charge d'une distribution volumique/ surfacique/ linéique de charges ?|[latex]Elle est décrite par une fonction scalaire appelée densité volumique/ surfacique/ linéique de charge&nbsp; $\\rho$/ $\\sigma$/$\\lambda$, qui dépend des coordonnées (x', y', z') des points de la distribution de charges.[/latex]|${PM5}
-10051|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Comment calcule-t-on le champ électrique total en un point en utilisant le principe de superposition ?|Le champ électrique total en un point est calculé en faisant la somme vectorielle des champs électriques créés par chaque charge prise individuellement.|${PM5}
-10052|(INC)<br>Comment calcule-t-on la force totale exercée sur une charge de la part d'un ensemble de charges ponctuelles?|On utilise le théorème de superposition en sommant la contribution de chaque charge ponctuelle prise séparément.|${PM5}
-10053|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Donner le champ électrostatique crée en un point P par une charge ponctuelle q située en S|\\(\\vec{E} (P) = \\frac{q}{4 \\pi \\epsilon _0} \\frac{\\vec{u}_r}{r^2} = \\frac{q}{4 \\pi \\epsilon _0}&nbsp;&nbsp;\\frac{\\vec{SP}}{SP^3}\\)|${PM5}
-10054|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la direction de \\(\\vec{E}\\) dans le cas où \\(q >0\\)|Le champ \\(\\vec{E}\\) créé par une charge ponctuelle positive part de la charge. Il diverge à partir de la charge<img src="images/paste-c1726407b90adfa409f559a158eb8b1a740d476c.jpg">|${PM5}
-10055|<span style="color: rgb(255, 170, 0);">(INC)</span><br>Donner la direction de \\(\\vec{E}\\) dans le cas où \\(q <0\\)|Le champ \\(\\vec{E}\\) créé par une charge ponctuelle négative se dirige vers la charge. Il converge vers la charge<img src="images/paste-001a83783b8dd4b04bb9bb0d44ca862c9303f523.jpg">|${PM5}
-10056|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Deux charges \\(q_1, q_2\\) qui sont de signe différent interagissent entre elles. S'attirent-elles ou se repoussent-elles ? Pourquoi ?|Elles s'attirent. En effet, \\(q_1 q_2 < 0\\), donc la force d'interaction électrostatique est attractive.|${PM5}
-10057|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Deux charges \\(q_1, q_2\\) qui sont de même signe interagissent entre elles. S'attirent-elles ou se repoussent-elles ? Pourquoi ?|Elles se repoussent. En effet, \\(q_1 q_2 > 0\\), donc la force d'interaction électrostatique est répulsive.|${PM5}
-10058|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Comment s'appelle la constante \\(\\epsilon_0\\) dans la loi de Coulomb ?|C'est la permittivité du vide&nbsp;|${PM5}
-10059|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quand peut-on considérer une distribution de charges comme surfacique ?|Une distribution de charges peut être considérée comme surfacique lorsque l'une de ses dimensions spatiales est beaucoup plus petite que les deux autres dimensions.|${PM5}
-10060|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quand peut-on considérer une distribution de charges comme linéique ?|Une distribution de charges peut être considérée comme linéique lorsque deux de ses dimensions spatiales sont beaucoup plus petites que la troisième dimension.|${PM5}
-10061|<img src="images/paste-de3005b71b3b26e6cbfb7bc7e487288057e44965.jpg">|<img src="images/paste-4e5b864acd14971b75ee4cfa20de066c86177c58.jpg">|${PM5}
-10062|<img src="images/paste-036e005e8785d46a0d662e7e88fa5533bfe23c98.jpg">|<img src="images/paste-75d5efd4f249c0e30de16f6754802351a3a09811.jpg">|${PM5}
 `.trim();
 
     // === LIGHTBOX IMAGE VIEWER ===
@@ -3252,22 +3208,8 @@ async function importApkg(file) {
     }
 
     function renderRecap(chap){
-  const v = $('#view');
-  const r = State.review;
-
-  // Utiliser d’abord la somme des ms des réponses, sinon fallback sur end-start
-  const duration = (() => {
-    if (r && Array.isArray(r.answers) && r.answers.length) {
-      return r.answers.reduce((sum, a) => sum + (a.ms || 0), 0);
-    }
-    if (r?.end && r?.start && r.end > r.start) {
-      return r.end - r.start;
-    }
-    return 0;
-  })();
-
-  const totalSession = r.answers.length;
-  const avgPerCard = totalSession ? duration / totalSession : 0;
+      const v=$('#view'); const r=State.review;
+      const totalSession=r.answers.length; const duration=r.end-r.start; const avgPerCard=totalSession?duration/totalSession:0;
       const todayChange=getTodayChange(chap); const todayReviews=getTodayCount(chap);
       v.innerHTML = `
         <div class="card recap" style="flex:1">
@@ -3286,8 +3228,7 @@ async function importApkg(file) {
           <div class="cta"><button class="btn btn--solid btn--primary" id="continueBtn">Continuer</button></div>
         </div>
       `;
-      // --- CORRECTION 2 : Le bouton utilise chap.id, qui est toujours correct ---
-      $('#continueBtn').addEventListener('click',()=>startReview(chap.id));
+      $('#continueBtn').addEventListener('click',()=>startReview(r.chapterId));
     }
 
     function startReviewMulti(chapIds){
@@ -3426,12 +3367,7 @@ async function importApkg(file) {
         r.index+=1; r.flipped=false; r.cardStart=Date.now();
         saveData(); renderReview();
       }else{
-        r.end=Date.now(); 
-        saveData(); 
-        
-        // MODIFICATION : On change la manière de naviguer
-        
-        goRecap(false);  // On pousse l'écran de récapitulatif par-dessus 'chapter'
+        r.end=Date.now(); saveData(); goRecap();
       }
     }
 
@@ -4081,9 +4017,8 @@ async function importApkg(file) {
     }
 
 
-    
+
     function init(){
-      
       Media.open().catch(console.warn);
       if(navigator.storage && navigator.storage.persist){
         navigator.storage.persist().then(granted=>console.log('persist granted?',granted));
@@ -4115,7 +4050,6 @@ async function importApkg(file) {
       applyUI();
       Nav.clear();
       goDeck(false);
-      
     }
     init();
   </script>
