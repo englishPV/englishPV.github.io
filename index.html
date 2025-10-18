@@ -554,11 +554,30 @@
     const PM4 = "M4";
     const PEM1 = "EM1";
 
+    // <--- NOUVELLE SECTION ÉLECTROMAGNÉTISME --- >
+    const PEM2 = "EM2", PEM3 = "EM3", PEM4 = "EM4", PEM5 = "EM5", PEM6 = "EM6";
+    const PEM7 = "EM7", PEM8 = "EM8", PEM9 = "EM9", PEM10 = "EM10", PEM11 = "EM11";
+    const PEM12 = "EM12", PEM13 = "EM13", PEM14 = "EM14", PEM15 = "EM15";
+
+    // <--- NOUVELLE SECTION OPTIQUE --- >
+    const PO1 = "O1", PO2 = "O2", PO3 = "O3", PO4 = "O4";
+
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
       'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
-      'M2':'⚙️', 'M3':'🌍', 'M4':'🤝', 'EM1':'⚡️',
+      'M2':'⚙️',
+      'M3':'🌍',
+      'M4':'🤝',
+      'EM1':'⚡️',
+
+      // === Électromagnétisme (EM) ===
+      'EM2':'🧲', 'EM3':'🧲', 'EM4':'🧲', 'EM5':'🧲', 'EM6':'🧲',
+      'EM7':'🧲', 'EM8':'🧲', 'EM9':'🧲', 'EM10':'🧲', 'EM11':'🧲',
+      'EM12':'🧲', 'EM13':'🧲', 'EM14':'🧲', 'EM15':'🧲',
+
+      // === Optique (O) ===
+      'O1':'🌈', 'O2':'🌈', 'O3':'🌈', 'O4':'🌈',
     };
     
 
@@ -1550,6 +1569,23 @@
 10060|<span style="color: rgb(0, 255, 0);">(INC)</span><br>Quand peut-on considérer une distribution de charges comme linéique ?|Une distribution de charges peut être considérée comme linéique lorsque deux de ses dimensions spatiales sont beaucoup plus petites que la troisième dimension.|${PEM1}
 10061|<img src="images/paste-de3005b71b3b26e6cbfb7bc7e487288057e44965.jpg">|<img src="images/paste-4e5b864acd14971b75ee4cfa20de066c86177c58.jpg">|${PEM1}
 10062|<img src="images/paste-036e005e8785d46a0d662e7e88fa5533bfe23c98.jpg">|<img src="images/paste-75d5efd4f249c0e30de16f6754802351a3a09811.jpg">|${PEM1}
+10063|<span style="color: rgb(0, 255, 0);">(A.R)</span> Quelle est la définition de la circulation du champ électrostatique \\(\\vec E\\) de \\(A\\) à \\(B\\) le long de \\((\\Gamma)\\) ?<br>Dépend-elle du chemin suivi \\((\\Gamma)\\) pour aller de A à B?|\\[C_{A \\to B(\\Gamma)}=\\int_{A(\\Gamma)}^{B}{\\vec E \\cdot \\vec{dl} }\\]Cette circulation est indépendante du chemin suivi car elle peut s'écrire sous la forme de la variation d'une fonction qui est le potentiel électrostatique :<br>\\(C_{A \\to B}=\\int_{A}^{B}{\\vec E \\cdot \\vec{dl} }=-(V_B-V_A) = V_A - V_B\\)|${PEM2}
+10064|<span style="color: rgb(0, 255, 0);">(A.R)</span> Que vaut la circulation du champ électrostatique le long d'un contour fermé? Justifier.|La <b>circulation</b> du champ électrostatique entre un point \\(A\\) et \\(B\\) est <i>indépendante du chemin parcouru</i>.<br>Si le chemin est fermé, B et A sont confondus donc \\(V_A=V_B\\) et la circulation du champ est <b>nulle</b> : \\[C_{A \\to A} = \\oint \\vec E \\cdot \\vec{dl} =-(V_A -V_A ) = 0\\]|${PEM2}
+10065|<span style="color: rgb(255, 170, 0);">(A.R)</span> Quelle est la formule donnant le potentiel électrostatique créé en un point \\(P\\) par une charge source \\(q\\) ?|Potentiel électrostatique :<br>\\[V(P) = \\frac{1}{4\\pi \\varepsilon_0}\\frac{q}{r} + K\\]\\(r\\) : distance du point \\(P\\) par rapport à la charge source<br>\\(q\\) : charge source<br>K : une constante d'intégration (souvent choisie nulle à l'infini)|${PEM2}
+10066|<span style="color: rgb(0, 255, 0);">(A.R)</span> Quelle est la forme des surfaces équipotentielles d'une charge ponctuelle ?|Ce sont des sphères dont le centre est la position de la charge ponctuelle.|${PEM2}
+10067|<span style="color: rgb(255, 170, 0);">(A.R)</span> Comment évolue le potentiel électrostatique à mesure que l'on s'éloigne d'une charge ponctuelle ? Comment oriente-t-on les flèches du champ électrostatique sur un schéma ?|Selon le signe de \\(q\\):<br><ul><li>Si \\(q > 0\\), le potentiel <b>décroît</b> lorsque l'on s'éloigne de la charge.</li><li>Si \\(q < 0\\), le potentiel <b>croît</b> lorsque l'on s'éloigne de la charge.</li></ul><br>Le champ électrostatique est toujours orienté dans le sens des <b>potentiels décroissants</b>.|${PEM2}
+10068|<span style="color: rgb(255, 170, 0);">(A.R)</span> Quelle formule donne le potentiel électrostatique créé par plusieurs charges ponctuelles en un point \\(P\\) ?|\\[V(P) = \\frac{1}{4 \\pi \\varepsilon_0}\\sum_i \\frac{q_i}{r_i}\\]<br>\\(q_i\\) : charge en Coulomb (C) de la \\(i\\)-ème particule<br>\\(r_i\\) : distance entre la \\(i\\)-ème particule et le point \\(P\\)<br><br>On choisit généralement la constante nulle, de sorte que \\(V \\to 0\\) lorsque \\(r_i \\to \\infty\\).|${PEM2}
+10069|<span style="color: rgb(0, 255, 0);">(L.L)</span> Dans le repère orthonormé \\((O, \\vec{u}_x, \\vec{u}_y, \\vec{u}_z)\\), donnez \\(df\\), puis \\(\\vec{grad}f\\) et enfin la relation entre les deux.|Différentielle : \\[df = \\frac{\\partial f}{\\partial x}dx + \\frac{\\partial f}{\\partial y}dy + \\frac{\\partial f}{\\partial z}dz\\]<br>Gradient : \\[\\vec{grad}f=\\frac{\\partial f}{\\partial x}\\vec{u}_x + \\frac{\\partial f}{\\partial y}\\vec{u}_y + \\frac{\\partial f}{\\partial z}\\vec{u}_z\\]<br>Relation : \\(df=\\vec{grad}f \\cdot d\\vec{l}\\)|${PEM2}
+10070|<span style="color: rgb(0, 255, 0);">(L.L)</span> \\(\\vec{grad}f\\) est normal à quelle surface ?|\\(\\vec{grad}f\\) est normal à la surface d'équation \\(f(x,y,z) = cste\\).|${PEM2}
+10071|<span style="color: rgb(255, 170, 0);">(L.L)</span> Quelle est la relation intégrale liant le champ électrostatique et le potentiel électrostatique ?|\\[\\int_{A}^{B} \\vec{E} \\cdot d\\vec{l} = V_A - V_B\\]|${PEM2}
+10072|<span style="color: rgb(255, 170, 0);">(L.L)</span> Quelle est la relation locale liant le champ électrostatique et le potentiel électrostatique ?|\\[\\vec{E} = -\\vec{grad} V\\]|${PEM2}
+10073|<span style="color: rgb(255, 170, 0);">(L.L)</span> Comment retrouver la relation locale \\(\\vec{E} = -\\vec{grad}V\\) à l'aide de la relation intégrale associée ?|La relation intégrale \\(\\int_{A}^{B} \\vec{E} \\cdot d\\vec{l} = - (V_B - V_A)\\) est vraie pour un déplacement élémentaire \\(d\\vec{l}\\) : \\(\\vec{E} \\cdot d\\vec{l} = -dV\\).<br>Par définition du gradient, on a aussi \\(dV = \\vec{grad}V \\cdot d\\vec{l}\\).<br>En comparant les deux expressions, on obtient \\(\\vec{E} = -\\vec{grad}V\\).|${PEM2}
+10074|<span style="color: rgb(255, 170, 0);">(C.J)</span> L'énergie potentielle électrostatique \\(E_p\\) d'une charge \\(q_0\\) placée dans un champ extérieur \\(\\vec{E}\\) (qui dérive d'un potentiel \\(V\\)) vérifie la relation :|\\[E_p = q_0V\\]|${PEM2}
+10075|<span style="color: rgb(255, 170, 0);">(C.J)</span> Comment passer de la relation \\(\\vec{E} = -\\vec{grad}V\\) à la relation \\(\\vec{F} = -\\vec{grad}E_p\\) ?|On multiplie par la charge \\(q_0\\) :<br>\\(q_0\\vec{E} = -q_0\\vec{grad}V\\)<br>Comme \\(\\vec{F} = q_0\\vec{E}\\) et \\(E_p = q_0V\\), on obtient :<br>\\(\\vec{F} = -\\vec{grad}(E_p)\\)|${PEM2}
+10076|<span style="color: rgb(0, 255, 0);">(C.J)</span> Quelle est l'unité du potentiel électrostatique ?|Le volt (V).|${PEM2}
+10077|<span style="color: rgb(0, 255, 0);">(C.J)</span> Quelle est l'unité du champ \\(\\vec{E}\\) ?|Le volt par mètre (\\(V \\cdot m^{-1}\\)).|${PEM2}
+10078|<span style="color: rgb(0, 255, 0);">(C.J)</span> Dans quel sens sont orientées les lignes du champ électrostatique ?|Dans le sens des potentiels décroissants.|${PEM2}
+10079|<span style="color: rgb(0, 255, 0);">(C.J)</span> Comment sont orientées les lignes du champ électrostatique par rapport aux surfaces équipotentielles ?|Elles sont orthogonales (perpendiculaires) aux surfaces équipotentielles.|${PEM2}
 `.trim();
 
     // === LIGHTBOX IMAGE VIEWER ===
