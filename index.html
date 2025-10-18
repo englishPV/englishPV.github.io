@@ -2623,7 +2623,6 @@ async function importApkg(file) {
     if (!list) return;
     const subj = getCurrentSubject();
 
-    // Clics sur les boutons de suppression (révélés par swipe)
     list.addEventListener('click', (e) => {
         if (e.target.matches('.deleteChBtn')) {
             e.stopPropagation();
@@ -2634,7 +2633,6 @@ async function importApkg(file) {
 
     const items = $$('.deck-item');
     items.forEach(el => {
-        // Ajout du CSS pour désactiver la sélection de texte directement ici
         el.style.webkitUserSelect = 'none';
         el.style.userSelect = 'none';
         el.style.webkitTouchCallout = 'none';
@@ -2675,19 +2673,13 @@ async function importApkg(file) {
             animationFrameId = requestAnimationFrame(autoScroll);
         };
         
-        // =========================================================
-        // === C'est ici que se trouve la modification demandée ===
-        // =========================================================
         const moveGhost = (x, y) => {
             if (!ghost) return;
-            // NOUVEL OFFSET : 75px pour un décalage très prononcé.
             ghost.style.transform = `translate(${x - 75}px, ${y - 75}px) scale(1.02)`;
         };
 
         const onDown = e => {
-            // Empêche le navigateur de sélectionner le texte ou de montrer le menu contextuel.
-            e.preventDefault();
-
+            // NOTE : On retire e.preventDefault() d'ici pour permettre le scroll natif !
             if (e.target.closest('button')) return;
             
             sx = e.clientX;
@@ -2709,7 +2701,7 @@ async function importApkg(file) {
         };
 
         const onMove = e => {
-            if (interactionState === 'idle') return;
+            if (interactionState === 'idle' || interactionState === 'swiping') return;
             
             dx = e.clientX - sx;
             dy = e.clientY - sy;
@@ -2717,16 +2709,18 @@ async function importApkg(file) {
             if (interactionState === 'pressed' && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
                 clearTimeout(longPressTimer);
                 
-                if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 20) {
-                    // La logique de swipe pour la suppression reste la même
+                // Si le mouvement est principalement horizontal, on le traite comme un swipe
+                if (Math.abs(dx) > Math.abs(dy) * 1.5) {
                     if (dx < 0 && el.querySelector('.right-action')) {
                         interactionState = 'swiping';
                         el.classList.add('reveal-delete');
+                        e.preventDefault(); // On bloque le scroll UNIQUEMENT si c'est un swipe horizontal
                     }
                 }
             }
             
             if (interactionState === 'dragging') {
+                e.preventDefault(); // On bloque le scroll UNIQUEMENT si on est en train de glisser
                 moveGhost(e.clientX, e.clientY);
                 const rect = scrollContainer.getBoundingClientRect();
                 const edgeSize = rect.height * 0.20;
@@ -2746,6 +2740,11 @@ async function importApkg(file) {
         const onUp = e => {
             clearTimeout(longPressTimer);
 
+            // --- MODIFICATION CLÉ : Détecter un vrai clic ---
+            // On calcule la distance totale parcourue par le doigt.
+            const distanceMoved = Math.hypot(dx, dy);
+            const CLICK_THRESHOLD = 10; // 10 pixels de tolérance
+
             if (interactionState === 'dragging') {
                 const targetEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
                 if (targetEl && targetEl !== el) {
@@ -2753,11 +2752,13 @@ async function importApkg(file) {
                     const tId = targetEl.getAttribute('data-id');
                     handleDrop(subj, { type, id }, { type: tType, id: tId });
                 }
-            } else if (interactionState === 'pressed') {
-                // Un clic simple (pas de mouvement, pas de long press)
+            } else if (interactionState === 'pressed' && distanceMoved < CLICK_THRESHOLD) {
+                // C'est un vrai clic seulement si le doigt n'a pas bougé de plus de 10px.
                 if (type === 'group') openGroup(subj, id);
                 else goChapter(id);
             }
+            // Si le doigt a bougé de plus de 10px (pour scroller), on ne fait rien, 
+            // laissant le navigateur gérer le scroll.
             
             cancelAnimationFrame(animationFrameId);
             scrollDirection = 0;
