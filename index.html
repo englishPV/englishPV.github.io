@@ -2937,13 +2937,35 @@
     });
 
     backBtn.addEventListener('click', ()=>{
+      // *** CORRECTION APPLIQUÉE *** : Logique de retour depuis l'écran de récapitulatif améliorée
       if (State.view === 'recap') {
-        const targetChapId = State.review?.chapterId || State.review?.multiChaps?.[0] || State.chapterId;
+        // On récupère l'ID du chapitre de la session terminée (qu'il soit réel ou virtuel)
+        const targetChapId = State.review?.chapterId || State.chapterId;
         State.review = null;
         hideReviewActionsBar();
-        if (targetChapId) { goChapter(targetChapId, false); } else { goDeck(false); }
+
+        if (targetChapId && targetChapId.startsWith('group-')) {
+          // Si c'est un chapitre virtuel (un fichier), on le reconstruit et on affiche ses stats
+          const subj = getCurrentSubject();
+          const groupId = targetChapId.replace('group-', '');
+          const group = findGroupById(subj, groupId);
+          if (group) {
+            State.virtualChapter = buildVirtualFromGroup(subj, group);
+            goChapter(State.virtualChapter.id, false); // On affiche la vue chapitre SANS pousser l'historique
+          } else {
+            goDeck(false); // Sécurité si le groupe a été supprimé
+          }
+        } else if (targetChapId) {
+          // Si c'est un chapitre normal, on y retourne
+          goChapter(targetChapId, false);
+        } else {
+          // Sinon, retour au deck principal
+          goDeck(false);
+        }
         return;
       }
+      // --- Fin de la correction ---
+
       if (State.view === 'review' && State.review && State.review.end == null) {
         if (!confirm('Quitter la révision en cours ?')) return;
       }
@@ -3573,10 +3595,10 @@
           </div>
           <div class="cta"><button class="btn btn--solid btn--primary" id="continueBtn">Continuer</button></div>
         </div>`;
-      $('#continueBtn').addEventListener('click',()=>startReview(chap.id));
+      $('#continueBtn').addEventListener('click',()=>startReview(chap.id, false));
     }
 
-    function startReviewMulti(chapIds){
+    function startReviewMulti(chapIds, virtualChapId, push = true){
       const all = chapIds.map(_getChapterReal).filter(Boolean); if (!all.length) return;
       const pool = [];
       all.forEach(ch=>{ const sel = ch.filters.grades; ch.cards.forEach(c=>{ if (sel[c.grade||'unseen']) pool.push({ chapId: ch.id, card: c }); }); });
@@ -3595,21 +3617,25 @@
       const avgSize = Math.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length);
       const size = Math.min(avgSize||10, scored.length);
       const queue = scored.slice(0,size).map(x=>({ chapId:x.chapId, cardId:x.cardId }));
-      State.review = { mode:'multi', chapterId:null, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
-      goReview();
+      // *** CORRECTION APPLIQUÉE *** : On stocke l'ID du chapitre VIRTUEL dans l'état de la révision
+      State.review = { mode:'multi', chapterId: virtualChapId, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
+      // *** CORRECTION APPLIQUÉE *** : On utilise le paramètre 'push' pour appeler goReview
+      goReview(push);
     }
     // ---------- Logique révision ----------
-    function startReview(chapterId){
+    function startReview(chapterId, push = true) {
       if(!chapterId) return;
       const chap=getChapter(chapterId);
-      if (chap && chap.virtual && Array.isArray(chap._ids)) { return startReviewMulti(chap._ids); }
+      // *** CORRECTION APPLIQUÉE *** : On passe le paramètre 'push' à startReviewMulti
+      if (chap && chap.virtual && Array.isArray(chap._ids)) { return startReviewMulti(chap._ids, chap.id, push); }
       const sel=chap.filters.grades;
       const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
       const size=Math.min(chap.settings.sessionSize,pool.length);
       if(size<=0){alert('Aucune carte disponible avec les filtres sélectionnés.'); return;}
       const queue=buildSmartQueue(chap,pool,size).map(c=>c.id);
       State.review={chapterId, queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now()};
-      goReview();
+      // *** CORRECTION APPLIQUÉE *** : On utilise le paramètre 'push' pour appeler goReview
+      goReview(push);
     }
 
     function buildSmartQueue(chap,pool,size){
