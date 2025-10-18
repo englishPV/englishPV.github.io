@@ -161,6 +161,10 @@
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .row-4{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100%}
     .face-label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.3px}
+    .input{
+      width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--border);
+      background:var(--surface); color:var(--text); font-size:14px;
+    }
 
     /* Cards/containers base (flat) */
     .card,.deck-item,.review-card,.viewer,.card-item,.legend-item,.kpi .k,.stat,.chip{
@@ -416,9 +420,13 @@
       padding:8px 10px; border-radius:10px; cursor:pointer;
     }
     .subject-item:hover{ background: rgba(255,255,255,.06) }
-    .subject-item .name{ font-weight:800; flex:1 }
+    .subject-item .name{ font-weight:800; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .subject-item .meta{ font-size:12px; color:var(--muted) }
+    .subject-item .subject-actions{ margin-left:auto; display:flex; gap:6px; }
+    .subject-item .subject-actions .btn { padding: 4px 6px; }
+    .subject-item.drop-target { background: color-mix(in srgb, var(--primary) 12%, transparent); }
     :root[data-theme="light"] .subject-item:hover{ background: rgba(0,0,0,.06) }
+    :root[data-theme="light"] .subject-item.drop-target { background: color-mix(in srgb, var(--primary) 12%, transparent); }
 
     /* === LIGHTBOX IMAGE VIEWER === */
     .img-lightbox{
@@ -1666,6 +1674,10 @@
       LB.images=[]; LB.idx=0;
       document.body.style.overflow = document.body.dataset._oriOverflow || '';
     }
+    
+    function safeCloseLightbox(){
+      try { if (LB?.el?.classList.contains('open')) closeLightbox(); } catch(e){}
+    }
 
     function showLB(idx, initial=false){
       if(!LB.images.length) return;
@@ -1730,7 +1742,6 @@
     const flashcardDataEN  = parseCardsRaw(cardsRawText);
     const flashcardDataPHY = parseCardsRaw(physicsRawText);
     
-    // NOUVEAU : Store IndexedDB pour l'état de l'application
     const StateStore = {
       db: null,
       async open(){
@@ -2007,7 +2018,6 @@
       goDeck(false);
     }
     
-    // NOUVEAU : Fonctions d'export/import de la progression complète
     function exportProgress(){
       const blob = new Blob([JSON.stringify(data)], { type:'application/json' });
       const a = document.createElement('a');
@@ -2145,9 +2155,6 @@
         }
       }catch(e){}
       
-      // MODIFIÉ : la restauration depuis les cookies a été retirée
-      // La restauration se fait désormais depuis IndexedDB à la fin de init()
-
       const subjects = buildCanonicalSubjects();
       return {
         subjects,
@@ -2163,14 +2170,10 @@
       try{
         const str=JSON.stringify(data);
         localStorage.setItem(STORAGE_KEY,str);
-        // NOUVEAU : Sauvegarde dans IndexedDB en plus de localStorage
         StateStore.set('state', str).catch(e => console.warn("IDB save failed", e));
-        // MODIFIÉ : La sauvegarde dans les cookies est désactivée
-        // writeCookieBackup(str);
       }catch(e){console.warn('Save error',e);}
     }
 
-    // NOUVEAU: Fonction pour nettoyer les anciens cookies de backup
     function nukeCookieBackup(){
       try{
         const n = parseInt(getCookie('F9X16_BN')||'0',10);
@@ -2179,7 +2182,6 @@
       }catch(e){}
     }
 
-    // NOUVEAU: Fonction de nettoyage des statistiques
     function pruneStats({maxDays=180, maxLogsPerDay=200}={}){
       const cutoff = new Date();
       cutoff.setHours(0,0,0,0);
@@ -2189,20 +2191,14 @@
       (data.subjects||[]).forEach(subj=>{
         (subj.chapters||[]).forEach(ch=>{
           const S = ch.stats || {};
-          // Supprimer jours trop anciens
           ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(k=>{
             const m = S[k] || {};
-            Object.keys(m).forEach(day=>{
-              if (day < cutoffKey) delete m[day];
-            });
+            Object.keys(m).forEach(day=>{ if (day < cutoffKey) delete m[day]; });
           });
-          // Limiter la taille des logs par jour
           const logs = S.dailyLog || {};
           Object.keys(logs).forEach(day=>{
             const arr = logs[day];
-            if (Array.isArray(arr) && arr.length > maxLogsPerDay){
-              logs[day] = arr.slice(-maxLogsPerDay);
-            }
+            if (Array.isArray(arr) && arr.length > maxLogsPerDay){ logs[day] = arr.slice(-maxLogsPerDay); }
           });
         });
       });
@@ -2210,16 +2206,10 @@
     }
 
 
-    // Fonctions de gestion des cookies (conservées pour le nettoyage)
     function setCookie(name,value,days=365){try{document.cookie=`${name}=${encodeURIComponent(value)}; max-age=${days*86400}; path=/; SameSite=Lax;`;}catch(e){}}
     function getCookie(name){try{const m=document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'=')); return m?decodeURIComponent(m.split('=').slice(1).join('=')):null;}catch(e){return null;}}
     function delCookie(name){document.cookie=`${name}=; max-age=0; path=/; SameSite=Lax;`;}
     
-    // La fonction writeCookieBackup n'est plus appelée mais on peut la garder pour référence ou la supprimer
-    // function writeCookieBackup(str){const CHUNK=3400; const parts=Math.ceil(str.length/CHUNK); for(let i=0;i<parts;i++) setCookie(`F9X16_B${i}`,str.slice(i*CHUNK,(i+1)*CHUNK)); for(let i=parts;i<10;i++) delCookie(`F9X16_B${i}`); setCookie('F9X16_BN',String(parts));}
-    // La fonction readCookieBackup n'est plus utilisée dans le flux normal de chargement
-    // function readCookieBackup(){const n=parseInt(getCookie('F9X16_BN')||'0',10); if(!n) return null; let out=''; for(let i=0;i<n;i++){const p=getCookie(`F9X16_B${i}`); if(p==null) return null; out+=p;} return out;}
-
     let data = loadData();
 
     // ---------- Helpers de matière ----------
@@ -2237,6 +2227,54 @@
       const s=getCurrentSubject();
       return s?.chapters || [];
     }
+    
+    // NOUVEAU : Helpers pour la gestion des chapitres et matières
+    function getChapterEmoji(ch) { return (ch && (ch.emoji || emojiFor(ch.title) || '')) || ''; }
+    function updateChapterDescription(ch) { const em = getChapterEmoji(ch); ch.description = (em ? em + ' ' : '') + ch.title; }
+    function uniqueChapterId(subj, baseId) {
+      const ids = new Set((subj.chapters||[]).map(c=>c.id));
+      if(!ids.has(baseId)) return baseId;
+      let i=2, id=baseId;
+      while(ids.has(id)) id = baseId + '-' + i++;
+      return id;
+    }
+    function moveChapterToSubject(fromSubjId, chapId, toSubjId) {
+      if (fromSubjId === toSubjId) return false;
+      const from = (data.subjects||[]).find(s=>s.id===fromSubjId);
+      const to   = (data.subjects||[]).find(s=>s.id===toSubjId);
+      if (!from || !to) return false;
+      const idx = (from.chapters||[]).findIndex(c=>c.id===chapId);
+      if (idx<0) return false;
+      const ch = from.chapters[idx];
+      ensureGroups(from).forEach(g=>{ g.chapIds = g.chapIds.filter(id=>id!==chapId); });
+      ensureValidGroups(from);
+      from.chapters.splice(idx,1);
+      ch.id = uniqueChapterId(to, ch.id);
+      to.chapters = to.chapters || [];
+      to.chapters.push(ch);
+      ensureValidGroups(to);
+      deleteSubjectIfEmpty(from.id);
+      saveData();
+      return true;
+    }
+    function deleteSubjectIfEmpty(subjId) {
+      const i = (data.subjects||[]).findIndex(s=>s.id===subjId);
+      if (i<0) return;
+      if ((data.subjects[i].chapters||[]).length===0){
+        const wasCurrent = data.app.currentSubjectId === subjId;
+        data.subjects.splice(i,1);
+        if (wasCurrent){ data.app.currentSubjectId = data.subjects[0]?.id || null; }
+        saveData();
+      }
+    }
+    function renameSubject(subjId, newTitle, newEmoji='') {
+      const s = (data.subjects||[]).find(x=>x.id===subjId);
+      if (!s) return false;
+      if (typeof newTitle==='string' && newTitle.trim()) s.title = newTitle.trim();
+      s.emoji = (newEmoji || '').trim();
+      saveData();
+      return true;
+    }
 
     // ===== GROUPES ("fichiers") =====
     function getSubject(){ return getCurrentSubject(); }
@@ -2248,7 +2286,7 @@
       const set = new Set();
       group.chapIds.forEach(id=>{
         const ch = subj.chapters.find(c=>c.id===id);
-        const em = ch ? emojiFor(ch.title) : '';
+        const em = ch ? getChapterEmoji(ch) : ''; // MODIFIÉ
         if (em) set.add(em);
       });
       return Array.from(set).join(', ');
@@ -2401,20 +2439,29 @@
       }
       return m;
     }
+    
+    // MODIFIÉ : renderSubjectMenu avec options de renommage et suppression
     function renderSubjectMenu(){
       const m = ensureSubjectMenu();
       const list = data.subjects || [];
       const currentId = data.app.currentSubjectId;
       m.innerHTML = list.map(s=>`
         <div class="subject-item" data-id="${s.id}">
-          <div class="name">${s.title}</div>
+          <div class="name">${s.emoji ? (s.emoji+' ') : ''}${s.title}</div>
           <div class="meta">${s.chapters?.length||0} chap.</div>
           ${s.id===currentId ? '<div class="muted">✓</div>': ''}
+          <div class="subject-actions">
+            <button class="btn btn--tiny rename-subject" title="Renommer">✏️</button>
+            ${(s.chapters?.length||0)===0 ? '<button class="btn btn--tiny del-subject" title="Supprimer">🗑️</button>':''}
+          </div>
         </div>
       `).join('');
+
       m.querySelectorAll('.subject-item').forEach(el=>{
         el.addEventListener('click', (e)=>{
+          if (e.target.closest('.rename-subject, .del-subject')) return;
           const id = el.getAttribute('data-id');
+          const currentId = data.app.currentSubjectId;
           if(id && id!==currentId){
             setCurrentSubject(id);
             closeSubjectMenu();
@@ -2425,7 +2472,39 @@
           e.stopPropagation();
         });
       });
+
+      m.querySelectorAll('.rename-subject').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          e.stopPropagation();
+          const id = btn.closest('.subject-item').getAttribute('data-id');
+          const s = data.subjects.find(x=>x.id===id);
+          const newTitle = prompt('Nouveau nom de la matière:', s.title);
+          if (newTitle==null) return;
+          const newEmoji = prompt('Emoji (optionnel):', s.emoji||'') || '';
+          if (renameSubject(id, newTitle, newEmoji)){
+            renderSubjectMenu();
+            const subj = getCurrentSubject();
+            setTopbar({ title: `Deck • ${(subj.emoji? subj.emoji+' ' : '')}${subj.title}` });
+            goDeck(false);
+          }
+        });
+      });
+
+      m.querySelectorAll('.del-subject').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          e.stopPropagation();
+          const id = btn.closest('.subject-item').getAttribute('data-id');
+          const s = data.subjects.find(x=>x.id===id);
+          if ((s.chapters?.length||0)>0) return;
+          if (confirm(`Supprimer la matière "${s.title}" ?`)){
+            deleteSubjectIfEmpty(id);
+            closeSubjectMenu();
+            goDeck(false);
+          }
+        });
+      });
     }
+
     function positionSubjectMenu(){
       const m = ensureSubjectMenu();
       const rect = titleEl.getBoundingClientRect();
@@ -2459,13 +2538,20 @@
       else openSubjectMenu();
     });
 
-
-    backBtn.addEventListener('click',()=>{
-      if(State.view==='review' && State.review && State.review.end==null){
-        if(!confirm('Quitter la révision en cours ?')) return;
+    backBtn.addEventListener('click', ()=>{
+      if (State.view === 'recap') {
+        const targetChapId = State.review?.chapterId || State.review?.multiChaps?.[0] || State.chapterId;
+        State.review = null;
+        hideReviewActionsBar();
+        if (targetChapId) { goChapter(targetChapId, false); } else { goDeck(false); }
+        return;
+      }
+      if (State.view === 'review' && State.review && State.review.end == null) {
+        if (!confirm('Quitter la révision en cours ?')) return;
       }
       Nav.back();
     });
+
     $('#cardsBtn').addEventListener('click',()=>goCards(State.chapterId));
     $('#settingsBtn').addEventListener('click',()=>openSettings(State.chapterId));
     startReviewBtn.addEventListener('click',() => startReview(State.chapterId));
@@ -2508,12 +2594,14 @@
 
     // Deck
     function goDeck(push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(push) Nav.push();
       State.view='deck';
       State.chapterId=null;
       const subj = getCurrentSubject();
-      setTopbar({title:`Deck • ${subj?.title||''}`, showBack:false});
+      // MODIFIÉ : Affiche l'emoji de la matière dans le titre
+      setTopbar({ title: `Deck • ${(subj?.emoji? subj.emoji+' ' : '')}${subj?.title||''}`, showBack:false});
       setBottomVisibility({actions:false, revision:false});
       hideReviewActionsBar();
       renderDeck();
@@ -2611,6 +2699,7 @@
       bindDeckInteractions();
     }
     
+    // MODIFIÉ : bindDeckInteractions avec drag & drop vers le menu des matières
     function bindDeckInteractions() {
       const list = $('#deckList'); if (!list) return; const subj = getCurrentSubject();
       list.addEventListener('click', (e) => {
@@ -2629,7 +2718,9 @@
           const startDrag = (e) => {
               if (interactionState !== 'pressed' || type !== 'chapter') return;
               interactionState = 'dragging'; el.classList.add('dragging-origin'); document.body.classList.add('dragging-active');
-              scrollContainer.classList.add('scroll-lock'); ghost = el.cloneNode(true); ghost.classList.add('drag-ghost');
+              scrollContainer.classList.add('scroll-lock');
+              openSubjectMenu(); // Ouvre le menu des matières pour le drop
+              ghost = el.cloneNode(true); ghost.classList.add('drag-ghost');
               ghost.style.width = el.getBoundingClientRect().width + 'px'; document.body.appendChild(ghost); moveGhost(e.clientX, e.clientY);
               animationFrameId = requestAnimationFrame(autoScroll);
           };
@@ -2653,24 +2744,44 @@
                   e.preventDefault(); moveGhost(e.clientX, e.clientY);
                   const rect = scrollContainer.getBoundingClientRect(); const edgeSize = rect.height * 0.20;
                   if (e.clientY < rect.top + edgeSize) scrollDirection = -1; else if (e.clientY > rect.bottom - edgeSize) scrollDirection = 1; else scrollDirection = 0;
-                  $$('.deck-item').forEach(n => n.classList.remove('drop-target')); const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
-                  if (target && target !== el) { target.classList.add('drop-target'); }
+                  
+                  $$('.deck-item, .subject-item').forEach(n => n.classList.remove('drop-target'));
+                  const targetDeck = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
+                  const targetSubj = document.elementFromPoint(e.clientX, e.clientY)?.closest('.subject-item');
+                  if (targetDeck && targetDeck !== el) { targetDeck.classList.add('drop-target'); }
+                  else if (targetSubj) { targetSubj.classList.add('drop-target'); }
               }
           };
           const onUp = e => {
-              clearTimeout(longPressTimer); const distanceMoved = Math.hypot(dx, dy); const CLICK_THRESHOLD = 10;
+              clearTimeout(longPressTimer);
+              
               if (interactionState === 'dragging') {
+                const subjEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.subject-item');
+                if (subjEl) {
+                  const toId = subjEl.getAttribute('data-id');
+                  const fromId = subj.id;
+                  if (toId && toId !== fromId) {
+                    if (moveChapterToSubject(fromId, id, toId)) {
+                      setCurrentSubject(toId);
+                    }
+                  }
+                } else {
                   const targetEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item');
                   if (targetEl && targetEl !== el) {
                       const tType = targetEl.getAttribute('data-type'); const tId = targetEl.getAttribute('data-id');
                       handleDrop(subj, { type, id }, { type: tType, id: tId });
                   }
-              } else if (interactionState === 'pressed' && distanceMoved < CLICK_THRESHOLD) {
+                }
+                renderDeck(); // Refresh dans tous les cas de drop
+              } else if (interactionState === 'pressed' && Math.hypot(dx, dy) < 10) {
                   if (type === 'group') openGroup(subj, id); else goChapter(id);
               }
+
               cancelAnimationFrame(animationFrameId); scrollDirection = 0; scrollContainer.classList.remove('scroll-lock');
               interactionState = 'idle'; if (ghost) ghost.remove(); ghost = null;
-              el.classList.remove('dragging-origin'); document.body.classList.remove('dragging-active'); $$('.deck-item').forEach(n => n.classList.remove('drop-target'));
+              el.classList.remove('dragging-origin'); document.body.classList.remove('dragging-active');
+              $$('.deck-item, .subject-item').forEach(n => n.classList.remove('drop-target'));
+              closeSubjectMenu();
           };
           el.addEventListener('pointerdown', onDown); el.addEventListener('pointermove', onMove);
           el.addEventListener('pointerup', onUp); el.addEventListener('pointercancel', onUp);
@@ -2707,7 +2818,7 @@
         if (srcG && srcG.id!==g.id){ removeFromGroup(subj, srcG.id, [src.id]); ensureValidGroups(subj); }
         addToGroup(subj, g.id, src.id);
       }
-      ensureValidGroups(subj); saveData(); renderDeck();
+      ensureValidGroups(subj); saveData();
     }
 
     function openGroup(subj, groupId){
@@ -2718,6 +2829,7 @@
     
     // Chapter
     function goChapter(chapterId,push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(push) Nav.push();
       State.view='chapter'; State.chapterId=chapterId;
@@ -2745,7 +2857,7 @@
       const avg7=get7DayAvgMs(chap);
       const dueNow=getDueNow(chap);
       const streak=getStreakDays(chap);
-      const emoji=emojiFor(chap.title);
+      const emoji=getChapterEmoji(chap); // MODIFIÉ
 
       v.innerHTML = `
         <div class="card" style="flex:1; display:flex; flex-direction:column;">
@@ -2820,6 +2932,7 @@
 
     // Cards
     async function goCards(chapterId,push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(push) Nav.push();
       State.view='cards'; State.chapterId=chapterId;
@@ -2885,6 +2998,7 @@
       return logs;
     }
     async function goDaily(chapterId, dayKey, push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if (push) Nav.push();
       State.view='daily'; State.chapterId=chapterId; State.dailyKey=dayKey;
@@ -2961,6 +3075,7 @@
 
     // Review
     function goReview(push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(push) Nav.push();
       State.view='review';
@@ -3023,6 +3138,7 @@
 
     // Recap
     function goRecap(push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(push) Nav.push();
       State.view='recap';
@@ -3154,7 +3270,11 @@
       if(r.index < r.queue.length-1){
         r.index+=1; r.flipped=false; r.cardStart=Date.now();
         saveData(); renderReview();
-      }else{ r.end=Date.now(); saveData(); goRecap(false); }
+      }else{ 
+        r.end=Date.now(); 
+        saveData(); 
+        goRecap(false);
+      }
     }
 
     // ---------- Helpers chapitres/stats ----------
@@ -3340,12 +3460,19 @@
           });
           syncGradeCounts(ch);
         });
+        // NOUVEAU : Ajout des propriétés emoji et mise à jour des descriptions
+        subj.emoji = subj.emoji || '';
+        (subj.chapters||[]).forEach(ch=>{
+            ch.emoji = ch.emoji || '';
+            if (!ch.description) updateChapterDescription(ch);
+        });
       });
       saveData();
     }
 
     // ---------- Paramètres ----------
     function openSettings(chapterId,push=true){
+      safeCloseLightbox();
       Media.revokeAll();
       if(!chapterId) chapterId=State.chapterId;
       const chap=getChapter(chapterId); if(!chap) return;
@@ -3361,6 +3488,15 @@
           <div>
             <div class="settings-hero">Paramètres</div>
             <div class="settings-sub">Personnalisez l’affichage, les langues et vos objectifs</div>
+          </div>
+          <!-- NOUVEAU : Section pour renommer le chapitre -->
+          <div class="settings-section">
+            <div class="section-title">Chapitre</div>
+            <label class="mt6 muted" style="font-size:13px">Nom du chapitre</label>
+            <input id="chTitleInput" class="input" type="text" value="${chap.title}">
+            <label class="mt6 muted" style="font-size:13px">Emoji (optionnel)</label>
+            <input id="chEmojiInput" class="input" type="text" maxlength="4" value="${chap.emoji||''}" placeholder="ex: 📚">
+            <div class="mt6"> <button class="btn" id="saveChapterIdentity">Enregistrer</button> </div>
           </div>
           <div class="settings-section">
             <div class="section-title">Apparence</div>
@@ -3395,8 +3531,6 @@
             <div class="wheel" id="wheelSession"><div class="name">Taille session</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
             <div class="wheel mt6" id="wheelGoal"><div class="name">Objectif quotidien</div><div class="hint">Glissez ↑↓</div><div class="wheel-value"></div></div>
           </div>
-          
-          <!-- NOUVEAU : Section de gestion des données -->
           <div class="settings-section">
             <div class="section-title">Gestion des données</div>
             <div class="mt6 muted" style="font-size:13px">Sauvegardez ou restaurez manuellement votre progression.</div>
@@ -3406,7 +3540,6 @@
               <input type="file" id="importProgressInput" class="hidden" accept="application/json">
             </div>
           </div>
-          
           <div class="settings-section">
             <div class="section-title">Réinitialiser</div>
             <div class="mt6 muted" style="font-size:13px">Remettre à zéro la progression (grades, stats, temps).</div>
@@ -3416,6 +3549,20 @@
             </div>
           </div>
         </div>`;
+
+      // NOUVEAU : Event listeners pour renommer le chapitre
+      const chTitleInput = $('#chTitleInput');
+      const chEmojiInput = $('#chEmojiInput');
+      $('#saveChapterIdentity').onclick = ()=>{
+        const newTitle = (chTitleInput.value||'').trim();
+        const newEmoji = (chEmojiInput.value||'').trim();
+        if (newTitle) chap.title = newTitle;
+        chap.emoji = newEmoji;
+        updateChapterDescription(chap);
+        saveData();
+        setTopbar({title:`${chap.title} • Paramètres`});
+        renderByState(false);
+      };
 
       const P=data.app.prefs;
       const refreshTheme=()=>{$('#themeLbl').textContent=data.app.theme==='light'?'Clair':'Sombre';};
@@ -3434,14 +3581,11 @@
       bindWheel($('#wheelSession'),{get:()=>chap.settings.sessionSize,set:v=>{chap.settings.sessionSize=v}, min:5,max:200,step:5,unit:' cartes'});
       bindWheel($('#wheelGoal'),{get:()=>chap.settings.dailyGoal,set:v=>{chap.settings.dailyGoal=v}, min:5,max:500,step:5,unit:' cartes'});
 
-      // NOUVEAU : Event listeners pour l'import/export
       $('#exportProgressBtn').onclick = exportProgress;
       $('#importProgressBtn').onclick = () => $('#importProgressInput').click();
       $('#importProgressInput').onchange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-          importProgressFile(e.target.files[0]);
-        }
-        e.target.value = ''; // Reset pour permettre de re-sélectionner le même fichier
+        if (e.target.files && e.target.files[0]) { importProgressFile(e.target.files[0]); }
+        e.target.value = '';
       };
 
       $('#resetChapterBtn').onclick=()=>{
@@ -3654,7 +3798,6 @@
     }
 
     function init(){
-      // NOUVEAU: Nettoyage des anciens cookies au démarrage
       nukeCookieBackup();
 
       Media.open().catch(console.warn);
@@ -3665,10 +3808,10 @@
       setInterval(saveData,15000);
       window.addEventListener('storage',(e)=>{ if(e.key===STORAGE_KEY && e.newValue){ try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){} } });
     
-      // NOUVEAU: Appel au nettoyage des stats après le chargement des données
       pruneStats();
 
       const prevVersion = localStorage.getItem('flash9x16_version');
+      // MODIFIÉ : reconcileAllSubjectsWithCanonical n'est appelé que lors d'une mise à jour de version.
       if (prevVersion !== APP_VERSION) {
         upgradeData();
         reconcileAllSubjectsWithCanonical();
@@ -3676,7 +3819,6 @@
         localStorage.setItem('flash9x16_version', APP_VERSION);
       } else {
         upgradeData();
-        reconcileAllSubjectsWithCanonical();
       }
     
       applyTheme();
@@ -3684,13 +3826,12 @@
       Nav.clear();
       goDeck(false);
       
-      // NOUVEAU: Tentative de restauration depuis IndexedDB si localStorage est vide
       StateStore.get('state').then(raw=>{
         if (!localStorage.getItem(STORAGE_KEY) && raw) {
           try{
             console.log("Restoring state from IndexedDB backup.");
             data = JSON.parse(raw);
-            saveData(); // re-synchronise localStorage
+            saveData();
             renderByState(false);
           } catch(e){ console.warn('Restore from IDB failed', e); }
         }
