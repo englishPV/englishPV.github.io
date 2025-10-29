@@ -3646,45 +3646,66 @@
       $('#continueBtn').addEventListener('click',()=>startReview(chap.id, false));
     }
 
-    function startReviewMulti(chapIds, virtualChapId, push = true){
-      const all = chapIds.map(_getChapterReal).filter(Boolean); if (!all.length) return;
-      const pool = [];
-      all.forEach(ch=>{ const sel = ch.filters.grades; ch.cards.forEach(c=>{ if (sel[c.grade||'unseen']) pool.push({ chapId: ch.id, card: c }); }); });
-      if (!pool.length){ alert('Aucune carte disponible avec les filtres actuels.'); return; }
-      const scored = pool.map(({chapId,card})=>{
-        const g=card.grade||'unseen'; const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
-        const now=Date.now(); const baseW=baseWMap[g]??1; let dueBoost=1;
-        if(card.dueAt && card.dueAt>0){ const delta=now-card.dueAt; dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85; }else{ dueBoost=1.15; }
-        const ema=typeof card.perfEma=='number' ? card.perfEma : 0.5; const perfBoost=1+(1-ema)*1.6;
-        const s=card.streak||0; const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
-        const t=card.avgMs||0; const timeBoost=1+Math.min(2,t/3000); const jitter=0.9+Math.random()*0.2;
-        const weight=baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter;
-        return { chapId, cardId: card.id, weight };
-      });
-      scored.sort((a,b)=>b.weight-a.weight);
-      const avgSize = Math.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length);
-      const size = Math.min(avgSize||10, scored.length);
-      const queue = scored.slice(0,size).map(x=>({ chapId:x.chapId, cardId:x.cardId }));
-      // *** CORRECTION APPLIQUÉE *** : On stocke l'ID du chapitre VIRTUEL dans l'état de la révision
-      State.review = { mode:'multi', chapterId: virtualChapId, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
-      // *** CORRECTION APPLIQUÉE *** : On utilise le paramètre 'push' pour appeler goReview
-      goReview(push);
-    }
+    function startReviewMulti(chapIds, virtualChapId, groupFilters, push = true){
+  const all = chapIds.map(_getChapterReal).filter(Boolean);
+  if (!all.length) return;
+  
+  const pool = [];
+  // <-- MODIFICATION CLÉ : On utilise le filtre du groupe (groupFilters)
+  // au lieu des filtres individuels de chaque chapitre.
+  const sel = groupFilters.grades; 
+  
+  all.forEach(ch=>{
+    // On parcourt les cartes de chaque chapitre et on applique le filtre commun.
+    ch.cards.forEach(c=>{
+      if (sel[c.grade||'unseen']) {
+        pool.push({ chapId: ch.id, card: c });
+      }
+    });
+  });
+
+  if (!pool.length){
+    alert('Aucune carte disponible avec les filtres actuels.');
+    return;
+  }
+  
+  const scored = pool.map(({chapId,card})=>{
+    const g=card.grade||'unseen'; const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+    const now=Date.now(); const baseW=baseWMap[g]??1; let dueBoost=1;
+    if(card.dueAt && card.dueAt>0){ const delta=now-card.dueAt; dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85; }else{ dueBoost=1.15; }
+    const ema=typeof card.perfEma=='number' ? card.perfEma : 0.5; const perfBoost=1+(1-ema)*1.6;
+    const s=card.streak||0; const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
+    const t=card.avgMs||0; const timeBoost=1+Math.min(2,t/3000); const jitter=0.9+Math.random()*0.2;
+    const weight=baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter;
+    return { chapId, cardId: card.id, weight };
+  });
+  
+  scored.sort((a,b)=>b.weight-a.weight);
+  const avgSize = Math.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length);
+  const size = Math.min(avgSize||10, scored.length);
+  const queue = scored.slice(0,size).map(x=>({ chapId:x.chapId, cardId:x.cardId }));
+  
+  State.review = { mode:'multi', chapterId: virtualChapId, multiChaps: chapIds.slice(), queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now() };
+  goReview(push);
+}
     // ---------- Logique révision ----------
     function startReview(chapterId, push = true) {
-      if(!chapterId) return;
-      const chap=getChapter(chapterId);
-      // *** CORRECTION APPLIQUÉE *** : On passe le paramètre 'push' à startReviewMulti
-      if (chap && chap.virtual && Array.isArray(chap._ids)) { return startReviewMulti(chap._ids, chap.id, push); }
-      const sel=chap.filters.grades;
-      const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
-      const size=Math.min(chap.settings.sessionSize,pool.length);
-      if(size<=0){alert('Aucune carte disponible avec les filtres sélectionnés.'); return;}
-      const queue=buildSmartQueue(chap,pool,size).map(c=>c.id);
-      State.review={chapterId, queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now()};
-      // *** CORRECTION APPLIQUÉE *** : On utilise le paramètre 'push' pour appeler goReview
-      goReview(push);
-    }
+  if(!chapterId) return;
+  const chap=getChapter(chapterId);
+  
+  if (chap && chap.virtual && Array.isArray(chap._ids)) {
+    // <-- MODIFICATION CLÉ : On passe maintenant chap.filters en 3ème argument
+    return startReviewMulti(chap._ids, chap.id, chap.filters, push);
+  }
+  
+  const sel=chap.filters.grades;
+  const pool=chap.cards.filter(c=>sel[(c.grade||'unseen')]);
+  const size=Math.min(chap.settings.sessionSize,pool.length);
+  if(size<=0){alert('Aucune carte disponible avec les filtres sélectionnés.'); return;}
+  const queue=buildSmartQueue(chap,pool,size).map(c=>c.id);
+  State.review={chapterId, queue, index:0, flipped:false, answers:[], start:Date.now(), end:null, cardStart:Date.now()};
+  goReview(push);
+}
 
     function buildSmartQueue(chap,pool,size){
       const now=Date.now(); const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
