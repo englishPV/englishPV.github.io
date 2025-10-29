@@ -2984,8 +2984,14 @@
     backBtn.addEventListener('click', ()=>{
   // Logique pour quitter l'écran de récapitulatif
   if (State.view === 'recap') {
+    // <-- MODIFICATION CLÉ : On retire l'écran de stats précédent de l'historique
+    // car on y retourne "manuellement".
+    if (Nav.stack.length > 0) {
+      Nav.stack.pop();
+    }
+
     // Récupère l'ID du chapitre de la session qui vient de se terminer
-    const targetChapId = State.review?.chapterId;
+    const targetChapId = State.review?.chapterId || State.chapterId;
     State.review = null; // Nettoie l'état de la session
     hideReviewActionsBar();
 
@@ -3316,7 +3322,7 @@
     function renderChapter(chapterId){
       const v=$('#view'); const chap=getChapter(chapterId);
       const sel=chap.filters.grades||{};
-      const counts=getLiveGradeCounts(chap);
+      const counts = chap.stats.gradeCounts || getLiveGradeCounts(chap);
       const {unseen,echec,difficile,bien,facile}=counts;
 
       const today=getTodayCount(chap);
