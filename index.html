@@ -2743,7 +2743,7 @@
         description: (finalEmoji ? finalEmoji + ' ' : '') + finalTitle,
         virtual:true, _ids: group.chapIds.slice(),
         settings:{ sessionSize:avgSize, dailyGoal:avgGoal, reviewOrder:'front-first', langSwap:false },
-        filters:{ grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true} },
+        filters: group.filters ? deepClone(group.filters) : { grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true} },
         stats: { gradeCounts: counts, ...stats },
         cards
       };
@@ -2783,7 +2783,32 @@
       if (State.virtualChapter && State.virtualChapter.id===id) return State.virtualChapter;
       return _getChapterReal(id);
     }
+    function updateChapterFilter(chap, key) {
+    let targetObject = chap; // Cible par défaut : le chapitre lui-même
 
+    // Si c'est un chapitre virtuel, on doit modifier le groupe original pour la sauvegarde
+    if (chap.virtual && chap._groupId) {
+        const subj = getCurrentSubject();
+        const group = findGroupById(subj, chap._groupId);
+        if (group) {
+            // Initialise la structure des filtres sur le groupe si elle n'existe pas
+            if (!group.filters) {
+                group.filters = { grades:{unseen:true,echec:true,difficile:true,bien:true,facile:true} };
+            }
+            targetObject = group; // La cible de la modification devient le groupe persistant
+        }
+    }
+
+    toggleFilterKey(targetObject, key); // Applique la logique de bascule sur la bonne cible
+
+    // Si on a modifié un groupe, on synchronise le chapitre virtuel en mémoire pour que l'UI se mette à jour instantanément
+    if (targetObject !== chap) {
+        chap.filters = targetObject.filters;
+    }
+
+    saveData(); // Sauvegarde les changements (y compris les filtres du groupe)
+    renderChapter(chap.id); // Re-dessine la vue du chapitre
+}
     function deleteImportedChapter(chId){
       const subj = getCurrentSubject();
       const idx = subj?.chapters?.findIndex(c=>c.id===chId) ?? -1;
@@ -2957,40 +2982,43 @@
     });
 
     backBtn.addEventListener('click', ()=>{
-      // *** CORRECTION APPLIQUÉE *** : Logique de retour depuis l'écran de récapitulatif améliorée
-      if (State.view === 'recap') {
-        // On récupère l'ID du chapitre de la session terminée (qu'il soit réel ou virtuel)
-        const targetChapId = State.review?.chapterId || State.chapterId;
-        State.review = null;
-        hideReviewActionsBar();
+  // Logique pour quitter l'écran de récapitulatif
+  if (State.view === 'recap') {
+    // Récupère l'ID du chapitre de la session qui vient de se terminer
+    const targetChapId = State.review?.chapterId;
+    State.review = null; // Nettoie l'état de la session
+    hideReviewActionsBar();
 
-        if (targetChapId && targetChapId.startsWith('group-')) {
-          // Si c'est un chapitre virtuel (un fichier), on le reconstruit et on affiche ses stats
-          const subj = getCurrentSubject();
-          const groupId = targetChapId.replace('group-', '');
-          const group = findGroupById(subj, groupId);
-          if (group) {
-            State.virtualChapter = buildVirtualFromGroup(subj, group);
-            goChapter(State.virtualChapter.id, false); // On affiche la vue chapitre SANS pousser l'historique
-          } else {
-            goDeck(false); // Sécurité si le groupe a été supprimé
-          }
-        } else if (targetChapId) {
-          // Si c'est un chapitre normal, on y retourne
-          goChapter(targetChapId, false);
-        } else {
-          // Sinon, retour au deck principal
-          goDeck(false);
-        }
-        return;
+    if (targetChapId && targetChapId.startsWith('group-')) {
+      // Cas d'un "fichier" (chapitre virtuel)
+      const subj = getCurrentSubject();
+      const groupId = targetChapId.replace('group-', '');
+      const group = findGroupById(subj, groupId);
+      if (group) {
+        // Reconstruit le chapitre virtuel avec les stats à jour et y navigue
+        State.virtualChapter = buildVirtualFromGroup(subj, group);
+        goChapter(State.virtualChapter.id, false);
+      } else {
+        goDeck(false); // Sécurité si le groupe a été supprimé
       }
-      // --- Fin de la correction ---
+    } else if (targetChapId) {
+      // Cas d'un chapitre normal : on y retourne simplement
+      goChapter(targetChapId, false);
+    } else {
+      // Sécurité : retour au menu principal
+      goDeck(false);
+    }
+    return; // Empêche l'exécution du Nav.back() plus bas
+  }
 
-      if (State.view === 'review' && State.review && State.review.end == null) {
-        if (!confirm('Quitter la révision en cours ?')) return;
-      }
-      Nav.back();
-    });
+  // Logique pour quitter une révision en cours
+  if (State.view === 'review' && State.review && State.review.end == null) {
+    if (!confirm('Quitter la révision en cours ?')) return;
+  }
+  
+  // Comportement de retour par défaut pour les autres écrans
+  Nav.back();
+});
 
     $('#cardsBtn').addEventListener('click',()=>goCards(State.chapterId));
     $('#settingsBtn').addEventListener('click',()=>openSettings(State.chapterId));
@@ -3885,9 +3913,9 @@
       const dx=x-map.cx, dy=y-map.cy; const r=Math.hypot(dx,dy); if(r<map.innerR||r>map.outerR) return;
       let a=Math.atan2(dy,dx); while(a<-Math.PI/2) a+=2*Math.PI; while(a>3*Math.PI/2) a-=2*Math.PI;
       const hit=map.arcs.find(s=>a>=s.start && a<=s.end); if(!hit) return;
-      toggleFilterKey(chap,hit.key); saveData(); renderChapter(chap.id);
+      updateChapterFilter(chap, hit.key);
     }
-    function handleLegendClick(key,chap){toggleFilterKey(chap,key); saveData(); renderChapter(chap.id);}
+    function handleLegendClick(key,chap){ updateChapterFilter(chap, key); }
 
     // ---------- Thème / UI ----------
     function applyTheme(){document.documentElement.setAttribute('data-theme', (data?.app?.theme)||'dark');}
