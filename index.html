@@ -3707,18 +3707,55 @@
   goReview(push);
 }
 
-    function buildSmartQueue(chap,pool,size){
-      const now=Date.now(); const baseWMap={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
-      const scored=pool.map(c=>{
-        const g=c.grade||'unseen'; const baseW=baseWMap[g]??1; let dueBoost=1;
-        if(c.dueAt && c.dueAt>0){ const delta=now-c.dueAt; dueBoost = delta>0 ? (1+Math.min(3,delta/864e5)) : 0.85; }else{ dueBoost=1.15; }
-        const ema=typeof c.perfEma=='number' ? c.perfEma : 0.5; const perfBoost=1+(1-ema)*1.6;
-        const s=c.streak||0; const streakAdj = s>=3 ? (1/(1+0.12*(s-2))) : (s<0 ? (1+0.18*Math.min(8,Math.abs(s))) : 1);
-        const t=c.avgMs||0; const timeBoost=1+Math.min(2,t/3000); const jitter=0.9+Math.random()*0.2;
-        return {card:c, weight:baseW*dueBoost*perfBoost*streakAdj*timeBoost*jitter};
-      });
-      scored.sort((a,b)=>b.weight-a.weight); return scored.slice(0,size).map(x=>x.card);
+    function buildSmartQueue(chap, pool, size) {
+  const now = Date.now();
+  
+  // Fonction utilitaire pour mélanger un tableau (algorithme de Fisher-Yates)
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
+  };
+
+  // --- Étape 1 : Catégoriser toutes les cartes du pool ---
+  const newCards = [];
+  const lapsedCards = []; // Cartes échouées ou difficiles, à réapprendre
+  const dueReviews = [];  // Cartes à réviser dont la date est échue
+
+  pool.forEach(card => {
+    const grade = card.grade || 'unseen';
+    
+    if (grade === 'unseen') {
+      newCards.push(card);
+    } else if (grade === 'echec' || grade === 'difficile') {
+      lapsedCards.push(card);
+    } else if (card.dueAt && card.dueAt <= now) {
+      // Uniquement les cartes "bien" ou "facile" qui sont dues
+      dueReviews.push(card);
+    }
+    // Les cartes dont la date de révision est future sont ignorées.
+  });
+
+  // --- Étape 2 : Construire la session en respectant les priorités ---
+  
+  // On mélange chaque catégorie pour éviter de voir toujours les mêmes cartes au début
+  shuffleArray(lapsedCards);
+  shuffleArray(dueReviews);
+  shuffleArray(newCards);
+  
+  // On assemble la file d'attente finale en suivant l'ordre de priorité :
+  // 1. Lapsus -> 2. Révisions dues -> 3. Nouvelles cartes
+  const sessionQueue = [
+    ...lapsedCards,
+    ...dueReviews,
+    ...newCards
+  ];
+
+  // --- Étape 3 : Renvoyer le nombre de cartes demandé ---
+  return sessionQueue.slice(0, size);
+}
 
     function getCurrentCard(){
       const r=State.review;
