@@ -2340,7 +2340,10 @@ const irregularVerbsRawText = `
         return {id:id.trim(),front:f.trim(),back:e.trim(),chapter:c.trim()};
       }).filter(Boolean);
     }
-    const flashcardDataEN  = parseCardsRaw(cardsRawText);
+  
+    // On combine les deux listes de cartes avant de les analyser.
+    const combinedEnglishRawText = `${cardsRawText}\n${irregularVerbsRawText}`;
+    const flashcardDataEN  = parseCardsRaw(combinedEnglishRawText);
     const flashcardDataPHY = parseCardsRaw(physicsRawText);
     
     const StateStore = {
@@ -4601,12 +4604,12 @@ const irregularVerbsRawText = `
       console.log(`Version sauvegardée: ${savedVersion || 'aucune'}, Version du code: ${APP_VERSION}`);
 
       // 2. Systématiquement réconcilier le contenu du code avec les données sauvegardées
-      //    Ceci garantit que les nouvelles cartes/chapitres sont toujours ajoutés.
+      //    Ceci garantit que les nouvelles cartes/chapitres sont toujours ajoutés tout en conservant la progression.
       console.log("Réconciliation des données...");
       reconcileAllSubjectsWithCanonical();
       
       // 3. Mettre à jour la version dans l'objet de données et sauvegarder
-      //    C'est la SEULE fois où nous modifions la version.
+      //    Cela permet de savoir que la fusion a bien été faite pour cette version du code.
       if (!data.app) data.app = {};
       data.app.version = APP_VERSION;
       saveData();
@@ -4620,7 +4623,7 @@ const irregularVerbsRawText = `
       Nav.clear();
       goDeck(false);
       
-      // Logique de secours pour IndexedDB
+      // Logique de secours pour récupérer les données depuis une autre base si localStorage est vide
       StateStore.get('state').then(raw=>{
         if (!localStorage.getItem(STORAGE_KEY) && raw) {
           try{
