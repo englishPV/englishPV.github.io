@@ -543,14 +543,13 @@
 
   <script>
     // ---------- Données & stockage ----------
-    const STORAGE_KEY = 'flash9x16_data_v3';
-    // *** PATCH APPLIQUÉ *** : J'ai mis à jour la version suite à l'ajout des nouveaux chapitres.
-    const APP_VERSION = '2025-10-18-5'; // Version incrémentée de 4 à 5.
+const APP_VERSION = '2025-10-18-5'; // Version incrémentée de 4 à 5.
     
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
-    const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM",IDR="ILLEGAL DRUGS"; // <--- VOS DEUX NOUVEAUX CHAPITRES
-    
+    const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM",IDR="ILLEGAL DRUGS";
+    const VI="Verbes Irréguliers"; // <--- AJOUT: Nouvelle constante pour le chapitre
+
     // Chapitres Physique (constantes pratiques pour le raw)
     const PM = "M2";
     const PM3 = "M3";
@@ -569,8 +568,9 @@
     // Emojis chapitres
     const CHAPTER_EMOJIS = {
       [CD]:'🏛️',[CG]:'🧬',[CI]:'🧳',[CIT]:'🌐',[CU]:'💼',[CR]:'⚖️',[PC]:'💀',[CF]:'♀️',
-      [HI]:'⚕️', [IF]:'🗽', // <--- AJOUT DES EMOJIS CORRESPONDANTS
+      [HI]:'⚕️', [IF]:'🗽',
       [IDR]:'💊',
+      [VI]:'📚', // <--- AJOUT: Emoji pour le nouveau chapitre
       'Politique':'🏛️','Business':'💼','Education':'🎓','Thanksgiving':'🦃',
       'M2':'⚙️',
       'M3':'🌍',
@@ -1738,6 +1738,139 @@
 1142|une amende|a fine|${IDR}
 1143|condamner qn à une amende|to fine sb|${IDR}
 1144|le responsable de la lutte contre la drogue|the drug czar, the drug tsar|${IDR}
+`.trim();
+
+
+
+
+
+const irregularVerbsRawText = `
+8000|supporter/porter/naître|bear / bore / borne/born|${VI}
+8001|battre|beat / beat / beaten|${VI}
+8002|devenir|become / became / become|${VI}
+8003|commencer|begin / began / begun|${VI}
+8004|plier, se courber|bend / bent / bent|${VI}
+8005|parier|bet / bet / bet|${VI}
+8006|lier, relier|bind / bound / bound|${VI}
+8007|mordre|bite / bit / bitten|${VI}
+8008|saigner|bleed / bled / bled|${VI}
+8009|souffler|blow / blew / blown|${VI}
+8010|casser|break / broke / broken|${VI}
+8011|apporter|bring / brought / brought|${VI}
+8012|construire|build / built / built|${VI}
+8013|brûler|burn / burnt / burnt|${VI}
+8014|éclater|burst / burst / burst|${VI}
+8015|acheter|buy / bought / bought|${VI}
+8016|jeter (un sort), distribuer des rôles|cast / cast / cast|${VI}
+8017|attraper|catch / caught / caught|${VI}
+8018|choisir|choose / chose / chosen|${VI}
+8019|s’accrocher, adhérer|cling / clung / clung|${VI}
+8020|venir|come / came / come|${VI}
+8021|coûter|cost / cost / cost|${VI}
+8022|ramper, grimper|creep / crept / crept|${VI}
+8023|couper|cut / cut / cut|${VI}
+8024|distribuer|deal / dealt / dealt|${VI}
+8025|creuser|dig / dug / dug|${VI}
+8026|plonger|dive / dived / dived/dove(USA)|${VI}
+8027|faire|do / did / done|${VI}
+8028|dessiner|draw / drew / drawn|${VI}
+8029|rêver|dream / dreamt / dreamt|${VI}
+8030|boire|drink / drank / drunk|${VI}
+8031|conduire|drive / drove / driven|${VI}
+8032|manger|eat / ate / eaten|${VI}
+8033|tomber|fall / fell / fallen|${VI}
+8034|nourrir|feed / fed / fed|${VI}
+8035|sentir, éprouver|feel / felt / felt|${VI}
+8036|se battre, combattre|fight / fought / fought|${VI}
+8037|trouver|find / found / found|${VI}
+8038|s’enfuir|flee / fled / fled|${VI}
+8039|voler (avion)|fly / flew / flown|${VI}
+8040|interdire|forbid / forbade / forbidden|${VI}
+8041|oublier|forget / forgot / forgotten|${VI}
+8042|pardonner|forgive / forgave / forgiven|${VI}
+8043|geler|freeze / froze / frozen|${VI}
+8044|obtenir|get / got / got|${VI}
+8045|donner|give / gave / given|${VI}
+8046|aller|go / went / gone|${VI}
+8047|grandir|grow / grew / grown|${VI}
+8048|pendre, tenir, accrocher|hang / hung / hung|${VI}
+8049|avoir|have / had / had|${VI}
+8050|entendre|hear / heard / heard|${VI}
+8051|(se) cacher|hide / hid / hidden|${VI}
+8052|frapper, atteindre, toucher|hit / hit / hit|${VI}
+8053|tenir|hold / held / held|${VI}
+8054|blesser|hurt / hurt / hurt|${VI}
+8055|garder|keep / kept / kept|${VI}
+8056|s’agenouiller|kneel / knelt / knelt|${VI}
+8057|savoir, connaître|know / knew / known|${VI}
+8058|mener|lead / led / led|${VI}
+8059|s’appuyer|lean / leant / leant|${VI}
+8060|apprendre|learn / learnt / learnt|${VI}
+8061|laisser, quitter|leave / left / left|${VI}
+8062|prêter|lend / lent / lent|${VI}
+8063|permettre|let / let / let|${VI}
+8064|allumer|light / lit / lit|${VI}
+8065|perdre|lose / lost / lost|${VI}
+8066|fabriquer, faire|make / made / made|${VI}
+8067|signifier, vouloir dire|mean / meant / meant|${VI}
+8068|(se) rencontrer|meet / met / met|${VI}
+8069|mettre|put / put / put|${VI}
+8070|cesser (de)|quit / quit / quit|${VI}
+8071|lire|read / read / read|${VI}
+8072|chevaucher|ride / rode / ridden|${VI}
+8G73|sonner|ring / rang / rung|${VI}
+8074|s’élever, se lever|rise / rose / risen|${VI}
+8075|courir|run / ran / run|${VI}
+8076|scier|saw / sawed / sawn|${VI}
+8077|dire|say / said / said|${VI}
+8078|voir|see / saw / seen|${VI}
+8079|chercher|seek / sought / sought|${VI}
+8080|vendre|sell / sold / sold|${VI}
+8081|envoyer|send / sent / sent|${VI}
+8082|fixer|set / set / set|${VI}
+8083|secouer|shake / shook / shaken|${VI}
+8084|briller|shine / shone / shone|${VI}
+8085|tirer/tuer par balle/filmer|shoot / shot / shot|${VI}
+8086|montrer|show / showed / shown|${VI}
+8087|rétrécir|shrink / shrank / shrunk|${VI}
+8088|fermer|shut / shut / shut|${VI}
+8089|chanter|sing / sang / sung|${VI}
+8090|couler|sink / sank / sunk|${VI}
+8091|être assis|sit / sat / sat|${VI}
+8092|dormir|sleep / slept / slept|${VI}
+8093|glisser|slide / slid / slid|${VI}
+8094|sentir|smell / smelt / smelt|${VI}
+8095|parler|speak / spoke / spoken|${VI}
+8096|accélérer|speed / sped / sped|${VI}
+8097|dépenser|spend / spent / spent|${VI}
+8098|fendre|split / split / split|${VI}
+8099|gâcher|spoil / spoilt / spoilt|${VI}
+8100|répandre|spread / spread / spread|${VI}
+8101|jaillir, bondir|spring / sprang / sprung|${VI}
+8102|être debout|stand / stood / stood|${VI}
+8103|voler quelque chose, dérober|steal / stole / stolen|${VI}
+8104|coller|stick / stuck / stuck|${VI}
+8105|piquer|sting / stung / stung|${VI}
+8106|frapper|strike / struck / struck|${VI}
+8107|jurer|swear / swore / sworn|${VI}
+8108|enfler|swell / swelled / swollen|${VI}
+8109|nager|swim / swam / swum|${VI}
+8110|se balancer|swing / swung / swung|${VI}
+8111|prendre|take / took / taken|${VI}
+8112|enseigner|teach / taught / taught|${VI}
+8113|déchirer|tear / tore / torn|${VI}
+8114|dire, raconter|tell / told / told|${VI}
+8115|penser|think / thought / thought|${VI}
+8116|jeter|throw / threw / thrown|${VI}
+8117|comprendre|understand / understood / understood|${VI}
+8118|bouleverser|upset / upset / upset|${VI}
+8119|(se) réveiller|wake / woke / woken|${VI}
+8120|porter (des vêtements)|wear / wore / worn|${VI}
+8121|mouiller|wet / wet / wet|${VI}
+8122|gagner|win / won / won|${VI}
+8123|enrouler|wind / wound / wound|${VI}
+8124|(se) retirer, retirer de l’argent|withdraw / withdrew / withdrawn|${VI}
+8125|écrire|write / wrote / written|${VI}
 `.trim();
 
 
