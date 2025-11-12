@@ -543,7 +543,8 @@
 
   <script>
     // ---------- Données & stockage ----------
-const APP_VERSION = '2025-10-18-5'; // Version incrémentée de 4 à 5.
+const STORAGE_KEY = 'flashcards9x16_data'; // <-- AJOUT CRUCIAL
+    const APP_VERSION = '2025-10-18-5';// Version incrémentée de 4 à 5.
     
     // Catégories Anglais
     const CD="Democracy",CG="Genetics",CI="Immigration",CIT="International Relations",CU="Labor",CR="Crime",PC="Capital Punishment",CF="Status of Women";
@@ -4587,56 +4588,46 @@ const irregularVerbsRawText = `
     }
 
     // *** PATCH APPLIQUÉ *** : Logique d'initialisation améliorée
-    function init(){
-      nukeCookieBackup();
-
+    // *** VERSION CORRIGÉE ET SÉCURISÉE DE L'INITIALISATION ***
+    function init() {
+      // Événements de sauvegarde automatique
       Media.open().catch(console.warn);
       if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().then(granted=>console.log('persist granted?',granted)); }
-      window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveData();});
-      window.addEventListener('pagehide',saveData);
-      window.addEventListener('beforeunload',saveData);
-      setInterval(saveData,15000);
-      window.addEventListener('storage',(e)=>{ if(e.key===STORAGE_KEY && e.newValue){ try{data=JSON.parse(e.newValue); renderByState(false);}catch(err){} } });
-    
-      // 1. Charger les données existantes de l'utilisateur
-      data = loadData();
+      window.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden') saveData(); });
+      window.addEventListener('pagehide', saveData);
+      window.addEventListener('beforeunload', saveData);
+      setInterval(saveData, 15000);
+
+      // 1. Charger les données depuis localStorage
+      data = loadData(); 
       const savedVersion = data?.app?.version;
-      console.log(`Version sauvegardée: ${savedVersion || 'aucune'}, Version du code: ${APP_VERSION}`);
+      console.log(`Version des données chargées: ${savedVersion || 'aucune'}, Version du code: ${APP_VERSION}`);
 
-      // 2. Systématiquement réconcilier le contenu du code avec les données sauvegardées
-      //    Ceci garantit que les nouvelles cartes/chapitres sont toujours ajoutés tout en conservant la progression.
-      console.log("Réconciliation des données...");
-      reconcileAllSubjectsWithCanonical();
+      // 2. VÉRIFIER si une mise à jour est nécessaire
+      if (savedVersion !== APP_VERSION) {
+        console.log("Mise à jour détectée. Lancement de la réconciliation des données...");
+        
+        // La réconciliation fusionne le nouveau contenu du code avec l'ancienne progression
+        reconcileAllSubjectsWithCanonical();
+        
+        // On met à jour le numéro de version dans les données de l'utilisateur
+        if (!data.app) data.app = {};
+        data.app.version = APP_VERSION;
+        
+        // On sauvegarde immédiatement les données fusionnées
+        saveData();
+        console.log("Réconciliation terminée. Les données sont maintenant à la version " + APP_VERSION);
+      } else {
+        console.log("Les données sont déjà à jour. Aucun besoin de réconcilier.");
+      }
       
-      // 3. Mettre à jour la version dans l'objet de données et sauvegarder
-      //    Cela permet de savoir que la fusion a bien été faite pour cette version du code.
-      if (!data.app) data.app = {};
-      data.app.version = APP_VERSION;
-      saveData();
-      console.log("Données à jour et sauvegardées.");
-
-      // 4. Continuer le démarrage normal de l'application
+      // 3. Démarrage normal de l'application avec les données correctes
       pruneStats();
       upgradeData();
       applyTheme();
       applyUI();
       Nav.clear();
       goDeck(false);
-      
-      // Logique de secours pour récupérer les données depuis une autre base si localStorage est vide
-      StateStore.get('state').then(raw=>{
-        if (!localStorage.getItem(STORAGE_KEY) && raw) {
-          try{
-            console.log("Restauration depuis la sauvegarde IndexedDB.");
-            data = JSON.parse(raw);
-            // On re-réconcilie au cas où la sauvegarde IDB soit ancienne
-            reconcileAllSubjectsWithCanonical();
-            data.app.version = APP_VERSION;
-            saveData();
-            renderByState(false);
-          } catch(e){ console.warn('Échec de la restauration depuis IDB', e); }
-        }
-      });
     }
     
     init();
