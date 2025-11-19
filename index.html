@@ -1,815 +1,173 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta http-equiv="Pragma" content="no-cache"/>
-<meta http-equiv="Expires" content="0"/>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"/>
-<title>Flashcards 9:16</title>
-<style>
-  :root {
-    --bg: #0b1020;
-    --surface: #12172b;
-    --card: #161c33;
-    --text: #e6ecff;
-    --muted: #8aa0d3;
-    --primary: #6366f1;
-    --primary-600: #5457e6;
-    --green: #22c55e;
-    --blue: #3b82f6;
-    --amber: #f59e0b;
-    --red: #ef4444;
-    --ring: #e5e7eb;
-    --border: #232a48;
-    
-    --fs-term: 20px;
-    --fs-def: 24px;
-    --fs-front-list: 16px;
-    --fs-back-list: 18px;
-    --radius-md: 14px;
-    
-    /* Btn Dark */
-    --btn-neutral-bg: rgba(255,255,255,.06);
-    --btn-neutral-fg: #e6ecff;
-    --btn-neutral-bd: #232a48;
-    --btn-neutral-bg-h: rgba(255,255,255,.10);
-    
-    --btn-soft-primary-bg: color-mix(in srgb, var(--primary) 22%, transparent);
-    --btn-soft-primary-bg-h: color-mix(in srgb, var(--primary) 34%, transparent);
-    --btn-soft-primary-fg: #dbe4ff;
-    --btn-soft-primary-bd: color-mix(in srgb, var(--primary) 55%, transparent);
-    
-    --btn-soft-red-bg: rgba(239,68,68,.18);
-    --btn-soft-red-bg-h: rgba(239,68,68,.28);
-    --btn-soft-red-fg: #fecaca;
-    --btn-soft-red-bd: rgba(239,68,68,.45);
-    
-    --btn-soft-amber-bg: rgba(245,158,11,.18);
-    --btn-soft-amber-bg-h: rgba(245,158,11,.28);
-    --btn-soft-amber-fg: #fde68a;
-    --btn-soft-amber-bd: rgba(245,158,11,.45);
-    
-    --btn-soft-blue-bg: rgba(59,130,246,.18);
-    --btn-soft-blue-bg-h: rgba(59,130,246,.28);
-    --btn-soft-blue-fg: #bfdbfe;
-    --btn-soft-blue-bd: rgba(59,130,246,.45);
-    
-    --btn-soft-green-bg: rgba(34,197,94,.18);
-    --btn-soft-green-bg-h: rgba(34,197,94,.28);
-    --btn-soft-green-fg: #bbf7d0;
-    --btn-soft-green-bd: rgba(34,197,94,.45);
-
-    --btn-solid-primary-bg: var(--primary);
-    --btn-solid-primary-bg-h: var(--primary-600);
-    --btn-solid-primary-fg: #fff;
-    --btn-solid-primary-bd: var(--primary-600);
-    
-    --btn-solid-red-bg: #ef4444;
-    --btn-solid-red-bg-h: #dc2626;
-    --btn-solid-red-fg: #fff;
-    --btn-solid-red-bd: #dc2626;
-    
-    --btn-solid-amber-bg: #f59e0b;
-    --btn-solid-amber-bg-h: #d97706;
-    --btn-solid-amber-fg: #0f172a;
-    --btn-solid-amber-bd: #d97706;
-    
-    --btn-solid-blue-bg: #3b82f6;
-    --btn-solid-blue-bg-h: #2563eb;
-    --btn-solid-blue-fg: #fff;
-    --btn-solid-blue-bd: #2563eb;
-    
-    --btn-solid-green-bg: #22c55e;
-    --btn-solid-green-bg-h: #16a34a;
-    --btn-solid-green-fg: #0f172a;
-    --btn-solid-green-bd: #16a34a;
-  }
-
-  :root[data-theme="light"] {
-    --bg: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-    --surface: #ffffff;
-    --card: #ffffff;
-    --text: #0f172a;
-    --muted: #475569;
-    --primary: #3b82f6;
-    --primary-600: #2563eb;
-    --border: #cbd5e1;
-    
-    --btn-neutral-bg: #f1f5f9;
-    --btn-neutral-fg: #0f172a;
-    --btn-neutral-bd: #cbd5e1;
-    --btn-neutral-bg-h: #e2e8f0;
-    
-    --btn-soft-primary-bg: color-mix(in srgb, var(--primary) 14%, white 86%);
-    --btn-soft-primary-bg-h: color-mix(in srgb, var(--primary) 22%, white 78%);
-    --btn-soft-primary-fg: color-mix(in srgb, var(--primary) 78%, black 22%);
-    --btn-soft-primary-bd: color-mix(in srgb, var(--primary) 35%, white 65%);
-    
-    --btn-soft-red-bg: #fee2e2;
-    --btn-soft-red-bg-h: #fecaca;
-    --btn-soft-red-fg: #991b1b;
-    --btn-soft-red-bd: #fca5a5;
-    
-    --btn-soft-amber-bg: #fef3c7;
-    --btn-soft-amber-bg-h: #fde68a;
-    --btn-soft-amber-fg: #92400e;
-    --btn-soft-amber-bd: #fcd34d;
-    
-    --btn-soft-blue-bg: #dbeafe;
-    --btn-soft-blue-bg-h: #bfdbfe;
-    --btn-soft-blue-fg: #1e3a8a;
-    --btn-soft-blue-bd: #93c5fd;
-    
-    --btn-soft-green-bg: #dcfce7;
-    --btn-soft-green-bg-h: #bbf7d0;
-    --btn-soft-green-fg: #14532d;
-    --btn-soft-green-bd: #86efac;
-  }
-
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    overflow: hidden;
-    font-size: 17px;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .wrapper {
-    height: 100dvh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
-
-  .phone {
-    aspect-ratio: 9/16;
-    height: 100%;
-    width: auto;
-    max-width: 100%;
-    max-height: 100%;
-    display: grid;
-    grid-template-rows: var(--row-top, 52px) var(--row-main, 1fr) var(--row-actions, 52px) var(--row-rev, 64px);
-    position: relative;
-    min-height: 0;
-    touch-action: pan-y;
-    overflow: hidden;
-  }
-  
-  /* Topbar */
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-  }
-  .topbar .back {
-    appearance: none;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--text);
-    padding: 8px 10px;
-    margin-right: 4px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .topbar .back:hover { background: rgba(255,255,255,.06); }
-  .topbar .title {
-    font-weight: 800;
-    font-size: 16px;
-    margin-left: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-  }
-  .spacer { flex: 1; }
-
-  /* Layouts */
-  main#view {
-    min-height: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 8px;
-    gap: 10px;
-  }
-  .hidden { display: none!important; }
-  .muted { color: var(--muted); }
-  .center { text-align: center; }
-  .mt6 { margin-top: 6px; }
-  .mt8 { margin-top: 8px; }
-  
-  .scroll-y {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-  }
-  .scroll-lock {
-    overflow: hidden;
-    touch-action: none!important;
-  }
-  
-  .list, .flexcol {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 0;
-  }
-  .stack {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .row, .grid2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  .grid2 { gap: 10px; }
-  .row-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  
-  .input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 14px;
-  }
-
-  /* Cards */
-  .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip {
-    background: transparent;
-    border: 0;
-    border-radius: var(--radius-md);
-  }
-  .section-title {
-    font-weight: 900;
-    font-size: 14px;
-    color: var(--primary);
-    letter-spacing: .3px;
-    margin: 0 0 6px;
-  }
-  
-  .kpi {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .kpi .k { padding: 0; }
-  .k .label, .stat .label {
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .k .value, .val {
-    font-weight: 900;
-    font-size: 17px;
-    margin-top: 2px;
-  }
-  
-  /* Deck & Chips */
-  .deck-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 8px;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-  .deck-item .slide {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 0;
-    transition: transform .18s ease;
-    will-change: transform;
-    width: 100%;
-  }
-  .deck-item .right-action {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 92px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .deck-item.reveal-delete .slide { transform: translateX(-92px); }
-  .deck-item.drop-target {
-    outline: 2px dashed var(--primary);
-    outline-offset: -2px;
-    border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--primary) 8%, transparent);
-  }
-  .deck-item.dragging-origin { opacity: .3; }
-  
-  .drag-ghost {
-    position: fixed;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-9999px, -9999px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    background: rgba(0,0,0,.08);
-    border-radius: var(--radius-md);
-  }
-  
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0;
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .chip-pie {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: conic-gradient(var(--primary) var(--progress,0%), var(--border) var(--progress,0%));
-    vertical-align: middle;
-    display: inline-block;
-  }
-  
-  /* Legend & Dots */
-  .legend {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 6px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #dbe4ff;
-    cursor: pointer;
-    user-select: none;
-    transition: opacity .15s;
-  }
-  .legend-item.inactive {
-    opacity: .45;
-    filter: grayscale(20%);
-  }
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-  .dot.gray { background: #9ca3af; }
-  .dot.red { background: var(--red); }
-  .dot.amber { background: var(--amber); }
-  .dot.blue { background: var(--blue); }
-  .dot.green { background: var(--green); }
-  
-  /* Charts & Bottom Bars */
-  .chart-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-  }
-  canvas#gradeChart {
-    width: 180px;
-    height: 180px;
-  }
-  .bottom-actions, .revision-bar, .review-actions-bar {
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-    display: none;
-    background: transparent;
-    border-top: 0;
-  }
-  .bottom-actions {
-    display: none;
-    gap: 8px;
-    grid-template-columns: 1fr 1fr;
-  }
-  .review-actions-bar {
-    grid-row: 4;
-    backdrop-filter: blur(8px) saturate(140%);
-  }
-  
-  /* Review & Cards View */
-  .review-wrap {
-    position: relative;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  .review-top {
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: 13px;
-  }
-  .review-card, .viewer {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    text-align: center;
-    min-height: 0;
-    cursor: auto;
-  }
-  .review-scroller {
-    max-height: 100%;
-    width: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .size-toast {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(64px + env(safe-area-inset-bottom) + 8px);
-    background: rgba(0,0,0,.55);
-    color: #fff;
-    font-weight: 800;
-    font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    pointer-events: none;
-    z-index: 3;
-    display: none;
-  }
-  .chapter-list {
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    opacity: .8;
-    padding-left: 2px;
-  }
-  .viewer .front {
-    font-weight: 900;
-    font-size: 20px;
-  }
-  .viewer .back {
-    color: #d9e6ff;
-    opacity: .95;
-    font-size: 15px;
-    margin-top: 6px;
-  }
-  .term {
-    font-size: var(--fs-term)!important;
-    font-weight: 600;
-  }
-  .definition {
-    font-size: var(--fs-def)!important;
-    font-weight: 900;
-  }
-  
-  /* Controls */
-  .wheel {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: rgba(255,255,255,.04);
-    touch-action: none;
-    user-select: none;
-    cursor: ns-resize;
-  }
-  .wheel .name, .wheel .wheel-value {
-    font-weight: 800;
-    font-size: 13px;
-  }
-  .wheel .hint {
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .wheel .wheel-value {
-    margin-left: auto;
-    font-weight: 900;
-  }
-  
-  /* Settings */
-  .settings-page {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 6px 4px;
-  }
-  .settings-hero {
-    font-weight: 900;
-    font-size: 18px;
-    color: var(--primary);
-  }
-  .settings-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .swatches {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .swatch {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--sw, #6366f1);
-    cursor: pointer;
-    position: relative;
-  }
-  .swatch.is-active::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border: 2px solid var(--primary);
-    border-radius: 10px;
-  }
-  
-  /* Bar7 & Cards Grid */
-  canvas#bar7 {
-    width: 100%;
-    height: 68px;
-    display: block;
-  }
-  .bar7-labels {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-top: 4px;
-    font-size: 12px;
-    color: var(--muted);
-    text-align: center;
-    cursor: pointer;
-  }
-  .cards-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  @media(min-width: 480px) {
-    .cards-grid { grid-template-columns: 1fr 1fr; }
-  }
-  .card-block {
-    position: relative;
-    border: 2px solid transparent;
-    border-radius: 14px;
-    padding: 14px;
-    background: transparent;
-    overflow-x: auto;
-  }
-  .card-block .definition {
-    display: none;
-    text-align: center;
-    margin-top: 6px;
-  }
-  .card-block.flipped .definition { display: block; }
-  .card-block .term { text-align: center; }
-  .cb-time {
-    position: absolute;
-    right: 10px;
-    bottom: 8px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .card-block.grade-echec { border-color: var(--red); }
-  .card-block.grade-difficile { border-color: var(--amber); }
-  .card-block.grade-bien { border-color: var(--blue); }
-  .card-block.grade-facile { border-color: var(--green); }
-  .card-block.grade-unseen { border-color: #9ca3af; }
-
-  /* Images & Lightbox */
-  img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 10px auto;
-    border-radius: 8px;
-    background: var(--border);
-    user-select: none;
-  }
-  .img-lightbox {
-    position: fixed;
-    inset: 0;
-    display: none;
-    background: transparent;
-    z-index: 10000;
-  }
-  .img-lightbox.open { display: block; }
-  .img-stage {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    touch-action: none;
-    cursor: grab;
-  }
-  .img-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: 0 0;
-    will-change: transform;
-  }
-  .img-counter {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 16px;
-    z-index: 2;
-    background: rgba(255,255,255,.9);
-    color: #0f172a;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-weight: 900;
-    font-size: 12px;
-  }
-
-  /* Buttons & Variants */
-  .btn, .navbtn, .action, .rev-btn {
-    background: var(--btn-bg, var(--btn-neutral-bg));
-    color: var(--btn-fg, var(--btn-neutral-fg));
-    border: 1px solid var(--btn-bd, var(--btn-neutral-bd));
-    border-radius: var(--radius-md);
-    padding: 10px 12px;
-    font-weight: 900;
-    cursor: pointer;
-    transition: .15s;
-    width: 100%;
-    appearance: none;
-    outline: 0;
-    font-size: 15px;
-  }
-  .btn:hover { background: var(--btn-bg-h, var(--btn-bg, var(--btn-neutral-bg-h))); }
-  .btn:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-  }
-  
-  .btn--primary { --btn-bg: var(--btn-soft-primary-bg); --btn-bg-h: var(--btn-soft-primary-bg-h); --btn-fg: var(--btn-soft-primary-fg); --btn-bd: var(--btn-soft-primary-bd); }
-  .btn--red { --btn-bg: var(--btn-soft-red-bg); --btn-bg-h: var(--btn-soft-red-bg-h); --btn-fg: var(--btn-soft-red-fg); --btn-bd: var(--btn-soft-red-bd); }
-  .btn--amber { --btn-bg: var(--btn-soft-amber-bg); --btn-bg-h: var(--btn-soft-amber-bg-h); --btn-fg: var(--btn-soft-amber-fg); --btn-bd: var(--btn-soft-amber-bd); }
-  .btn--blue { --btn-bg: var(--btn-soft-blue-bg); --btn-bg-h: var(--btn-soft-blue-bg-h); --btn-fg: var(--btn-soft-blue-fg); --btn-bd: var(--btn-soft-blue-bd); }
-  .btn--green { --btn-bg: var(--btn-soft-green-bg); --btn-bg-h: var(--btn-soft-green-bg-h); --btn-fg: var(--btn-soft-green-fg); --btn-bd: var(--btn-soft-green-bd); }
-  
-  .btn--solid.btn--primary { --btn-bg: var(--btn-solid-primary-bg); --btn-bg-h: var(--btn-solid-primary-bg-h); --btn-fg: var(--btn-solid-primary-fg); --btn-bd: var(--btn-solid-primary-bd); }
-  .btn--solid-red-bg { --btn-bg: var(--btn-solid-red-bg); } /* Simplified for brevity */
-  
-  .btn--ghost {
-    --btn-bg: transparent;
-    --btn-bg-h: rgba(255,255,255,.06);
-    --btn-fg: var(--muted);
-    --btn-bd: var(--border);
-  }
-  .btn--tiny {
-    padding: 6px 8px;
-    font-size: 13px;
-    border-radius: 8px;
-  }
-  
-  /* Subject Menu */
-  .subject-menu {
-    position: absolute;
-    top: 52px;
-    left: 10px;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    min-width: 220px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    padding: 6px;
-    z-index: 1000;
-    display: none;
-  }
-  .subject-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  .subject-item:hover { background: rgba(255,255,255,.06); }
-  .subject-item .name {
-    font-weight: 800;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .subject-item .meta {
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .subject-item .subject-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 6px;
-  }
-
-  @media(min-width: 1024px) {
-    .phone {
-      aspect-ratio: auto;
-      width: 100%;
-      height: 100dvh;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Flashcards 9:16</title>
+  <style>
+    /* --- VARIABLES & THEME --- */
+    :root {
+      --bg: #0b1020; --surface: #12172b; --card: #161c33; --text: #e6ecff; --muted: #8aa0d3;
+      --primary: #6366f1; --primary-600: #5457e6; --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b; --red: #ef4444;
+      --ring: #e5e7eb; --border: #232a48;
+      --fs-term: 20px; --fs-def: 24px; --radius-md: 14px;
+      
+      /* Buttons */
+      --btn-neutral-bg: rgba(255,255,255,.06); --btn-neutral-fg: #e6ecff; --btn-neutral-bd: #232a48; --btn-neutral-bg-h: rgba(255,255,255,.10);
+      --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 22%,transparent); --btn-soft-primary-bg-h: color-mix(in srgb,var(--primary) 34%,transparent);
+      --btn-soft-primary-fg: #dbe4ff; --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 55%,transparent);
+      --btn-soft-red-bg: rgba(239,68,68,.18); --btn-soft-red-bg-h: rgba(239,68,68,.28); --btn-soft-red-fg: #fecaca; --btn-soft-red-bd: rgba(239,68,68,.45);
+      --btn-soft-amber-bg: rgba(245,158,11,.18); --btn-soft-amber-bg-h: rgba(245,158,11,.28); --btn-soft-amber-fg: #fde68a; --btn-soft-amber-bd: rgba(245,158,11,.45);
+      --btn-soft-blue-bg: rgba(59,130,246,.18); --btn-soft-blue-bg-h: rgba(59,130,246,.28); --btn-soft-blue-fg: #bfdbfe; --btn-soft-blue-bd: rgba(59,130,246,.45);
+      --btn-soft-green-bg: rgba(34,197,94,.18); --btn-soft-green-bg-h: rgba(34,197,94,.28); --btn-soft-green-fg: #bbf7d0; --btn-soft-green-bd: rgba(34,197,94,.45);
+      --btn-solid-primary-bg: var(--primary); --btn-solid-primary-bg-h: var(--primary-600); --btn-solid-primary-fg: #fff; --btn-solid-primary-bd: var(--primary-600);
     }
-    .topbar, main#view, .bottom-actions, .revision-bar {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
+    :root[data-theme="light"] {
+      --bg: linear-gradient(180deg,#f8fafc 0%,#eef2f7 100%); --surface: #fff; --card: #fff; --text: #0f172a; --muted: #475569;
+      --primary: #3b82f6; --primary-600: #2563eb; --border: #cbd5e1;
+      --btn-neutral-bg: #f1f5f9; --btn-neutral-fg: #0f172a; --btn-neutral-bd: #cbd5e1; --btn-neutral-bg-h: #e2e8f0;
+      --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 14%,white 86%); --btn-soft-primary-bg-h: color-mix(in srgb,var(--primary) 22%,white 78%);
+      --btn-soft-primary-fg: color-mix(in srgb,var(--primary) 78%,black 22%); --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 35%,white 65%);
+      --btn-soft-red-bg: #fee2e2; --btn-soft-red-bg-h: #fecaca; --btn-soft-red-fg: #991b1b; --btn-soft-red-bd: #fca5a5;
+      --btn-soft-amber-bg: #fef3c7; --btn-soft-amber-bg-h: #fde68a; --btn-soft-amber-fg: #92400e; --btn-soft-amber-bd: #fcd34d;
+      --btn-soft-blue-bg: #dbeafe; --btn-soft-blue-bg-h: #bfdbfe; --btn-soft-blue-fg: #1e3a8a; --btn-soft-blue-bd: #93c5fd;
+      --btn-soft-green-bg: #dcfce7; --btn-soft-green-bg-h: #bbf7d0; --btn-soft-green-fg: #14532d; --btn-soft-green-bd: #86efac;
     }
-    main#view { padding: 16px 20px; }
-  }
-  
-  /* Light tweaks */
-  :root[data-theme="light"] .definition,
-  :root[data-theme="light"] .card-item .back {
-    color: var(--text)!important;
-    opacity: 1!important;
-  }
-  :root[data-theme="light"] .muted { color: #475569!important; }
-  :root[data-theme="light"] .legend-item {
-    color: #0f172a!important;
-    border-color: #e2e8f0!important;
-    background: transparent!important;
-  }
-  :root[data-theme="light"] .revision-bar,
-  :root[data-theme="light"] .review-actions-bar {
-    background: rgba(241,245,249,.9)!important;
-    border-top: 1px solid #e2e8f0!important;
-  }
-  :root[data-theme="light"] .btn--ghost { --btn-bg-h: rgba(0,0,0,.06); }
-  :root[data-theme="light"] .img-counter,
-  :root[data-theme="light"] .img-close {
-    background: rgba(255,255,255,.9);
-    color: #0f172a;
-  }
-</style>
+    :root[data-theme="light"] .definition, :root[data-theme="light"] .card-item .back { color: var(--text)!important; opacity: 1!important; }
+    :root[data-theme="light"] .muted { color: #475569!important; }
+    :root[data-theme="light"] .legend-item { color: #0f172a!important; border-color: #e2e8f0!important; background: 0 0!important; }
+    :root[data-theme="light"] .revision-bar, :root[data-theme="light"] .review-actions-bar { background: rgba(241,245,249,.9)!important; border-top: 1px solid #e2e8f0!important; }
+    :root[data-theme="light"] .btn--ghost { --btn-bg-h: rgba(0,0,0,.06); }
+    :root[data-theme="light"] .img-counter, :root[data-theme="light"] .img-close { background: rgba(255,255,255,.9); color: #0f172a; }
+
+    /* --- RESET & LAYOUT --- */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; font-size: 17px; -webkit-font-smoothing: antialiased; }
+    .wrapper { height: 100dvh; width: 100%; display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .phone { aspect-ratio: 9/16; height: 100%; width: auto; max-width: 100%; max-height: 100%; display: grid; grid-template-rows: var(--row-top,52px) var(--row-main,1fr) var(--row-actions,52px) var(--row-rev,64px); position: relative; min-height: 0; touch-action: pan-y; overflow: hidden; }
+    @media(min-width: 1024px) { .phone { aspect-ratio: auto; width: 100%; height: 100dvh; } .topbar, main#view, .bottom-actions, .revision-bar { max-width: 1200px; margin: 0 auto; width: 100%; } main#view { padding: 16px 20px; } }
+
+    /* --- COMPONENTS --- */
+    .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; padding: 0 10px; }
+    .topbar .back { appearance: none; border: 0; outline: 0; background: 0 0; color: var(--text); padding: 8px 10px; margin-right: 4px; border-radius: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; }
+    .topbar .back:hover { background: rgba(255,255,255,.06); }
+    .topbar .title { font-weight: 800; font-size: 16px; margin-left: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+    .spacer { flex: 1; }
+    
+    main#view { min-height: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden; padding: 8px; gap: 10px; }
+    .hidden { display: none!important; } .muted { color: var(--muted); } .center { text-align: center; } .mt6 { margin-top: 6px; } .mt8 { margin-top: 8px; }
+    .scroll-y { overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; } .scroll-lock { overflow: hidden; touch-action: none!important; }
+    .list, .flexcol { display: flex; flex-direction: column; gap: 8px; min-height: 0; } .stack { display: flex; flex-direction: column; gap: 6px; }
+    .row, .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .grid2 { gap: 10px; } .row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; }
+    .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); }
+    
+    /* Deck & Lists */
+    .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer; user-select: none; position: relative; overflow: hidden; touch-action: pan-y; }
+    .deck-item .slide { display: flex; align-items: center; gap: 8px; padding: 8px 0; transition: transform .18s ease; will-change: transform; width: 100%; }
+    .deck-item .right-action { position: absolute; top: 0; right: 0; height: 100%; width: 92px; display: flex; align-items: center; justify-content: center; }
+    .deck-item.reveal-delete .slide { transform: translateX(-92px); }
+    .deck-item.drop-target { outline: 2px dashed var(--primary); outline-offset: -2px; border-radius: var(--radius-md); background: color-mix(in srgb,var(--primary) 8%,transparent); }
+    .deck-item.dragging-origin { opacity: .3; }
+    .drag-ghost { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; transform: translate(-9999px,-9999px) scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,.35); background: rgba(0,0,0,.08); border-radius: var(--radius-md); }
+    
+    /* Stats & Charts */
+    .section-title { font-weight: 900; font-size: 14px; color: var(--primary); letter-spacing: .3px; margin: 0 0 6px; }
+    .kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .kpi .k { padding: 0; } .k .label, .stat .label { color: var(--muted); font-size: 12px; } .k .value, .val { font-weight: 900; font-size: 17px; margin-top: 2px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 0; color: var(--muted); font-size: 12px; }
+    .chip-pie { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress,0%),var(--border) var(--progress,0%)); vertical-align: middle; display: inline-block; }
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #dbe4ff; cursor: pointer; user-select: none; transition: opacity .15s; }
+    .legend-item.inactive { opacity: .45; filter: grayscale(20%); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; } .dot.gray { background: #9ca3af; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); } .dot.green { background: var(--green); }
+    .chart-wrap { display: flex; align-items: center; justify-content: center; height: 200px; } canvas#gradeChart { width: 180px; height: 180px; }
+    canvas#bar7 { width: 100%; height: 68px; display: block; } .bar7-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-top: 4px; font-size: 12px; color: var(--muted); text-align: center; cursor: pointer; }
+    
+    /* Review Mode */
+    .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; }
+    .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; }
+    .review-card, .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px; text-align: center; min-height: 0; cursor: auto; }
+    .review-scroller { max-height: 100%; width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; }
+    .term { font-size: var(--fs-term)!important; font-weight: 600; } .definition { font-size: var(--fs-def)!important; font-weight: 900; }
+    .bottom-actions, .revision-bar, .review-actions-bar { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
+    .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 4; backdrop-filter: blur(8px) saturate(140%); }
+    
+    /* Buttons & UI */
+    .btn, .navbtn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 10px 12px; font-weight: 900; cursor: pointer; transition: .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; }
+    .btn:hover { background: var(--btn-bg-h,var(--btn-bg,var(--btn-neutral-bg-h))); } .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .btn--primary { --btn-bg: var(--btn-soft-primary-bg); --btn-bg-h: var(--btn-soft-primary-bg-h); --btn-fg: var(--btn-soft-primary-fg); --btn-bd: var(--btn-soft-primary-bd); }
+    .btn--red { --btn-bg: var(--btn-soft-red-bg); --btn-bg-h: var(--btn-soft-red-bg-h); --btn-fg: var(--btn-soft-red-fg); --btn-bd: var(--btn-soft-red-bd); }
+    .btn--amber { --btn-bg: var(--btn-soft-amber-bg); --btn-bg-h: var(--btn-soft-amber-bg-h); --btn-fg: var(--btn-soft-amber-fg); --btn-bd: var(--btn-soft-amber-bd); }
+    .btn--blue { --btn-bg: var(--btn-soft-blue-bg); --btn-bg-h: var(--btn-soft-blue-bg-h); --btn-fg: var(--btn-soft-blue-fg); --btn-bd: var(--btn-soft-blue-bd); }
+    .btn--green { --btn-bg: var(--btn-soft-green-bg); --btn-bg-h: var(--btn-soft-green-bg-h); --btn-fg: var(--btn-soft-green-fg); --btn-bd: var(--btn-soft-green-bd); }
+    .btn--solid.btn--primary { --btn-bg: var(--btn-solid-primary-bg); --btn-bg-h: var(--btn-solid-primary-bg-h); --btn-fg: var(--btn-solid-primary-fg); --btn-bd: var(--btn-solid-primary-bd); }
+    .btn--ghost { --btn-bg: transparent; --btn-bg-h: rgba(255,255,255,.06); --btn-fg: var(--muted); --btn-bd: var(--border); } .btn--tiny { padding: 6px 8px; font-size: 13px; border-radius: 8px; }
+    
+    /* Cards Grid */
+    .cards-grid { display: grid; grid-template-columns: 1fr; gap: 10px; } @media(min-width: 480px) { .cards-grid { grid-template-columns: 1fr 1fr; } }
+    .card-block { position: relative; border: 2px solid transparent; border-radius: 14px; padding: 14px; background: 0 0; overflow-x: auto; }
+    .card-block .definition { display: none; text-align: center; margin-top: 6px; } .card-block.flipped .definition { display: block; } .card-block .term { text-align: center; }
+    .cb-time { position: absolute; right: 10px; bottom: 8px; font-size: 12px; color: var(--muted); }
+    .card-block.grade-echec { border-color: var(--red); } .card-block.grade-difficile { border-color: var(--amber); } .card-block.grade-bien { border-color: var(--blue); } .card-block.grade-facile { border-color: var(--green); } .card-block.grade-unseen { border-color: #9ca3af; }
+    
+    /* Settings & Misc */
+    .subject-menu { position: absolute; top: 52px; left: 10px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-md); min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,.35); padding: 6px; z-index: 1000; display: none; }
+    .subject-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; cursor: pointer; } .subject-item:hover { background: rgba(255,255,255,.06); } .subject-item .name { font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .subject-item .meta { font-size: 12px; color: var(--muted); } .subject-item .subject-actions { margin-left: auto; display: flex; gap: 6px; }
+    .wheel { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(255,255,255,.04); touch-action: none; user-select: none; cursor: ns-resize; }
+    .wheel .name, .wheel .wheel-value { font-weight: 800; font-size: 13px; } .wheel .hint { color: var(--muted); font-size: 12px; } .wheel .wheel-value { margin-left: auto; font-weight: 900; }
+    .swatches { display: flex; gap: 8px; flex-wrap: wrap; } .swatch { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border); background: var(--sw,#6366f1); cursor: pointer; position: relative; } .swatch.is-active::after { content: ''; position: absolute; inset: -3px; border: 2px solid var(--primary); border-radius: 10px; }
+    img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-radius: 8px; background: var(--border); user-select: none; }
+    .img-lightbox { position: fixed; inset: 0; display: none; background: 0 0; z-index: 10000; } .img-lightbox.open { display: block; }
+    .img-stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; cursor: grab; } .img-canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+  </style>
 </head>
 <body>
-<div class="wrapper">
-  <div class="phone" id="app">
-    <header class="topbar">
-      <button class="back" id="backBtn" title="Retour">← Retour</button>
-      <div class="title" id="title">Deck</div>
-      <div class="spacer"></div>
-    </header>
-    <main id="view"></main>
-    <div class="bottom-actions" id="bottomActions">
-      <button class="action btn" id="cardsBtn">Cartes</button>
-      <button class="action btn" id="settingsBtn">Paramètres</button>
+  <div class="wrapper">
+    <div class="phone" id="app">
+      <header class="topbar">
+        <button class="back" id="backBtn" title="Retour">← Retour</button>
+        <div class="title" id="title">Deck</div>
+        <div class="spacer"></div>
+      </header>
+      <main id="view"></main>
+      <div class="bottom-actions" id="bottomActions">
+        <button class="action btn" id="cardsBtn">Cartes</button>
+        <button class="action btn" id="settingsBtn">Paramètres</button>
+      </div>
+      <footer class="revision-bar" id="revisionBar">
+        <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">Révision</button>
+      </footer>
+      <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
     </div>
-    <footer class="revision-bar" id="revisionBar">
-      <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">Révision</button>
-    </footer>
-    <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
   </div>
-</div>
 
 <script>
-// Constants & Data
-const STORAGE_KEY = 'flashcards9x16_data', APP_VERSION = '2025-10-18-5';
+
+
+/* --- CONSTANTS & DATA --- */
+const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-6';
+
+// -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
 const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers";
-const PM="M2", PM3="M3", PM4="M4", PEM1="EM1", PEM2="EM2", PE345="E3-E4-E5", PEM6="EM6", PEM7="EM7", PEM8="EM8(Pas de E7)", PEM9="EM9", PEM10="EM10", PEM11="EM11", PEM12="EM12", PEM13="EM13", PEM14="EM14", PEM15="EM15", PO1="O1", PO2="O2", PO3="O3", PO4="O4";
 
-const CHAPTER_EMOJIS = {
+// -- SUJETS PHYSIQUE --
+const PM="M2", PM3="M3", PM4="M4";
+const PEM1="EM1", PEM2="EM2", PE345="E3-E4-E5", PEM6="EM6", PEM7="EM7", PEM8="EM8(Pas de E7)", PEM9="EM9", PEM10="EM10", PEM11="EM11", PEM12="EM12", PEM13="EM13", PEM14="EM14", PEM15="EM15";
+const PO1="O1", PO2="O2", PO3="O3", PO4="O4";
+
+// -- EMOJIS --
+const C_EMOJIS = {
   [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚',
-  'Politique':'🏛️', 'Business':'💼', 'Education':'🎓', 'Thanksgiving':'🦃', 'M2':'⚙️', 'M3':'🌍', 'M4':'🤝', 'EM1':'⚡️',
-  'EM2':'🧲', 'E3-E4-E5':'🧲', 'EM6':'🧲', 'EM8(Pas de E7)':'🧲', 'EM9':'🧲', 'EM10':'🧲', 'EM11':'🧲', 'EM12':'🧲', 'EM13':'🧲', 'EM14':'🧲', 'EM15':'🧲',
-  'O1':'🌈', 'O2':'🌈', 'O3':'🌈', 'O4':'🌈'
+  [PM]:'⚙️', [PM3]:'🌍', [PM4]:'🤝',
+  [PEM1]:'⚡️', [PEM2]:'🧲', [PE345]:'🧲', [PEM6]:'🧲', [PEM8]:'🧲', [PEM9]:'🧲', [PEM10]:'🧲', [PEM11]:'🧲', [PEM12]:'🧲', [PEM13]:'🧲', [PEM14]:'🧲', [PEM15]:'🧲',
+  [PO1]:'🌈', [PO2]:'🌈', [PO3]:'🌈', [PO4]:'🌈',
+  // Fallbacks texte au cas où
+  'Politique':'🏛️', 'Business':'💼', 'Education':'🎓', 'Thanksgiving':'🦃'
 };
-
-const cardsRawText = `
+const RAW_EN = `
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
 2|souverain|sovereign|${CD}
@@ -1957,13 +1315,7 @@ const cardsRawText = `
 1142|une amende|a fine|${IDR}
 1143|condamner qn à une amende|to fine sb|${IDR}
 1144|le responsable de la lutte contre la drogue|the drug czar, the drug tsar|${IDR}
-`.trim();
 
-
-
-
-
-const irregularVerbsRawText = `
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
 8001|battre|beat / beat / beaten|${VI}
 8002|devenir|become / became / become|${VI}
@@ -2090,10 +1442,11 @@ const irregularVerbsRawText = `
 8123|enrouler|wind / wound / wound|${VI}
 8124|(se) retirer, retirer de l’argent|withdraw / withdrew / withdrawn|${VI}
 8125|écrire|write / wrote / written|${VI}
+
 `.trim();
 
-
-    const physicsRawText = `10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
+const RAW_PHY = `
+10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un referentiel galiléen?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .&nbsp;&nbsp;|${PM}
 10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Tout référentiel [...] rapport à un référentiel galiléen est galiléen|<b>en translation rectiligne et uniforme par</b>|${PM}
 10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span><br>Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
 10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> <br>Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<b>n’est jamais galiléen.</b>|${PM}
@@ -2372,702 +1725,299 @@ const irregularVerbsRawText = `
 10276|<span style="color: rgb(0, 255, 0);">(A.R)</span> En lame d'air, comment évolue la figure d'interférence lorsque l'on diminue l'épaisseur \\(e\\) ? Quel est le cas limite ?|Lorsque l'on diminue l'épaisseur \\(e\\), l'ordre d'interférence \\(p = 2e\\cos i / \\lambda_0\\) diminue. Pour un ordre \\(p\\) donné, \\(\\cos i\\) doit augmenter, donc \\(i\\) doit diminuer. Le rayon des anneaux diminue : les anneaux "rentrent" vers le centre et disparaissent.<br>Le cas limite est le <b>contact optique</b> (\\(e=0\\)), où l'on observe une <b>teinte plate</b> uniforme.|${PO4}
 `.trim();
 
-// Utilities
-const $ = (s, p = document) => p.querySelector(s);
-const $$ = (s, p = document) => [...p.querySelectorAll(s)];
-const doc = document, loc = localStorage, math = Math;
-const clamp = (n, min, max) => math.max(min, math.min(max, n));
-const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-// Lightbox Logic
-const LB = {
-  el: null, stage: null, canvas: null, img: null, counter: null, images: [], idx: 0,
-  baseW: 0, baseH: 0, s: 1, minS: 1, maxS: 5, x: 0, y: 0,
-  pointers: new Map(), startDist: 0, startS: 1, startX: 0, startY: 0, panStartX: 0, panStartY: 0, tapMoved: false
-};
 
-function ensureLightbox() {
-  if (LB.el) return LB.el;
-  const el = doc.createElement('div'); el.className = 'img-lightbox';
-  el.innerHTML = `<div class="img-stage" id="lbStage" tabindex="-1"><div class="img-canvas" id="lbCanvas"><img id="lbImg" alt=""></div></div><div class="img-counter" id="lbCounter">1/1</div>`;
-  doc.body.appendChild(el);
-  LB.el = el; LB.stage = el.querySelector('#lbStage'); LB.canvas = el.querySelector('#lbCanvas');
-  LB.img = el.querySelector('#lbImg'); LB.counter = el.querySelector('#lbCounter');
 
-  const ptrDown = e => {
-    LB.stage.setPointerCapture?.(e.pointerId);
-    LB.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (LB.pointers.size === 1) {
-      LB.panStartX = LB.x; LB.panStartY = LB.y; LB.startX = e.clientX; LB.startY = e.clientY; LB.startS = LB.s; LB.tapMoved = false;
-    } else if (LB.pointers.size === 2) {
-      const pts = [...LB.pointers.values()];
-      LB.startDist = math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
-      LB.startS = LB.s; LB.tapMoved = true;
-    }
-    e.preventDefault();
-  };
+/* --- UTILS --- */
+const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
+const clamp = (n,mn,mx) => M.max(mn, M.min(mx, n));
+const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const todayKey = () => dateKey(new Date());
+const avg = a => !a?.length ? 0 : a.reduce((x,y)=>x+y,0)/a.length;
+const deepClone = o => JSON.parse(JSON.stringify(o));
+const isSucc = g => g==='facile'||g==='bien';
+const ppLat = s => s ? s.replace(/\[\/?latex\]/gi,'').replace(/\\newline\s*/g,'<br/>') : s;
+const tsLat = e => { if(W.MathJax?.typesetPromise) W.MathJax.typesetPromise(e?[e]:null).catch(()=>{}); return Promise.resolve() };
+const getEmoji = t => C_EMOJIS[t]||'';
+const extractId = c => String(c).match(/-(\d+)$/)?.[1]||null;
+const getSides = (c,ch) => ch?.settings?.langSwap ? {f:c.back,b:c.front} : {f:c.front,b:c.back};
+const fmtDur = ms => { const s=M.round(ms/1000); return`${M.floor(s/60)}:${String(s%60).padStart(2,'0')}` };
+function fmtDayFR(k){ const [Y,M,D]=k.split('-').map(Number), d=new Date(Y,M-1,D); return`${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]} ${String(D).padStart(2,'0')} ${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][M-1]} ${Y}` }
 
-  const ptrMove = e => {
-    if (!LB.pointers.has(e.pointerId)) return;
-    LB.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    const dx = e.clientX - LB.startX, dy = e.clientY - LB.startY;
-    if (math.abs(dx) > 6 || math.abs(dy) > 6) LB.tapMoved = true;
-    
-    if (LB.pointers.size >= 2) {
-      const pts = [...LB.pointers.values()];
-      const dist = math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || LB.startDist;
-      setLBScaleCentered(LB.startS * (dist / LB.startDist));
-    } else {
-      setLBPan(LB.panStartX + dx, LB.panStartY + dy);
-    }
-    e.preventDefault();
-  };
+W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
 
-  const ptrUp = e => {
-    if (LB.pointers.has(e.pointerId)) LB.pointers.delete(e.pointerId);
-    if (LB.pointers.size === 0) {
-      if (!LB.tapMoved) {
-        const r = LB.img.getBoundingClientRect();
-        if (!(e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom)) closeLightbox();
-      }
-      LB.startDist = 0;
-    } else if (LB.pointers.size === 1) {
-      const p = [...LB.pointers.values()][0];
-      LB.startX = p.x; LB.startY = p.y; LB.panStartX = LB.x; LB.panStartY = LB.y; LB.startS = LB.s; LB.startDist = 0;
-    }
-  };
-
-  let lastTap = 0;
-  LB.stage.addEventListener('pointerdown', e => {
-    ptrDown(e);
-    const now = Date.now();
-    if (now - lastTap < 250) {
-      if (LB.s > LB.minS + 0.001) setLBScaleCentered(LB.minS);
-      else setLBScaleCentered(math.min(LB.maxS, LB.minS * 2.2));
-      LB.tapMoved = true;
-    }
-    lastTap = now;
-  });
-  LB.stage.addEventListener('pointermove', ptrMove);
-  LB.stage.addEventListener('pointerup', ptrUp);
-  LB.stage.addEventListener('pointercancel', ptrUp);
-  LB.stage.addEventListener('lostpointercapture', ptrUp);
-  LB.stage.addEventListener('wheel', e => { e.preventDefault(); setLBScaleCentered(LB.s + (e.deltaY > 0 ? -0.15 : 0.15) * LB.s); }, { passive: false });
-  window.addEventListener('resize', () => { if (LB.el.classList.contains('open')) refitLB(); });
-  return el;
+/* --- LIGHTBOX --- */
+const LB = { el:null, stage:null, cnv:null, img:null, cnt:null, imgs:[], idx:0, bw:0, bh:0, s:1, mnS:1, mxS:5, x:0, y:0, ptrs:new Map(), sDist:0, sS:1, sX:0, sY:0, psX:0, psY:0, tm:!1 };
+function ensureLB(){
+  if(LB.el)return LB.el; const el=D.createElement('div'); el.className='img-lightbox'; el.innerHTML='<div class="img-stage" id="lbStg" tabindex="-1"><div class="img-canvas" id="lbCnv"><img id="lbImg" alt=""></div></div><div class="img-counter" id="lbCnt">1/1</div>'; D.body.appendChild(el);
+  LB.el=el; LB.stage=el.querySelector('#lbStg'); LB.cnv=el.querySelector('#lbCnv'); LB.img=el.querySelector('#lbImg'); LB.cnt=el.querySelector('#lbCnt');
+  const pd=e=>{ LB.stage.setPointerCapture?.(e.pointerId); LB.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(LB.ptrs.size===1){LB.psX=LB.x;LB.psY=LB.y;LB.sX=e.clientX;LB.sY=e.clientY;LB.sS=LB.s;LB.tm=!1}else if(LB.ptrs.size===2){const p=[...LB.ptrs.values()];LB.sDist=M.hypot(p[0].x-p[1].x,p[0].y-p[1].y)||1;LB.sS=LB.s;LB.tm=!0} e.preventDefault() };
+  const pm=e=>{ if(!LB.ptrs.has(e.pointerId))return; LB.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); const dx=e.clientX-LB.sX, dy=e.clientY-LB.sY; if(M.abs(dx)>6||M.abs(dy)>6)LB.tm=!0; if(LB.ptrs.size>=2){const p=[...LB.ptrs.values()];setLBScale(LB.sS*(M.hypot(p[0].x-p[1].x,p[0].y-p[1].y)/LB.sDist||1))}else setLBPan(LB.psX+dx,LB.psY+dy); e.preventDefault() };
+  const pu=e=>{ if(LB.ptrs.has(e.pointerId))LB.ptrs.delete(e.pointerId); if(LB.ptrs.size===0){if(!LB.tm){const r=LB.img.getBoundingClientRect();if(!(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom))closeLB()}LB.sDist=0}else if(LB.ptrs.size===1){const p=[...LB.ptrs.values()][0];LB.sX=p.x;LB.sY=p.y;LB.psX=LB.x;LB.psY=LB.y;LB.sS=LB.s;LB.sDist=0} };
+  let lt=0; LB.stage.addEventListener('pointerdown',e=>{pd(e);const n=Date.now();if(n-lt<250){setLBScale(LB.s>LB.mnS+0.001?LB.mnS:M.min(LB.mxS,LB.mnS*2.2));LB.tm=!0}lt=n});
+  LB.stage.addEventListener('pointermove',pm); LB.stage.addEventListener('pointerup',pu); LB.stage.addEventListener('pointercancel',pu); LB.stage.addEventListener('lostpointercapture',pu);
+  LB.stage.addEventListener('wheel',e=>{e.preventDefault();setLBScale(LB.s+(e.deltaY>0?-.15:.15)*LB.s)},{passive:!1}); W.addEventListener('resize',()=>{if(LB.el.classList.contains('open'))refitLB()}); return el;
 }
+function openLB(img,sc){ ensureLB(); const l=[...sc.querySelectorAll('img')]; LB.imgs=l.map(i=>({src:i.currentSrc||i.src,alt:i.alt||'',w:i.naturalWidth||800,h:i.naturalHeight||600})); LB.idx=M.max(0,l.indexOf(img)); LB.el.classList.add('open'); D.body.dataset._ov=D.body.style.overflow||''; D.body.style.overflow='hidden'; LB.el.focus?.(); showLB(LB.idx,!0) }
+function closeLB(){ LB.el.classList.remove('open'); LB.imgs=[]; LB.idx=0; D.body.style.overflow=D.body.dataset._ov||'' }
+function safeCloseLB(){ try{if(LB?.el?.classList.contains('open'))closeLB()}catch(e){} }
+function showLB(i,init=!1){ if(!LB.imgs.length)return; LB.idx=(i+LB.imgs.length)%LB.imgs.length; const t=LB.imgs[LB.idx]; LB.img.src=t.src; LB.img.alt=t.alt; LB.bw=t.w; LB.bh=t.h; if(LB.cnt)LB.cnt.textContent=`${LB.idx+1}/${LB.imgs.length}`; refitLB(init) }
+function refitLB(init=!1){ const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight, fit=M.min(sw/LB.bw,sh/LB.bh); LB.mnS=fit; if(init){LB.s=fit;LB.x=(sw-LB.s*LB.bw)/2;LB.y=(sh-LB.s*LB.bh)/2;applyLB()}else setLBScale(fit,!0) }
+function applyLB(){ const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight, w=LB.s*LB.bw, h=LB.s*LB.bh; LB.x=w<=sw?(sw-w)/2:clamp(LB.x,sw-w,0); LB.y=h<=sh?(sh-h)/2:clamp(LB.y,sh-h,0); LB.cnv.style.width=LB.bw+'px'; LB.cnv.style.height=LB.bh+'px'; LB.cnv.style.transform=`translate(${LB.x}px,${LB.y}px) scale(${LB.s})` }
+function setLBPan(nx,ny){ LB.x=nx; LB.y=ny; applyLB() }
+function setLBScale(ns,f=!1){ const os=LB.s, s=clamp(ns,LB.mnS,LB.mxS); if(!f&&M.abs(s-os)<1e-4)return; const cx=LB.stage.clientWidth/2, cy=LB.stage.clientHeight/2; LB.s=s; LB.x=cx-s*((cx-LB.x)/os); LB.y=cy-s*((cy-LB.y)/os); applyLB() }
 
-function openLightboxFor(imgEl, scopeEl) {
-  ensureLightbox();
-  const list = [...scopeEl.querySelectorAll('img')];
-  LB.images = list.map(i => ({ src: i.currentSrc || i.src, alt: i.alt || '', w: i.naturalWidth || 800, h: i.naturalHeight || 600 }));
-  LB.idx = math.max(0, list.indexOf(imgEl));
-  LB.el.classList.add('open');
-  doc.body.dataset._oriOverflow = doc.body.style.overflow || '';
-  doc.body.style.overflow = 'hidden';
-  LB.el.focus?.();
-  showLB(LB.idx, true);
-}
+/* --- DATABASE & IMPORT --- */
+const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
+const dataEN = parseRaw(RAW_EN), dataPHY = parseRaw(RAW_PHY);
 
-function closeLightbox() {
-  LB.el.classList.remove('open'); LB.images = []; LB.idx = 0;
-  doc.body.style.overflow = doc.body.dataset._oriOverflow || '';
-}
-function safeCloseLightbox() { try { if (LB?.el?.classList.contains('open')) closeLightbox(); } catch (e) { } }
-
-function showLB(idx, initial = false) {
-  if (!LB.images.length) return;
-  LB.idx = (idx + LB.images.length) % LB.images.length;
-  const it = LB.images[LB.idx];
-  LB.img.src = it.src; LB.img.alt = it.alt; LB.baseW = it.w; LB.baseH = it.h;
-  if (LB.counter) LB.counter.textContent = `${LB.idx + 1}/${LB.images.length}`;
-  refitLB(initial);
-}
-
-function refitLB(initial = false) {
-  const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight;
-  const fit = math.min(sw / LB.baseW, sh / LB.baseH);
-  LB.minS = fit;
-  if (initial) {
-    LB.s = fit; LB.x = (sw - LB.s * LB.baseW) / 2; LB.y = (sh - LB.s * LB.baseH) / 2; applyLB();
-  } else setLBScaleCentered(fit, true);
-}
-
-function applyLB() {
-  const sw = LB.stage.clientWidth, sh = LB.stage.clientHeight, w = LB.s * LB.baseW, h = LB.s * LB.baseH;
-  LB.x = w <= sw ? (sw - w) / 2 : clamp(LB.x, sw - w, 0);
-  LB.y = h <= sh ? (sh - h) / 2 : clamp(LB.y, sh - h, 0);
-  LB.canvas.style.width = LB.baseW + 'px'; LB.canvas.style.height = LB.baseH + 'px';
-  LB.canvas.style.transform = `translate(${LB.x}px,${LB.y}px) scale(${LB.s})`;
-}
-function setLBPan(nx, ny) { LB.x = nx; LB.y = ny; applyLB(); }
-function setLBScaleCentered(newS, force = false) {
-  const oldS = LB.s, s = clamp(newS, LB.minS, LB.maxS);
-  if (!force && math.abs(s - oldS) < 1e-4) return;
-  const cx = LB.stage.clientWidth / 2, cy = LB.stage.clientHeight / 2;
-  LB.s = s;
-  LB.x = cx - s * ((cx - LB.x) / oldS);
-  LB.y = cy - s * ((cy - LB.y) / oldS);
-  applyLB();
-}
-
-// Data Parsers
-const parseCardsRaw = raw => raw.split(/\r?\n/).map(l => {
-  const p = l.split('|');
-  return p.length !== 4 ? null : { id: p[0].trim(), front: p[1].trim(), back: p[2].trim(), chapter: p[3].trim() };
-}).filter(Boolean);
-const flashcardDataEN = parseCardsRaw(cardsRawText + '\n' + irregularVerbsRawText);
-const flashcardDataPHY = parseCardsRaw(physicsRawText);
-
-// Storage Modules
 const StateStore = {
   db: null,
-  async open() { if (this.db) return this.db; return this.db = await new Promise((res, rej) => { const r = indexedDB.open('flash9x16_state', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
-  async set(key, val) { const db = await this.open(); const tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(val, key); },
-  async get(key) { const db = await this.open(); return new Promise(res => { const r = db.transaction('kv', 'readonly').objectStore('kv').get(key); r.onsuccess = () => res(r.result); r.onerror = () => res(null); }); }
+  async open(){ if(this.db)return this.db; return this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_state',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}) },
+  async set(k,v){ const d=await this.open(), tx=d.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k) }
 };
-
 const Media = {
   db: null, cache: new Map(),
-  async open() {
-    if (this.db) return this.db;
-    this.db = await new Promise((res, rej) => {
-      const r = indexedDB.open('flash9x16_media', 1);
-      r.onupgradeneeded = e => { if (!r.result.objectStoreNames.contains('files')) r.result.createObjectStore('files', { keyPath: 'key' }); };
-      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
-    }); return this.db;
-  },
-  async save(key, blob, meta = {}) {
-    const db = await this.open(); const tx = db.transaction('files', 'readwrite');
-    tx.objectStore('files').put({ key, blob, meta, ts: Date.now() });
-    data.mediaIndex = data.mediaIndex || {};
-    data.mediaIndex[key] = { name: meta.name || key, type: blob.type, size: blob.size };
-    saveData();
-  },
-  async urlFor(key) {
-    if (this.cache.has(key)) return this.cache.get(key);
-    const db = await this.open();
-    return new Promise((res, rej) => {
-      const r = db.transaction('files', 'readonly').objectStore('files').get(key);
-      r.onsuccess = () => { if (!r.result?.blob) return rej('Missing'); const u = URL.createObjectURL(r.result.blob); this.cache.set(key, u); res(u); };
-      r.onerror = () => rej(r.error);
-    });
-  },
-  revokeAll() { for (const u of this.cache.values()) URL.revokeObjectURL(u); this.cache.clear(); },
-  async clearAll() {
-    const db = await this.open(); const tx = db.transaction('files', 'readwrite');
-    tx.objectStore('files').clear(); this.revokeAll(); data.mediaIndex = {}; saveData();
-  },
-  rewriteHTMLToPlaceholders(html, nameMap) {
-    return String(html || '').replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (m, p, src, s) => {
-      const k = nameMap[src.replace(/^.*[\\\/]/, '').replace(/^_+/, '')] || null;
-      return k ? `${p}media://${k}${s}` : m;
-    });
-  },
-  async resolveMediaInElement(el) {
-    const imgs = [...el.querySelectorAll('img[src^="media://"]')];
-    await Promise.all(imgs.map(async i => { try { i.src = await Media.urlFor(i.getAttribute('src').replace(/^media:\/\//, '')); } catch (e) { } }));
-  }
+  async open(){ if(this.db)return this.db; this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_media',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('files'))r.result.createObjectStore('files',{keyPath:'key'})};r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}); return this.db },
+  async save(k,b,m={}){ const d=await this.open(), tx=d.transaction('files','readwrite'); tx.objectStore('files').put({key:k,blob:b,meta:m,ts:Date.now()}); data.mediaIndex=data.mediaIndex||{}; data.mediaIndex[k]={name:m.name||k,type:b.type,size:b.size}; saveData() },
+  async urlFor(k){ if(this.cache.has(k))return this.cache.get(k); const d=await this.open(); return new Promise((s,j)=>{const r=d.transaction('files','readonly').objectStore('files').get(k);r.onsuccess=()=>{if(!r.result?.blob)return j('Missing');const u=URL.createObjectURL(r.result.blob);this.cache.set(k,u);s(u)};r.onerror=()=>j(r.error)}) },
+  revokeAll(){ for(const u of this.cache.values())URL.revokeObjectURL(u); this.cache.clear() },
+  async clearAll(){ const d=await this.open(), tx=d.transaction('files','readwrite'); tx.objectStore('files').clear(); this.revokeAll(); data.mediaIndex={}; saveData() },
+  rwHTML(h,m){ return String(h||'').replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi,(x,p,src,s)=>{const k=m[src.replace(/^.*[\\\/]/,'').replace(/^_+/,'')]||null;return k?`${p}media://${k}${s}`:x}) },
+  async resolve(el){ const i=[...el.querySelectorAll('img[src^="media://"]')]; await Promise.all(i.map(async x=>{try{x.src=await Media.urlFor(x.getAttribute('src').replace(/^media:\/\//,''))}catch{}})) }
 };
-const ensureSQL = (() => { let p; return () => { if (!p) p = initSqlJs({ locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}` }); return p; } })();
+const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}`}); return p } })();
 
-// Imports
-async function importFiles(files) {
-  for (const f of files) {
-    const n = f.name.toLowerCase();
-    if (n.endsWith('.apkg')) await importApkg(f);
-    else if (n.endsWith('.csv') || n.endsWith('.tsv')) await importDelimited(f);
-    else if (n.endsWith('.json')) await importJSON(f);
-  }
-}
-async function importApkg(file) {
+async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
+async function impApkg(f){
   try {
-    const buf = await file.arrayBuffer(), zip = await JSZip.loadAsync(buf);
-    let mediaMap = {}; const mEnt = zip.file(/^media(\.json)?$/i)[0];
-    if (mEnt) try { mediaMap = JSON.parse(await mEnt.async('string')); } catch (e) { }
-    const impId = `apkg-${slugify(file.name.replace(/\.[^.]+$/, ''))}-${Date.now()}`, mNameKey = {};
-    for (const [nStr, rName] of Object.entries(mediaMap)) {
-      const ent = zip.file(new RegExp(`^${nStr}$`))[0]; if (!ent) continue;
-      const key = `${impId}/${rName || nStr}`; await Media.save(key, await ent.async('blob'), { name: rName || nStr });
-      mNameKey[rName] = key; mNameKey[nStr] = key;
-    }
-    const col = zip.file(/collection\.anki2(1|\.db)?/i)[0]; if (!col) throw new Error("Collection introuvable");
-    const db = new (await ensureSQL()).Database(new Uint8Array(await col.async('uint8array')));
-    let deckById = {}; try { const r = db.exec('select decks from col limit 1'); if (r[0]?.values[0]) deckById = JSON.parse(r[0].values[0][0] || '{}'); } catch (e) { }
-    let rows; try { rows = db.exec('select cards.id as cid,cards.nid,cards.did,cards.ord,notes.flds from cards join notes on notes.id=cards.nid'); } catch (e) { throw new Error("Erreur lecture DB"); }
-    if (!rows[0]) return;
-    const byDeck = new Map(); const cols = rows[0].columns, vals = rows[0].values;
-    for (const r of vals) {
-      const row = Object.fromEntries(cols.map((c, i) => [c, r[i]])); const dName = (deckById[row.did]?.name || `Deck ${row.did}`).replace(/::/g, ' › ');
-      const flds = (row.flds || '').split('\x1f');
-      const chArr = byDeck.get(dName) || [];
-      chArr.push({ id: String(row.cid), front: Media.rewriteHTMLToPlaceholders(flds[0] || '', mNameKey), back: Media.rewriteHTMLToPlaceholders(flds[1] || '', mNameKey) });
-      byDeck.set(dName, chArr);
-    }
+    const b=await f.arrayBuffer(), z=await JSZip.loadAsync(b); let mm={}; const me=z.file(/^media(\.json)?$/i)[0];
+    if(me) try{mm=JSON.parse(await me.async('string'))}catch{}
+    const iId=`apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`, mnk={};
+    for(const [ns,rn] of Object.entries(mm)){ const e=z.file(new RegExp(`^${ns}$`))[0]; if(!e)continue; const k=`${iId}/${rn||ns}`; await Media.save(k,await e.async('blob'),{name:rn||ns}); mnk[rn]=k; mnk[ns]=k }
+    const col=z.file(/collection\.anki2(1|\.db)?/i)[0]; if(!col) throw new Error("No Collection");
+    const db=new(await ensureSQL()).Database(new Uint8Array(await col.async('uint8array'))); let dk={};
+    try{const r=db.exec('select decks from col limit 1');if(r[0]?.values[0])dk=JSON.parse(r[0].values[0][0]||'{}')}catch{}
+    let rows; try{rows=db.exec('select cards.id,cards.nid,cards.did,cards.ord,notes.flds from cards join notes on notes.id=cards.nid')}catch{throw new Error("DB Error")}
+    if(!rows[0])return;
+    const byD=new Map(), cols=rows[0].columns, vals=rows[0].values;
+    for(const r of vals){ const row=Object.fromEntries(cols.map((c,i)=>[c,r[i]])), dn=(dk[row.did]?.name||`Deck ${row.did}`).replace(/::/g,' › '), fl=(row.flds||'').split('\x1f'), ca=byD.get(dn)||[]; ca.push({id:String(row.id),front:Media.rwHTML(fl[0]||'',mnk),back:Media.rwHTML(fl[1]||'',mnk)}); byD.set(dn,ca) }
     db.close();
-    const chapters = [];
-    for (const [name, arr] of byDeck) {
-      const cards = arr.map(r => ({ id: `${slugify(name)}-${r.id}`, front: r.front, back: r.back, grade: 'unseen', timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0, perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0 }));
-      chapters.push({ id: 'chap-' + slugify(name), title: name, description: `${emojiFor(name) || '📦'} ${name}`, settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false }, filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } }, stats: { gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 }, totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {} }, cards, imported: true });
+    const chs=[]; for(const [n,arr] of byD){
+      const cds=arr.map(r=>({id:`${slugify(n)}-${r.id}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
+      chs.push({id:'chap-'+slugify(n),title:n,description:`${getEmoji(n)||'📦'} ${n}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0})
     }
-    const subj = { id: `import-${slugify(file.name)}`, title: file.name.replace(/\.[^.]+$/, ''), chapters, imported: true };
-    data.subjects.push(subj); data.app.currentSubjectId = subj.id; saveData();
-  } catch (e) { alert("Erreur import APKG: " + e.message); }
+    const sj={id:`import-${slugify(f.name)}`,title:f.name.replace(/\.[^.]+$/,''),chapters:chs,imported:!0}; data.subjects.push(sj); data.app.currentSubjectId=sj.id; saveData()
+  } catch(e) { alert("Import APKG Err: "+e.message) }
 }
-async function importDelimited(f) {
-  const t = await f.text(), sep = t.includes('\t') ? '\t' : (t.includes(';') ? ';' : ',');
-  const lines = t.split(/\r?\n/).filter(Boolean);
-  let h = lines[0].split(sep).map(s => s.trim().toLowerCase()), start = 0;
-  if (!h.includes('front')) h = ['front', 'back', 'chapter']; else start = 1;
-  const recs = [];
-  for (let i = start; i < lines.length; i++) { const c = lines[i].split(sep), row = Object.fromEntries(h.map((x, j) => [x, c[j] || ''])); recs.push({ front: row.front || c[0] || '', back: row.back || c[1] || '', chapter: row.chapter || 'Général' }); }
-  await importAsSimpleSubject(f.name.replace(/\.[^.]+$/, ''), recs);
-}
-async function importJSON(f) { const o = JSON.parse(await f.text()); if (Array.isArray(o)) importAsSimpleSubject(f.name.replace(/\.[^.]+$/, ''), o); else if (o.cards) importAsSimpleSubject(o.subject || f.name, o.cards); }
-async function importAsSimpleSubject(name, list) {
-  const byCh = {}; list.forEach(x => { const c = (x.chapter || 'Général').trim() || 'Général'; (byCh[c] = byCh[c] || []).push({ front: Media.rewriteHTMLToPlaceholders(String(x.front || ''), {}), back: Media.rewriteHTMLToPlaceholders(String(x.back || ''), {}) }); });
-  const chapters = Object.entries(byCh).map(([cName, arr]) => {
-    const cards = arr.map((r, i) => ({ id: `${slugify(cName)}-${i}-${Date.now()}`, front: r.front, back: r.back, grade: 'unseen', timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0, perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0 }));
-    return { id: 'chap-' + slugify(cName), title: cName, description: `📦 ${cName}`, settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false }, filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } }, stats: { gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 }, totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {} }, cards, imported: true };
+async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
+async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(o)) impSimpSub(f.name.replace(/\.[^.]+$/,''),o); else if(o.cards) impSimpSub(o.subject||f.name,o.cards) }
+async function impSimpSub(n,l){
+  const by={}; l.forEach(x=>{ const c=(x.chapter||'Général').trim()||'Général'; (by[c]=by[c]||[]).push({front:Media.rwHTML(String(x.front||''),{}),back:Media.rwHTML(String(x.back||''),{})}) });
+  const chs=Object.entries(by).map(([cn,arr])=>{
+    const cds=arr.map((r,i)=>({id:`${slugify(cn)}-${i}-${Date.now()}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
+    return{id:'chap-'+slugify(cn),title:cn,description:`📦 ${cn}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0}
   });
-  const s = { id: `import-${slugify(name)}-${Date.now()}`, title: name, chapters, imported: true };
-  data.subjects.push(s); data.app.currentSubjectId = s.id; saveData(); goDeck(false);
+  const s={id:`import-${slugify(n)}-${Date.now()}`,title:n,chapters:chs,imported:!0}; data.subjects.push(s); data.app.currentSubjectId=s.id; saveData(); goDeck(!1)
 }
 
-// Helpers
-const ChartHit = {}, Bar7Hit = {};
-const dateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-const todayKey = () => dateKey(new Date());
-const formatDuration = ms => { const s = math.round(ms / 1000); return `${math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-const avg = a => !a?.length ? 0 : a.reduce((x, y) => x + y, 0) / a.length;
-const deepClone = o => JSON.parse(JSON.stringify(o));
-const isSuccess = g => g === 'facile' || g === 'bien';
-function preprocessLaTeX(s) { return s ? s.replace(/\[\/?latex\]/gi, '').replace(/\\newline\s*/g, '<br/>') : s; }
-function typesetLatex(el) { if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise(el ? [el] : null).catch(() => { }); return Promise.resolve(); }
-window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true }, options: { skipHtmlTags: ['script', 'style', 'textarea'] }, startup: { typeset: false } };
-function formatDayKeyFR(k) { const [Y, M, D] = k.split('-').map(Number), d = new Date(Y, M - 1, D); return `${['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][d.getDay()]} ${String(D).padStart(2, '0')} ${['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'][M - 1]} ${Y}`; }
-const emojiFor = t => CHAPTER_EMOJIS[t] || '';
-const extractRowId = cId => { const m = String(cId).match(/-(\d+)$/); return m ? m[1] : null; };
-
-function buildChaptersFromFlashcards(list) {
-  const byCh = {}; list.forEach(r => { const n = r.chapter || 'Sans catégorie'; (byCh[n] = byCh[n] || []).push(r); });
-  const chapters = Object.keys(byCh).map(name => {
-    const cards = byCh[name].map(r => ({ id: `${slugify(name)}-${r.id}`, front: r.front, back: r.back, grade: 'unseen', timesReviewed: 0, lastReviewed: 0, lastMs: 0, avgMs: 0, perfEma: 0.5, ef: 2.5, intervalDays: 0, dueAt: 0, streak: 0, successes: 0, failures: 0 }));
-    return { id: 'chap-' + slugify(name), title: name, description: emojiFor(name) ? `${emojiFor(name)} ${name}` : name, settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false }, filters: { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } }, stats: { gradeCounts: { unseen: cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 }, totalReviews: 0, dailyReviews: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {}, dailyLog: {} }, cards };
-  });
-  return { chapters, app: { currentChapterId: chapters[0]?.id || null, theme: 'dark', prefs: { fsTerm: 22, fsDef: 24, accent: 'indigo', showEmoji: true, radius: 14 } } };
-}
-const buildSubjectFromList = (t, l) => ({ id: slugify(t), title: t, chapters: buildChaptersFromFlashcards(l).chapters, groups: [] });
-const buildCanonicalSubjects = () => [buildSubjectFromList('Anglais', flashcardDataEN), buildSubjectFromList('Physique', flashcardDataPHY)];
-
-function loadData() {
-  try { const r = loc.getItem(STORAGE_KEY); if (r) { const p = JSON.parse(r); if (p.subjects) return p; if (p.chapters) return { subjects: [{ id: 'anglais', title: 'Anglais', chapters: p.chapters, groups: [] }], app: p.app || { theme: 'light', currentSubjectId: 'anglais' } }; } } catch (e) { }
-  const s = buildCanonicalSubjects(); return { subjects: s, app: { currentSubjectId: s[0]?.id, theme: 'light', prefs: { fsTerm: 22, fsDef: 24, accent: 'indigo' } } };
-}
-function saveData() { try { const s = JSON.stringify(data); loc.setItem(STORAGE_KEY, s); StateStore.set('state', s); } catch (e) { } }
-function pruneStats() { const cut = new Date(); cut.setDate(cut.getDate() - 180); const kCut = dateKey(cut); data.subjects.forEach(s => s.chapters.forEach(c => { ['dailyReviews', 'dailyDurMs', 'dailyDurCount', 'dailyChanges', 'dailyLog'].forEach(k => { const m = c.stats[k] || {}; Object.keys(m).forEach(d => { if (d < kCut) delete m[d]; }); }); if (c.stats.dailyLog) Object.values(c.stats.dailyLog).forEach(a => { if (a.length > 200) a.splice(0, a.length - 200); }); })); saveData(); }
-
+/* --- STATE MANAGEMENT --- */
 let data;
-const getCurrentSubject = () => data.subjects.find(x => x.id === data.app.currentSubjectId) || data.subjects[0];
-const setCurrentSubject = id => { if (data.subjects.find(s => s.id === id)) { data.app.currentSubjectId = id; saveData(); } };
-const getCurrentChapters = () => getCurrentSubject()?.chapters || [];
-const getChapterEmoji = ch => (ch && (ch.emoji || emojiFor(ch.title) || '')) || '';
-const updateChapterDescription = ch => { const e = getChapterEmoji(ch); ch.description = (e ? e + ' ' : '') + ch.title; };
-function uniqueChapterId(sub, base) { const ids = new Set((sub.chapters || []).map(c => c.id)); if (!ids.has(base)) return base; let i = 2, id = base; while (ids.has(id)) id = base + '-' + i++; return id; }
-function moveChapterToSubject(fromId, chId, toId) {
-  if (fromId === toId) return false; const f = data.subjects.find(s => s.id === fromId), t = data.subjects.find(s => s.id === toId); if (!f || !t) return false;
-  const idx = f.chapters.findIndex(c => c.id === chId); if (idx < 0) return false; const ch = f.chapters[idx];
-  ensureGroups(f).forEach(g => g.chapIds = g.chapIds.filter(id => id !== chId)); ensureValidGroups(f);
-  f.chapters.splice(idx, 1); ch.id = uniqueChapterId(t, ch.id); (t.chapters = t.chapters || []).push(ch); ensureValidGroups(t);
-  if (f.chapters.length === 0) { data.subjects = data.subjects.filter(s => s.id !== f.id); if (data.app.currentSubjectId === f.id) data.app.currentSubjectId = data.subjects[0]?.id; }
-  saveData(); return true;
-}
-function renameSubject(id, t, e) { const s = data.subjects.find(x => x.id === id); if (!s) return false; if (t) s.title = t.trim(); s.emoji = (e || '').trim(); saveData(); return true; }
+const ChartHit={}, Bar7Hit={};
+function buildChs(l){ const by={}; l.forEach(r=>{ const n=r.chapter||'Sans catégorie'; (by[n]=by[n]||[]).push(r) }); return{chapters:Object.keys(by).map(n=>{ const cds=by[n].map(r=>({id:`${slugify(n)}-${r.id}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0})); return{id:'chap-'+slugify(n),title:n,description:getEmoji(n)?`${getEmoji(n)} ${n}`:n,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds} }), app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',showEmoji:!0,radius:14}}} }
+const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]}), buildCanon=() => [buildSub('Anglais',dataEN),buildSub('Physique',dataPHY)];
+function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} }
+function saveData(){ try{const s=JSON.stringify(data);LS.setItem(KEY,s);StateStore.set('state',s)}catch{} }
+function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); data.subjects.forEach(s=>s.chapters.forEach(ch=>{ ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(x=>{const m=ch.stats[x]||{};Object.keys(m).forEach(d=>{if(d<k)delete m[d]})}); if(ch.stats.dailyLog)Object.values(ch.stats.dailyLog).forEach(a=>{if(a.length>200)a.splice(0,a.length-200)}) })) }
+const getSub = () => data.subjects.find(x=>x.id===data.app.currentSubjectId)||data.subjects[0];
+const setSub = id => { if(data.subjects.find(s=>s.id===id)){data.app.currentSubjectId=id;saveData()} };
+const getChs = () => getSub()?.chapters||[];
+const updChDesc = c => { const e=getEmoji(c.title)||c.emoji||''; c.description=(e?e+' ':'')+c.title };
+function uniqId(s,b){ const ids=new Set((s.chapters||[]).map(c=>c.id)); if(!ids.has(b))return b; let i=2,d=b; while(ids.has(d))d=b+'-'+i++; return d }
+function moveCh(fid,cid,tid){ if(fid===tid)return!1; const f=data.subjects.find(s=>s.id===fid), t=data.subjects.find(s=>s.id===tid); if(!f||!t)return!1; const i=f.chapters.findIndex(c=>c.id===cid); if(i<0)return!1; const ch=f.chapters[i]; ensGrps(f).forEach(g=>g.chapIds=g.chapIds.filter(id=>id!==cid)); valGrps(f); f.chapters.splice(i,1); ch.id=uniqId(t,ch.id); (t.chapters=t.chapters||[]).push(ch); valGrps(t); if(f.chapters.length===0){data.subjects=data.subjects.filter(s=>s.id!==f.id);if(data.app.currentSubjectId===f.id)data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 }
+function renSub(id,t,e){ const s=data.subjects.find(x=>x.id===id); if(!s)return!1; if(t)s.title=t.trim(); s.emoji=(e||'').trim(); saveData(); return!0 }
+const ensGrps = s => { if(!Array.isArray(s.groups))s.groups=[]; return s.groups };
+const findGrp = (s,id) => ensGrps(s).find(g=>g.id===id);
+const findGrpCh = (s,cid) => ensGrps(s).find(g=>g.chapIds.includes(cid));
+const grpEmojis = (s,g) => { const z=new Set(); g.chapIds.forEach(id=>{const c=s.chapters.find(x=>x.id===id),e=c?(c.emoji||getEmoji(c.title)||''):'';if(e)z.add(e)}); return[...z].join(', ') };
+const valGrps = s => { const all=new Set(s.chapters.map(c=>c.id)); s.groups=ensGrps(s).map(g=>({...g,chapIds:g.chapIds.filter(x=>all.has(x))})).filter(g=>g.chapIds.length>=2) };
 
-/* Groups */
-const ensureGroups = s => { if (!Array.isArray(s.groups)) s.groups = []; return s.groups; };
-const findGroupById = (s, id) => ensureGroups(s).find(g => g.id === id);
-const findGroupByChapter = (s, cid) => ensureGroups(s).find(g => g.chapIds.includes(cid));
-function groupEmojiList(s, g) { const set = new Set(); g.chapIds.forEach(id => { const c = s.chapters.find(x => x.id === id), e = c ? getChapterEmoji(c) : ''; if (e) set.add(e); }); return [...set].join(', '); }
-function buildGroupStats(s, g) {
-  const chs = g.chapIds.map(id => s.chapters.find(c => c.id === id)).filter(Boolean);
-  const c = { unseen: 0, echec: 0, difficile: 0, bien: 0, facile: 0 };
-  chs.forEach(ch => { const k = getLiveGradeCounts(ch); for (let x in c) c[x] += k[x]; });
-  const st = { totalReviews: chs.reduce((a, b) => a + (b.stats.totalReviews || 0), 0), dailyReviews: {}, dailyDurMs: {}, dailyDurCount: {}, dailyChanges: {} };
-  const base = new Date();
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(base); d.setDate(base.getDate() - i); const k = dateKey(d);
-    st.dailyReviews[k] = chs.reduce((a, b) => a + (b.stats.dailyReviews[k] || 0), 0); st.dailyDurMs[k] = chs.reduce((a, b) => a + (b.stats.dailyDurMs[k] || 0), 0); st.dailyDurCount[k] = chs.reduce((a, b) => a + (b.stats.dailyDurCount[k] || 0), 0);
-    st.dailyChanges[k] = chs.reduce((acc, ch) => { const v = ch.stats.dailyChanges[k]; if (v) { acc.changed += v.changed || 0; acc.total += v.total || 0; } return acc; }, { changed: 0, total: 0 });
+function buildGrpStats(s,g){
+  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), c={unseen:0,echec:0,difficile:0,bien:0,facile:0};
+  chs.forEach(ch=>{ const k=getLive(ch); for(let x in c)c[x]+=k[x] });
+  const st={totalReviews:chs.reduce((a,b)=>a+(b.stats.totalReviews||0),0),dailyReviews:{},dailyDurMs:{},dailyDurCount:{},dailyChanges:{}}, base=new Date();
+  for(let i=0;i<60;i++){
+    const d=new Date(base); d.setDate(base.getDate()-i); const k=dateKey(d);
+    st.dailyReviews[k]=chs.reduce((a,b)=>a+(b.stats.dailyReviews[k]||0),0); st.dailyDurMs[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurMs[k]||0),0);
+    st.dailyDurCount[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurCount[k]||0),0);
+    st.dailyChanges[k]=chs.reduce((acc,ch)=>{const v=ch.stats.dailyChanges[k];if(v){acc.changed+=v.changed||0;acc.total+=v.total||0}return acc},{changed:0,total:0})
   }
-  return { counts: c, stats: st };
+  return {counts:c, stats:st}
 }
-function buildVirtualFromGroup(s, g) {
-  const chs = g.chapIds.map(id => s.chapters.find(c => c.id === id)).filter(Boolean), cards = [];
-  chs.forEach(ch => ch.cards.forEach(c => cards.push({ ...c, id: `virt-${ch.id}-${c.id}`, _origin: { chapId: ch.id, cardId: c.id } })));
-  return { id: 'group-' + g.id, _groupId: g.id, title: g.title || `Fichier (${groupEmojiList(s, g)})`, emoji: g.emoji || '', description: (g.emoji ? g.emoji + ' ' : '') + (g.title || 'Fichier'), virtual: true, _ids: g.chapIds.slice(), settings: { sessionSize: 10, dailyGoal: 10, reviewOrder: 'front-first', langSwap: false }, filters: g.filters ? deepClone(g.filters) : { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } }, stats: { gradeCounts: buildGroupStats(s, g).counts, ...buildGroupStats(s, g).stats }, cards };
+function buildVirt(s,g){
+  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
+  chs.forEach(ch=>ch.cards.forEach(c=>cards.push({...c,id:`virt-${ch.id}-${c.id}`,_origin:{chapId:ch.id,cardId:c.id}})));
+  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards}
 }
-function addGroup(s, ids) { const u = [...new Set(ids)].filter(Boolean); if (u.length < 2) return; ensureGroups(s).push({ id: 'g' + Date.now().toString(36), chapIds: u, createdAt: Date.now(), title: '', emoji: '' }); }
-function addToGroup(s, gid, cid) { const g = findGroupById(s, gid); if (g && !g.chapIds.includes(cid)) g.chapIds.push(cid); }
-function removeFromGroup(s, gid, ids) { const g = findGroupById(s, gid); if (g) g.chapIds = g.chapIds.filter(x => !ids.includes(x)); }
-function deleteGroup(s, gid) { s.groups = ensureGroups(s).filter(g => g.id !== gid); }
-function ensureValidGroups(s) { const all = new Set(s.chapters.map(c => c.id)); s.groups = ensureGroups(s).map(g => ({ ...g, chapIds: g.chapIds.filter(x => all.has(x)) })).filter(g => g.chapIds.length >= 2); }
+function addGrp(s,ids){ const u=[...new Set(ids)].filter(Boolean); if(u.length<2)return; ensGrps(s).push({id:'g'+Date.now().toString(36),chapIds:u,createdAt:Date.now(),title:'',emoji:''}) }
+function toGrp(s,gid,cid){ const g=findGrp(s,gid); if(g&&!g.chapIds.includes(cid))g.chapIds.push(cid) }
+function remGrp(s,gid,ids){ const g=findGrp(s,gid); if(g)g.chapIds=g.chapIds.filter(x=>!ids.includes(x)) }
+function delGrp(s,gid){ s.groups=ensGrps(s).filter(g=>g.id!==gid) }
 
-// Navigation & State
-const State = { view: 'deck', chapterId: null, review: null, cardsIndex: 0, dailyKey: null, virtualChapter: null };
-const _getChapterReal = id => getCurrentChapters().find(c => c.id === id);
-function getChapter(id) { return (State.virtualChapter?.id === id) ? State.virtualChapter : _getChapterReal(id); }
-function updateChapterFilter(ch, key) {
-  let t = ch; if (ch.virtual && ch._groupId) { const g = findGroupById(getCurrentSubject(), ch._groupId); if (g) { if (!g.filters) g.filters = { grades: { unseen: true, echec: true, difficile: true, bien: true, facile: true } }; t = g; } }
-  toggleFilterKey(t, key); if (t !== ch) ch.filters = t.filters; saveData(); renderChapter(ch.id);
-}
-const deleteImportedChapter = id => { const s = getCurrentSubject(), idx = s.chapters.findIndex(c => c.id === id); if (idx < 0 || !s.chapters[idx].imported || !confirm('Supprimer ?')) return false; ensureGroups(s).forEach(g => g.chapIds = g.chapIds.filter(x => x !== id)); ensureValidGroups(s); s.chapters.splice(idx, 1); if (!s.chapters.length && s.imported) { data.subjects = data.subjects.filter(x => x.id !== s.id); data.app.currentSubjectId = data.subjects[0]?.id; } saveData(); return true; }
+const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey:null, virtualChapter:null };
+const _real = id => getChs().find(c=>c.id===id), getCh = id => (State.virtualChapter?.id===id) ? State.virtualChapter : _real(id);
+function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); renCh(ch.id) }
+const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id); if(i<0||!s.chapters[i].imported||!confirm('Supprimer ?'))return!1; ensGrps(s).forEach(g=>g.chapIds=g.chapIds.filter(x=>x!==id)); valGrps(s); s.chapters.splice(i,1); if(!s.chapters.length&&s.imported){data.subjects=data.subjects.filter(x=>x.id!==s.id);data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 };
 
+/* --- NAVIGATION & UI --- */
 const Nav = {
-  stack: [], push() { this.stack.push(deepClone({ view: State.view, chapterId: State.chapterId, review: State.review, dailyKey: State.dailyKey })); },
-  back() {
-    if (!this.stack.length) return; const prev = this.stack.pop();
-    if (!this.stack.length || (!prev.chapterId?.startsWith('group-'))) State.virtualChapter = null;
-    State.view = prev.view; State.chapterId = prev.chapterId; State.review = prev.review; State.dailyKey = prev.dailyKey; renderByState(false);
-  }, clear() { this.stack = []; }
+  stack: [],
+  push(){ this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey})) },
+  back(){ if(!this.stack.length)return; const p=this.stack.pop(); if(!this.stack.length||(!p.chapterId?.startsWith('group-')))State.virtualChapter=null; State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; render(!1) },
+  clear(){ this.stack=[] }
 };
+const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), revBar=$('#revisionBar'), startBtn=$('#startReviewBtn');
 
-const backBtn = $('#backBtn'), titleEl = $('#title'), bottomActions = $('#bottomActions'), revisionBar = $('#revisionBar'), startReviewBtn = $('#startReviewBtn');
+function renSubMenu(){
+  let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
+  m.innerHTML=data.subjects.map(s=>`<div class="subject-item" data-id="${s.id}"><div class="name">${s.emoji?s.emoji+' ':''}${s.title}</div><div class="meta">${s.chapters?.length||0} chap.</div>${s.id===data.app.currentSubjectId?'<div class="muted">✓</div>':''}<div class="subject-actions"><button class="btn btn--tiny rs">✏️</button>${!(s.chapters?.length)?'<button class="btn btn--tiny ds">🗑️</button>':''}</div></div>`).join('');
+  $$('.subject-item',m).forEach(el=>{
+    el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
+    const r=el.querySelector('.rs'); if(r)r.onclick=e=>{e.stopPropagation();const id=el.dataset.id,s=data.subjects.find(x=>x.id===id),t=prompt('Nom:',s.title);if(t){renSub(id,t,prompt('Emoji:',s.emoji));renSubMenu();setTop({title:`Deck • ${getSub().title}`});goDeck(!1)}};
+    const d=el.querySelector('.ds'); if(d)d.onclick=e=>{e.stopPropagation();const id=el.dataset.id;if(confirm('Supprimer ?')){data.subjects=data.subjects.filter(s=>s.id!==id);if(data.app.currentSubjectId===id)data.app.currentSubjectId=data.subjects[0]?.id;closeSubMenu();goDeck(!1);saveData()}}
+  })
+}
+const openSubMenu = () => { renSubMenu(); const m=$('#subjectMenu'), r=titleEl.getBoundingClientRect(); m.style.top=`${r.bottom+6}px`; m.style.left=`${r.left}px`; m.style.display='block'; setTimeout(()=>D.addEventListener('click',clsOnOut),0) };
+const closeSubMenu = () => { const m=$('#subjectMenu'); if(m)m.style.display='none'; D.removeEventListener('click',clsOnOut) };
+const clsOnOut = e => { if(!$('#subjectMenu')?.contains(e.target)&&e.target!==titleEl)closeSubMenu() };
 
-function renderSubjectMenu() {
-  let m = $('#subjectMenu'); if (!m) { m = doc.createElement('div'); m.id = 'subjectMenu'; m.className = 'subject-menu'; doc.body.appendChild(m); }
-  m.innerHTML = data.subjects.map(s => `<div class="subject-item" data-id="${s.id}"><div class="name">${s.emoji ? s.emoji + ' ' : ''}${s.title}</div><div class="meta">${s.chapters?.length || 0} chap.</div>${s.id === data.app.currentSubjectId ? '<div class="muted">✓</div>' : ''}<div class="subject-actions"><button class="btn btn--tiny rename-subject">✏️</button>${!(s.chapters?.length) ? '<button class="btn btn--tiny del-subject">🗑️</button>' : ''}</div></div>`).join('');
-  $$('.subject-item', m).forEach(el => {
-    el.onclick = e => { if (e.target.closest('button')) return; const id = el.dataset.id; if (id !== data.app.currentSubjectId) { setCurrentSubject(id); closeSubjectMenu(); goDeck(false); } else closeSubjectMenu(); e.stopPropagation(); };
-    const rBtn = el.querySelector('.rename-subject'); if (rBtn) rBtn.onclick = e => { e.stopPropagation(); const id = el.dataset.id, s = data.subjects.find(x => x.id === id), t = prompt('Nom:', s.title); if (t) { renameSubject(id, t, prompt('Emoji:', s.emoji)); renderSubjectMenu(); setTopbar({ title: `Deck • ${getCurrentSubject().title}` }); goDeck(false); } };
-    const dBtn = el.querySelector('.del-subject'); if (dBtn) dBtn.onclick = e => { e.stopPropagation(); const id = el.dataset.id; if (confirm('Supprimer ?')) { data.subjects = data.subjects.filter(s => s.id !== id); if (data.app.currentSubjectId === id) data.app.currentSubjectId = data.subjects[0]?.id; closeSubjectMenu(); goDeck(false); saveData(); } };
-  });
-}
-const openSubjectMenu = () => { renderSubjectMenu(); const m = $('#subjectMenu'), r = titleEl.getBoundingClientRect(); m.style.top = `${r.bottom + 6}px`; m.style.left = `${r.left}px`; m.style.display = 'block'; setTimeout(() => doc.addEventListener('click', onDocClickClose), 0); };
-const closeSubjectMenu = () => { const m = $('#subjectMenu'); if (m) m.style.display = 'none'; doc.removeEventListener('click', onDocClickClose); };
-const onDocClickClose = e => { if (!$('#subjectMenu')?.contains(e.target) && e.target !== titleEl) closeSubjectMenu(); };
-titleEl.onclick = () => { if (State.view !== 'deck') goDeck(false); else ($('#subjectMenu')?.style.display === 'block') ? closeSubjectMenu() : openSubjectMenu(); };
+titleEl.onclick = () => { if(State.view!=='deck')goDeck(!1); else($('#subjectMenu')?.style.display==='block')?closeSubMenu():openSubMenu() };
+backBtn.onclick = () => { if(State.view==='recap'){if(Nav.stack.length)Nav.stack.pop();const t=State.review?.chapterId||State.chapterId;State.review=null;hideRevAct();if(t?.startsWith('group-')){const g=findGrp(getSub(),t.replace('group-',''));if(g){State.virtualChapter=buildVirt(getSub(),g);goChapter(State.virtualChapter.id,!1)}else goDeck(!1)}else if(t)goChapter(t,!1);else goDeck(!1)}else{if(State.view==='review'&&State.review&&!State.review.end&&!confirm('Quitter la révision ?'))return;Nav.back()} };
+$('#cardsBtn').onclick = () => goCards(State.chapterId); $('#settingsBtn').onclick = () => openSet(State.chapterId); startBtn.onclick = () => startRev(State.chapterId);
 
-backBtn.onclick = () => {
-  if (State.view === 'recap') {
-    if (Nav.stack.length) Nav.stack.pop(); const tid = State.review?.chapterId || State.chapterId; State.review = null; hideReviewActionsBar();
-    if (tid?.startsWith('group-')) { const g = findGroupById(getCurrentSubject(), tid.replace('group-', '')); if (g) { State.virtualChapter = buildVirtualFromGroup(getCurrentSubject(), g); goChapter(State.virtualChapter.id, false); } else goDeck(false); }
-    else if (tid) goChapter(tid, false); else goDeck(false);
-  } else {
-    if (State.view === 'review' && State.review && !State.review.end && !confirm('Quitter la révision ?')) return;
-    Nav.back();
-  }
-};
-$('#cardsBtn').onclick = () => goCards(State.chapterId); $('#settingsBtn').onclick = () => openSettings(State.chapterId); startReviewBtn.onclick = () => startReview(State.chapterId);
+function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
+function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
+function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
+const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
-function setTopbar({ title, showBack }) { backBtn.classList.toggle('hidden', showBack === false); if (title) titleEl.textContent = title; }
-function setBottomVisibility({ actions, revision, sessionSize = 10, enabled = true, available = null, chapterId = null }) {
-  bottomActions.style.display = actions ? 'grid' : 'none'; revisionBar.style.display = revision ? 'block' : 'none';
-  $('#app').style.setProperty('--row-actions', actions ? '52px' : '0px'); $('#app').style.setProperty('--row-rev', revision ? '64px' : '0px');
-  if (available == null && chapterId) { const c = getChapter(chapterId); available = c ? countAvailable(c) : 0; }
-  startReviewBtn.textContent = `Révision • ${available > 0 ? math.min(sessionSize, available) : sessionSize} cartes${revision && (available > 0) ? ` • ${available} dispo` : ''}`; startReviewBtn.disabled = !enabled || (available || 0) <= 0;
+function goDeck(push=true){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='deck'; State.chapterId=null; const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`,showBack:!1}); setBot({actions:!1,revision:!1}); hideRevAct();
+  const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
+  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept=".apkg,.csv,.tsv,.json" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0;return`<div class="deck-item" data-type="group" data-id="${g.id}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${chs.filter(c=>!inG.has(c.id)).map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0;return`<div class="deck-item" data-type="chapter" data-id="${c.id}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
+  $('#impB').onclick=()=>$('#impI').click(); $('#impI').onchange=async e=>{try{await importFiles([...e.target.files]);alert('Import OK');saveData();goDeck(!1)}catch(x){alert(x)}finally{e.target.value=''}}; bindDeck()
 }
-function renderByState(push = true) {
-  if (State.view === 'deck') goDeck(push); else if (State.view === 'chapter') goChapter(State.chapterId, push); else if (State.view === 'cards') goCards(State.chapterId, push);
-  else if (State.view === 'review') goReview(push); else if (State.view === 'recap') goRecap(push); else if (State.view === 'settings') openSettings(State.chapterId, push);
-  else if (State.view === 'daily') goDaily(State.chapterId, State.dailyKey, push);
+function bindDeck(){
+  const l=$('#dL'); if(!l)return; const sub=getSub(); l.onclick=e=>{if(e.target.matches('.delCh')){e.stopPropagation();if(delImpCh(e.target.dataset.cid))goDeck(!1)}};
+  $$('.deck-item').forEach(el=>{
+    const t=el.dataset.type, id=el.dataset.id; let sx=0, sy=0, dx=0, dy=0, st='idle', tm, g, raf, sd=0;
+    const auto=()=>{if(sd!==0)l.scrollTop+=6*sd;if(st==='dragging')raf=requestAnimationFrame(auto)};
+    const mG=(x,y)=>{if(g)g.style.transform=`translate(${x-75}px,${y-75}px) scale(1.02)`};
+    const d=e=>{if(e.target.closest('button'))return;sx=e.clientX;sy=e.clientY;dx=dy=0;st='pressed';el.setPointerCapture?.(e.pointerId);clearTimeout(tm);if(t==='chapter')tm=setTimeout(()=>{st='dragging';el.classList.add('dragging-origin');D.body.classList.add('dragging-active');l.classList.add('scroll-lock');openSubMenu();g=el.cloneNode(!0);g.className='drag-ghost';g.style.width=el.offsetWidth+'px';D.body.appendChild(g);mG(sx,sy);raf=requestAnimationFrame(auto)},500);else if(t==='group')tm=setTimeout(()=>{st='idle';if(confirm("Décomposer ?"))delGrp(sub,id);saveData();goDeck(!1)},700)};
+    const m=e=>{if(st==='idle'||st==='swiping')return;dx=e.clientX-sx;dy=e.clientY-sy;if(st==='pressed'&&M.abs(dx)>10){clearTimeout(tm);if(dx<0&&el.querySelector('.right-action')){st='swiping';el.classList.add('reveal-delete');e.preventDefault()}}else if(st==='dragging'){e.preventDefault();mG(e.clientX,e.clientY);const r=l.getBoundingClientRect();sd=e.clientY<r.top+r.height*.2?-1:(e.clientY>r.bottom-r.height*.2?1:0);$$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item,.subject-item');if(tg&&tg!==el)tg.classList.add('drop-target')}};
+    const u=e=>{clearTimeout(tm);if(st==='dragging'){const sEl=D.elementFromPoint(e.clientX,e.clientY)?.closest('.subject-item');if(sEl){const to=sEl.dataset.id;if(to&&to!==sub.id&&moveCh(sub.id,id,to))setSub(to)}else{const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item');if(tg&&tg!==el)hDrop(sub,{type:t,id},{type:tg.dataset.type,id:tg.dataset.id})}goDeck(!1)}else if(st==='pressed'&&M.hypot(dx,dy)<10){if(t==='group')openGrp(sub,id);else goChapter(id)}cancelAnimationFrame(raf);st='idle';if(g)g.remove();g=null;el.classList.remove('dragging-origin');D.body.classList.remove('dragging-active');l.classList.remove('scroll-lock');$$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));closeSubMenu()};
+    el.addEventListener('pointerdown',d); el.addEventListener('pointermove',m); el.addEventListener('pointerup',u); el.addEventListener('pointercancel',u); el.oncontextmenu=e=>e.preventDefault()
+  }); l.onscroll=()=>{$$('.reveal-delete').forEach(n=>n.classList.remove('reveal-delete'))}
 }
-const hideReviewActionsBar = () => { $('#reviewActionsBar').style.display = 'none'; };
+function hDrop(s,src,dst){
+  if(src.type!=='chapter')return; const sG=findGrpCh(s,src.id);
+  if(dst.type==='chapter'){if(src.id===dst.id)return;const dG=findGrpCh(s,dst.id);if(!sG&&!dG)addGrp(s,[src.id,dst.id]);else if(sG&&!dG)toGrp(s,sG.id,dst.id);else if(!sG&&dG)toGrp(s,dG.id,src.id);else if(sG!==dG){remGrp(s,sG.id,[src.id]);toGrp(s,dG.id,src.id)}}
+  else if(dst.type==='group'){if(sG&&sG.id!==dst.id)remGrp(s,sG.id,[src.id]);toGrp(s,dst.id,src.id)} valGrps(s); saveData()
+}
+function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buildVirt(s,g);goChapter(State.virtualChapter.id)} }
 
-/* Views */
-function goDeck(push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'deck'; State.chapterId = null;
-  const s = getCurrentSubject(); setTopbar({ title: `Deck • ${s.emoji ? s.emoji + ' ' : ''}${s.title}`, showBack: false });
-  setBottomVisibility({ actions: false, revision: false }); hideReviewActionsBar();
-  const v = $('#view'), groups = ensureGroups(s), chs = (s.chapters || []), inG = new Set(groups.flatMap(g => g.chapIds));
-  v.innerHTML = `<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="importBtn">Importer</button><input id="importInput" type="file" class="hidden" accept=".apkg,.csv,.tsv,.json" multiple/></div></div><div id="deckList" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${groups.map(g => { const { counts } = buildGroupStats(s, g), tot = Object.values(counts).reduce((a, b) => a + b, 0), pct = tot ? math.round((tot - counts.unseen) * 100 / tot) : 0; return `<div class="deck-item" data-type="group" data-id="${g.id}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title ? ((g.emoji ? g.emoji + ' ' : '') + g.title) : `📁 Fichier (${groupEmojiList(s, g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${counts.echec}</span><span class="chip">🟨 ${counts.difficile}</span><span class="chip">🟦 ${counts.bien}</span><span class="chip">🟩 ${counts.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>` }).join('')}${chs.filter(c => !inG.has(c.id)).map(c => { const k = getLiveGradeCounts(c), tot = c.cards.length, pct = tot ? math.round((tot - k.unseen) / tot * 100) : 0; return `<div class="deck-item" data-type="chapter" data-id="${c.id}">${c.imported ? `<div class="right-action"><button class="btn btn--solid btn--red btn--tiny deleteChBtn" data-chap-id="${c.id}">Supprimer</button></div>` : ''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description || c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>` }).join('')}</div></div></div>`;
-  $('#importBtn').onclick = () => $('#importInput').click(); $('#importInput').onchange = async e => { try { await importFiles([...e.target.files]); alert('Import OK'); saveData(); goDeck(false); } catch (x) { alert(x); } finally { e.target.value = ''; } };
-  bindDeckInteractions();
+function goChapter(id,push=true){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${['unseen','echec','difficile','bien','facile'].map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWk(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div><div class="bar7-wrap"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
+  drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('')
 }
-function bindDeckInteractions() {
-  const l = $('#deckList'); if (!l) return; const subj = getCurrentSubject();
-  l.onclick = e => { if (e.target.matches('.deleteChBtn')) { e.stopPropagation(); if (deleteImportedChapter(e.target.dataset.chapId)) goDeck(false); } };
-  $$('.deck-item').forEach(el => {
-    const t = el.dataset.type, id = el.dataset.id; let sx = 0, sy = 0, dx = 0, dy = 0, state = 'idle', tmr, ghost, raf, scDir = 0;
-    const autoSc = () => { if (scDir !== 0) l.scrollTop += 6 * scDir; if (state === 'dragging') raf = requestAnimationFrame(autoSc); };
-    const mvGhost = (x, y) => { if (ghost) ghost.style.transform = `translate(${x - 75}px,${y - 75}px) scale(1.02)`; };
-    const down = e => {
-      if (e.target.closest('button')) return; sx = e.clientX; sy = e.clientY; dx = dy = 0; state = 'pressed'; el.setPointerCapture?.(e.pointerId); clearTimeout(tmr);
-      if (t === 'chapter') tmr = setTimeout(() => { state = 'dragging'; el.classList.add('dragging-origin'); doc.body.classList.add('dragging-active'); l.classList.add('scroll-lock'); openSubjectMenu(); ghost = el.cloneNode(true); ghost.className = 'drag-ghost'; ghost.style.width = el.offsetWidth + 'px'; doc.body.appendChild(ghost); mvGhost(sx, sy); raf = requestAnimationFrame(autoSc); }, 500);
-      else if (t === 'group') tmr = setTimeout(() => { state = 'idle'; if (confirm("Décomposer ?")) deleteGroup(subj, id); saveData(); goDeck(false); }, 700);
-    };
-    const move = e => {
-      if (state === 'idle' || state === 'swiping') return; dx = e.clientX - sx; dy = e.clientY - sy;
-      if (state === 'pressed' && math.abs(dx) > 10) { clearTimeout(tmr); if (dx < 0 && el.querySelector('.right-action')) { state = 'swiping'; el.classList.add('reveal-delete'); e.preventDefault(); } }
-      else if (state === 'dragging') {
-        e.preventDefault(); mvGhost(e.clientX, e.clientY); const r = l.getBoundingClientRect(); scDir = e.clientY < r.top + r.height * .2 ? -1 : (e.clientY > r.bottom - r.height * .2 ? 1 : 0);
-        $$('.deck-item,.subject-item').forEach(n => n.classList.remove('drop-target')); const tg = doc.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item,.subject-item'); if (tg && tg !== el) tg.classList.add('drop-target');
-      }
-    };
-    const up = e => {
-      clearTimeout(tmr);
-      if (state === 'dragging') {
-        const sEl = doc.elementFromPoint(e.clientX, e.clientY)?.closest('.subject-item');
-        if (sEl) { const to = sEl.dataset.id; if (to && to !== subj.id && moveChapterToSubject(subj.id, id, to)) setCurrentSubject(to); }
-        else { const tg = doc.elementFromPoint(e.clientX, e.clientY)?.closest('.deck-item'); if (tg && tg !== el) handleDrop(subj, { type: t, id }, { type: tg.dataset.type, id: tg.dataset.id }); }
-        goDeck(false);
-      } else if (state === 'pressed' && math.hypot(dx, dy) < 10) { if (t === 'group') openGroup(subj, id); else goChapter(id); }
-      cancelAnimationFrame(raf); state = 'idle'; if (ghost) ghost.remove(); ghost = null; el.classList.remove('dragging-origin'); doc.body.classList.remove('dragging-active'); l.classList.remove('scroll-lock'); $$('.deck-item,.subject-item').forEach(n => n.classList.remove('drop-target')); closeSubjectMenu();
-    };
-    el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.oncontextmenu = e => e.preventDefault();
-  });
-  l.onscroll = () => { $$('.reveal-delete').forEach(n => n.classList.remove('reveal-delete')); };
+function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
+async function goCards(cid,push=true){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
+  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Cartes (${pool.length})</div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid">${pool.map(x=>{const{f,b}=getSides(x,c);return`<div class="card-block grade-${x.grade||'unseen'}" data-id="${x.id}"><div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}</div>`}).join('')}</div></div></div>`;
+  await Media.resolve(v); await tsLat(v); $('#cardsGrid').onclick=e=>{const b=e.target.closest('.card-block');if(b){$$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')});b.classList.toggle('flipped')}}
 }
-function handleDrop(s, src, dst) {
-  if (src.type !== 'chapter') return; const sG = findGroupByChapter(s, src.id);
-  if (dst.type === 'chapter') { if (src.id === dst.id) return; const dG = findGroupByChapter(s, dst.id); if (!sG && !dG) addGroup(s, [src.id, dst.id]); else if (sG && !dG) addToGroup(s, sG.id, dst.id); else if (!sG && dG) addToGroup(s, dG.id, src.id); else if (sG !== dG) { removeFromGroup(s, sG.id, [src.id]); addToGroup(s, dG.id, src.id); } }
-  else if (dst.type === 'group') { if (sG && sG.id !== dst.id) removeFromGroup(s, sG.id, [src.id]); addToGroup(s, dst.id, src.id); }
-  ensureValidGroups(s); saveData();
+async function goDaily(cid,k,push=true){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='daily'; State.chapterId=cid; State.dailyKey=k; const c=getCh(cid), sub=getSub(); setTop({title:`Activité • ${fmtDayFR(k)}`}); setBot({actions:!1,revision:!1});
+  const log=c.virtual?(findGrp(sub,c._groupId)?getLogGrp(sub,findGrp(sub,c._groupId),k):[]):(c.stats.dailyLog[k]||[]), v=$('#view'); if(!log.length){v.innerHTML=`<div class="card"><div class="section-title">Activité ${fmtDayFR(k)}</div><div class="muted">Aucune donnée.</div></div>`;return}
+  log.sort((a,b)=>a.ts-b.ts); const byC=new Map(); for(const e of log){const cur=byC.get(e.cardId)||{f:e.prev,l:e.next,ts:e.ts,lts:e.ts,_c:e._chapId};if(e.ts>cur.lts){cur.l=e.next;cur.lts=e.ts}byC.set(e.cardId,cur)}
+  const rows=[...byC].map(([id,i])=>{const ch=c.virtual?_real(i._c):c,card=ch.cards.find(x=>x.id===id);return card?{t:ppLat(getSides(card,ch).f),d:ppLat(getSides(card,ch).b),b:i.f,a:i.l}:null}).filter(Boolean);
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Activité ${fmtDayFR(k)}</div><div id="dayL" class="scroll-y" style="flex:1"><div class="list">${rows.map(r=>`<div class="grid2"><div class="card-block grade-${r.b}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div><div class="card-block grade-${r.a}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div></div>`).join('')}</div></div></div>`;
+  await Media.resolve(v); await tsLat(v); $('#dayL').onclick=e=>{const b=e.target.closest('.card-block');if(b)b.classList.toggle('flipped')}
 }
-function openGroup(s, gid) { const g = findGroupById(s, gid); if (g) { State.virtualChapter = buildVirtualFromGroup(s, g); goChapter(State.virtualChapter.id); } }
+function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.find(c=>c.id===cid);return(ch?.stats?.dailyLog?.[k]||[]).map(e=>({...e,_chapId:cid}))}) }
 
-function goChapter(id, push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'chapter'; State.chapterId = id;
-  const c = getChapter(id); if (!c) { Nav.back(); return; }
-  setTopbar({ title: c.title }); updateRevisionBarForChapter(c); hideReviewActionsBar();
-  const k = c.stats.gradeCounts || getLiveGradeCounts(c), sel = c.filters.grades, v = $('#view');
-  v.innerHTML = `<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual ? c.description : (getChapterEmoji(c) ? getChapterEmoji(c) + ' ' : '') + 'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${['unseen', 'echec', 'difficile', 'bien', 'facile'].map(x => `<div class="legend-item ${sel[x] ? '' : 'inactive'}" data-key="${x}"><span class="dot ${x === 'unseen' ? 'gray' : (x === 'echec' ? 'red' : (x === 'difficile' ? 'amber' : (x === 'bien' ? 'blue' : 'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTodayCount(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWeekCount(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSuccessRate(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7DayAvgMs(c) ? math.round(get7DayAvgMs(c) / 100) / 10 + 's' : '—'}</div></div></div><div class="bar7-wrap"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
-  drawGradeChart('gradeChart', k, sel); $('#gradeChart').onclick = e => handleChartClick(e, 'gradeChart', c);
-  $$('.legend-item').forEach(el => el.onclick = () => updateChapterFilter(c, el.dataset.key));
-  drawBars7('bar7', getLastNDaysArray(c, 7));
-  $('#bar7').onclick = e => openDayFromBarClick(e, 'bar7', c.id);
-  $('#bar7Labels').innerHTML = getLastNDaysLabelsFR(7).map((j, i) => `<div onclick="goDaily('${c.id}','${dayKeyFromIndex(7, i)}')">${j.substring(0, 3)}</div>`).join('');
+function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; renRev() }
+function renRev(){
+  const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), fT=ppLat(f), bT=ppLat(b), ff=chap.settings.reviewOrder!=='back-first';
+  v.innerHTML=`<div class="review-wrap"><div class="review-top"><div>${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="${ff?'term':'definition'}" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:6px">${bT}</div></div>`}</div></div></div>`;
+  tsLat(v).then(()=>{Media.resolve(v);initGest()}); const bar=$('#reviewActionsBar');
+  if(!r.flipped){bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;$('#flipBtn').onclick=()=>{r.flipped=!0;renRev()}}else{bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn btn--${g==='echec'?'red':(g==='difficile'?'amber':(g==='bien'?'blue':'green'))}" id="g_${g}">${g}</button>`).join('')}</div>`;['echec','difficile','bien','facile'].forEach(g=>$('#g_'+g).onclick=()=>subG(g))}
 }
-function updateRevisionBarForChapter(c) { const n = countAvailable(c); setBottomVisibility({ actions: true, revision: true, sessionSize: c.settings.sessionSize, enabled: c.cards.length > 0, available: n, chapterId: c.id }); }
-
-async function goCards(cid, push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'cards'; State.chapterId = cid;
-  const c = getChapter(cid), pool = c.cards.filter(x => c.filters.grades[x.grade || 'unseen']), v = $('#view');
-  setTopbar({ title: `${c.title} • Cartes` }); setBottomVisibility({ actions: false, revision: false }); hideReviewActionsBar();
-  v.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Cartes (${pool.length})</div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid">${pool.map(x => { const { frontText, backText } = getCardSides(x, c); return `<div class="card-block grade-${x.grade || 'unseen'}" data-id="${x.id}"><div class="term">${preprocessLaTeX(frontText)}</div><div class="definition">${preprocessLaTeX(backText)}</div>${x.avgMs ? `<div class="cb-time">${formatDuration(x.avgMs)}</div>` : ''}</div>` }).join('')}</div></div></div>`;
-  await Media.resolveMediaInElement(v); await typesetLatex(v);
-  $('#cardsGrid').onclick = e => { const b = e.target.closest('.card-block'); if (b) { $$('.card-block').forEach(x => { if (x !== b) x.classList.remove('flipped') }); b.classList.toggle('flipped'); } };
+function goRecap(push=true){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh(State.review.multiChaps[0]); setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
+  const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
+  $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Objectif</div><div class="val">${c.settings.dailyGoal}</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}/${c.settings.dailyGoal}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
+  $('#contBtn').onclick=()=>startRev(c.id,!1)
+}
+function startRev(cid,push=true){
+  if(!cid)return; const c=getCh(cid); if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push); const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); if(!pool.length){alert('Aucune carte.');return}
+  const q=bldQ(c,pool,c.settings.sessionSize); State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
+}
+function startRevMulti(ids,vid,flt,push=true){
+  const all=ids.map(_real).filter(Boolean), pool=[]; all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen'])pool.push({chapId:ch.id,card:c})})); if(!pool.length){alert('Aucune carte.');return}
+  const scored=pool.map(i=>{const g=i.card.grade||'unseen',base={unseen:6,echec:5,difficile:3.5,bien:2,facile:1}[g]||1,due=(i.card.dueAt&&i.card.dueAt>0)?(Date.now()-i.card.dueAt>0?(1+M.min(3,(Date.now()-i.card.dueAt)/864e5)):0.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(0.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w), sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
+  State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
+}
+function bldQ(c,pool,sz){
+  const sh=a=>{for(let i=a.length-1;i>0;i--){const j=M.floor(M.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}, nc=[], lc=[], dr=[];
+  pool.forEach(x=>{const g=x.grade||'unseen';if(g==='unseen')nc.push(x);else if(g==='echec'||g==='difficile')lc.push(x);else if(x.dueAt<=Date.now())dr.push(x)}); return[...sh(lc),...sh(dr),...sh(nc)].slice(0,sz)
+}
+function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.index],ch=_real(i.chapId);return{card:ch.cards.find(x=>x.id===i.cardId),chap:ch}}else{const ch=getCh(r.chapterId);return{card:ch.cards.find(x=>x.id===r.queue[r.index]),chap:ch}} }
+function subG(nxt){
+  const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
+  const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
+  card.grade=nxt; syncG(chap); card.perfEma=(1-.3)*(card.perfEma??.5)+.3*(nxt==='facile'?1:nxt==='bien'?0.75:nxt==='difficile'?0.35:0);
+  schNx(card,nxt,now); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
+  if(isSucc(nxt))card.successes++;else card.failures++; chap.stats.totalReviews++; const k=todayKey();
+  chap.stats.dailyReviews[k]=(chap.stats.dailyReviews[k]||0)+1; chap.stats.dailyDurMs[k]=(chap.stats.dailyDurMs[k]||0)+ms; chap.stats.dailyDurCount[k]=(chap.stats.dailyDurCount[k]||0)+1;
+  const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
+  (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
+  r.answers.push({cardId:card.id,prev,next:nxt,ms});
+  if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();saveData();renRev()}else{r.end=Date.now();saveData();goRecap(!1)}
+}
+function schNx(c,g,now){
+  const q={'facile':5,'bien':4,'difficile':2,'echec':1}[g]||0; let ef=c.ef||2.5; ef=ef+(0.1-(5-q)*(0.08+(5-q)*0.02)); if(ef<1.3)ef=1.3; c.ef=ef;
+  if(q<3){c.intervalDays=(g==='echec')?0.02:0.5;c.streak=(c.streak<=0?c.streak-1:-1)}else{c.intervalDays=(c.intervalDays<1e-6)?1:(c.intervalDays<1.5?6:M.round(c.intervalDays*ef));c.streak=(c.streak>=0?c.streak+1:1)}
+  c.streak=clamp(c.streak,-8,12); c.dueAt=now+c.intervalDays*864e5
 }
 
-async function goDaily(cid, key, push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'daily'; State.chapterId = cid; State.dailyKey = key;
-  const c = getChapter(cid), subj = getCurrentSubject();
-  setTopbar({ title: `Activité • ${formatDayKeyFR(key)}` }); setBottomVisibility({ actions: false, revision: false });
-  const log = c.virtual ? (findGroupById(subj, c._groupId) ? getCombinedDailyLogForGroup(subj, findGroupById(subj, c._groupId), key) : []) : (c.stats.dailyLog[key] || []);
-  const v = $('#view'); if (!log.length) { v.innerHTML = `<div class="card"><div class="section-title">Activité ${formatDayKeyFR(key)}</div><div class="muted">Aucune donnée.</div></div>`; return; }
-  log.sort((a, b) => a.ts - b.ts); const byC = new Map();
-  for (const e of log) { const curr = byC.get(e.cardId) || { f: e.prev, l: e.next, ts: e.ts, lts: e.ts, _c: e._chapId }; if (e.ts > curr.lts) { curr.l = e.next; curr.lts = e.ts; } byC.set(e.cardId, curr); }
-  const rows = [...byC].map(([id, i]) => { const ch = c.virtual ? _getChapterReal(i._c) : c, card = ch.cards.find(x => x.id === id); return card ? { t: preprocessLaTeX(getCardSides(card, ch).frontText), d: preprocessLaTeX(getCardSides(card, ch).backText), b: i.f, a: i.l } : null; }).filter(Boolean);
-  v.innerHTML = `<div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Activité ${formatDayKeyFR(key)}</div><div id="dailyList" class="scroll-y" style="flex:1"><div class="list">${rows.map(r => `<div class="grid2"><div class="card-block grade-${r.b}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div><div class="card-block grade-${r.a}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div></div>`).join('')}</div></div></div>`;
-  await Media.resolveMediaInElement(v); await typesetLatex(v);
-  $('#dailyList').onclick = e => { const b = e.target.closest('.card-block'); if (b) b.classList.toggle('flipped'); };
-}
-function getCombinedDailyLogForGroup(s, g, k) { return g.chapIds.flatMap(cid => { const ch = s.chapters.find(c => c.id === cid); return (ch?.stats?.dailyLog?.[k] || []).map(e => ({ ...e, _chapId: cid })); }); }
+const getLive=c=>{const o={unseen:0,echec:0,difficile:0,bien:0,facile:0};c.cards.forEach(x=>o[x.grade||'unseen']++);return o}, syncG=c=>c.stats.gradeCounts=getLive(c), getTod=c=>c.stats.dailyReviews[todayKey()]||0, getTodCh=c=>c.stats.dailyChanges[todayKey()]||{changed:0,total:0}, cntAv=c=>c.cards.filter(x=>c.filters.grades[x.grade||'unseen']).length;
+const getSucc=c=>{const k=c.stats.gradeCounts,g=k.bien+k.facile,t=g+k.echec+k.difficile;return t?M.round(g/t*100):0}, get7dAvgMs=c=>{const b=new Date();let s=0,cnt=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);const k=dateKey(d);s+=(c.stats.dailyDurMs[k]||0);cnt+=(c.stats.dailyDurCount[k]||0)}return cnt?M.round(s/cnt):0}, get7dAvg=c=>{const b=new Date(),arr=[];for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);arr.push(c.stats.dailyReviews[dateKey(d)]||0)}return M.round(avg(arr))}, getWk=c=>{const b=new Date();let s=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);s+=(c.stats.dailyReviews[dateKey(d)]||0)}return s}, getLastN=(c,n)=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(c.stats.dailyReviews[dateKey(d)]||0)}return a}, getLbls=n=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][d.getDay()])}return a}, dayKeyIdx=(n,i)=>{const b=new Date();b.setDate(b.getDate()-((n-1)-i));return dateKey(b)};
 
-function goReview(push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'review';
-  setTopbar({ title: 'Révision' }); setBottomVisibility({ actions: false, revision: true }); $('#revisionBar').style.display = 'none';
-  $('#reviewActionsBar').style.display = 'block'; renderReview();
-}
-function renderReview() {
-  const v = $('#view'), r = State.review, { card, chap } = getCurrentCard(), idx = r.index + 1, tot = r.queue.length;
-  const { frontText, backText } = getCardSides(card, chap), fTxt = preprocessLaTeX(frontText), bTxt = preprocessLaTeX(backText), ff = chap.settings.reviewOrder !== 'back-first';
-  v.innerHTML = `<div class="review-wrap"><div class="review-top"><div>${r.mode === 'multi' ? 'Multi • ' + chap.title : chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped ? `<div class="${ff ? 'term' : 'definition'}" data-face="${ff ? 'front' : 'back'}">${ff ? fTxt : bTxt}</div>` : `<div class="stack"><div class="term" data-face="front">${fTxt}</div><div class="definition" data-face="back" style="margin-top:6px">${bTxt}</div></div>`}</div></div></div>`;
-  typesetLatex(v).then(() => { Media.resolveMediaInElement(v); initReviewGestures(); });
-  const bar = $('#reviewActionsBar');
-  if (!r.flipped) { bar.innerHTML = `<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`; $('#flipBtn').onclick = () => { r.flipped = true; renderReview(); }; }
-  else { bar.innerHTML = `<div class="row-4">${['echec', 'difficile', 'bien', 'facile'].map(g => `<button class="btn btn--${g === 'echec' ? 'red' : (g === 'difficile' ? 'amber' : (g === 'bien' ? 'blue' : 'green'))}" id="g_${g}">${g}</button>`).join('')}</div>`;['echec', 'difficile', 'bien', 'facile'].forEach(g => $('#g_' + g).onclick = () => submitGrade(g)); }
-}
-function goRecap(push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (push) Nav.push(); State.view = 'recap';
-  const c = getChapter(State.review.chapterId) || State.virtualChapter || getChapter(State.review.multiChaps[0]);
-  setTopbar({ title: 'Récapitulatif' }); setBottomVisibility({ actions: false, revision: false }); hideReviewActionsBar();
-  const dur = (State.review.answers || []).reduce((s, a) => s + (a.ms || 0), 0), n = State.review.answers.length;
-  $('#view').innerHTML = `<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7DayAverage(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodayChange(c).total > 0 ? math.round(getTodayChange(c).changed / getTodayChange(c).total * 100) : 0}%</div></div><div class="stat"><div class="label">Objectif</div><div class="val">${c.settings.dailyGoal}</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTodayCount(c)}/${c.settings.dailyGoal}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${formatDuration(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="continueBtn">Continuer</button></div></div>`;
-  $('#continueBtn').onclick = () => startReview(c.id, false);
+function drawBars(cid,v){ const el=D.getElementById(cid); if(!el)return; const ctx=el.getContext('2d'), dpr=W.devicePixelRatio||1, w=el.clientWidth, h=60; el.width=w*dpr; el.height=h*dpr; ctx.scale(dpr,dpr); const max=M.max(1,...v), barW=M.floor((w-36)/7); ctx.fillStyle='#94a3b8'; ctx.fillRect(0,h-14,w,1); let x=0; const bars=[]; v.forEach(n=>{const bh=M.max(3,(n/max)*(h-20));ctx.fillStyle='#6366f1';ctx.fillRect(x,h-14-bh,barW,bh);ctx.fillStyle='#e2e8f0';ctx.fillText(n,x+barW/2-3,h);bars.push({x,w:barW});x+=barW+6}); Bar7Hit[cid]={cssW:w,bars} }
+function opDayBar(e,id,cid){ const h=Bar7Hit[id]; if(!h)return; const x=e.clientX-e.target.getBoundingClientRect().left, i=h.bars.findIndex(b=>x>=b.x&&x<=b.x+b.w); if(i>=0)goDaily(cid,dayKeyIdx(7,i)) }
+function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=180, h=180, cx=90, cy=90, R=84, r=54; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=30;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,69,start,end);ctx.lineWidth=30;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+5); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
+function hChartClk(e,id,ch){ const h=ChartHit[id]; if(!h)return; const r=e.target.getBoundingClientRect(), dx=(e.clientX-r.left)*(180/r.width)-h.cx, dy=(e.clientY-r.top)*(180/r.height)-h.cy, d=M.hypot(dx,dy); if(d<h.innerR||d>h.outerR)return; let a=M.atan2(dy,dx); if(a<-1.57)a+=6.28; const hit=h.arcs.find(s=>a>=s.start&&a<=s.end); if(hit)updFilt(ch,hit.key) }
+function togFilt(c,k){ const s=c.filters.grades, keys=Object.keys(s), act=keys.filter(x=>s[x]); if(act.length===keys.length){keys.forEach(x=>s[x]=!1);s[k]=!0}else if(act.length===1&&s[k])s[k]=!0;else{s[k]=!s[k];if(!Object.values(s).some(Boolean))s[k]=!0} }
+
+function openSet(cid,push=true){
+  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
+  v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div><div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div><div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
+  $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:{unseen:c.cards.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyLog:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{}};saveData();openSet(cid,!1)}}; $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; bindTypo()
 }
 
-function startReview(cid, push = true) {
-  if (!cid) return; const c = getChapter(cid);
-  if (c.virtual && c._ids) return startReviewMulti(c._ids, c.id, c.filters, push);
-  const pool = c.cards.filter(x => c.filters.grades[x.grade || 'unseen']);
-  if (!pool.length) { alert('Aucune carte.'); return; }
-  const q = buildSmartQueue(c, pool, c.settings.sessionSize);
-  State.review = { chapterId: cid, queue: q.map(x => x.id), index: 0, flipped: false, answers: [], start: Date.now(), end: null, cardStart: Date.now() }; goReview(push);
-}
-function startReviewMulti(ids, vid, flt, push = true) {
-  const all = ids.map(_getChapterReal).filter(Boolean), pool = [];
-  all.forEach(ch => ch.cards.forEach(c => { if (flt.grades[c.grade || 'unseen']) pool.push({ chapId: ch.id, card: c }); }));
-  if (!pool.length) { alert('Aucune carte.'); return; }
-  const scored = pool.map(i => {
-    const g = i.card.grade || 'unseen', wMap = { unseen: 6, echec: 5, difficile: 3.5, bien: 2, facile: 1 }, base = wMap[g] || 1;
-    const due = (i.card.dueAt && i.card.dueAt > 0) ? (Date.now() - i.card.dueAt > 0 ? (1 + math.min(3, (Date.now() - i.card.dueAt) / 864e5)) : 0.85) : 1.15;
-    return { chapId: i.chapId, cardId: i.card.id, w: base * due * (1 + (1 - (i.card.perfEma || .5)) * 1.6) * (1 + math.min(2, (i.card.avgMs || 0) / 3000)) * (0.9 + math.random() * .2) };
-  }).sort((a, b) => b.w - a.w);
-  const sz = math.round(all.reduce((s, c) => s + (c.settings.sessionSize || 10), 0) / all.length) || 10;
-  State.review = { mode: 'multi', chapterId: vid, multiChaps: ids.slice(), queue: scored.slice(0, sz), index: 0, flipped: false, answers: [], start: Date.now(), end: null, cardStart: Date.now() };
-  goReview(push);
-}
-function buildSmartQueue(c, pool, sz) {
-  const now = Date.now(), shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = math.floor(math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
-  const nc = [], lc = [], dr = [];
-  pool.forEach(x => { const g = x.grade || 'unseen'; if (g === 'unseen') nc.push(x); else if (g === 'echec' || g === 'difficile') lc.push(x); else if (x.dueAt <= now) dr.push(x); });
-  return [...shuffle(lc), ...shuffle(dr), ...shuffle(nc)].slice(0, sz);
-}
-function getCurrentCard() { const r = State.review; if (r.mode === 'multi') { const i = r.queue[r.index], ch = _getChapterReal(i.chapId); return { card: ch.cards.find(x => x.id === i.cardId), chap: ch }; } else { const ch = getChapter(r.chapterId); return { card: ch.cards.find(x => x.id === r.queue[r.index]), chap: ch }; } }
-function submitGrade(next) {
-  const r = State.review, now = Date.now(), { card, chap } = getCurrentCard();
-  if (!card || !chap) { goDeck(false); return; }
-  const ms = math.max(0, now - (r.cardStart || now)), prev = card.grade || 'unseen';
-  const wasZero = !chap.stats.gradeCounts[next]; card.grade = next; syncGradeCounts(chap);
-  card.perfEma = (1 - .3) * (card.perfEma ?? .5) + .3 * (next === 'facile' ? 1 : next === 'bien' ? 0.75 : next === 'difficile' ? 0.35 : 0);
-  scheduleNext(card, next, now); card.lastReviewed = now; card.lastMs = ms; card.avgMs = card.avgMs ? math.round(card.avgMs * .7 + ms * .3) : ms;
-  card.timesReviewed++; if (isSuccess(next)) card.successes++; else card.failures++;
-  chap.stats.totalReviews++; const k = todayKey();
-  chap.stats.dailyReviews[k] = (chap.stats.dailyReviews[k] || 0) + 1; chap.stats.dailyDurMs[k] = (chap.stats.dailyDurMs[k] || 0) + ms; chap.stats.dailyDurCount[k] = (chap.stats.dailyDurCount[k] || 0) + 1;
-  const dc = chap.stats.dailyChanges[k] || { changed: 0, total: 0 }; dc.total++; if (prev !== next) dc.changed++; chap.stats.dailyChanges[k] = dc;
-  (chap.stats.dailyLog[k] = chap.stats.dailyLog[k] || []).push({ cardId: card.id, prev, next, ms, ts: now });
-  if (wasZero && next !== 'unseen') chap.filters.grades[next] = true;
-  r.answers.push({ cardId: card.id, prev, next, ms });
-  if (r.index < r.queue.length - 1) { r.index++; r.flipped = false; r.cardStart = Date.now(); saveData(); renderReview(); } else { r.end = Date.now(); saveData(); goRecap(false); }
-}
-function scheduleNext(c, g, now) {
-  const q = { 'facile': 5, 'bien': 4, 'difficile': 2, 'echec': 1 }[g] || 0;
-  let ef = c.ef || 2.5; ef = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); if (ef < 1.3) ef = 1.3; c.ef = ef;
-  if (q < 3) { c.intervalDays = (g === 'echec') ? 0.02 : 0.5; c.streak = (c.streak <= 0 ? c.streak - 1 : -1); }
-  else { c.intervalDays = (c.intervalDays < 1e-6) ? 1 : (c.intervalDays < 1.5 ? 6 : math.round(c.intervalDays * ef)); c.streak = (c.streak >= 0 ? c.streak + 1 : 1); }
-  c.streak = clamp(c.streak, -8, 12); c.dueAt = now + c.intervalDays * 864e5;
-}
+function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-value'), ren=()=>val.textContent=get(), com=()=>{saveData();applyUI()}; ren(); let sy=null, sv=null; const pd=e=>{e.preventDefault();e.stopPropagation()}; el.onpointerdown=e=>{sy=e.clientY;sv=get();el.setPointerCapture?.(e.pointerId);pd(e)}; el.onpointermove=e=>{if(sy==null)return;set(sv+M.round((sy-e.clientY)/6)*step);ren();applyUI();pd(e)}; el.onpointerup=()=>{if(sy!=null)com();sy=null}; el.onwheel=e=>{e.preventDefault();set(get()+(e.deltaY>0?-step:step));ren();com()} }
+function bindTypo(){ const box=$('#tyP'), P=data.app.prefs; if(!box)return; let sy=null, st=null, sd=null; const up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; box.onpointerdown=e=>{sy=e.clientY;st=P.fsTerm;sd=P.fsDef;e.preventDefault()}; box.onpointermove=e=>{if(sy==null)return;const d=M.round((sy-e.clientY)/6);P.fsTerm=clamp(st+d,12,60);P.fsDef=clamp(sd+d,14,72);up()}; box.onpointerup=()=>{if(sy!=null)saveData();sy=null} }
+function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
+function bindSz(){ const P=data.app.prefs, up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; $$('.review-card [data-face]').forEach(el=>{let sy=null,sv=null;const f=el.dataset.face,get=()=>f==='front'?P.fsTerm:P.fsDef,set=v=>{if(f==='front')P.fsTerm=clamp(v,12,60);else P.fsDef=clamp(v,14,72);up()};el.onpointerdown=e=>{if(e.target.tagName==='IMG')return;sy=e.clientY;sv=get();el.setPointerCapture?.(e.pointerId);e.preventDefault()};el.onpointermove=e=>{if(sy==null)return;set(sv+M.round((sy-e.clientY)/6));e.preventDefault()};el.onpointerup=()=>{if(sy!=null)saveData();sy=null}}) }
 
-const getCardSides = (c, ch) => ch?.settings?.langSwap ? { frontText: c.back, backText: c.front } : { frontText: c.front, backText: c.back };
-const getLiveGradeCounts = c => { const o = { unseen: 0, echec: 0, difficile: 0, bien: 0, facile: 0 }; c.cards.forEach(x => o[x.grade || 'unseen']++); return o; };
-const syncGradeCounts = c => c.stats.gradeCounts = getLiveGradeCounts(c);
-const getTodayCount = c => c.stats.dailyReviews[todayKey()] || 0;
-const getTodayChange = c => c.stats.dailyChanges[todayKey()] || { changed: 0, total: 0 };
-const countAvailable = c => c.cards.filter(x => c.filters.grades[x.grade || 'unseen']).length;
-const getSuccessRate = c => { const k = c.stats.gradeCounts, g = k.bien + k.facile, t = g + k.echec + k.difficile; return t ? math.round(g / t * 100) : 0; };
-const get7DayAvgMs = c => { const base = new Date(); let s = 0, cnt = 0; for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(base.getDate() - i); const k = dateKey(d); s += (c.stats.dailyDurMs[k] || 0); cnt += (c.stats.dailyDurCount[k] || 0); } return cnt ? math.round(s / cnt) : 0; };
-const get7DayAverage = c => { const base = new Date(), arr = []; for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(base.getDate() - i); arr.push(c.stats.dailyReviews[dateKey(d)] || 0); } return math.round(avg(arr)); };
-const getWeekCount = c => { const base = new Date(); let s = 0; for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(base.getDate() - i); s += (c.stats.dailyReviews[dateKey(d)] || 0); } return s; };
-const getLastNDaysArray = (c, n) => { const a = [], b = new Date(); for (let i = n - 1; i >= 0; i--) { const d = new Date(b); d.setDate(b.getDate() - i); a.push(c.stats.dailyReviews[dateKey(d)] || 0); } return a; };
-const getLastNDaysLabelsFR = n => { const a = [], b = new Date(); for (let i = n - 1; i >= 0; i--) { const d = new Date(b); d.setDate(b.getDate() - i); a.push(['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][d.getDay()]); } return a; };
-const dayKeyFromIndex = (n, i) => { const b = new Date(); b.setDate(b.getDate() - ((n - 1) - i)); return dateKey(b); };
+function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
+function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
+function reconcile(){ const c=buildCanon(), o=data.subjects||[]; data.subjects=c.map(x=>{const old=o.find(z=>z.title===x.title)||{},chs=x.chapters.map(nc=>{const oc=(old.chapters||[]).find(z=>z.title===nc.title);return oc?{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=oc.cards.find(z=>extractId(z.id)===extractId(cd.id));return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}:nc});return{...x,chapters:chs,groups:old.groups||[]}}); o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id }
+function upgrade(){ if(!data.app)data.app={theme:'dark'}; data.app.prefs={fsTerm:22,fsDef:24,accent:'indigo',radius:14,...(data.app.prefs||{})}; data.subjects.forEach(s=>{valGrps(s);s.emoji=s.emoji||'';s.chapters.forEach(c=>{c.emoji=c.emoji||'';updChDesc(c);c.stats.dailyLog=c.stats.dailyLog||{};syncG(c)})}) }
+function init(){ Media.open(); setInterval(saveData,15000); data=loadData(); if(data.app?.version!==APP_VER){reconcile();data.app.version=APP_VER;saveData()} pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1) }
 
-function drawBars7(cid, v) {
-  const el = doc.getElementById(cid); if (!el) return; const ctx = el.getContext('2d'), dpr = window.devicePixelRatio || 1, w = el.clientWidth, h = 60;
-  el.width = w * dpr; el.height = h * dpr; ctx.scale(dpr, dpr);
-  const max = math.max(1, ...v), barW = math.floor((w - 36) / 7);
-  ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, h - 14, w, 1);
-  let x = 0; const bars = [];
-  v.forEach(n => { const bh = math.max(3, (n / max) * (h - 20)); ctx.fillStyle = '#6366f1'; ctx.fillRect(x, h - 14 - bh, barW, bh); ctx.fillStyle = '#e2e8f0'; ctx.fillText(n, x + barW / 2 - 3, h); bars.push({ x, w: barW }); x += barW + 6; });
-  Bar7Hit[cid] = { cssW: w, bars };
-}
-function openDayFromBarClick(e, id, cid) { const h = Bar7Hit[id]; if (!h) return; const x = e.clientX - e.target.getBoundingClientRect().left; const i = h.bars.findIndex(b => x >= b.x && x <= b.x + b.w); if (i >= 0) goDaily(cid, dayKeyFromIndex(7, i)); }
-function drawGradeChart(id, k, sel) {
-  const el = doc.getElementById(id); if (!el) return; const ctx = el.getContext('2d'), w = 180, h = 180, cx = 90, cy = 90, R = 84, r = 54;
-  ctx.clearRect(0, 0, w, h);
-  const segs = [{ k: 'unseen', c: '#9ca3af' }, { k: 'echec', c: '#ef4444' }, { k: 'difficile', c: '#f59e0b' }, { k: 'bien', c: '#3b82f6' }, { k: 'facile', c: '#22c55e' }];
-  const tot = segs.reduce((s, x) => s + (k[x.k] || 0), 0), arcs = [];
-  if (!tot) { ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.lineWidth = 30; ctx.strokeStyle = '#cbd5e1'; ctx.stroke(); ChartHit[id] = { cx, cy, innerR: r, outerR: R, arcs: [] }; return; }
-  let start = -1.57;
-  segs.forEach(s => {
-    const v = k[s.k]; if (!v) return; const ang = (v / tot) * 6.28, end = start + ang, act = !sel || sel[s.k];
-    ctx.beginPath(); ctx.arc(cx, cy, 69, start, end); ctx.lineWidth = 30; ctx.strokeStyle = s.c; ctx.globalAlpha = act ? 0.9 : 0.2; ctx.stroke(); ctx.globalAlpha = 1;
-    arcs.push({ key: s.k, start, end }); start = end;
-  });
-  ctx.fillStyle = '#0ea5e9'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(tot, cx, cy + 5);
-  ChartHit[id] = { cx, cy, innerR: r, outerR: R, arcs };
-}
-function handleChartClick(e, id, ch) {
-  const h = ChartHit[id]; if (!h) return; const rect = e.target.getBoundingClientRect(), dx = (e.clientX - rect.left) * (180 / rect.width) - h.cx, dy = (e.clientY - rect.top) * (180 / rect.height) - h.cy;
-  const d = math.hypot(dx, dy); if (d < h.innerR || d > h.outerR) return;
-  let a = math.atan2(dy, dx); if (a < -1.57) a += 6.28;
-  const hit = h.arcs.find(s => a >= s.start && a <= s.end); if (hit) updateChapterFilter(ch, hit.key);
-}
-function toggleFilterKey(c, k) { const s = c.filters.grades, keys = Object.keys(s), act = keys.filter(x => s[x]); if (act.length === keys.length) { keys.forEach(x => s[x] = false); s[k] = true; } else if (act.length === 1 && s[k]) s[k] = true; else { s[k] = !s[k]; if (!Object.values(s).some(Boolean)) s[k] = true; } }
-
-function openSettings(cid, push = true) {
-  safeCloseLightbox(); Media.revokeAll(); if (!cid) cid = State.chapterId; const c = getChapter(cid); if (!c) return;
-  if (push) Nav.push(); State.view = 'settings'; setTopbar({ title: `${c.title} • Paramètres` }); setBottomVisibility({ actions: false }); hideReviewActionsBar();
-  const v = $('#view'), P = data.app.prefs;
-  v.innerHTML = `<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div>
-  <div class="settings-section"><div class="section-title">Chapitre</div><input id="chTitleInput" class="input" value="${c.title}"><input id="chEmojiInput" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji || ''}"><button class="btn mt6" id="saveId">Enregistrer</button></div>
-  <div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="togTheme">Thème: <span id="themeLbl">${data.app.theme}</span></button><div class="swatches mt6" id="swatches">${['indigo', 'blue', 'teal', 'emerald', 'rose', 'amber', 'violet'].map(x => `<button class="swatch ${P.accent === x ? 'is-active' : ''}" data-accent="${x}" style="--sw:var(--${x === 'indigo' ? 'primary' : x})"></button>`).join('')}</div></div>
-  <div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="togLang">${c.settings.langSwap ? 'EN → FR' : 'FR → EN'}</button></div>
-  <div class="settings-section"><div class="section-title">Typo</div><div class="card" id="typoP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div>
-  <div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div>
-  <div class="settings-section"><button class="btn" id="expBtn">Exporter</button><button class="btn" id="impBtn">Importer</button><input type="file" id="impFile" class="hidden"></div>
-  <div class="settings-section"><button class="btn" id="rstCh">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstAll">Reset App</button></div></div>`;
-
-  $('#saveId').onclick = () => {
-    const t = $('#chTitleInput').value.trim(), e = $('#chEmojiInput').value.trim();
-    if (c.virtual && c._groupId) { const g = findGroupById(getCurrentSubject(), c._groupId); if (g) { g.title = t; g.emoji = e; c.title = t; c.emoji = e; updateChapterDescription(c); } }
-    else { if (t) c.title = t; c.emoji = e; updateChapterDescription(c); }
-    saveData(); goChapter(c.id, false);
-  };
-  $('#togTheme').onclick = () => { data.app.theme = data.app.theme === 'light' ? 'dark' : 'light'; saveData(); applyTheme(); $('#themeLbl').textContent = data.app.theme; };
-  $$('.swatch').forEach(b => b.onclick = () => { P.accent = b.dataset.accent; saveData(); applyUI(); $$('.swatch').forEach(x => x.classList.toggle('is-active', x === b)); });
-  $('#togLang').onclick = () => { c.settings.langSwap = !c.settings.langSwap; saveData(); $('#togLang').textContent = c.settings.langSwap ? 'EN → FR' : 'FR → EN'; };
-  bindWheel($('#wT'), { get: () => P.fsTerm, set: v => P.fsTerm = v, min: 12, max: 60 }); bindWheel($('#wD'), { get: () => P.fsDef, set: v => P.fsDef = v, min: 14, max: 72 });
-  bindWheel($('#wS'), { get: () => c.settings.sessionSize, set: v => c.settings.sessionSize = v, min: 5, max: 200, step: 5 }); bindWheel($('#wG'), { get: () => c.settings.dailyGoal, set: v => c.settings.dailyGoal = v, min: 5, max: 500, step: 5 });
-  $('#expBtn').onclick = () => { const a = doc.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' })); a.download = `flashcards-${dateKey(new Date())}.json`; a.click(); };
-  $('#impBtn').onclick = () => $('#impFile').click(); $('#impFile').onchange = async e => { if (confirm("Écraser tout ?")) { data = JSON.parse(await e.target.files[0].text()); upgradeData(); applyTheme(); applyUI(); saveData(); goDeck(false); } };
-  $('#rstCh').onclick = () => { if (confirm('Reset ?')) { c.cards.forEach(x => { x.grade = 'unseen'; x.timesReviewed = 0; x.ef = 2.5; x.intervalDays = 0; x.dueAt = 0; x.streak = 0; }); c.stats = { gradeCounts: { unseen: c.cards.length, echec: 0, difficile: 0, bien: 0, facile: 0 }, totalReviews: 0, dailyReviews: {}, dailyLog: {}, dailyChanges: {}, dailyDurMs: {}, dailyDurCount: {} }; saveData(); openSettings(cid, false); } };
-  $('#rstAll').onclick = async () => { if (confirm('Tout effacer ?')) { await Media.clearAll(); loc.removeItem(STORAGE_KEY); loc.reload(); } };
-  bindTypoPreviewDrag();
-}
-function bindWheel(el, { get, set, min, max, step = 1 }) {
-  const val = el.querySelector('.wheel-value'), ren = () => val.textContent = get(), com = () => { saveData(); applyUI(); };
-  ren(); let sy = null, sv = null; const pd = e => { e.preventDefault(); e.stopPropagation(); };
-  el.onpointerdown = e => { sy = e.clientY; sv = get(); el.setPointerCapture?.(e.pointerId); pd(e); };
-  el.onpointermove = e => { if (sy == null) return; set(sv + math.round((sy - e.clientY) / 6) * step); ren(); applyUI(); pd(e); };
-  el.onpointerup = () => { if (sy != null) com(); sy = null; };
-  el.onwheel = e => { e.preventDefault(); set(get() + (e.deltaY > 0 ? -step : step)); ren(); com(); };
-}
-function bindTypoPreviewDrag() {
-  const box = $('#typoP'), P = data.app.prefs; if (!box) return; let sy = null, st = null, sd = null;
-  const up = () => { doc.documentElement.style.setProperty('--fs-term', P.fsTerm + 'px'); doc.documentElement.style.setProperty('--fs-def', P.fsDef + 'px'); };
-  box.onpointerdown = e => { sy = e.clientY; st = P.fsTerm; sd = P.fsDef; e.preventDefault(); };
-  box.onpointermove = e => { if (sy == null) return; const d = math.round((sy - e.clientY) / 6); P.fsTerm = clamp(st + d, 12, 60); P.fsDef = clamp(sd + d, 14, 72); up(); };
-  box.onpointerup = () => { if (sy != null) saveData(); sy = null; };
-}
-function initReviewGestures() { const s = $('.review-scroller'); if (s) $$('img', s).forEach(i => i.onclick = e => { e.preventDefault(); openLightboxFor(i, s); }); bindReviewSizeControls(); }
-function bindReviewSizeControls() {
-  const P = data.app.prefs, up = () => { doc.documentElement.style.setProperty('--fs-term', P.fsTerm + 'px'); doc.documentElement.style.setProperty('--fs-def', P.fsDef + 'px'); };
-  $$('.review-card [data-face]').forEach(el => {
-    let sy = null, sv = null; const f = el.dataset.face, get = () => f === 'front' ? P.fsTerm : P.fsDef, set = v => { if (f === 'front') P.fsTerm = clamp(v, 12, 60); else P.fsDef = clamp(v, 14, 72); up(); };
-    el.onpointerdown = e => { if (e.target.tagName === 'IMG') return; sy = e.clientY; sv = get(); el.setPointerCapture?.(e.pointerId); e.preventDefault(); };
-    el.onpointermove = e => { if (sy == null) return; set(sv + math.round((sy - e.clientY) / 6)); e.preventDefault(); };
-    el.onpointerup = () => { if (sy != null) saveData(); sy = null; };
-  });
-}
-
-function applyTheme() { doc.documentElement.dataset.theme = data.app.theme; }
-function applyUI() {
-  const p = data.app.prefs; doc.documentElement.style.setProperty('--fs-term', p.fsTerm + 'px'); doc.documentElement.style.setProperty('--fs-def', p.fsDef + 'px');
-  const pal = { indigo: ['#6366f1', '#5457e6'], blue: ['#3b82f6', '#2563eb'], teal: ['#14b8a6', '#0d9488'], emerald: ['#10b981', '#059669'], rose: ['#f43f5e', '#e11d48'], amber: ['#f59e0b', '#d97706'], violet: ['#8b5cf6', '#7c3aed'] };
-  const c = pal[p.accent] || pal.indigo; doc.documentElement.style.setProperty('--primary', c[0]); doc.documentElement.style.setProperty('--primary-600', c[1]);
-}
-function reconcileAllSubjects() {
-  const canons = buildCanonicalSubjects(), olds = data.subjects || [];
-  data.subjects = canons.map(c => {
-    const o = olds.find(x => x.title === c.title) || {};
-    const chapters = c.chapters.map(nc => { const oc = (o.chapters || []).find(x => x.title === nc.title); return oc ? { ...nc, stats: { ...oc.stats }, cards: nc.cards.map(card => { const oldC = oc.cards.find(z => extractRowId(z.id) === extractRowId(card.id)); return oldC ? { ...card, grade: oldC.grade, ef: oldC.ef, intervalDays: oldC.intervalDays, dueAt: oldC.dueAt } : card; }) } : nc; });
-    return { ...c, chapters, groups: o.groups || [] };
-  });
-  olds.forEach(o => { if (!data.subjects.find(x => x.id === o.id)) data.subjects.push(o); });
-  if (!data.subjects.find(x => x.id === data.app.currentSubjectId)) data.app.currentSubjectId = data.subjects[0].id;
-}
-function upgradeData() {
-  if (!data.app) data.app = { theme: 'dark' }; data.app.prefs = { fsTerm: 22, fsDef: 24, accent: 'indigo', radius: 14, ...(data.app.prefs || {}) };
-  data.subjects.forEach(s => { ensureValidGroups(s); s.emoji = s.emoji || ''; s.chapters.forEach(c => { c.emoji = c.emoji || ''; updateChapterDescription(c); c.stats.dailyLog = c.stats.dailyLog || {}; syncGradeCounts(c); }); });
-}
-function init() {
-  Media.open(); setInterval(saveData, 15000);
-  data = loadData();
-  if (data.app?.version !== APP_VERSION) { reconcileAllSubjects(); data.app.version = APP_VERSION; saveData(); }
-  pruneStats(); upgradeData(); applyTheme(); applyUI(); Nav.clear(); goDeck(false);
-}
 init();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -3075,3 +2025,5 @@ init();
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>
 </html>
+
+
