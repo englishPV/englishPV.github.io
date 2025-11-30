@@ -17,13 +17,10 @@
       --btn-neutral-bg: rgba(255,255,255,.06); --btn-neutral-fg: #e6ecff; --btn-neutral-bd: #232a48; --btn-neutral-bg-h: rgba(255,255,255,.10);
       --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 22%,transparent); --btn-soft-primary-bg-h: color-mix(in srgb,var(--primary) 34%,transparent);
       --btn-soft-primary-fg: #dbe4ff; --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 55%,transparent);
-      
-      /* Solid/Soft Actions colors */
-      --btn-soft-red-bg: rgba(239,68,68,.25); --btn-soft-red-fg: #fca5a5; --btn-soft-red-bd: rgba(239,68,68,.5);
-      --btn-soft-amber-bg: rgba(245,158,11,.25); --btn-soft-amber-fg: #fcd34d; --btn-soft-amber-bd: rgba(245,158,11,.5);
-      --btn-soft-blue-bg: rgba(59,130,246,.25); --btn-soft-blue-fg: #93c5fd; --btn-soft-blue-bd: rgba(59,130,246,.5);
-      --btn-soft-green-bg: rgba(34,197,94,.25); --btn-soft-green-fg: #86efac; --btn-soft-green-bd: rgba(34,197,94,.5);
-      
+      --btn-soft-red-bg: rgba(239,68,68,.18); --btn-soft-red-bg-h: rgba(239,68,68,.28); --btn-soft-red-fg: #fecaca; --btn-soft-red-bd: rgba(239,68,68,.45);
+      --btn-soft-amber-bg: rgba(245,158,11,.18); --btn-soft-amber-bg-h: rgba(245,158,11,.28); --btn-soft-amber-fg: #fde68a; --btn-soft-amber-bd: rgba(245,158,11,.45);
+      --btn-soft-blue-bg: rgba(59,130,246,.18); --btn-soft-blue-bg-h: rgba(59,130,246,.28); --btn-soft-blue-fg: #bfdbfe; --btn-soft-blue-bd: rgba(59,130,246,.45);
+      --btn-soft-green-bg: rgba(34,197,94,.18); --btn-soft-green-bg-h: rgba(34,197,94,.28); --btn-soft-green-fg: #bbf7d0; --btn-soft-green-bd: rgba(34,197,94,.45);
       --btn-solid-primary-bg: var(--primary); --btn-solid-primary-bg-h: var(--primary-600); --btn-solid-primary-fg: #fff; --btn-solid-primary-bd: var(--primary-600);
     }
     :root[data-theme="light"] {
@@ -32,16 +29,15 @@
       --btn-neutral-bg: #f1f5f9; --btn-neutral-fg: #0f172a; --btn-neutral-bd: #cbd5e1; --btn-neutral-bg-h: #e2e8f0;
       --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 14%,white 86%); --btn-soft-primary-bg-h: color-mix(in srgb,var(--primary) 22%,white 78%);
       --btn-soft-primary-fg: color-mix(in srgb,var(--primary) 78%,black 22%); --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 35%,white 65%);
-      
-      --btn-soft-red-bg: #fee2e2; --btn-soft-red-fg: #991b1b; --btn-soft-red-bd: #fca5a5;
-      --btn-soft-amber-bg: #fef3c7; --btn-soft-amber-fg: #92400e; --btn-soft-amber-bd: #fcd34d;
-      --btn-soft-blue-bg: #dbeafe; --btn-soft-blue-fg: #1e3a8a; --btn-soft-blue-bd: #93c5fd;
-      --btn-soft-green-bg: #dcfce7; --btn-soft-green-fg: #14532d; --btn-soft-green-bd: #86efac;
+      --btn-soft-red-bg: #fee2e2; --btn-soft-red-bg-h: #fecaca; --btn-soft-red-fg: #991b1b; --btn-soft-red-bd: #fca5a5;
+      --btn-soft-amber-bg: #fef3c7; --btn-soft-amber-bg-h: #fde68a; --btn-soft-amber-fg: #92400e; --btn-soft-amber-bd: #fcd34d;
+      --btn-soft-blue-bg: #dbeafe; --btn-soft-blue-bg-h: #bfdbfe; --btn-soft-blue-fg: #1e3a8a; --btn-soft-blue-bd: #93c5fd;
+      --btn-soft-green-bg: #dcfce7; --btn-soft-green-bg-h: #bbf7d0; --btn-soft-green-fg: #14532d; --btn-soft-green-bd: #86efac;
     }
     :root[data-theme="light"] .definition, :root[data-theme="light"] .card-item .back { color: var(--text)!important; opacity: 1!important; }
     :root[data-theme="light"] .muted { color: #475569!important; }
     :root[data-theme="light"] .legend-item { color: #0f172a!important; border-color: #e2e8f0!important; background: 0 0!important; }
-    :root[data-theme="light"] .revision-bar, :root[data-theme="light"] .review-actions-bar { background: rgba(241,245,249,.95)!important; border-top: 1px solid #e2e8f0!important; }
+    :root[data-theme="light"] .revision-bar, :root[data-theme="light"] .review-actions-bar { background: rgba(241,245,249,.9)!important; border-top: 1px solid #e2e8f0!important; }
     :root[data-theme="light"] .btn--ghost { --btn-bg-h: rgba(0,0,0,.06); }
     :root[data-theme="light"] .img-counter, :root[data-theme="light"] .img-close { background: rgba(255,255,255,.9); color: #0f172a; }
 
@@ -93,7 +89,7 @@
     
     main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
 
-    /* --- MODE REVIEW --- */
+    /* --- FIXES & MODE REVIEW --- */
     .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
     
@@ -105,10 +101,8 @@
       overflow: hidden; 
       min-height: 0;
       padding: 0;
-      user-select: text; /* Permet de sélectionner le texte si besoin */
     }
 
-    /* Scroller central */
     .review-scroller { 
       flex: 1; 
       width: 100%; 
@@ -118,72 +112,53 @@
       -webkit-overflow-scrolling: touch; 
       display: flex; 
       flex-direction: column;
-      padding: 16px; /* Plus d'espace */
+      padding: 10px;
     }
     
     .review-scroller > * {
       margin-top: auto;
       margin-bottom: auto;
       width: 100%;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    /* Style Texte de révision AMÉLIORÉ */
+    /* Style Texte de révision - Centré mais avec retour à la ligne (pre-wrap) */
     .term, .definition { 
         font-size: var(--fs-term)!important; 
         font-weight: 600; 
-        text-align: center;
+        text-align: center; /* On garde le centré */
         white-space: pre-wrap; /* IMPORTANT: Respecte les retours à la ligne */
         word-wrap: break-word;
-        line-height: 1.5;
     } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
     
-    /* Si le texte est long ou contient des maths, on l'aligne à gauche pour la lisibilité */
-    .align-left { text-align: left!important; }
-
     mjx-container { 
       overflow-x: auto; 
       overflow-y: hidden; 
       max-width: 100%; 
-      display: inline-block!important; 
-      padding: 2px 0;
-      vertical-align: middle;
+      display: block!important; 
+      padding: 4px 0;
     }
     img { 
       display: block; 
       max-width: 100%; 
       height: auto; 
-      margin: 12px auto; 
+      margin: 10px auto; 
       border-radius: 8px; 
       background: var(--border); 
       user-select: none; 
       object-fit: contain;
     }
 
-    .bottom-actions, .revision-bar, .review-actions-bar { padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
-    .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } 
+    .bottom-actions, .revision-bar, .review-actions-bar { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
+    .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 4; backdrop-filter: blur(8px) saturate(140%); }
     
-    /* Barre d'action revue AMÉLIORÉE */
-    .review-actions-bar { grid-row: 4; backdrop-filter: blur(12px) saturate(160%); background: color-mix(in srgb, var(--surface) 90%, transparent); }
-    .review-actions-bar .row-4 { gap: 10px; } /* Espacement entre boutons */
-
-    .btn, .navbtn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 12px 12px; font-weight: 800; cursor: pointer; transition: transform .1s, background .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn:active { transform: scale(0.97); }
+    .btn, .navbtn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 10px 12px; font-weight: 900; cursor: pointer; transition: .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; }
     .btn:hover { background: var(--btn-bg-h,var(--btn-bg,var(--btn-neutral-bg-h))); } .btn:disabled { opacity: .6; cursor: not-allowed; }
-    
-    /* Styles spécifiques aux boutons de notation (plus jolis) */
     .btn--primary { --btn-bg: var(--btn-soft-primary-bg); --btn-bg-h: var(--btn-soft-primary-bg-h); --btn-fg: var(--btn-soft-primary-fg); --btn-bd: var(--btn-soft-primary-bd); }
-    .btn--red { --btn-bg: var(--btn-soft-red-bg); --btn-bg-h: color-mix(in srgb,var(--red) 20%,transparent); --btn-fg: var(--btn-soft-red-fg); --btn-bd: var(--btn-soft-red-bd); }
-    .btn--amber { --btn-bg: var(--btn-soft-amber-bg); --btn-bg-h: color-mix(in srgb,var(--amber) 20%,transparent); --btn-fg: var(--btn-soft-amber-fg); --btn-bd: var(--btn-soft-amber-bd); }
-    .btn--blue { --btn-bg: var(--btn-soft-blue-bg); --btn-bg-h: color-mix(in srgb,var(--blue) 20%,transparent); --btn-fg: var(--btn-soft-blue-fg); --btn-bd: var(--btn-soft-blue-bd); }
-    .btn--green { --btn-bg: var(--btn-soft-green-bg); --btn-bg-h: color-mix(in srgb,var(--green) 20%,transparent); --btn-fg: var(--btn-soft-green-fg); --btn-bd: var(--btn-soft-green-bd); }
-    
-    .btn-grade { flex-direction: column; height: 60px; font-size: 13px; line-height: 1.2; padding: 4px; border-width: 2px; }
-    .btn-grade .emoji { font-size: 20px; margin-bottom: 2px; }
-
+    .btn--red { --btn-bg: var(--btn-soft-red-bg); --btn-bg-h: var(--btn-soft-red-bg-h); --btn-fg: var(--btn-soft-red-fg); --btn-bd: var(--btn-soft-red-bd); }
+    .btn--amber { --btn-bg: var(--btn-soft-amber-bg); --btn-bg-h: var(--btn-soft-amber-bg-h); --btn-fg: var(--btn-soft-amber-fg); --btn-bd: var(--btn-soft-amber-bd); }
+    .btn--blue { --btn-bg: var(--btn-soft-blue-bg); --btn-bg-h: var(--btn-soft-blue-bg-h); --btn-fg: var(--btn-soft-blue-fg); --btn-bd: var(--btn-soft-blue-bd); }
+    .btn--green { --btn-bg: var(--btn-soft-green-bg); --btn-bg-h: var(--btn-soft-green-bg-h); --btn-fg: var(--btn-soft-green-fg); --btn-bd: var(--btn-soft-green-bd); }
     .btn--solid.btn--primary { --btn-bg: var(--btn-solid-primary-bg); --btn-bg-h: var(--btn-solid-primary-bg-h); --btn-fg: var(--btn-solid-primary-fg); --btn-bd: var(--btn-solid-primary-bd); }
     .btn--ghost { --btn-bg: transparent; --btn-bg-h: rgba(255,255,255,.06); --btn-fg: var(--muted); --btn-bd: var(--border); } .btn--tiny { padding: 6px 8px; font-size: 13px; border-radius: 8px; }
     
@@ -2044,30 +2019,20 @@ function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.fi
 
 function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; renRev() }
 
-/* MODIF: Fonction renRev améliorée pour le rendu et les boutons */
+/* MODIF: Fonction renRev rétablie (boutons classiques, texte centré mais pre-wrap) */
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const fT=ppLat(f), bT=ppLat(b);
   
-  // Detection si le contenu est long ou complexe (physique) pour alignement
-  const isComplex = (s) => s.length > 150 || s.includes('<br') || s.includes('\\(') || s.includes('\\[');
-  const clsF = isComplex(fT) ? 'term align-left' : 'term';
-  const clsB = isComplex(bT) ? 'definition align-left' : 'definition';
-
-  v.innerHTML=`<div class="review-wrap"><div class="review-top"><div>${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="${clsF}" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="${clsF}" data-face="front">${fT}</div><div class="${clsB}" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div></div>`;
+  v.innerHTML=`<div class="review-wrap"><div class="review-top"><div>${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="term" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div></div>`;
   tsLat(v).then(()=>{Media.resolve(v);initGest()}); const bar=$('#reviewActionsBar');
   
   if(!r.flipped){
       bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn" style="height:60px;font-size:18px">Retourner</button>`;
       $('#flipBtn').onclick=()=>{r.flipped=!0;renRev()}
   } else {
-      // Boutons améliorés avec Emojis
-      bar.innerHTML=`<div class="row-4">
-        <button class="btn btn--red btn-grade" id="g_echec"><div class="emoji">🟥</div>Échec</button>
-        <button class="btn btn--amber btn-grade" id="g_difficile"><div class="emoji">🟨</div>Difficile</button>
-        <button class="btn btn--blue btn-grade" id="g_bien"><div class="emoji">🟦</div>Bien</button>
-        <button class="btn btn--green btn-grade" id="g_facile"><div class="emoji">🟩</div>Facile</button>
-      </div>`;
+      // Boutons classiques
+      bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn btn--${g==='echec'?'red':(g==='difficile'?'amber':(g==='bien'?'blue':'green'))}" id="g_${g}">${g}</button>`).join('')}</div>`;
       ['echec','difficile','bien','facile'].forEach(g=>$('#g_'+g).onclick=()=>subG(g))
   }
 }
@@ -2129,8 +2094,7 @@ function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-
 function bindTypo(){ const box=$('#tyP'), P=data.app.prefs; if(!box)return; let sy=null, st=null, sd=null; const up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; box.onpointerdown=e=>{sy=e.clientY;st=P.fsTerm;sd=P.fsDef;e.preventDefault()}; box.onpointermove=e=>{if(sy==null)return;const d=M.round((sy-e.clientY)/6);P.fsTerm=clamp(st+d,12,60);P.fsDef=clamp(sd+d,14,72);up()}; box.onpointerup=()=>{if(sy!=null)saveData();sy=null} }
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
 
-/* MODIF: Fonction bindSz modifiée pour permettre Scroll ET Resize */
-/* Logique: Scroll = Vertical (Y), Resize = Horizontal (X) */
+/* Fonction bindSz conservée : permet Scroll ET Resize */
 function bindSz(){ 
     const P=data.app.prefs, up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; 
     
@@ -2150,7 +2114,6 @@ function bindSz(){
             sy = e.clientY;
             sv = get();
             isResize = false;
-            // On ne capture pas tout de suite pour laisser le scroll natif démarrer si besoin
         };
 
         el.onpointermove = e => {
@@ -2159,18 +2122,17 @@ function bindSz(){
             const dx = e.clientX - sx;
             const dy = e.clientY - sy;
 
-            // Si on n'a pas encore décidé si c'est un scroll ou un resize
+            // Détection : Mouvement horizontal dominant = Resize
             if(!isResize) {
-                // Si on bouge plus horizontalement que verticalement, c'est un resize
                 if(M.abs(dx) > 10 && M.abs(dx) > M.abs(dy)) {
                     isResize = true;
-                    el.setPointerCapture?.(e.pointerId); // On capture le pointeur maintenant
+                    el.setPointerCapture?.(e.pointerId);
                 }
             }
 
             if(isResize) {
-                e.preventDefault(); // On bloque le scroll navigateur
-                set(sv + M.round(dx / 5)); // Ajustement sensibilité
+                e.preventDefault(); // Bloque le scroll si on resize
+                set(sv + M.round(dx / 5));
             }
         };
 
