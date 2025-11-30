@@ -62,7 +62,9 @@
     .list, .flexcol { display: flex; flex-direction: column; gap: 8px; min-height: 0; } .stack { display: flex; flex-direction: column; gap: 6px; }
     .row, .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .grid2 { gap: 10px; } .row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; }
-    .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); }
+    
+    /* MODIF: Ajout de pointer-events:auto pour garantir les clics */
+    .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
     
     /* Deck & Lists */
     .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer; user-select: none; position: relative; overflow: hidden; touch-action: pan-y; }
@@ -78,18 +80,28 @@
     .kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .kpi .k { padding: 0; } .k .label, .stat .label { color: var(--muted); font-size: 12px; } .k .value, .val { font-weight: 900; font-size: 17px; margin-top: 2px; }
     .chip { display: inline-flex; align-items: center; gap: 8px; padding: 0; color: var(--muted); font-size: 12px; }
     .chip-pie { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress,0%),var(--border) var(--progress,0%)); vertical-align: middle; display: inline-block; }
-    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #dbe4ff; cursor: pointer; user-select: none; transition: opacity .15s; }
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; position: relative; z-index: 2; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #dbe4ff; cursor: pointer; user-select: none; transition: opacity .15s; position: relative; z-index: 2; }
     .legend-item.inactive { opacity: .45; filter: grayscale(20%); }
     .dot { width: 10px; height: 10px; border-radius: 50%; } .dot.gray { background: #9ca3af; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); } .dot.green { background: var(--green); }
-    .chart-wrap { display: flex; align-items: center; justify-content: center; height: 200px; } canvas#gradeChart { width: 180px; height: 180px; }
+    .chart-wrap { display: flex; align-items: center; justify-content: center; height: 200px; position: relative; z-index: 1; } 
+    canvas#gradeChart { width: 180px; height: 180px; pointer-events: auto; }
     canvas#bar7 { width: 100%; height: 68px; display: block; } .bar7-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-top: 4px; font-size: 12px; color: var(--muted); text-align: center; cursor: pointer; }
     
-    /* Review Mode Fix */
+    /* --- FIXES & MODE REVIEW --- */
+
+    /* 1. Correction du Menu Stats : doit être scrollable si trop grand */
+    main#view > .card {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      /* On s'assure que le contenu est accessible */
+      min-height: 0;
+    }
+
+    /* 2. Mode Révision Fluide */
     .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
     
-    /* MODIF: Layout fluide pour le contenu */
     .review-card, .viewer { 
       flex: 1; 
       display: flex; 
@@ -112,7 +124,7 @@
       padding: 10px;
     }
     
-    /* MODIF: Centrage vertical SAFE (scroll si trop grand, centré si petit) */
+    /* Centrage safe pour le mode révision */
     .review-scroller > * {
       margin-top: auto;
       margin-bottom: auto;
@@ -122,7 +134,7 @@
     .term { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; text-align: center; }
     
-    /* Fix pour formules MathJax et Images qui dépassent */
+    /* Fix pour formules MathJax et Images */
     mjx-container { 
       overflow-x: auto; 
       overflow-y: hidden; 
@@ -164,7 +176,6 @@
       border-radius: 14px; 
       padding: 14px; 
       background: 0 0; 
-      /* FIX: Scroll interne dans la liste pour ne pas casser la grille */
       max-height: 350px;
       overflow-y: auto; 
       overflow-x: hidden;
@@ -185,7 +196,7 @@
     .swatches { display: flex; gap: 8px; flex-wrap: wrap; } .swatch { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border); background: var(--sw,#6366f1); cursor: pointer; position: relative; } .swatch.is-active::after { content: ''; position: absolute; inset: -3px; border: 2px solid var(--primary); border-radius: 10px; }
     .img-lightbox { position: fixed; inset: 0; display: none; background: 0 0; z-index: 10000; } .img-lightbox.open { display: block; }
     .img-stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; cursor: grab; } .img-canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
-  </style>
+</style>
 </head>
 <body>
   <div class="wrapper">
