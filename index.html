@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
@@ -113,6 +113,9 @@
       display: flex; 
       flex-direction: column;
       padding: 10px;
+      /* AJOUT: Permet au geste de zoom de fonctionner sur toute la zone */
+      touch-action: pan-y; 
+      user-select: none;
     }
     
     .review-scroller > * {
@@ -121,12 +124,11 @@
       width: 100%;
     }
 
-    /* Style Texte de révision - Centré mais avec retour à la ligne (pre-wrap) */
     .term, .definition { 
         font-size: var(--fs-term)!important; 
         font-weight: 600; 
-        text-align: center; /* On garde le centré */
-        white-space: pre-wrap; /* IMPORTANT: Respecte les retours à la ligne */
+        text-align: center;
+        white-space: pre-wrap;
         word-wrap: break-word;
     } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
@@ -173,7 +175,8 @@
       background: 0 0; 
       max-height: 350px;
       overflow-y: auto; 
-      overflow-x: hidden;
+      /* MODIF: Permet le défilement horizontal pour les formules très longues */
+      overflow-x: auto;
       display: flex;
       flex-direction: column;
     }
@@ -214,10 +217,8 @@
   </div>
 
 <script>
-
-
 /* --- CONSTANTS & DATA --- */
-const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-7';
+const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-8';
 
 // -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
@@ -1795,9 +1796,6 @@ const RAW_PHY = `
 10276|<span style="color: rgb(0, 255, 0);">(A.R)</span> En lame d'air, comment évolue la figure d'interférence lorsque l'on diminue l'épaisseur \\(e\\) ? Quel est le cas limite ?|Lorsque l'on diminue l'épaisseur \\(e\\), l'ordre d'interférence \\(p = 2e\\cos i / \\lambda_0\\) diminue. Pour un ordre \\(p\\) donné, \\(\\cos i\\) doit augmenter, donc \\(i\\) doit diminuer. Le rayon des anneaux diminue : les anneaux "rentrent" vers le centre et disparaissent.<br>Le cas limite est le <b>contact optique</b> (\\(e=0\\)), où l'on observe une <b>teinte plate</b> uniforme.|${PO4}
 `.trim();
 
-
-
-
 /* --- UTILS --- */
 const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
 const clamp = (n,mn,mx) => M.max(mn, M.min(mx, n));
@@ -2019,7 +2017,6 @@ function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.fi
 
 function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; renRev() }
 
-/* MODIF: Fonction renRev rétablie (boutons classiques, texte centré mais pre-wrap) */
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const fT=ppLat(f), bT=ppLat(b);
@@ -2028,10 +2025,10 @@ function renRev(){
   tsLat(v).then(()=>{Media.resolve(v);initGest()}); const bar=$('#reviewActionsBar');
   
   if(!r.flipped){
-      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn" style="height:60px;font-size:18px">Retourner</button>`;
+      /* MODIF: Bouton "Retourner" redimensionné (style en ligne supprimé) */
+      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
       $('#flipBtn').onclick=()=>{r.flipped=!0;renRev()}
   } else {
-      // Boutons classiques
       bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn btn--${g==='echec'?'red':(g==='difficile'?'amber':(g==='bien'?'blue':'green'))}" id="g_${g}">${g}</button>`).join('')}</div>`;
       ['echec','difficile','bien','facile'].forEach(g=>$('#g_'+g).onclick=()=>subG(g))
   }
@@ -2087,63 +2084,76 @@ function togFilt(c,k){ const s=c.filters.grades, keys=Object.keys(s), act=keys.f
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div><div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div><div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
-  $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:{unseen:c.cards.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyLog:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{}};saveData();openSet(cid,!1)}}; $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; bindTypo()
+  $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:{unseen:c.cards.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyLog:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{}};saveData();openSet(cid,!1)}}; $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; 
 }
 
 function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-value'), ren=()=>val.textContent=get(), com=()=>{saveData();applyUI()}; ren(); let sy=null, sv=null; const pd=e=>{e.preventDefault();e.stopPropagation()}; el.onpointerdown=e=>{sy=e.clientY;sv=get();el.setPointerCapture?.(e.pointerId);pd(e)}; el.onpointermove=e=>{if(sy==null)return;set(sv+M.round((sy-e.clientY)/6)*step);ren();applyUI();pd(e)}; el.onpointerup=()=>{if(sy!=null)com();sy=null}; el.onwheel=e=>{e.preventDefault();set(get()+(e.deltaY>0?-step:step));ren();com()} }
-function bindTypo(){ const box=$('#tyP'), P=data.app.prefs; if(!box)return; let sy=null, st=null, sd=null; const up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; box.onpointerdown=e=>{sy=e.clientY;st=P.fsTerm;sd=P.fsDef;e.preventDefault()}; box.onpointermove=e=>{if(sy==null)return;const d=M.round((sy-e.clientY)/6);P.fsTerm=clamp(st+d,12,60);P.fsDef=clamp(sd+d,14,72);up()}; box.onpointerup=()=>{if(sy!=null)saveData();sy=null} }
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
 
-/* Fonction bindSz conservée : permet Scroll ET Resize */
-function bindSz(){ 
-    const P=data.app.prefs, up=()=>{D.documentElement.style.setProperty('--fs-term',P.fsTerm+'px');D.documentElement.style.setProperty('--fs-def',P.fsDef+'px')}; 
-    
-    $$('.review-card [data-face]').forEach(el=>{
-        let sx=null, sy=null, sv=null, isResize=false;
-        const f=el.dataset.face;
-        const get=()=>f==='front'?P.fsTerm:P.fsDef;
-        const set=v=>{
-            if(f==='front')P.fsTerm=clamp(v,12,60);
-            else P.fsDef=clamp(v,14,72);
+/* MODIF: Nouvelle fonction pour gérer le redimensionnement vertical de la police par glissement */
+function bindSz() {
+    const P = data.app.prefs;
+    const up = () => {
+        D.documentElement.style.setProperty('--fs-term', P.fsTerm + 'px');
+        D.documentElement.style.setProperty('--fs-def', P.fsDef + 'px');
+    };
+
+    $$('.review-card .term, .review-card .definition').forEach(el => {
+        let sy = null, sv = null, isResize = false;
+        const face = el.classList.contains('term') ? 'term' : 'def';
+
+        const get = () => face === 'term' ? P.fsTerm : P.fsDef;
+        const set = v => {
+            if (face === 'term') P.fsTerm = clamp(v, 12, 60);
+            else P.fsDef = clamp(v, 14, 72);
             up();
         };
 
-        el.onpointerdown = e => {
-            if(e.target.tagName==='IMG') return;
-            sx = e.clientX;
+        const onPointerDown = e => {
+            // Ignore le geste sur les images ou si du texte est sélectionné
+            if (e.target.tagName === 'IMG' || window.getSelection().toString()) return;
             sy = e.clientY;
             sv = get();
             isResize = false;
+            // On attache les listeners de fin au document pour ne pas les perdre
+            D.addEventListener('pointermove', onPointerMove);
+            D.addEventListener('pointerup', onPointerEnd);
+            D.addEventListener('pointercancel', onPointerEnd);
         };
 
-        el.onpointermove = e => {
-            if(sx===null) return;
+        const onPointerMove = e => {
+            if (sy === null) return;
             
-            const dx = e.clientX - sx;
             const dy = e.clientY - sy;
 
-            // Détection : Mouvement horizontal dominant = Resize
-            if(!isResize) {
-                if(M.abs(dx) > 10 && M.abs(dx) > M.abs(dy)) {
-                    isResize = true;
-                    el.setPointerCapture?.(e.pointerId);
-                }
+            // Détecte un geste vertical significatif
+            if (!isResize && Math.abs(dy) > 10) {
+                isResize = true;
             }
 
-            if(isResize) {
-                e.preventDefault(); // Bloque le scroll si on resize
-                set(sv + M.round(dx / 5));
+            if (isResize) {
+                e.preventDefault(); // Empêche le défilement de la page
+                // Glisser vers le haut (dy négatif) augmente la taille, vers le bas (dy positif) la diminue
+                set(sv - Math.round(dy / 4)); // Le diviseur contrôle la sensibilité
             }
         };
 
-        const end = () => {
-            if(isResize) saveData();
-            sx = null; sy = null; isResize = false;
+        const onPointerEnd = () => {
+            if (isResize) {
+                saveData(); // Sauvegarde uniquement si une modification a eu lieu
+            }
+            sy = null;
+            isResize = false;
+            // Nettoie les listeners
+            D.removeEventListener('pointermove', onPointerMove);
+            D.removeEventListener('pointerup', onPointerEnd);
+            D.removeEventListener('pointercancel', onPointerEnd);
         };
-        el.onpointerup = end;
-        el.onpointercancel = end;
+        
+        el.addEventListener('pointerdown', onPointerDown);
     });
 }
+
 
 function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
