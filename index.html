@@ -222,7 +222,7 @@ const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x
 
 // -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
-const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers";
+const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers"; const HI="HEALTH ISSUES"; 
 
 // -- SUJETS PHYSIQUE --
 const PM="M2", PM3="M3", PM4="M4";
@@ -231,7 +231,7 @@ const PO1="O1", PO2="O2", PO3="O3", PO4="O4";
 
 // -- EMOJIS --
 const C_EMOJIS = {
-  [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚',
+  [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚', [HI]:'⚕️', 
   [PM]:'⚙️', [PM3]:'🌍', [PM4]:'🤝',
   [PEM1]:'⚡️', [PEM2]:'🧲', [PE345]:'🧲', [PEM6]:'🧲', [PEM8]:'🧲', [PEM9]:'🧲', [PEM10]:'🧲', [PEM11]:'🧲', [PEM12]:'🧲', [PEM13]:'🧲', [PEM14]:'🧲', [PEM15]:'🧲',
   [PO1]:'🌈', [PO2]:'🌈', [PO3]:'🌈', [PO4]:'🌈',
@@ -1386,6 +1386,106 @@ const RAW_EN = `
 1142|une amende|a fine|${IDR}
 1143|condamner qn à une amende|to fine sb|${IDR}
 1144|le responsable de la lutte contre la drogue|the drug czar, the drug tsar|${IDR}
+1145|un virus|a virus|${HI}
+1146|muter|to mutate|${HI}
+1147|contagieux, infectieux|contagious, catching, infectious|${HI}
+1148|contaminer|to contaminate|${HI}
+1149|être contaminé par un virus|to be infected with a virus|${HI}
+1150|un symptôme|a symptom|${HI}
+1151|asymptomatique|asymptomatic|${HI}
+1152|tousser|to cough|${HI}
+1153|éternuer|to sneeze|${HI}
+1154|inhaler des goutelettes en suspension dans l’air|to inhale airborne droplets|${HI}
+1155|avoir le nez qui coule|to have a runny nose|${HI}
+1156|avoir mal à la gorge|to have a sore throat|${HI}
+1157|fatigue|tiredness, fatigue|${HI}
+1158|mal de tête|headache|${HI}
+1159|la diarrhée|diarrhoea, diarrhea (US)|${HI}
+1160|avoir du mal à respirer|to have difficulty / trouble breathing|${HI}
+1161|être essouflé, avoir le souffle court|to be short of breath, out of breath|${HI}
+1162|avoir de la température|to have a temperature|${HI}
+1163|avoir de la fièvre|to have a fever, to run a fever|${HI}
+1164|être testé positif (pour le virus)|to test positive (for the virus)|${HI}
+1165|être porteur d’un virus|to carry a virus|${HI}
+1166|un porteur|a carrier|${HI}
+1167|le système immunitaire|the immune system|${HI}
+1168|immunité de groupe|herd immunity|${HI}
+1169|la peste|plague|${HI}
+1170|le choléra|cholera|${HI}
+1171|la variole|smallpox|${HI}
+1172|un fléau|a curse, a plague, a scourge|${HI}
+1173|une catastrophe|a disaster|${HI}
+1174|inattendu|unexpected|${HI}
+1175|imprévisible|unpredictable, unforeseeable|${HI}
+1176|se propager|to spread|${HI}
+1177|la propagation d’un virus|the spread of a virus|${HI}
+1178|une épidemie|an epidemic|${HI}
+1179|une pandémie|a pandemic|${HI}
+1180|un épicentre|an epicentre|${HI}
+1181|éclater, se déclarer|to break out|${HI}
+1182|le début d’une épidémie|an outbreak|${HI}
+1183|l’ampleur, l’étendue de l’épidémie|the scope, the extent of the epidemic|${HI}
+1184|affecter, toucher un pays|to affect a country|${HI}
+1185|la zone la plus durement touchée|the hardest-hit area|${HI}
+1186|endiguer une épidémie|to stem, halt an outbreak|${HI}
+1187|enrayer une épidémie|to check an epidemic|${HI}
+1188|éradiquer|to eradicate|${HI}
+1189|endémique|endemic|${HI}
+1190|la grippe|flu, influenza|${HI}
+1191|syndrome respiratoire aigu sévère (SRAS)|Severe Acute Respiratory Syndrome (SARS)|${HI}
+1192|le virus de la grippe A|the H1N1 virus|${HI}
+1193|la grippe porcine|swine flu, pig flu, H1N1 flu|${HI}
+1194|la grippe aviaire|bird flu, avian flu, avian influenza H5N1|${HI}
+1195|une souche de grippe|a flu strain|${HI}
+1196|un cas de grippe aviaire|a case of avian flu|${HI}
+1197|un foyer de grippe aviaire|an outbreak of avian flu|${HI}
+1198|mortel|lethal|${HI}
+1199|létalité|lethality|${HI}
+1200|le nombre de victimes|the death toll|${HI}
+1201|les personnes âgées|the elderly|${HI}
+1202|une maison de retraite|a care home, a nursing home, a retirement home|${HI}
+1203|hospitaliser qn|to hospitalize sb|${HI}
+1204|être en réanimation|to be in intensive care|${HI}
+1205|un ventilateur|a ventilator|${HI}
+1206|les (personnels) soignants|health workers, medical staff|${HI}
+1207|une infirmière|a nurse|${HI}
+1208|une aide-soignante|an assistant nurse|${HI}
+1209|un héros|a hero|${HI}
+1210|applaudir|to clap|${HI}
+1211|être solidaire de qn|show solidarity with sb|${HI}
+1212|lutter contre le virus|to combat the virus|${HI}
+1213|état d’urgence|state of emergency|${HI}
+1214|aplatir la courbe|to flatten the curve|${HI}
+1215|les gestes barrières|preventative measures, health precautions|${HI}
+1216|un mouchoir en papier|a tissue|${HI}
+1217|la distanciation sociale|social distancing|${HI}
+1218|se laver les mains|to wash your hands|${HI}
+1219|saluer qn|to greet sb|${HI}
+1220|se serrer la main|to shake hands|${HI}
+1221|faire la bise à qn|to kiss sb|${HI}
+1222|porter un masque|to wear a (face) mask|${HI}
+1223|fournitures médicales|medical supplies|${HI}
+1224|stocker|to stockpile|${HI}
+1225|ne plus avoir d’équipements de protection|to run out of protective equipment|${HI}
+1226|manquer de masques|to be short of masks|${HI}
+1227|une pénurie|a shortage|${HI}
+1228|des gants|gloves|${HI}
+1229|s’isoler|to self-isolate|${HI}
+1230|l’eau de javel|bleach|${HI}
+1231|désinfecter les lieux publics|to disinfect public areas|${HI}
+1232|antibiotiques|antibiotics|${HI}
+1233|un vaccin|a vaccine|${HI}
+1234|se faire vacciner|to get vaccinated|${HI}
+1235|mettre qn en quarantaine|to quarantine sb|${HI}
+1236|mettre / être en quarantaine|to put / be under quarantine|${HI}
+1237|interdiction de voyager|travel ban|${HI}
+1238|limitations de déplacement|travel restrictions|${HI}
+1239|ordonner le confinement|to issue a stay-at-home order|${HI}
+1240|confinement|lockdown, confinement|${HI}
+1241|télétravailler|to work from / at home|${HI}
+1242|une visioconférence|a videoconference|${HI}
+1243|mettre qn en chômage partiel|to furlough sb|${HI}
+1244|achats (sous l’emprise de la) panique|panic buying|${HI}
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
 8001|battre|beat / beat / beaten|${VI}
