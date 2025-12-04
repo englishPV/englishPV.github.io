@@ -23,6 +23,1249 @@ const C_EMOJIS = {
 const RAW_EN = `
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
+2|souverain|sovereign|${CD}
+3|aristocratie|aristocracy|${CD}
+4|oligarchie|oligarchy|${CD}
+5|dictateur|a dictator|${CD}
+6|dictature|dictatorship|${CD}
+7|autoritaire|authoritarian|${CD}
+8|autoritarisme|authoritarianism|${CD}
+9|totalitaire|totalitarian|${CD}
+10|totalitarisme|totalitarianism|${CD}
+11|homme fort|a strongman|${CD}
+12|tyran|a tyrant, an autocrat|${CD}
+13|despote|a despot|${CD}
+14|despote éclairé|an enlightened despot|${CD}
+15|junte militaire|a military junta|${CD}
+16|coup d'État|a coup, a coup d'état|${CD}
+17|gouvernement autoritaire|a regime|${CD}
+18|régime de Vichy / de Pinochet|the Vichy / Pinochet regime|${CD}
+19|régime répressif|a repressive regime|${CD}
+20|régime politique|a political system|${CD}
+21|se démocratiser|to become more democratic|${CD}
+22|prendre le pouvoir|to take, seize power|${CD}
+23|arriver au pouvoir|to come to power|${CD}
+24|arriver au pouvoir (démocratiquement)|to come into office|${CD}
+25|être au pouvoir|to be in power|${CD}
+26|rester au pouvoir|to remain, stay in power|${CD}
+27|s'accrocher au pouvoir|to cling to power|${CD}
+28|bonne gouvernance|good governance|${CD}
+29|mal administrer, mal gérer|to misrule, mismanage|${CD}
+30|mauvaise administration|misrule|${CD}
+31|mauvaise gestion|mismanagement|${CD}
+32|tenir un dirigeant pour responsable|to hold a leader to account|${CD}
+33|être responsable devant les électeurs|to be accountable to the electorate|${CD}
+34|responsabilité|accountability|${CD}
+35|corruption|corruption, sleaze, bribery|${CD}
+36|corrompu|corrupt|${CD}
+37|pot-de-vin|a bribe|${CD}
+38|acheter, soudoyer qn|to bribe sb|${CD}
+39|état de droit, règne de la loi|the rule of law|${CD}
+40|multipartisme|multi-party system|${CD}
+41|système de parti unique|single-party system|${CD}
+42|élections libres et régulières|free and fair elections|${CD}
+43|fraude électorale|vote rigging, ballot rigging, electoral fraud|${CD}
+44|l'élection était truquée|the election was rigged|${CD}
+45|opposant politique|a political opponent|${CD}
+46|dissident|a dissident|${CD}
+47|bâillonner / museler la presse / l'opposition|to gag / muzzle the press / the opposition|${CD}
+48|déclarer l'état d'urgence|to declare a state of emergency|${CD}
+49|bafouer la constitution|to trample the constitution|${CD}
+50|censurer|to censor|${CD}
+51|censure|censorship|${CD}
+52|bloquer / restreindre l'accès à internet|to block / restrict internet access|${CD}
+53|contourner la censure|to circumvent, bypass censorship|${CD}
+54|droits de l'homme|human rights|${CD}
+55|atteintes aux droits de l'homme|human rights abuses, violations|${CD}
+56|crime contre l'humanité|a crime against humanity|${CD}
+57|devoir d'ingérence|the duty to interfere, to intervene|${CD}
+58|association de défense des droits de l'homme|human Rights lobby|${CD}
+59|passé de la Chine en matière de droits de l'homme|China's human rights record|${CD}
+60|mécontentement, malaise|discontent|${CD}
+61|provoquer des troubles|to spark unrest|${CD}
+62|agitation|turmoil|${CD}
+63|bouleversement|an upheaval|${CD}
+64|fomenter des troubles|to stir up trouble|${CD}
+65|insurgé|an insurgent|${CD}
+66|insurrection|an insurgency|${CD}
+67|manifestation|a demonstration, a protest march|${CD}
+68|manifestant|a demonstrator, a protester|${CD}
+69|organiser / participer à un rassemblement|to hold / attend a rally|${CD}
+70|émeute|a riot|${CD}
+71|émeutier, casseur|a rioter|${CD}
+72|des émeutes ont éclaté|riots broke out|${CD}
+73|CRS|anti-riot police|${CD}
+74|cocktail Molotov|a petrol bomb, a Molotov cocktail|${CD}
+75|gaz lacrymogène|tear gas|${CD}
+76|heurt, affrontement|a clash|${CD}
+77|échauffourée|a skirmish|${CD}
+78|complot|a plot|${CD}
+79|comploteur|a plotter|${CD}
+80|se révolter|to revolt|${CD}
+81|se rebeller|to rebel|${CD}
+82|rebelle|a rebel|${CD}
+83|rébellion, révolte|a rebellion|${CD}
+84|déjouer les autorités|to defy the authorities|${CD}
+85|soulèvement|an uprising|${CD}
+86|se soulever contre|to rise up against|${CD}
+87|renverser un dictateur|to overthrow, to topple a dictator|${CD}
+88|évincer un dictateur|to oust a dictator|${CD}
+89|renversement d'un dictateur|the overthrow of a dictator|${CD}
+90|déposer un dirigeant|to depose a ruler|${CD}
+91|s'effondrer|to collapse|${CD}
+92|restaurer la démocratie|to restore democracy|${CD}
+93|chute d'un gouvernement|the downfall of a government|${CD}
+94|répression brutale|ruthless repression|${CD}
+95|réprimer une rébellion|to put down, to suppress a rebellion|${CD}
+96|réprimer, étouffer la contestation|to quell the protests|${CD}
+97|mesures de répression|crackdown, clampdown|${CD}
+98|mettre les gens en prison|to send people to prison|${CD}
+99|passer qn à tabac|to beat sb up|${CD}
+100|gène|a gene|${CG}
+101|cellule|a cell|${CG}
+102|cellules-souches|stem cells|${CG}
+103|recherche sur les cellules souches|stem-cell research|${CG}
+104|génome humain|the human genome|${CG}
+105|cartographie du génome|genome mapping|${CG}
+106|carte génétique|gene map, genetic map|${CG}
+107|séquence génétique|gene sequence|${CG}
+108|séquençage|sequencing|${CG}
+109|épissage du gène|gene splicing|${CG}
+110|patrimoine héréditaire|gene pool|${CG}
+111|généticien|a geneticist|${CG}
+112|eugénisme|eugenics|${CG}
+113|eugéniste, partisan de l'eugénisme|a eugenicist|${CG}
+114|ADN|DNA|${CG}
+115|test génétique|a DNA test|${CG}
+116|empreinte génétique|a DNA print, genetic print|${CG}
+117|analyse ADN|DNA analysis|${CG}
+118|prélèvement d'ADN|a DNA sample|${CG}
+119|profil génétique|genetic make-up, genetic profile|${CG}
+120|analyse de l'empreinte génétique|genetic profiling, DNA fingerprinting|${CG}
+121|dépistage génétique|genetic screening|${CG}
+122|subir un prélèvement d'ADN|to be DNA-swabbed|${CG}
+123|manipulations génétiques, génie génétique|genetic engineering|${CG}
+124|transgénique|transgenic|${CG}
+125|organisme génétiquement modifié|a genetically modified organism|${CG}
+126|OGM|GMOs|${CG}
+127|aliments contenant des OGM|GM food|${CG}
+128|pommes de terres génétiquement modifiées|GM potatoes|${CG}
+129|produits transgéniques|biotech products|${CG}
+130|semence, graines|seed|${CG}
+131|soja|soyabeans|${CG}
+132|colza|rapeseed|${CG}
+133|maïs|maize (GB), corn (US)|${CG}
+134|blé|wheat|${CG}
+135|culture, récolte|a crop|${CG}
+136|essais sur le terrain|field trials, crop trials|${CG}
+137|culture OGM|a GM crop|${CG}
+138|rendement|yield|${CG}
+139|filière agroalimentaire|agribusiness|${CG}
+140|augmenter, améliorer les rendements|to improve yields|${CG}
+141|résistant aux maladies|resistant to disease|${CG}
+142|insecticide / pesticide / herbicide|insecticide / pesticide / herbicide|${CG}
+143|polliniser|to pollinate|${CG}
+144|pollinisation croisée|cross-pollination|${CG}
+145|contaminer|to contaminate|${CG}
+146|contamination|contamination|${CG}
+147|maladie génétique|a genetic disease|${CG}
+148|gène défectueux|a faulty gene|${CG}
+149|gène manquant|a missing gene|${CG}
+150|héréditaire|hereditary|${CG}
+151|chromosome X / Y|an X / Y chromosome|${CG}
+152|clonage|cloning|${CG}
+153|conseil génétique|genetic counselling|${CG}
+154|entreprise pharmaceutique|a pharmaceutical company|${CG}
+155|thérapie génique|gene therapy|${CG}
+156|traitement génique|genetic treatment|${CG}
+157|à des fins thérapeutiques|for therapeutic purposes|${CG}
+158|agriculture au service de la médecine|pharming|${CG}
+159|jouer à l'apprenti-sorcier|to play God|${CG}
+160|toucher à la nature|to tamper with nature|${CG}
+161|principe de précaution|the precautionary principle, the safety-first principle|${CG}
+162|étiquette|a label|${CG}
+163|étiquetter|to label|${CG}
+164|étiquetage|labelling|${CG}
+165|avertir|to warn|${CG}
+166|avertissement|a warning|${CG}
+167|dont l'origine peut être établie|traceable|${CG}
+168|traçabilité|traceability|${CG}
+169|effets à long terme|long-term effects|${CG}
+170|chaîne alimentaire|the food chain|${CG}
+171|sécurité alimentaire|food security|${CG}
+172|lobby OGM|the pro-GM lobby|${CG}
+173|militants contre les OGM|anti-GM activists|${CG}
+174|campagne contre les OGM|an anti-GM campaign|${CG}
+175|étranger|a foreigner|${CI}
+176|inconnu|a stranger|${CI}
+177|nationalité|nationality|${CI}
+178|ressortissant étranger|a foreign national|${CI}
+179|personnes de nationalité française|French citizens|${CI}
+180|émigrer en Nouvelle-Zélande|to emigrate to New Zealand|${CI}
+181|immigrer en France|to immigrate to France|${CI}
+182|vague d'immigration|a wave of immigration|${CI}
+183|immigration à grande échelle / de masse|large-scale / mass immigration|${CI}
+184|exode|an exodus|${CI}
+185|nouvel arrivant|a newcomer|${CI}
+186|pays natal, pays d'origine|native country, home country|${CI}
+187|patrie|homeland|${CI}
+188|pays d'accueil|a host country|${CI}
+189|pays d'adoption|an adoptive country, a country of adoption|${CI}
+190|accueillir|to welcome|${CI}
+191|accueillant|welcoming|${CI}
+192|politique migratoire|immigration policy|${CI}
+193|immigration choisie|selective immigration, controlled immigration|${CI}
+194|flux migratoires|migration flows|${CI}
+195|passager clandestin|a stowaway|${CI}
+196|immigration clandestine, irrégulière|illegal immigration|${CI}
+197|immigration sauvage|uncontrolled immigration|${CI}
+198|immigrant clandestin, sans-papiers|an illegal immigrant, an illegal alien, an undocumented alien|${CI}
+199|il est en situation irrégulière|his papers are not in order|${CI}
+200|frontière|a border, a frontier|${CI}
+201|fermer ses frontières|to close one's borders|${CI}
+202|contrôles aux frontières|border controls|${CI}
+203|contrôles d'identité|identity checks|${CI}
+204|centre de rétention (administrative)|a holding centre, a detention facility|${CI}
+205|passeport|a passport|${CI}
+206|carte d'identité|an identity card|${CI}
+207|visa|a visa|${CI}
+208|réfugié|a refugee|${CI}
+209|personne déplacée|a displaced person|${CI}
+210|apatride|a stateless person|${CI}
+211|se réfugier|to take refuge, take shelter|${CI}
+212|demander l'asile politique|to seek political asylum|${CI}
+213|demandeur d'asile|an asylum-seeker|${CI}
+214|fuir la persécution / la misère|to flee persecution / destitution|${CI}
+215|échapper à la pauvreté|to escape poverty|${CI}
+216|chercher de meilleures conditions de vie|to be in search of better living conditions|${CI}
+217|trafic des êtres humains|human trafficking|${CI}
+218|contrebandier, passeur|a smuggler|${CI}
+219|passeurs d'immigrants clandestins|people-smugglers|${CI}
+220|réseau de passeurs|a smuggling ring|${CI}
+221|faux passeport|a fake passport|${CI}
+222|reconduire qn à la frontière|to escort sb back to the border|${CI}
+223|renvoyer un immigrant dans son pays d'origine|to send an immigrant back to his native country|${CI}
+224|expulser qn|to deport sb|${CI}
+225|être refoulé à la frontière|to be turned away at the border|${CI}
+226|être expulsé|to be ordered out of the country|${CI}
+227|s'exiler|to go into exile|${CI}
+228|exilé|an exile|${CI}
+229|exiler, bannir qn|to exile, banish sb|${CI}
+230|s'expatrier|to expatriate oneself|${CI}
+231|expatrié|an expatriate, an expat|${CI}
+232|passer à l'Ouest / à l'ennemi|to defect to the West / to the enemy|${CI}
+233|fuite des cerveaux / afflux des cerveaux|brain drain / brain gain|${CI}
+234|partir de rien|to start from scratch|${CI}
+235|travail au noir|moonlighting|${CI}
+236|atelier clandestin|a sweatshop|${CI}
+237|exploiter les travailleurs immigrés|to exploit migrant workers|${CI}
+238|permis de travail, carte de travail|a work permit|${CI}
+239|permis de séjour, carte de séjour|a residence permit, a resident permit|${CI}
+240|travailleur migrant|a migrant worker|${CI}
+241|travailleur invité (disposant d'un visa temporaire)|a guest worker|${CI}
+242|s'intégrer|to become integrated|${CI}
+243|bien s'intégrer dans une société|to integrate well into a society|${CI}
+244|insertion sociale|social integration|${CI}
+245|régulariser la situation des clandestins|to regularise the status of illegal immigrants|${CI}
+246|régularisation|regularisation|${CI}
+247|se faire naturaliser britannique, être naturalisé britannique, obtenir la nationalité britannique|to be granted British citizenship, to become a British citizen|${CI}
+248|quota|a quota|${CI}
+249|regroupement familial|family reunion, reunification|${CI}
+250|qn qui abuse du système des prestations sociales|a benefit cheat|${CI}
+251|fraude aux prestations sociales|benefit fraud|${CI}
+252|parasite|a freeloader|${CI}
+253|mariage blanc|a sham marriage, a marriage of convenience|${CI}
+254|inonder|to flood|${CI}
+255|être envahi par les étrangers|to be swamped with foreigners|${CI}
+256|arrivée massive, afflux de travailleurs|the influx of workers|${CI}
+257|endiguer l'afflux d'immigrés|to stem the flow of immigrants|${CI}
+258|limiter / freiner l'immigration|to restrict / curb immigration|${CI}
+259|parti d'extrême-droite|a far-right party|${CI}
+260|faire fuir les immigrants|to scare immigrants away|${CI}
+261|empêcher les indésirables d'entrer|to keep out undesirables|${CI}
+262|xénophobie|xenophobia|${CI}
+263|xénophobe|xenophobic|${CI}
+264|avoir un grand-père né à l'étranger|to have a foreign-born grandfather|${CI}
+265|jeunes gens d'origine asiatique / portugaise|young men of Asian / Portuguese descent|${CI}
+266|Français de naissance|a native of France|${CI}
+267|New Yorkais de souche|a born and bred New Yorker|${CI}
+268|il est français de souche|he's of French origin, of French extraction|${CI}
+269|Maghreb|North Africa|${CI}
+270|Maghrébins|North Africans|${CI}
+271|pakistanais / du Bangladesh|Pakistani / Bangladeshi|${CI}
+272|hispanophone / parlant le Hindi|Spanish-speaking / Hindi-speaking|${CI}
+273|diaspora|diaspora|${CI}
+274|affaires étrangères|foreign affairs|${CIT}
+275|relations extérieures|foreign relations|${CIT}
+276|communauté internationale|the international community|${CIT}
+277|problème mondial, planétaire|a global issue|${CIT}
+278|État souverain|a sovereign state|${CIT}
+279|souveraineté|sovereignty|${CIT}
+280|État-nation|a nation-state|${CIT}
+281|frontière|a border, a frontier|${CIT}
+282|droit international|international law|${CIT}
+283|géopolitique|geopolitics|${CIT}
+284|scène internationale|the international stage, the international scene, the world stage|${CIT}
+285|jouer un rôle dans qch|to play a role, a part in sth|${CIT}
+286|occidental / oriental|western / eastern|${CIT}
+287|politique étrangère, extérieure|foreign policy|${CIT}
+288|ambassadeur|an ambassador|${CIT}
+289|ambassade|an embassy|${CIT}
+290|attaché culturel / commercial / militaire|a cultural / commercial / military attaché|${CIT}
+291|envoyé, émissaire|an envoy, an emissary|${CIT}
+292|diplomate|a diplomat|${CIT}
+293|diplomatie|diplomacy|${CIT}
+294|rompre / reprendre les relations|to break off / resume diplomatic relations|${CIT}
+295|relations tendues|tense, strained relations|${CIT}
+296|réchauffement|a thaw|${CIT}
+297|refroidissement|a chill, a cooling off|${CIT}
+298|rappeler un ambassadeur|to recall an ambassador|${CIT}
+299|normaliser les relations|to normalize relations|${CIT}
+300|grande puissance|a great power|${CIT}
+301|superpuissance / hyperpuissance|a superpower / a hyperpower|${CIT}
+302|hégémonie|hegemony|${CIT}
+303|impérialisme|imperialism|${CIT}
+304|impérialiste|imperialistic|${CIT}
+305|expansionisme|expansionism|${CIT}
+306|unilatéralisme / multilatéralisme|unilateralism / multilateralism|${CIT}
+307|bilatéral / multilatéral|bilateral / multilateral|${CIT}
+308|bipolaire / multipolaire|bipolar / multipolar|${CIT}
+309|bloc|a bloc|${CIT}
+310|équilibre des forces|balance of power|${CIT}
+311|système onusien|the UN system|${CIT}
+312|État-membre, pays membre|a member state|${CIT}
+313|membre fondateur|a founding member, founder member|${CIT}
+314|cotisation|a contribution|${CIT}
+315|discuter / voter une résolution|to debate / to pass a resolution|${CIT}
+316|appliquer une résolution|to implement, enforce a resolution|${CIT}
+317|autoriser l'usage de la force|to authorize the use of force|${CIT}
+318|embargo|an embargo|${CIT}
+319|majorité des deux-tiers|a two-thirds majority|${CIT}
+320|maintenir la paix|to maintain peace|${CIT}
+321|opération de maintien de la paix|a peace-keeping operation|${CIT}
+322|soldat de la paix|a peacekeeper|${CIT}
+323|casque bleu|a blue helmet|${CIT}
+324|devoir d'ingérence|the duty to interfere, to intervene|${CIT}
+325|intervention militaire|military intervention|${CIT}
+326|OTAN|NATO, the North Atlantic Treaty Organization|${CIT}
+327|négocier|to negotiate|${CIT}
+328|négociations, pourparlers, discussions|negotiations, talks|${CIT}
+329|table des négociations|negotiating table|${CIT}
+330|table ronde|a round table|${CIT}
+331|faire une déclaration|to make, issue, deliver a statement|${CIT}
+332|communiqué|a communiqué|${CIT}
+333|sous l'égide de|under the aegis of|${CIT}
+334|réunion au sommet, sommet|a summit (meeting)|${CIT}
+335|porte-parole|a spokesman, spokeswoman, spokesperson|${CIT}
+336|homologue|a counterpart, an opposite number|${CIT}
+337|impasse|a stalemate, a deadlock, a standoff, an impasse|${CIT}
+338|aboutir à une impasse|to reach a stalemate|${CIT}
+339|sortir d'une impasse|to break a stalemate|${CIT}
+340|ultimatum|an ultimatum|${CIT}
+341|médiateur|a mediator|${CIT}
+342|négocier un accord|to broker an agreement|${CIT}
+343|surmonter un obstacle|to overcome an obstacle|${CIT}
+344|volonté politique|political will|${CIT}
+345|compromis|a compromise|${CIT}
+346|transiger|to compromise|${CIT}
+347|faire une concession|to make a concession|${CIT}
+348|s'engager à faire qch|to commit oneself to doing sth|${CIT}
+349|promettre de faire, s'engager à faire qch|to pledge to do sth|${CIT}
+350|signer / ratifier un traité|to sign / ratify a treaty|${CIT}
+351|protocole|a protocol|${CIT}
+352|accord|an agreement, an accord|${CIT}
+353|conclure un accord|to reach a settlement|${CIT}
+354|stipuler|to stipulate|${CIT}
+355|parvenir à un consensus|to reach a consensus|${CIT}
+356|interdire|to prohibit, to ban|${CIT}
+357|mettre son véto à une décision|to veto a decision|${CIT}
+358|Union Européenne, l'UE|the European Union, the EU|${CIT}
+359|directive européenne|an EU directive|${CIT}
+360|adhérer à l'UE|to join the EU|${CIT}
+361|demander son adhésion à l'UE|to apply to join the EU, to apply for EU membership|${CIT}
+362|pourparlers d'adhésion|membership negotiations|${CIT}
+363|organisation non-gouvernementale, ONG|a non-governmental organization, an NGO|${CIT}
+364|droits de l'homme|human rights|${CIT}
+365|violations des droits de l'homme|human rights abuses, violations|${CIT}
+366|faire respecter un principe|to uphold a principle|${CIT}
+367|passé de la Chine en matière de droits de l'homme|China's human Rights record|${CIT}
+368|décolonisation|decolonization|${CIT}
+369|obtenir l'indépendance, devenir indépendant|to achieve, gain, attain independence|${CIT}
+370|ancienne colonie|a former colony|${CIT}
+371|puissance coloniale|a colonial power|${CIT}
+372|du travail|work|${CU}
+373|un travail, un emploi|a job|${CU}
+374|une profession, une activité professionnelle|an occupation|${CU}
+375|les professions libérales|the professions|${CU}
+376|une carrière|a career|${CU}
+377|le monde du travail|the world of work|${CU}
+378|être au travail|to be at work|${CU}
+379|le lieu de travail|the workplace|${CU}
+380|travailler chez soi|to work from home|${CU}
+381|travailler à temps partiel OU à mi-temps|to work part time|${CU}
+382|travailler à plein temps|to work full time|${CU}
+383|la classe ouvrière|the working class|${CU}
+384|la population active|the working population|${CU}
+385|la vie active|the working life|${CU}
+386|conditions de travail|working conditions|${CU}
+387|atelier|a workshop|${CU}
+388|usine|a factory, a plant|${CU}
+389|atelier clandestin (où la main d'œuvre est exploitée)|a sweatshop|${CU}
+390|travailler beaucoup|to work hard|${CU}
+391|être travailleur|to be hard-working|${CU}
+392|travailleur acharné, bourreau de travail|a hard worker, a workaholic|${CU}
+393|permis de travail|a work permit|${CU}
+394|être / ne pas être de service OU de garde|to be on duty / off duty|${CU}
+395|chômage|unemployment, joblessness|${CU}
+396|être au chômage|to be unemployed, jobless, out of work|${CU}
+397|taux de chômage|unemployment rate, jobless rate|${CU}
+398|chômeurs|the unemployed, the jobless|${CU}
+399|chômage de longue durée|long-term unemployment|${CU}
+400|chômage des jeunes|youth unemployment|${CU}
+401|allocation chômage|unemployment benefit|${CU}
+402|toucher le chômage|to be on the dole (GB), to be on welfare (US)|${CU}
+403|marché du travail, de l'emploi|job market, labour market|${CU}
+404|contrat à durée déterminée, CDD|a fixed-term contract|${CU}
+405|contrat à durée indéterminée, CDI|an open-ended contract|${CU}
+406|flexibilité de l'emploi|job flexibility|${CU}
+407|avoir des horaires flexibles|work flexitime (GB) flextime (US)|${CU}
+408|sécurité / précarité de l'emploi|job security / insecurity|${CU}
+409|stage|an internship, a work placement|${CU}
+410|stagiaire|an intern, a trainee|${CU}
+411|travailleur précaire|a casual worker|${CU}
+412|petit boulot|an odd job, a casual job|${CU}
+413|boulot d'été|a summer job|${CU}
+414|intérimaire|a temporary worker|${CU}
+415|faire de l'intérim|to temp, to work as a temp|${CU}
+416|employer|to employ|${CU}
+417|employeur|an employer|${CU}
+418|employé|an employee|${CU}
+419|changer de travail|to change jobs|${CU}
+420|embaucher un travailleur|to hire, to take on a worker|${CU}
+421|recruter|to recruit|${CU}
+422|période d'essai|a trial period|${CU}
+423|poste|a post, a position|${CU}
+424|nommer qn à un poste|to appoint sb to a post|${CU}
+425|muter qn|to transfer sb|${CU}
+426|poste à responsabilité(s)|a responsible job|${CU}
+427|emploi subalterne|a menial job|${CU}
+428|demandeur d'emploi|a job-seeker|${CU}
+429|agence Pôle emploi|a Jobcenter (GB)|${CU}
+430|CV, curriculum vitae|a curriculum vitae, a CV, a résumé (US)|${CU}
+431|expérience professionnelle|work experience|${CU}
+432|compétences|skills|${CU}
+433|être candidat à un emploi, faire une demande d'emploi|to apply for a job|${CU}
+434|candidat à un poste|an applicant|${CU}
+435|entretien d'embauche|a job interview|${CU}
+436|offre d'emploi|a job offer, a job vacancy, a job opportunity|${CU}
+437|travail OU main d'œuvre|labour|${CU}
+438|main d'œuvre féminine / travail des enfants|female labour / child labour|${CU}
+439|normes en matière d'emploi|labour standards|${CU}
+440|main d'œuvre|manpower, workforce|${CU}
+441|personnel|staff, personnel|${CU}
+442|collègue, camarade de travail|a colleague, a co-worker, a workmate|${CU}
+443|ressources humaines|human resources|${CU}
+444|travail qualifié / peu qualifié / non qualifié|a skilled / low-skilled / an unskilled job|${CU}
+445|ouvrier spécialisé, OS|an unskilled worker|${CU}
+446|ouvrier|a blue-collar worker|${CU}
+447|employé de bureau|a white-collar worker|${CU}
+448|fonctionnaire|a state employee, a civil servant|${CU}
+449|salarié du secteur public|a public-sector employee|${CU}
+450|haut fonctionnaire|a high-ranking civil servant|${CU}
+451|être indépendant, travailler à son compte|to be self-employed|${CU}
+452|travailleurs indépendants|the self-employed|${CU}
+453|honoraires|fees|${CU}
+454|paie, paye|pay|${CU}
+455|salaire|salary|${CU}
+456|salaire (d'ouvrier)|wages|${CU}
+457|gagner de l'argent|to earn money, to make money|${CU}
+458|gagner sa vie|to earn a living, to earn one's living, to make a living|${CU}
+459|Que fait-il dans la vie ?|What does he do for a living?|${CU}
+460|travail mal payé|a badly-paid job, a low-paid job|${CU}
+461|travail bien payé|a well-paid job, a highly-paid job|${CU}
+462|salarié|a wage-earner|${CU}
+463|prime|a bonus|${CU}
+464|avantage (en nature), avantage annexe|a perk, a fringe benefit|${CU}
+465|voiture de fonction|a company car|${CU}
+466|salaire au rendement|performance-related pay|${CU}
+467|être employé par une entreprise|to be on a company's payroll|${CU}
+468|vacances|holiday, vacation (US)|${CU}
+469|congés payés|paid holiday|${CU}
+470|être en vacances|to be on holiday|${CU}
+471|jour férié|a bank holiday|${CU}
+472|être en congé maladie|to be on sick leave|${CU}
+473|prendre deux jours de congé|to take two days off|${CU}
+474|réduction du temps de travail, RTT|reduction of working hours|${CU}
+475|les 35 heures, la semaine de 35 heures|the 35-hour working week|${CU}
+476|supprimer des emplois|to cut jobs|${CU}
+477|faire des coupes sombres, claires dans la main d'œuvre|to slash, to axe jobs|${CU}
+478|pertes d'emploi, suppressions d'emploi|job losses|${CU}
+479|rationaliser|to streamline|${CU}
+480|dégraisser ses effectifs|to downsize|${CU}
+481|licencier des salariés|to lay off workers, to make workers redundant|${CU}
+482|licenciement (économique)|a redundancy|${CU}
+483|départ volontaire|a voluntary redundancy|${CU}
+484|plan social|a redundancy plan|${CU}
+485|indemnité de licenciement, prime de départ|redundancy payment, severance pay, severance package|${CU}
+486|parachute doré|a golden parachute, a golden handshake|${CU}
+487|renvoyer, licencier, congédier qn|to dismiss sb|${CU}
+488|mettre à la porte, renvoyer, virer|to fire, to sack, to give sb the sack|${CU}
+489|être renvoyé|to get the sack|${CU}
+490|conflit social|an industrial dispute|${CU}
+491|se mettre / être en grève|to go on strike / be on strike|${CU}
+492|gréviste|a striker|${CU}
+493|direction et les salariés|management and workers|${CU}
+494|délégué syndical|a shop steward|${CU}
+495|syndicat|a (trade) union|${CU}
+496|revendication|a claim|${CU}
+497|revendications salariales|wage claims, wage demands|${CU}
+498|augmentation de salaire|a payrise (GB), a payraise (US)|${CU}
+499|reprendre le travail|to resume work|${CU}
+500|prendre sa retraite|to retire|${CU}
+501|démissionner|to resign, to step down|${CU}
+502|retraité|a pensioner, an old age pensioner, a retiree (US)|${CU}
+503|retraite|retirement|${CU}
+504|partir en pré-retraite|to take early retirement|${CU}
+505|âge de la retraite|retirement age|${CU}
+506|bien réussir à l'école|to do well at school|Education
+507|lire l'anglais couramment|to read English fluently|Education
+508|être bon en sport|to be good at sports|Education
+509|faire l'école buissonnière|to play truant|Education
+510|absentéisme|truancy|Education
+511|suivre un cours d'anglais|to take a class in English|Education
+512|donner du travail à la maison|to set homework|Education
+513|rendre un travail|to hand in a piece of work|Education
+514|les subtilités de la langue anglaise|the intricacies of the English language|Education
+515|se lancer|to get started|Education
+516|se conformer à une règle|to obey a rule|Education
+517|obéir à (qqn)|to obey (sone)|Education
+518|avoir des difficultés en maths|to have difficulty with maths|Education
+519|donner un coup de main à (qqn)|to give (sone) a hand|Education
+520|obtenir un diplôme|to graduate|Education
+521|une salle de classe|a classroom|Education
+522|une leçon|a class|Education
+523|rattraper un cours loupé|to catch up a missed lesson|Education
+524|évaluer|to assess, appraise|Education
+525|le programme scolaire|the school curriculum|Education
+526|étudiant de premier cycle|undergraduate|Education
+527|indiscipliné|unruly|Education
+528|incontrôlable|unmanageable|Education
+529|bâcler ses devoirs|to dash off one's work|Education
+530|obtenir une bonne note|to get a good mark|Education
+531|tricher sur son voisin|to eye over one's neighbour's work|Education
+532|principal, directeur (école)|headmaster|Education
+533|élève doué|gifted pupil|Education
+534|réussir un examen haut la main|to pass a test with flying colors|Education
+535|une matière (scolaire)|a (school) subject|Education
+536|une pause de 20 minutes|a 20-minute break|Education
+537|une heure de cours|a teaching-hour|Education
+538|passer dans la classe supérieure|to pass the next grade|Education
+539|travail de paperasse|paperwork|Education
+540|passer un examen|to take an exam|Education
+541|examen blanc|mock exam|Education
+542|se préparer à un examen|to prepare for an exam|Education
+543|échouer à un examen|to flunk a test|Education
+544|recaler (qqn)|to flunk (sone)|Education
+545|être reçu à un examen avec mention|to pass a degree with distinction|Education
+546|abandonner l'école|to drop out of school|Education
+547|un élève décrocheur|a dropout|Education
+548|obtenir une bourse|to get a scholarship|Education
+549|entrer en fac de médecine|to go to a medical school|Education
+550|faire des études de médecine|to study medicine|Education
+551|remettre un évènement à plus tard|to put off an event|Education
+552|sortie scolaire|school trip|Education
+553|faire des recherches sur (qqch)|to do research on (sthg)|Education
+554|cour d'école|schoolyard|Education
+555|un élève de terminale|[UK] a sixth-former|Education
+556|méticuleux|painstaking|Education
+557|sécher un cours|to skip a lesson|Education
+558|se voir accorder la possibilité de [...]|to be provided with an opportunity to [...]|Education
+559|tricher|to cheat|Education
+560|un tricheur|a cheater|Education
+561|être renvoyé|to be expelled|Education
+562|rouler sur un examen|to sail through an exam|Education
+563|sauce (tomate)|dressing|Thanksgiving
+564|chuckle|laughter|Thanksgiving
+565|to gather|to get together|Thanksgiving
+566|a feast|a banquet|Thanksgiving
+567|to reach accross|to make efforts to join|Thanksgiving
+568|one another|each other|Thanksgiving
+569|to winnow away|to filter out and remove|Thanksgiving
+570|widely viewed as|largely regarded as|Thanksgiving
+571|twice|two times|Thanksgiving
+572|to provide|to give|Thanksgiving
+573|the bulk of|the biggest part of|Thanksgiving
+574|to depict|to describe|Thanksgiving
+575|to feature|to represent, show|Thanksgiving
+576|subservient|submissive, docile|Thanksgiving
+577|pilgrims|migrants arriving in America from England in 17th|Thanksgiving
+578|to outnumber|to surpass in number|Thanksgiving
+579|to crouch|almost to sit on the floor|Thanksgiving
+580|a harvest|a crop|Thanksgiving
+581|likely|probably|Thanksgiving
+582|a deed|an [bad] action|Thanksgiving
+583|settlers|colons|Thanksgiving
+584|in retaliation for|in revenge for|Thanksgiving
+585|to broker|to organize, negotiate|Thanksgiving
+586|to grab|to seize|Thanksgiving
+587|gauzy|transparent|Thanksgiving
+588|willfully|deliberately|Thanksgiving
+589|How [s.one] would have it|What [s.one] would like to believe|Thanksgiving
+590|druthers|inclination, penchant|Thanksgiving
+591|blissfully|ecstatically|Thanksgiving
+592|bleached out|washed out|Thanksgiving
+593|to abid|to respect|Thanksgiving
+594|altérer|alter|Thanksgiving
+595|apprentissage en continu|lifelong learning|Thanksgiving
+596|malaise|general feeling of discomfort|Business
+597|stagflation|period of slow economic growth and high unemployment|Business
+598|aftermath|the consequences of a significant unpleasant event|Business
+599|hyperinflation|extremely high and accelerating inflation|Business
+600|third-world countries|countries with lower economic development|Business
+601|martial law|military control over civilian functions of government|Business
+602|gleaming|shining brightly, describe something polished or new|Business
+603|suburban area|residential area on the outskirts of the a city|Business
+604|stagnation|lack of activity, growth, and development|Business
+605|dispirited|having lost emthusiasm and hope|Business
+606|fatalistic|believing that events are inevitable|Business
+607|hollowed out|destroyed or weakened from within|Business
+608|brimming|filled to the point of overflowing (with positive emotions and energy)|Business
+609|rabais, ristourne|discount|Business
+610|chaîne de montage|assembly line|Business
+611|payer comptant|to pay cash|Business
+612|pénurie de main d'oeuvre|labor shortage|Business
+613|productivité|productivity|Business
+614|soumettre sa candidature|to apply|Business
+615|racheter|to buy out|Business
+616|licencier|to lay off|Business
+617|se mettre en grève|to go on strike|Business
+618|service client|customer service|Business
+619|représentant syndical|union representative|Business
+620|commerćant|shopkeeper|Business
+621|virer, mettre à la porte|to fire|Business
+622|se mettre à son compte|to set up one's business|Business
+623|démissionner|to resign|Business
+624|en sureffectif|overstaffed|Business
+625|contrat à durée indéterminée|permanent contract|Business
+626|équipe de nuit|night shift|Business
+627|service, département|department|Business
+628|refondre, réorganiser|to revamp|Business
+629|concurrent|competitor|Business
+630|fusion|merger|Business
+631|faire faillite|to go bankrupt, bust|Business
+632|embaucher|to hire, take on|Business
+633|fiche de paie|pay slip|Business
+634|faire des heures supplémentaires|work overtime|Business
+635|mettre la clé sous la porte|to go out of business, close up shop|Business
+636|fait main|handmade|Business
+637|artisan|craftsman|Business
+638|ouvrier qualifié|skilled worker|Business
+639|entreprise|business|Business
+640|plein emploi|full employment|Business
+641|un maire|a mayor|Politique
+642|homme politique|politician|Politique
+643|s'assurer une majorité|to secure a majority|Politique
+644|déclencher des élections anticipées|to call an early election|Politique
+645|(UK) les éléctions législatives|(UK) the general election|Politique
+646|(US) les éléctions présidentielles|(US) the general election|Politique
+647|les grands partis|mainstream parties|Politique
+648|premier ministre|Prime Minister|Politique
+649|le ministre de l'économie et des finances|(UK) the Chancellor of the Exchequer|Politique
+650|remaniement ministériel|Cabinet reshuffle|Politique
+651|ministre des Affaires étrangères|Foreign minister|Politique
+652|pronncer un discours|to deliver a speech|Politique
+653|une dictature|a dictatorship|Politique
+654|museler, baîlloner|to gag, muzzle|Politique
+655|société civile|civil society|Politique
+656|(UK) syndicats|(UK) trade unions|Politique
+657|(US) syndicats|(US) labor unions|Politique
+658|élections de mi-mandat|mid-term elections|Politique
+659|minisre "frondeur"|rebellious minister|Politique
+660|démissionner|resign, step down|Politique
+661|officier en tant que|to serve as|Politique
+662|opposer son veto à (qqch)|to veto (sthg)|Politique
+663|un projet de loi|a bill|Politique
+664|un groupe de réflexion|a think-tank|Politique
+665|(UK) un ministre|(UK) a Cabinet member|Politique
+666|un directeur de cabinet|a chief of staff|Politique
+667|impôts locaux|local taxes|Politique
+668|cote de popularité|approval ratings|Politique
+669|se présenter à une éléction|to run for election [office]|Politique
+670|prêter serment|to take the oath, be sworn in|Politique
+671|rendre homage à (qqn)|to pay tribute to (sone)|Politique
+672|dirigeant|political leader|Politique
+673|élection truquée|rigged election|Politique
+674|les allocations|social benefits|Politique
+675|revaloriser|to scale up, raise, increase|Politique
+676|l'allocation familliale|the family allowance|Politique
+677|le gel de la production|the production freeze|Politique
+678|un bras de fer|a tug of war|Politique
+679|chancelant|teetering, wavering|Politique
+680|tailored|customized|Politique
+681|rote memorisation|repetition-based learning|Politique
+682|impoverished|cash-strapped|Politique
+683|unencumbered|unburdened|Politique
+684|inquisitiveness|interest, curiosity|Politique
+685|substantially|notably, significatly|Politique
+686|authoritarian|dictatorial, strict|Politique
+687|minimally supervised|lightly monitored|Politique
+688|crime, criminality|la criminalité|${CR}
+689|the crime rate|le taux de criminalité|${CR}
+690|organized crime|la criminalité organisée, le grand banditisme|${CR}
+691|white-collar crime|la criminalité en col blanc|${CR}
+692|juvenile delinquency|la délinquance juvénile|${CR}
+693|a juvenile delinquent, a young offender|un délinquant juvénile|${CR}
+694|petty crime|la petite délinquance|${CR}
+695|a crime, a felony|un crime|${CR}
+696|to commit a crime|commettre un crime|${CR}
+697|a criminal, a felon|un criminel|${CR}
+698|a criminal record|un casier judiciaire|${CR}
+699|an offense|un délit, une infraction|${CR}
+700|a misdemeanour|une infraction (GB), un délit (US)|${CR}
+701|an offender|un délinquant, un contrevenant|${CR}
+702|a repeat offender, a recidivist|un récidiviste|${CR}
+703|murder|le meurtre|${CR}
+704|a murderer|un meurtrier|${CR}
+705|manslaughter|homicide|${CR}
+706|a serial killer|un tueur en série|${CR}
+707|theft|le vol|${CR}
+708|a thief, a robber|un voleur|${CR}
+709|to steal a watch|voler une montre|${CR}
+710|to rob sb of sth|voler qch à qn|${CR}
+711|rape|le viol|${CR}
+712|armed robbery|vol à main armée|${CR}
+713|a burglary|un cambriolage|${CR}
+714|to mug sb, to attack sb|agresser qn|${CR}
+715|money-laundering|le blanchiment d’argent|${CR}
+716|to break a law|enfreindre une loi|${CR}
+717|lawful / unlawful|légal / illégal|${CR}
+718|a lawbreaker|un délinquant, une personne qui enfreint la loi|${CR}
+719|wrongdoing|des méfaits|${CR}
+720|a wrongdoer|un malfaiteur|${CR}
+721|to flout the law|se moquer de la loi|${CR}
+722|a no-go area|une zone de non-droit|${CR}
+723|to obey the law|obéir à la loi|${CR}
+724|to abide by the law|respecter la loi|${CR}
+725|a law-abiding citizen|un citoyen respectueux des lois|${CR}
+726|the justice system|la justice|${CR}
+727|a court, a court of law|un tribunal|${CR}
+728|a judge|un juge|${CR}
+729|a lawyer, a barrister (GB), an attorney (US)|un avocat|${CR}
+730|the jury|le jury|${CR}
+731|to prosecute sb|poursuivre qn (en justice)|${CR}
+732|to bring a lawsuit against sb, sue sb|intenter un procès à qn, engager des poursuites contre qn|${CR}
+733|the prosecutor|le procureur|${CR}
+734|a suspect|un suspect|${CR}
+735|to charge sb with murder|accuser, inculper qn de meurtre|${CR}
+736|a charge|une accusation, un chef d’inculpation|${CR}
+737|to confess to a crime|avouer un crime|${CR}
+738|to confess to embezzling money|avouer avoir détourné de l’argent|${CR}
+739|confession|un aveu|${CR}
+740|a defendant|un accusé, un prévenu|${CR}
+741|a witness / an eye witness|un témoin / un témoin oculaire|${CR}
+742|a case|une affaire|${CR}
+743|a trial|un procès|${CR}
+744|to be tried, stand trial|passer en jugement, être jugé|${CR}
+745|to await trial|être en attente de jugement|${CR}
+746|the principle that a defendant is innocent until proven guilty|la présomption d’innocence|${CR}
+747|forensic evidence|preuves relevées lors d’une expertise|${CR}
+748|a culprit|un coupable|${CR}
+749|to acquit sb|acquitter qn|${CR}
+750|acquittal|acquittement|${CR}
+751|to find sb guilty|condamner qn, reconnaître qn coupable|${CR}
+752|to convict sb of rape, murder|reconnaître qn coupable de viol, meurtre|${CR}
+753|a conviction|une condamnation|${CR}
+754|a fine|une amende|${CR}
+755|to fine sb for sth|condamner qn à une amende pour qch|${CR}
+756|to be sentenced to five years’ imprisonment, five years in jail|être condamné à cinq ans de prison|${CR}
+757|a death sentence|une condamnation à mort|${CR}
+758|a life sentence|une condamnation à perpétuité|${CR}
+759|a suspended sentence|une condamnation avec sursis|${CR}
+760|to be sent to prison|être mis en prison|${CR}
+761|to incarcerate, to imprison sb|incarcérer qn|${CR}
+762|the incarceration rate|le taux d’incarcération|${CR}
+763|a cell|une cellule|${CR}
+764|a prisoner, an inmate, a detainee|un détenu, un prisonnier|${CR}
+765|a prison officer, a prison warder (GB)|un gardien de prison|${CR}
+766|a high-security prison|une prison de haute sécurité|${CR}
+767|solitary confinement|l’isolement carcéral|${CR}
+768|prison overcrowding|la surpopulation carcérale|${CR}
+769|a miscarriage of justice|une erreur judiciaire|${CR}
+770|to fabricate evidence|fabriquer des preuves|${CR}
+771|to be proved innocent, to be exonerated|être innocenté|${CR}
+772|to free, to release a prisoner|libérer, relâcher un prisonnier|${CR}
+773|to pardon a convict|grâcier un condamné|${CR}
+774|to parole sb|mettre qn en liberté conditionnelle|${CR}
+775|to be on parole|être en liberté conditionnelle|${CR}
+776|to report to the police|se présenter à la police|${CR}
+777|an electronic tag|un bracelet de surveillance électronique|${CR}
+778|contre la peine de mort|against the death penalty|${PC}
+779|le meurtre|murder|${PC}
+780|être coupable de meurtre|to be guilty of murder|${PC}
+781|un meurtrier|a murderer|${PC}
+782|le viol|rape|${PC}
+783|un violeur|a rapist|${PC}
+784|un délinquant sexuel|a sex offender|${PC}
+785|un récidiviste|a repeat offender, a recidivist|${PC}
+786|la culpabilité|guilt|${PC}
+787|appliquer la loi du talion|to demand an eye for an eye|${PC}
+788|déclarer qn coupable, condamner qn|to convict sb, to find sb guilty|${PC}
+789|une condamnation|a conviction|${PC}
+790|une condamnation à tort|a wrongful conviction|${PC}
+791|condamner qn à mort|to sentence sb to death|${PC}
+792|condamner qn à 25 ans de prison|to sentence sb to 25 years imprisonment|${PC}
+793|un coupable|a culprit|${PC}
+794|dissuader qn de faire qch|to deter sb from doing sth|${PC}
+795|avoir un effet dissuasif|to act as a deterrent|${PC}
+796|une condamnation à mort|a death sentence|${PC}
+797|une condamnation à perpétuité|a life sentence|${PC}
+798|perpétuité sans possibilité de remise de peine|life without parole|${PC}
+799|mettre qn en prison|to jail, imprison sb|${PC}
+800|un détenu, un prisonnier|a prisoner, an inmate, a detainee|${PC}
+801|être dans les couloirs de la mort|to be on death row|${PC}
+802|une cellule|a cell|${PC}
+803|un avocat|a lawyer|${PC}
+804|un appel|an appeal|${PC}
+805|faire appel d’une décision|to appeal against a decision|${PC}
+806|casser une décision (de justice)|to quash, to overturn a decision|${PC}
+807|commuer une condamnation à mort en réclusion à perpétuité|to commute a death sentence to life|${PC}
+808|surseoir à l’exécution d’un condamné|to grant a convict a stay of execution, a reprieve|${PC}
+809|gracier un criminel|to pardon a criminal|${PC}
+810|executer un condamné|to execute a convict|${PC}
+811|mettre qn à mort|to put sb to death|${PC}
+812|un bourreau|an executioner|${PC}
+813|une piqûre mortelle|a lethal injection|${PC}
+814|faire une piqûre mortelle à qn|to inject sb with a lethal substance|${PC}
+815|pendre qn|to hang sb|${PC}
+816|la guillotine|the guillotine|${PC}
+817|guillotiner qn|to guillotine sb|${PC}
+818|électrocuter qn|to electrocute sb|${PC}
+819|la chaise électrique|the electric chair|${PC}
+820|lapider qn, tuer qn à coups de pierre|to stone sb to death|${PC}
+821|abolir|to abolish, to do away with|${PC}
+822|rétablir la peine de mort|to reinstate, to reintroduce, to restore the death penalty|${PC}
+823|appliquer la peine de mort|to apply, to enforce the death penalty|${PC}
+824|une erreur judiciaire|a miscarriage of justice|${PC}
+825|les tests ADN|DNA analysis, DNA testing|${PC}
+826|innocenter qn|to prove sb innocent, to exonerate sb|${PC}
+827|être innocenté grâce à l’ADN|to be cleared by DNA|${PC}
+828|un problème controversé|a controversial, contentious issue|${PC}
+829|un problème sensible, qui suscite de vives réactions|a hot-button issue|${PC}
+830|partisans de la peine de mort|advocates, supporters, proponents of the death penalty|${PC}
+831|opposants à, adversaires de la peine de mort|critics, opponents of the death penalty|${PC}
+832|être contre la peine de mort|to oppose the death penalty, to be opposed to the death penalty|${PC}
+833|un abolitionniste|an abolitionist|${PC}
+834|du sexe féminin|female|${CF}
+835|le statut, la position, la place des femmes dans la société|women’s status in society|${CF}
+836|le déséquilibre entre les sexes|gender imbalance|${CF}
+837|les inégalités entre les hommes et les femmes|gender inequalities|${CF}
+838|la guerre entre les sexes|gender war|${CF}
+839|un phallocrate, un machiste|a (male) chauvinist|${CF}
+840|le machisme|machismo|${CF}
+841|la misogynie|misogyny|${CF}
+842|un misogyne|a misogynist|${CF}
+843|le sexisme|sexism|${CF}
+844|des préjugés sexistes|sexist prejudices|${CF}
+845|le féminisme|feminism|${CF}
+846|le mouvement des femmes, le mouvement pour les droits de la femme|the Women’s Movement, the women’s rights movement|${CF}
+847|s’émanciper|to become emancipated|${CF}
+848|rendre les femmes autonomes|to empower women|${CF}
+849|un mariage forcé / arrangé|a forced marriage / an arranged marriage|${CF}
+850|un mariage blanc|a sham marriage, a marriage of convenience|${CF}
+851|une dot|a dowry|${CF}
+852|la polygamie|polygamy|${CF}
+853|polygame|polygamous|${CF}
+854|l’excision|female circumcision, female genital mutilation|${CF}
+855|une femme battue|a battered wife|${CF}
+856|violence conjugale, familiale|domestic violence|${CF}
+857|être privé du droit de vote|to be disenfranchised|${CF}
+858|le droit de vote|the right to vote|${CF}
+859|tomber enceinte|to become pregnant|${CF}
+860|les femmes en âge d’avoir des enfants|women of childbearing age|${CF}
+861|la pilule (contraceptive)|the (contraceptive) pill|${CF}
+862|prendre la pilule|to be on the pill|${CF}
+863|partir en congé maternité|to go on maternity leave|${CF}
+864|congé parental|parental leave, career break|${CF}
+865|s’occuper de ses enfants|to look after one’s children|${CF}
+866|élever un enfant|to bring up, to raise a child|${CF}
+867|l’éducation des enfants|the upbringing of children, child rearing, parenting|${CF}
+868|des enfants d’âge scolaire|school-age children|${CF}
+869|une femme au foyer, une ménagère|a housewife|${CF}
+870|faire le ménage|to do the housework|${CF}
+871|faire la cuisine / la lessive / la vaisselle / les courses|to do the cooking / washing / washing-up / shopping|${CF}
+872|passer l’aspirateur|to do the vacuuming / to vacuum|${CF}
+873|les appareils ménagers|domestic appliances|${CF}
+874|les tâches ménagères|household chores|${CF}
+875|être confronté à un dilemme|to be faced with a dilemma|${CF}
+876|une crèche, une garderie|a nursery, a day-care centre (GB), a child-care center|${CF}
+877|une nounou, une nourrice|a nanny|${CF}
+878|une assistante maternelle, une nourrice|a childminder|${CF}
+879|trouver un équilibre entre travail et famille|to balance, combine work and family|${CF}
+880|jongler pour concilier carrière et famille|to juggle a career and a family|${CF}
+881|concilier|to reconcile|${CF}
+882|les responsabilités familiales|family responsibilities|${CF}
+883|être dépendant financièrement de qn|to be financially dependent on sb|${CF}
+884|gagner sa vie|to earn a living, to make a living|${CF}
+885|subvenir aux besoins de sa famille|to support one’s family|${CF}
+886|nourrir ses enfants|to feed one’s children|${CF}
+887|être celui qui fait vivre la famille|to be the breadwinner|${CF}
+888|c’est elle qui fait vivre sa famille|she is the family wage earner|${CF}
+889|faire bouillir la marmite|to bring home the bacon|${CF}
+890|la main d’œuvre féminine|female labour|${CF}
+891|l’emploi des femmes|female employment|${CF}
+892|les femmes représentent x % de la main d’œuvre|women make up x% of the workforce|${CF}
+893|faire carrière|to have a career|${CF}
+894|être une femme qui travaille|to be a working woman|${CF}
+895|une femme qui fait carrière|a career woman|${CF}
+896|travailler à temps partiel OU à mi-temps|to work part time|${CF}
+897|travailler à plein temps|to work full time|${CF}
+898|l’égalité des salaires|equal pay|${CF}
+899|le différentiel de salaire entre les sexes|the gender pay gap, the gender wage gap|${CF}
+900|nommer qn à un poste|to appoint sb to a post|${CF}
+901|être en concurrence avec les hommes|to compete with men|${CF}
+902|un poste à responsabilités|a responsible job|${CF}
+903|un poste de haut niveau|a top job|${CF}
+904|un emploi subalterne|a menial job|${CF}
+905|réussir sa carrière|to have a successful career|${CF}
+906|les obstacles à la promotion des femmes|barriers to female advancement|${CF}
+907|une chasse gardée pour les hommes|a male preserve|${CF}
+908|introduire une discrimination contre qn|to discriminate against sb|${CF}
+909|être victime de discrimination|to be discriminated against|${CF}
+910|le harcèlement|harassment|${CF}
+911|le harcèlement sexuel|sexual harassment|${CF}
+912|la parité|parity|${CF}
+913|sous-représenté|under-represented|${CF}
+914|instaurer des quotas|to introduce quotas|${CF}
+915|l’instauration de quotas|the introduction of quotas|${CF}
+916|la discrimination positive|affirmative action|${CF}
+917|l’égalité des chances|equal opportunity|${CF}
+918|égalitaire|egalitarian|${CF}
+919|l’égalitarisme|egalitarianism|${CF}
+920|atteindre l’égalité avec les hommes|to achieve equality with men|${CF}
+921|une maladie|a disease, an illness, a sickness|${HI}
+922|souffrir d’une maladie|to suffer from a disease|${HI}
+923|mourir d’une maladie|to die of, to die from a disease|${HI}
+924|une maladie grave|a serious disease|${HI}
+925|être dans un état critique|to be critically ill|${HI}
+926|un microbe, un germe|a germ|${HI}
+927|des bactéries|bacteria|${HI}
+928|attraper la grippe|to go down with the flu|${HI}
+929|un danger pour la santé|a health hazard|${HI}
+930|un fléau|a curse, a plague, a scourge|${HI}
+931|le cancer du poumon / du sein / de la peau|lung / breast / skin cancer|${HI}
+932|cancérigène|carcinogenic|${HI}
+933|le diabète|diabetes|${HI}
+934|l’hépatite|hepatitis|${HI}
+935|la malaria, le paludisme|malaria|${HI}
+936|une maladie sexuellement transmissible (MST)|a sexually transmitted disease (STD), a venereal disease (VD)|${HI}
+937|avoir une maladie cardiaque|to have a heart condition|${HI}
+938|la maladie d’Alzheimer / de Parkison|Alzeihemer’s / Parkinson’s disease|${HI}
+939|une maladie neurodégénérative|a neurodegenerative disease|${HI}
+940|un symptôme|a symptom|${HI}
+941|affecter, toucher un pays|to affect a country|${HI}
+942|toucher 20 % de la population|to afflict 20% of the population|${HI}
+943|la zone la plus durement touchée|the hardest-hit area|${HI}
+944|éradiquer|to eradicate|${HI}
+945|endémique|endemic|${HI}
+946|le SIDA|AIDS, acquired immune deficiency syndrome|${HI}
+947|contracter le SIDA|to develop AIDS|${HI}
+948|un malade du SIDA|an AIDS sufferer, an AIDS patient|${HI}
+949|séropositif|HIV-positive|${HI}
+950|faire passer un test de dépistage du SIDA à qn|to screen sb for AIDS|${HI}
+951|un centre de dépistage du SIDA|an HIV screening centre|${HI}
+952|un test de dépistage|a screening test|${HI}
+953|le sperme|sperm, semen|${HI}
+954|avoir des rapports non protégés|to have unprotected sex|${HI}
+955|un préservatif|a condom|${HI}
+956|l’abstinence|abstinence|${HI}
+957|la fidélité|faithfulness|${HI}
+958|une aiguille|a needle|${HI}
+959|les anti-rétroviraux|anti-retroviral drugs|${HI}
+960|la trithérapie|triple therapy, combination therapy|${HI}
+961|un traitement médical|medical treatment|${HI}
+962|secret médical|medical confidentiality|${HI}
+963|une infection nosocomiale|a hospital-acquired infection|${HI}
+964|MRSA, un staphylocoque résistant à la méthicilline|MRSA|${HI}
+965|une bactérie multi-résistante|a superbug|${HI}
+966|prescrire|to prescribe|${HI}
+967|une ordonnance|a prescription|${HI}
+968|un médecin généraliste|a general practitioner, a GP|${HI}
+969|un chirurgien|a surgeon|${HI}
+970|se faire opérer|to have surgery, go through surgery, have an operation|${HI}
+971|diagnostiquer|to diagnose|${HI}
+972|un diagnostic|a diagnosis|${HI}
+973|guérir un patient|to cure a patient|${HI}
+974|un remède|a remedy, a cure|${HI}
+975|un médicament|a drug, a medicine, a medication|${HI}
+976|un médicament générique|a generic drug|${HI}
+977|un antalgique, analgésique|a painkiller|${HI}
+978|un effet secondaire|a side effect|${HI}
+979|une piqûre|an injection, a shot|${HI}
+980|prendre des antibiotiques|to be on antibiotics|${HI}
+981|un laboratoire pharmaceutique|a pharmaceutical laboratory|${HI}
+982|des produits pharmaceutiques|pharmaceuticals|${HI}
+983|un vaccin|a vaccine|${HI}
+984|vacciner|to vaccinate|${HI}
+985|une campagne de vaccination|a vaccination campaign|${HI}
+986|se rétablir, guérir|to recover|${HI}
+987|guérison, rétablissement|recovery|${HI}
+988|rechuter|to relapse|${HI}
+989|une alerte à l’intoxication alimentaire|a food scare|${HI}
+990|un péril sanitaire, une alerte sanitaire|a health scare|${HI}
+991|épizootie|an epizootic disease|${HI}
+992|la fièvre aphteuse|food-and-mouth disease|${HI}
+993|l’encéphalopathie bovine spongiforme, l’ESB|bovine spongiform encephalopathy, BSE|${HI}
+994|la maladie de la vache folle|mad-cow disease|${HI}
+995|la maladie de Creutzfeldt Jacob (MCJ)|Creutzfeldt-Jacob Disease (CJD)|${HI}
+996|une maladie à prions|a prion disease|${HI}
+997|la dioxine|dioxin|${HI}
+998|le scandale du poulet à la dioxine|the dioxin chicken scandal|${HI}
+999|la traçabilité|traceability|${HI}
+1000|les soins médicaux / les services de santé|health care|${HI}
+1001|la santé publique|public health|${HI}
+1002|les responsables de la santé publique|public health officials|${HI}
+1003|les autorités sanitaires|the health authorities|${HI}
+1004|le système de santé|the health care system, the health system|${HI}
+1005|les services de santé|health services|${HI}
+1006|les dépenses de santé|health expenses|${HI}
+
+// === NOUVEAU CHAPITRE : INDIVIDUAL FREEDOM ===
+1007|la liberté d’expression, de parole|freedom of speech, free speech, freedom of expression|${IF}
+1008|la liberté de la presse|freedom of the press|${IF}
+1009|une presse libre|a free press|${IF}
+1010|la liberté de culte, la liberté religieuse|freedom of worship|${IF}
+1011|le pouvoir arbitraire|arbitrary power|${IF}
+1012|une lettre de cachet|a lettre de cachet|${IF}
+1013|empiéter sur les droits des gens|to infringe (on) people’s rights|${IF}
+1014|une atteinte, une entorse aux droits de qn|an infringement on sb’s rights|${IF}
+1015|empiéter sur les libertés fondamentales|to encroach on basic liberties|${IF}
+1016|un empiètement de l’État|an encroachment of the state|${IF}
+1017|restreindre, limiter la liberté d’expression|to restrict free speech|${IF}
+1018|rogner sur les libertés individuelles|to erode individual freedoms|${IF}
+1019|détenir un suspect sans l’inculper|to detain a suspect without charge|${IF}
+1020|être détenu sans être inculpé|to be held without charge|${IF}
+1021|placer qn en détention provisoire|to remand sb in custody|${IF}
+1022|emprisonner qn|to jail sb, to imprison sb|${IF}
+1023|le droit de vote|the right to vote|${IF}
+1024|les droits fondamentaux|basic rights|${IF}
+1025|les libertés fondamentales / individuelles|basic / individual liberties|${IF}
+1026|être garanti par la constitution|to be enshrined in the constitution|${IF}
+1027|les libertés civiques|civil liberties|${IF}
+1028|censurer|to censor|${IF}
+1029|la censure|censorship|${IF}
+1030|la surveillance|surveillance|${IF}
+1031|une société surveillée|a surveillance society|${IF}
+1032|un État policier|a police state|${IF}
+1033|la police, les forces de l’ordre|the police force|${IF}
+1034|interpeller et fouiller|to stop and search|${IF}
+1035|arrêter qn|to arrest sb|${IF}
+1036|(le droit à) la vie privée, l’intimité|privacy|${IF}
+1037|la vie privée de qn|sb’s private life|${IF}
+1038|violer la vie privée de qn|to breach, to violate sb’s privacy|${IF}
+1039|une atteinte à, une violation de la vie privée|a breach of privacy, an invasion of privacy, a privacy violation|${IF}
+1040|porter atteinte à la vie privée de qn|to intrude upon sb’s privacy|${IF}
+1041|la vidéosurveillance|video surveillance|${IF}
+1042|télévision en circuit fermé|CCTV, closed circuit television|${IF}
+1043|enregistrer|to record|${IF}
+1044|suivre de près les mouvements de qn|to monitor sb’s movements|${IF}
+1045|avoir qn à l’œil|to keep tabs on sb, to keep an eye on sb|${IF}
+1046|espionner qn|to spy on sb, to snoop on sb|${IF}
+1047|suivre la trace de qn|to track sb|${IF}
+1048|surveiller une frontière / le courrier de qn|to monitor a border / sb’s mail|${IF}
+1049|un micro caché|a bug|${IF}
+1050|placer des micros dans une pièce|to bug a room|${IF}
+1051|mettre qn sur écoute téléphonique|to (wire)tap sb’s phone|${IF}
+1052|les écoutes téléphoniques|phone tapping, wiretapping|${IF}
+1053|écouter les conversations téléphoniques de qn|to eavesdrop on sb’s phone conversations|${IF}
+1054|mettre son nez dans la vie personnelle de qn|to pry into sb’s personal life|${IF}
+1055|des données, des informations|data|${IF}
+1056|des informations personnelles|personal data, personal details|${IF}
+1057|les coordonnées de qn|sb’s contact details|${IF}
+1058|des données biométriques|biometric data|${IF}
+1059|les informations bancaires de qn|sb’s banking details|${IF}
+1060|un dossier médical / scolaire|a medical record / a school record|${IF}
+1061|un casier judiciaire|a criminal record|${IF}
+1062|un relevé de téléphone|a telephone bill|${IF}
+1063|un relevé bancaire|a bank statement|${IF}
+1064|rassembler, recueillir des informations|to collect, gather data|${IF}
+1065|glaner des informations|to glean infomation|${IF}
+1066|enregistrer, conserver des données|to record, store, retain data|${IF}
+1067|rechercher et extraire des données|to retrieve data|${IF}
+1068|ficher un suspect|to put a suspect on file|${IF}
+1069|une base de données|a database|${IF}
+1070|une base de données ADN|a DNA database|${IF}
+1071|une empreinte génétique|a DNA print, genetic print|${IF}
+1072|subir un test ADN|to be DNA-swabbed|${IF}
+1073|tirer la sonnette d’alarme|to sound, to ring the alarm bell|${IF}
+1074|dénoncer qn|to blow the whistle on sb|${IF}
+1075|un lanceur d’alerte|a whistleblower|${IF}
+1076|la drogue|drugs|${IDR}
+1077|une drogue douce / dure|a soft / hard drug|${IDR}
+1078|les stupéfiants|narcotics|${IDR}
+1079|la dope, la came|dope|${IDR}
+1080|le cannabis|cannabis|${IDR}
+1081|la marijuana|marijuana|${IDR}
+1082|les amphétamines|amphetamines|${IDR}
+1083|l’héroïne|heroin|${IDR}
+1084|inhaler, sniffer de la coke|to sniff, snort cocaine|${IDR}
+1085|une aiguille|a needle|${IDR}
+1086|une seringue|a syringe|${IDR}
+1087|une drogue à usage récréatif occasionnel|a recreational drug|${IDR}
+1088|une drogue de synthèse|a designer drug, a synthetic drug|${IDR}
+1089|un psychotrope|a psychoactive, psychotropic substance|${IDR}
+1090|se banaliser|to become commonplace|${IDR}
+1091|la banalisation du crack|the spreading use of crack|${IDR}
+1092|un fléau|a plague, a curse, a scourge|${IDR}
+1093|le trafic de drogue|drug-trafficking|${IDR}
+1094|un trafiquant de drogue, un narcotrafiquant|a drug trafficker|${IDR}
+1095|un réseau de trafiquants|a drug ring, a drug cartel|${IDR}
+1096|un baron de la drogue|a drug baron, a drug lord, a drug kingpin|${IDR}
+1097|un passeur, une mule|a mule|${IDR}
+1098|faire entrer de la drogue dans un pays|to smuggle drugs into a country|${IDR}
+1099|un revendeur de drogues|a drug pusher, a drug peddler, a drug dealer|${IDR}
+1100|la criminalité due à la drogue|drug-related crime|${IDR}
+1101|consommer, prendre de la drogue, se droguer|to use drugs, to take drugs|${IDR}
+1102|la consommation de drogue|drug use|${IDR}
+1103|la toxicomanie|drug abuse, substance abuse, drug addiction|${IDR}
+1104|un usager de drogue, un drogué|a drug-user|${IDR}
+1105|un consommateur occasionnel / un gros consommateur|a casual / heavy user|${IDR}
+1106|un consommateur de cannabis|a cannabis user|${IDR}
+1107|être accro à qch|to be addicted to sth|${IDR}
+1108|être accro à la cocaïne|to be hooked on cocaine|${IDR}
+1109|avoir besoin d’une dose|to need a fix|${IDR}
+1110|avoir un besoin maladif de qch|to crave sth|${IDR}
+1111|l’accoutumance (à qch), la dépendance|addiction (to sth), dependency (on sth)|${IDR}
+1112|qui crée une accoutumance, addictogène|addictive|${IDR}
+1113|un drogué, un toxicomane|a drug addict, a drug abuser|${IDR}
+1114|un drogué, un camé, un toxico|a junkie, a druggie|${IDR}
+1115|faire une overdose, une surdose|to take an overdose, to OD|${IDR}
+1116|essayer l’héroïne|to experiment with heroin|${IDR}
+1117|un joint|a joint, a reefer|${IDR}
+1118|avaler, inhaler la fumée|to inhale smoke|${IDR}
+1119|planer, être défoncé|to be high, to be spaced out|${IDR}
+1120|la prévention|prevention|${IDR}
+1121|sensibiliser le public aux dangers du cannabis|to make people aware of the dangers of cannabis|${IDR}
+1122|une campagne de sensibilisation|an awareness(-raising) campaign|${IDR}
+1123|légaliser la consommation de cannabis|to legalize cannabis use|${IDR}
+1124|dépénaliser, décriminaliser|to decriminalize|${IDR}
+1125|les arguments pour et contre la légalisation|the pros and cons of legalization|${IDR}
+1126|le traitement|treatment|${IDR}
+1127|demander à être soigné|to seek treatment|${IDR}
+1128|décrocher|to kick the habit|${IDR}
+1129|un centre de désintoxication|a rehabilitation center|${IDR}
+1130|entreprendre une cure de désintoxication|to go into rehab|${IDR}
+1131|désintoxication|detoxification, detoxication|${IDR}
+1132|un centre de désintoxication|a detoxi(fi)cation centre|${IDR}
+1133|une cure de désintoxication|a detoxi(fi)cation programme|${IDR}
+1134|être en cure de désintoxication|to be in detox|${IDR}
+1135|éliminer qch progressivement|to phase sth out|${IDR}
+1136|les symptômes de (l’état de) manque|withdrawal symptoms|${IDR}
+1137|la méthadone|methadone|${IDR}
+1138|rechuter|to relapse|${IDR}
+1139|réprimer la consommation de drogues|to clamp down on, to crack down on drug abuse|${IDR}
+1140|la répression|repression|${IDR}
+1141|pénaliser la possession de drogues|to impose penalties for drug possession|${IDR}
+1142|une amende|a fine|${IDR}
+1143|condamner qn à une amende|to fine sb|${IDR}
+1144|le responsable de la lutte contre la drogue|the drug czar, the drug tsar|${IDR}
+1145|un virus|a virus|${CO}
+1146|muter|to mutate|${CO}
+1147|contagieux, infectieux|contagious, catching, infectious|${CO}
+1148|contaminer|to contaminate|${CO}
+1149|être contaminé par un virus|to be infected with a virus|${CO}
+1150|un symptôme|a symptom|${CO}
+1151|asymptomatique|asymptomatic|${CO}
+1152|tousser|to cough|${CO}
+1153|éternuer|to sneeze|${CO}
+1154|inhaler des goutelettes en suspension dans l’air|to inhale airborne droplets|${CO}
+1155|avoir le nez qui coule|to have a runny nose|${CO}
+1156|avoir mal à la gorge|to have a sore throat|${CO}
+1157|fatigue|tiredness, fatigue|${CO}
+1158|mal de tête|headache|${CO}
+1159|la diarrhée|diarrhoea, diarrhea (US)|${CO}
+1160|avoir du mal à respirer|to have difficulty / trouble breathing|${CO}
+1161|être essouflé, avoir le souffle court|to be short of breath, out of breath|${CO}
+1162|avoir de la température|to have a temperature|${CO}
+1163|avoir de la fièvre|to have a fever, to run a fever|${CO}
+1164|être testé positif (pour le virus)|to test positive (for the virus)|${CO}
+1165|être porteur d’un virus|to carry a virus|${CO}
+1166|un porteur|a carrier|${CO}
+1167|le système immunitaire|the immune system|${CO}
+1168|immunité de groupe|herd immunity|${CO}
+1169|la peste|plague|${CO}
+1170|le choléra|cholera|${CO}
+1171|la variole|smallpox|${CO}
+1172|un fléau|a curse, a plague, a scourge|${CO}
+1173|une catastrophe|a disaster|${CO}
+1174|inattendu|unexpected|${CO}
+1175|imprévisible|unpredictable, unforeseeable|${CO}
+1176|se propager|to spread|${CO}
+1177|la propagation d’un virus|the spread of a virus|${CO}
+1178|une épidemie|an epidemic|${CO}
+1179|une pandémie|a pandemic|${CO}
+1180|un épicentre|an epicentre|${CO}
+1181|éclater, se déclarer|to break out|${CO}
+1182|le début d’une épidémie|an outbreak|${CO}
+1183|l’ampleur, l’étendue de l’épidémie|the scope, the extent of the epidemic|${CO}
+1184|affecter, toucher un pays|to affect a country|${CO}
+1185|la zone la plus durement touchée|the hardest-hit area|${CO}
+1186|endiguer une épidémie|to stem, halt an outbreak|${CO}
+1187|enrayer une épidémie|to check an epidemic|${CO}
+1188|éradiquer|to eradicate|${CO}
+1189|endémique|endemic|${CO}
+1190|la grippe|flu, influenza|${CO}
+1191|syndrome respiratoire aigu sévère (SRAS)|Severe Acute Respiratory Syndrome (SARS)|${CO}
+1192|le virus de la grippe A|the H1N1 virus|${CO}
+1193|la grippe porcine|swine flu, pig flu, H1N1 flu|${CO}
+1194|la grippe aviaire|bird flu, avian flu, avian influenza H5N1|${CO}
+1195|une souche de grippe|a flu strain|${CO}
+1196|un cas de grippe aviaire|a case of avian flu|${CO}
+1197|un foyer de grippe aviaire|an outbreak of avian flu|${CO}
+1198|mortel|lethal|${CO}
+1199|létalité|lethality|${CO}
+1200|le nombre de victimes|the death toll|${CO}
+1201|les personnes âgées|the elderly|${CO}
+1202|une maison de retraite|a care home, a nursing home, a retirement home|${CO}
+1203|hospitaliser qn|to hospitalize sb|${CO}
+1204|être en réanimation|to be in intensive care|${CO}
+1205|un ventilateur|a ventilator|${CO}
+1206|les (personnels) soignants|health workers, medical staff|${CO}
+1207|une infirmière|a nurse|${CO}
+1208|une aide-soignante|an assistant nurse|${CO}
+1209|un héros|a hero|${CO}
+1210|applaudir|to clap|${CO}
+1211|être solidaire de qn|show solidarity with sb|${CO}
+1212|lutter contre le virus|to combat the virus|${CO}
+1213|état d’urgence|state of emergency|${CO}
+1214|aplatir la courbe|to flatten the curve|${CO}
+1215|les gestes barrières|preventative measures, health precautions|${CO}
+1216|un mouchoir en papier|a tissue|${CO}
+1217|la distanciation sociale|social distancing|${CO}
+1218|se laver les mains|to wash your hands|${CO}
+1219|saluer qn|to greet sb|${CO}
+1220|se serrer la main|to shake hands|${CO}
+1221|faire la bise à qn|to kiss sb|${CO}
+1222|porter un masque|to wear a (face) mask|${CO}
+1223|fournitures médicales|medical supplies|${CO}
+1224|stocker|to stockpile|${CO}
+1225|ne plus avoir d’équipements de protection|to run out of protective equipment|${CO}
+1226|manquer de masques|to be short of masks|${CO}
+1227|une pénurie|a shortage|${CO}
+1228|des gants|gloves|${CO}
+1229|s’isoler|to self-isolate|${CO}
+1230|l’eau de javel|bleach|${CO}
+1231|désinfecter les lieux publics|to disinfect public areas|${CO}
+1232|antibiotiques|antibiotics|${CO}
+1233|un vaccin|a vaccine|${CO}
+1234|se faire vacciner|to get vaccinated|${CO}
+1235|mettre qn en quarantaine|to quarantine sb|${CO}
+1236|mettre / être en quarantaine|to put / be under quarantine|${CO}
+1237|interdiction de voyager|travel ban|${CO}
+1238|limitations de déplacement|travel restrictions|${CO}
+1239|ordonner le confinement|to issue a stay-at-home order|${CO}
+1240|confinement|lockdown, confinement|${CO}
+1241|télétravailler|to work from / at home|${CO}
+1242|une visioconférence|a videoconference|${CO}
 1243|mettre qn en chômage partiel|to furlough sb|${CO}
 1244|achats (sous l’emprise de la) panique|panic buying|${CO}
 
@@ -31,12 +1274,404 @@ const RAW_EN = `
 8002|devenir|become / became / become|${VI}
 8003|commencer|begin / began / begun|${VI}
 8004|plier, se courber|bend / bent / bent|${VI}
+8005|parier|bet / bet / bet|${VI}
+8006|lier, relier|bind / bound / bound|${VI}
+8007|mordre|bite / bit / bitten|${VI}
+8008|saigner|bleed / bled / bled|${VI}
+8009|souffler|blow / blew / blown|${VI}
+8010|casser|break / broke / broken|${VI}
+8011|apporter|bring / brought / brought|${VI}
+8012|construire|build / built / built|${VI}
+8013|brûler|burn / burnt / burnt|${VI}
+8014|éclater|burst / burst / burst|${VI}
+8015|acheter|buy / bought / bought|${VI}
+8016|jeter (un sort), distribuer des rôles|cast / cast / cast|${VI}
+8017|attraper|catch / caught / caught|${VI}
+8018|choisir|choose / chose / chosen|${VI}
+8019|s’accrocher, adhérer|cling / clung / clung|${VI}
+8020|venir|come / came / come|${VI}
+8021|coûter|cost / cost / cost|${VI}
+8022|ramper, grimper|creep / crept / crept|${VI}
+8023|couper|cut / cut / cut|${VI}
+8024|distribuer|deal / dealt / dealt|${VI}
+8025|creuser|dig / dug / dug|${VI}
+8026|plonger|dive / dived / dived/dove(USA)|${VI}
+8027|faire|do / did / done|${VI}
+8028|dessiner|draw / drew / drawn|${VI}
+8029|rêver|dream / dreamt / dreamt|${VI}
+8030|boire|drink / drank / drunk|${VI}
+8031|conduire|drive / drove / driven|${VI}
+8032|manger|eat / ate / eaten|${VI}
+8033|tomber|fall / fell / fallen|${VI}
+8034|nourrir|feed / fed / fed|${VI}
+8035|sentir, éprouver|feel / felt / felt|${VI}
+8036|se battre, combattre|fight / fought / fought|${VI}
+8037|trouver|find / found / found|${VI}
+8038|s’enfuir|flee / fled / fled|${VI}
+8039|voler (avion)|fly / flew / flown|${VI}
+8040|interdire|forbid / forbade / forbidden|${VI}
+8041|oublier|forget / forgot / forgotten|${VI}
+8042|pardonner|forgive / forgave / forgiven|${VI}
+8043|geler|freeze / froze / frozen|${VI}
+8044|obtenir|get / got / got|${VI}
+8045|donner|give / gave / given|${VI}
+8046|aller|go / went / gone|${VI}
+8047|grandir|grow / grew / grown|${VI}
+8048|pendre, tenir, accrocher|hang / hung / hung|${VI}
+8049|avoir|have / had / had|${VI}
+8050|entendre|hear / heard / heard|${VI}
+8051|(se) cacher|hide / hid / hidden|${VI}
+8052|frapper, atteindre, toucher|hit / hit / hit|${VI}
+8053|tenir|hold / held / held|${VI}
+8054|blesser|hurt / hurt / hurt|${VI}
+8055|garder|keep / kept / kept|${VI}
+8056|s’agenouiller|kneel / knelt / knelt|${VI}
+8057|savoir, connaître|know / knew / known|${VI}
+8058|mener|lead / led / led|${VI}
+8059|s’appuyer|lean / leant / leant|${VI}
+8060|apprendre|learn / learnt / learnt|${VI}
+8061|laisser, quitter|leave / left / left|${VI}
+8062|prêter|lend / lent / lent|${VI}
+8063|permettre|let / let / let|${VI}
+8064|allumer|light / lit / lit|${VI}
+8065|perdre|lose / lost / lost|${VI}
+8066|fabriquer, faire|make / made / made|${VI}
+8067|signifier, vouloir dire|mean / meant / meant|${VI}
+8068|(se) rencontrer|meet / met / met|${VI}
+8069|mettre|put / put / put|${VI}
+8070|cesser (de)|quit / quit / quit|${VI}
+8071|lire|read / read / read|${VI}
+8072|chevaucher|ride / rode / ridden|${VI}
+8G73|sonner|ring / rang / rung|${VI}
+8074|s’élever, se lever|rise / rose / risen|${VI}
+8075|courir|run / ran / run|${VI}
+8076|scier|saw / sawed / sawn|${VI}
+8077|dire|say / said / said|${VI}
+8078|voir|see / saw / seen|${VI}
+8079|chercher|seek / sought / sought|${VI}
+8080|vendre|sell / sold / sold|${VI}
+8081|envoyer|send / sent / sent|${VI}
+8082|fixer|set / set / set|${VI}
+8083|secouer|shake / shook / shaken|${VI}
+8084|briller|shine / shone / shone|${VI}
+8085|tirer/tuer par balle/filmer|shoot / shot / shot|${VI}
+8086|montrer|show / showed / shown|${VI}
+8087|rétrécir|shrink / shrank / shrunk|${VI}
+8088|fermer|shut / shut / shut|${VI}
+8089|chanter|sing / sang / sung|${VI}
+8090|couler|sink / sank / sunk|${VI}
+8091|être assis|sit / sat / sat|${VI}
+8092|dormir|sleep / slept / slept|${VI}
+8093|glisser|slide / slid / slid|${VI}
+8094|sentir|smell / smelt / smelt|${VI}
+8095|parler|speak / spoke / spoken|${VI}
+8096|accélérer|speed / sped / sped|${VI}
+8097|dépenser|spend / spent / spent|${VI}
+8098|fendre|split / split / split|${VI}
+8099|gâcher|spoil / spoilt / spoilt|${VI}
+8100|répandre|spread / spread / spread|${VI}
+8101|jaillir, bondir|spring / sprang / sprung|${VI}
+8102|être debout|stand / stood / stood|${VI}
+8103|voler quelque chose, dérober|steal / stole / stolen|${VI}
+8104|coller|stick / stuck / stuck|${VI}
+8105|piquer|sting / stung / stung|${VI}
+8106|frapper|strike / struck / struck|${VI}
+8107|jurer|swear / swore / sworn|${VI}
+8108|enfler|swell / swelled / swollen|${VI}
+8109|nager|swim / swam / swum|${VI}
+8110|se balancer|swing / swung / swung|${VI}
+8111|prendre|take / took / taken|${VI}
+8112|enseigner|teach / taught / taught|${VI}
+8113|déchirer|tear / tore / torn|${VI}
+8114|dire, raconter|tell / told / told|${VI}
+8115|penser|think / thought / thought|${VI}
+8116|jeter|throw / threw / thrown|${VI}
+8117|comprendre|understand / understood / understood|${VI}
+8118|bouleverser|upset / upset / upset|${VI}
+8119|(se) réveiller|wake / woke / woken|${VI}
+8120|porter (des vêtements)|wear / wore / worn|${VI}
+8121|mouiller|wet / wet / wet|${VI}
+8122|gagner|win / won / won|${VI}
+8123|enrouler|wind / wound / wound|${VI}
 8124|(se) retirer, retirer de l’argent|withdraw / withdrew / withdrawn|${VI}
 8125|écrire|write / wrote / written|${VI}
+
 `.trim();
 
 const RAW_PHY = `
 10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un référentiel galiléen ?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifié : tout objet isolé ou pseudo-isolé est soit immobile, soit en mouvement rectiligne uniforme dans ce référentiel.|${PM}
+10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Tout référentiel [...] rapport à un référentiel galiléen est galiléen.|<b>en translation rectiligne et uniforme par</b>|${PM}
+10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Si la translation de R' par rapport à R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
+10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<b>n’est jamais galiléen.</b>|${PM}
+10004|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg">|<img src="images/paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg">|${PM}
+10005|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-d77f3722e5a6b97cce4097de2c62d12a8d197b00.jpg">|<img src="images/paste-94c2181742a47574197e38c01becf17fe5e14056.jpg"><br>Avec O' un point fixe de R'|${PM}
+10006|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-cb677b12d3a6508a44f3f9b492a67a4a71774fca.jpg">|Cas de R' en translation par rapport à R : $\\vec{f}_{ic}=\\vec{0}$ donc $P(\\vec{f}_{ic})=0$<br><br>Cas de R' en rotation par rapport à R : $P(\\vec{f}_{ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ) \\cdot \\vec{v}_{M/R'}=0$<br><br>TPC : $\\frac{dE_{c/R'}}{dt}=\\sum_i P(\\vec{F}_i)_{/R'} + P(\\vec{f}_{ie})_{/R'}$|${PM}
+10007|<span style="color: rgb(255, 170, 0);"><u><b>(MAG)</b></u></span> Justifier que $\\vec{f}_{ic}$ ne travaille pas et exprimer le TEC dans R' non gal.|En translation : $\\vec{f}_{ic}=\\vec{0}$ donc $P(\\vec{f}_{ic})=0$.<br>En rotation : $\\vec{f}_{ic} \\perp \\vec{v}_{M/R'}$ donc $P(\\vec{f}_{ic}) = 0$.<br><br>Csq : $W(\\vec{f}_{ic}) = 0$.<br>TEC dans R' : $\\Delta E_{c/R'}=\\sum W(\\vec{F}_i)_{/R'} + W(\\vec{f}_{ie})_{/R'}$|${PM}
+10008|<b><span style="color: rgb(255, 170, 0);">(MAG)</span></b><span style="color: rgb(0, 85, 255);"> Sur l'exemple d'un manège avec sièges suspendus à des chaînes :</span><br><img src="images/paste-a933d76dcbeef4f62508fa32bd894eade0892cea.jpg"><br><img src="images/paste-162500c424b12166f0f9f7c8345e074e19a42672.jpg">|<img src="images/paste-7d986b294569fcc662beb25c0076c304bcdbb34e.jpg">|${PM}
+10009|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>Exprimer la force d'inertie de Coriolis et la force d'inertie d'entraînement dans le cas d'une rotation de R' par rapport à R.|$\\vec{f}_{ic} = -2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'}$<br>$\\vec{f}_{ie} = m \\Omega^2 \\overrightarrow{HM}$ (force centrifuge)|${PM}
+10010|<span style="color: rgb(0, 255, 0);">(INC)</span> TEM dans R' repère non galiléen.|Si $\\vec{f}_{ie}$ est conservative, elle dérive d'une énergie potentielle $E_{p,fie}$ telle que $W(\\vec{f}_{ie})=-\\Delta E_{p,fie}$.<br><br>Alors TEM : $\\Delta E_{m/R'}=\\sum W(\\vec{F}_{i,NC/R'})$<br><br>Si $\\vec{f}_{ie}$ est non conservative :<br>TEM : $\\Delta E_{m/R'}=\\sum W(\\vec{F}_{i,NC/R'})+W(\\vec{f}_{ie/R'})$|${PM}
+10011|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un référentiel R' non galiléen.|Loi de composition des accélérations : $m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + m\\vec{a}_c + m\\vec{a}_e$<br>PFD dans R : $m \\vec{a}_{M/R} = \\sum \\vec{F}_i$<br>Donc : $m \\vec{a}_{M/R'} = \\sum \\vec{F}_i - m \\vec{a}_c - m \\vec{a}_e$<br>Avec $\\vec{f}_{ie} = - m \\vec{a}_e$ et $\\vec{f}_{ic} = - m \\vec{a}_c$.|${PM}
+10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $\\vec{f}_{ic}$ et $\\vec{f}_{ie}$ dans le cas d'une translation de R' par rapport à R.|$\\vec{f}_{ic} = \\vec{0}$ (car $\\vec{a}_c = \\vec{0}$)<br>$\\vec{f}_{ie} = -m(\\vec{a}(O')_{/R})$|${PM}
+10013|<span style="color: rgb(255, 170, 0);">(LPB)</span><span style="color: rgb(0, 255, 0);"> </span>Comment est défini réellement le poids ?|Le poids est défini expérimentalement comme la force opposée à la tension d'un fil tenant un corps à l'équilibre dans le référentiel terrestre.<br>$\\vec{P} = \\vec{F}_G + \\vec{f}_{ie}$ (Attraction gravitaire + force d'inertie d'entraînement axifuge).|${PM3}
+10014|<span style="color: rgb(0, 255, 0);">(LPB)</span> Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique.|L'existence des marées (deux hautes et deux basses par jour) dues aux forces d'inertie différentielles.<br><img src="images/Capture d’écran 2023-10-07 161935.png">|${PM3}
+10015|<span style="color: rgb(0, 255, 0);">(TS) </span>Donner des exemples qui mettent en évidence le caractère non galiléen du référentiel terrestre.|- La déviation vers l'Est (chute libre).<br>- Le sens de rotation des cyclones.<br>- Le pendule de Foucault.|${PM3}
+10016|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire de rotation du référentiel terrestre par rapport au référentiel géocentrique.|$\\omega = \\frac{2\\pi}{86164} \\approx 7.3 \\times 10^{-5} \\text{ rad/s}$ (Jour sidéral).|${PM3}
+10017|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire caractérisant la translation elliptique du référentiel géocentrique par rapport au référentiel de Copernic (Héliocentrique).|$\\Omega \\approx 2.0 \\times 10^{-7} \\text{ rad/s}$ (Révolution annuelle).|${PM3}
+10018|<span style="color: rgb(255, 170, 0);">(TS) </span>Quelles forces fera apparaître le PFD dans $R_T$ non galiléen ?|- Le poids $\\vec{P}$ (qui contient déjà $\\vec{f}_{ie}$).<br>- La force d'inertie de Coriolis $\\vec{f}_{ic}$.<br>- Les autres forces physiques appliquées.|${PM3}
+10019|(B.K.)<img src="images/paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg"><br>Qu'est-ce qui est à l'origine de cette déviation vers l'Est ? Dans l'hémisphère Sud, le sens change-t-il ?|C'est la force d'inertie de Coriolis.<br>La déviation se fait également vers l'Est dans l'hémisphère Sud (pour une chute libre).|${PM3}
+10020|<span style="color: rgb(0, 255, 0);">(enzo m) </span><u>Contexte : Appli 3 Pendule de Foucault</u><br>On a : $\\begin{cases} \\ddot x +\\omega_0^2 x \\approx 2\\Omega \\sin(\\lambda)\\dot y & (1) \\\\ \\ddot y +\\omega_0^2 y \\approx -2\\Omega \\sin(\\lambda)\\dot x & (2) \\end{cases}$<br>Quelle est la <b>méthode</b> pour obtenir une équation différentielle selon $\\underline{Z} = x+jy$ ?|Méthode : faire $(1) + j(2)$.<br>Cela donne : $\\underline{\\ddot Z} + \\omega_0^2\\underline{Z} = -2j\\Omega \\sin(\\lambda)\\underline{\\dot Z}$.<br>On résout pour $\\underline{Z}$ puis on identifie $x=Re(\\underline{Z})$ et $y=Im(\\underline{Z})$.|${PM3}
+10021|<span style="color: rgb(0, 255, 0);">(enzo m)</span> <u>Contexte : Appli 3 Pendule de Foucault</u><br><img src="images/paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg" width="495"><br>Solutions : $\\begin{cases} x(t) = x_0\\cos(\\omega_0t)\\cos(-\\Omega \\sin\\lambda t)\\\\ y(t) = x_0\\cos(\\omega_0t)\\sin(-\\Omega \\sin\\lambda t)\\end{cases}$<br>Expression de la période T de rotation du plan d'oscillation et de la période propre $T_0$ ?|$T = \\left|\\frac{2\\pi}{\\Omega \\sin\\lambda}\\right|$ (rotation du plan)<br>$T_0 = \\frac{2\\pi}{\\omega_0}$ (oscillations propres)|${PM3}
+10022|<img src="images/anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad SABRI</span> <img src="images/paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Expression de $\\vec{g}$ en fonction de la latitude $\\lambda$. Où est-il max/min ?|$\\vec{g} = \\vec{G}_{Newton} + \\vec{a}_e = -G \\frac{m_T}{R_T^2} \\vec{e}_{z_{P}} + \\Omega^2 R_T \\cos(\\lambda) \\vec{e}_{HM}$<br>En projetant :<br>$\\vec{g} \\approx -\\left( \\frac{Gm_T}{R_T^2} - \\Omega^2 R_T \\cos^2(\\lambda) \\right) \\vec{e}_{z_P} - (\\Omega^2 R_T \\cos\\lambda \\sin\\lambda) \\vec{e}_{y_P}$<br><br>$g$ est max aux pôles (car distance au centre min et effet centrifuge nul) et min à l'équateur.|${PM3}
+10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre ?|La force d'inertie d'entraînement (différentielle) due au fait que le référentiel géocentrique est en translation elliptique (non galiléen) par rapport au référentiel héliocentrique.|${PM3}
+10024|(B.K.) Quelle force d'inertie explique le sens de rotation des cyclones ? Dans quel sens tournent-ils ?|Force d'inertie de Coriolis.<br>Hémisphère Nord : Sens anti-horaire (trigonométrique).<br>Hémisphère Sud : Sens horaire.<br><img src="images/paste-71cc5358ce5c51ce02d2e1d9d2e63300dba80598.jpg">|${PM3}
+10025|Valeur de $\\vec{v}_{g}$ (vitesse de glissement) dans le cas de non glissement (adhérence).|On a : $\\vec{v}_{g} = \\vec{0}$|${PM4}
+10026|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le non-glissement (statique) :|$\\|\\vec{T}\\| \\le f_s \\|\\vec{N}\\|$ avec $f_s$ le coefficient de frottement statique.|${PM4}
+10027|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le glissement (dynamique) :|$\\|\\vec{T}\\| = f_d \\|\\vec{N}\\|$ avec $f_d$ le coefficient de frottement dynamique.|${PM4}
+10028|<span style="color: rgb(0, 255, 0);">(Yannick) </span>Les forces de frottement sont-elles conservatives ?|Non, elles ne sont généralement pas conservatives (dissipation d'énergie).|${PM4}
+10029|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Quel peut être le signe de la puissance d'une force de contact ?|Généralement négatif (freinage/dissipation).<br>Parfois positif si la force de frottement est motrice (ex: tapis roulant entraînant un colis, roue motrice sans glissement).<br><img src="images/paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg" width="265">|${PM4}
+10030|Que dire sur la puissance totale des forces de contact inter-solides ?|$P(\\vec{R}_{1\\to 2}) + P(\\vec{R}_{2\\to 1}) = \\vec{T} \\cdot \\vec{v}_g \\le 0$<br>Elle est nulle si adhérence ($\\vec{v}_g=\\vec{0}$) ou glissement sans frottement ($\\vec{T}=\\vec{0}$).<br>Elle est négative s'il y a glissement avec frottement (dissipation).|${PM4}
+10031|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Décomposition de la réaction de contact $\\vec{R}_{1\\to 2}$.|$\\vec{R} = \\vec{N} + \\vec{T}$<br>- $\\vec{N}$ : Réaction normale (orthogonale au plan tangent).<br>- $\\vec{T}$ : Réaction tangentielle ou force de frottement (dans le plan tangent).|${PM4}
+10032|<span style="color: rgb(255, 170, 0);">(INC)</span> Qu’est-ce que <b>la vitesse de glissement</b> ?|$\\vec{v_g}_{2/1} = \\vec{v}(I_2) - \\vec{v}(I_1)$<br>C'est la vitesse relative du point de contact du solide 2 par rapport au point de contact du solide 1.|${PM4}
+10033|<span style="color: rgb(0, 255, 0);">(Ali H.)</span> <img src="images/paste-15e45e099744e7f013048018acad29cb70089200.jpg">|<img src="images/paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg"><br><img src="images/paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg">|${PM4}
+10034|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><img src="images/paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg">|<img src="images/paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg">|${PM4}
+10035|(INC) Énoncer le principe de Curie.|Les effets produits doivent avoir au moins les mêmes éléments de symétrie que les causes qui les produisent.|${PEM1}
+10036|(INC) Dimensions et unités des densités de charge (volumique, surfacique, linéique).|Volumique $\\rho$ : $C.m^{-3}$<br>Surfacique $\\sigma$ : $C.m^{-2}$<br>Linéique $\\lambda$ : $C.m^{-1}$|${PEM1}
+10037|<span style="color: rgb(0, 255, 0);">(INC)</span> Charge élémentaire dq pour un volume, une surface, une ligne ?|$dq = \\rho d\\tau$<br>$dq = \\sigma dS$<br>$dq = \\lambda dl$|${PEM1}
+10038|<span style="color: rgb(255, 170, 0);">(INC)</span> Condition pour qu'une distribution soit invariante par rotation autour d'un axe $\\Delta$ ?|La densité de charge ne doit dépendre que de la distance à l'axe (en cylindrique) ou au centre (en sphérique), pas de l'angle de rotation.|${PEM1}
+10039|<span style="color: rgb(255, 170, 0);">(INC)</span> Condition pour qu'une distribution soit invariante par translation suivant $\\Delta$ ?|La densité de charge $\\rho(M)$ est indépendante de la coordonnée le long de l'axe $\\Delta$ (ex: $\\rho$ ne dépend pas de $z$).|${PEM1}
+10040|<span style="color: rgb(0, 255, 0);">(INC)</span> Choix de coordonnées selon les invariances.|Translation $\\to$ Cartésiennes ou Cylindriques.<br>Rotation $\\to$ Cylindriques ou Sphériques.|${PEM1}
+10041|<span style="color: rgb(255, 170, 0);">(INC)</span> Propriété du champ $\\vec{E}$ par rapport à un plan d’antisymétrie de la charge.|Si $\\Pi$ est un plan d'antisymétrie des charges ($\\rho(M') = -\\rho(M)$), alors $\\vec{E}$ appartient au plan $\\Pi$ pour tout point de ce plan. (Le vecteur champ est symétrique par rapport au plan).|${PEM1}
+10042|(INC) Propriété du champ $\\vec{E}$ par rapport à un plan de symétrie de la charge.|Si $\\Pi$ est un plan de symétrie des charges ($\\rho(M') = \\rho(M)$), alors $\\vec{E}$ est contenu dans ce plan pour tout point appartenant à ce plan.|${PEM1}
+10043|(INC) Orientation du champ $\\vec{E}$ sur un plan de symétrie.|Le champ $\\vec{E}$ en un point M d'un plan de symétrie est contenu dans ce plan.|${PEM1}
+10044|<span style="color: rgb(255, 170, 0);">(INC)</span> Continuité de $\\vec{E}$ pour une distribution volumique ?|$\\vec{E}$ est défini et continu en tout point de l'espace.|${PEM1}
+10045|<span style="color: rgb(255, 170, 0);">(INC)</span> Continuité de $\\vec{E}$ pour une distribution surfacique ?|$\\vec{E}$ subit une discontinuité à la traversée de la surface chargée : $\\vec{E}_2 - \\vec{E}_1 = \\frac{\\sigma}{\\varepsilon_0}\\vec{n}_{1\\to 2}$.|${PEM1}
+10046|(INC) Continuité de $\\vec{E}$ pour des charges ponctuelles ?|$\\vec{E}$ n'est pas défini (diverge) sur les charges ponctuelles.|${PEM1}
+10047|<span style="color: rgb(0, 255, 0);">(INC)</span> Définition d'un plan de symétrie des charges.|Plan tel que la distribution reste inchangée par symétrie miroir (\\% charge identique image).|${PEM1}
+10048|<span style="color: rgb(0, 255, 0);">(INC)</span> Définition d'un plan d'antisymétrie des charges.|Plan tel que la charge en un point image est l'opposée de la charge au point objet (\\% charge inversée).|${PEM1}
+10049|<span style="color: rgb(255, 170, 0);">(INC)</span> Loi de Coulomb.|$\\vec{F}_{1 \\to 2} = \\frac{1}{4 \\pi \\epsilon _0} \\frac{q_1 q_2}{r^2} \\vec{u}_{1 \\to 2}$|${PEM1}
+10050|<span style="color: rgb(0, 255, 0);">(INC)</span> Comment est décrite la répartition des charges ?|Par une fonction scalaire densité ($\\rho, \\sigma, \\lambda$) dépendant des coordonnées.|${PEM1}
+10051|<span style="color: rgb(255, 170, 0);">(INC)</span> Principe de superposition pour le champ électrique.|Le champ total est la somme vectorielle des champs créés par chaque charge élémentaire.|${PEM1}
+10052|(INC) Force totale sur une charge due à un ensemble de charges.|Somme vectorielle des forces individuelles (superposition).|${PEM1}
+10053|<span style="color: rgb(0, 255, 0);">(INC)</span> Champ électrostatique créé par une charge ponctuelle q en S au point P.|$\\vec{E}(P) = \\frac{q}{4\\pi\\epsilon_0} \\frac{\\overrightarrow{SP}}{SP^3}$|${PEM1}
+10054|<span style="color: rgb(255, 170, 0);">(INC)</span> Direction de $\\vec{E}$ si $q > 0$.|Divergent (s'éloigne de la charge).|${PEM1}
+10055|<span style="color: rgb(255, 170, 0);">(INC)</span> Direction de $\\vec{E}$ si $q < 0$.|Convergent (se dirige vers la charge).|${PEM1}
+10056|<span style="color: rgb(0, 255, 0);">(INC)</span> Interaction entre charges de signes opposés.|Attractive.|${PEM1}
+10057|<span style="color: rgb(0, 255, 0);">(INC)</span> Interaction entre charges de même signe.|Répulsive.|${PEM1}
+10058|<span style="color: rgb(0, 255, 0);">(INC)</span> Nom de $\\epsilon_0$.|Permittivité diélectrique du vide.|${PEM1}
+10059|<span style="color: rgb(0, 255, 0);">(INC)</span> Quand considérer une distribution comme surfacique ?|Quand l'épaisseur est négligeable devant les autres dimensions et la distance d'observation.|${PEM1}
+10060|<span style="color: rgb(0, 255, 0);">(INC)</span> Quand considérer une distribution comme linéique ?|Quand la section transverse est négligeable.|${PEM1}
+10061|<img src="images/paste-de3005b71b3b26e6cbfb7bc7e487288057e44965.jpg">|<img src="images/paste-4e5b864acd14971b75ee4cfa20de066c86177c58.jpg">|${PEM1}
+10062|<img src="images/paste-036e005e8785d46a0d662e7e88fa5533bfe23c98.jpg">|<img src="images/paste-75d5efd4f249c0e30de16f6754802351a3a09811.jpg">|${PEM1}
+10063|<span style="color: rgb(0, 255, 0);">(A.R)</span> Circulation du champ $\\vec E$ de A à B ? Dépendance au chemin ?|$C_{A \\to B} = \\int_A^B \\vec E \\cdot d\\vec{l} = V_A - V_B$.<br>Indépendante du chemin suivi (car $\\vec{E}$ dérive d'un potentiel).|${PEM2}
+10064|<span style="color: rgb(0, 255, 0);">(A.R)</span> Circulation du champ électrostatique sur un contour fermé ?|Nulle. $\\oint \\vec E \\cdot d\\vec{l} = 0$ (car champ conservatif).|${PEM2}
+10065|<span style="color: rgb(255, 170, 0);">(A.R)</span> Potentiel électrostatique créé par une charge $q$ à distance $r$ ?|$V(r) = \\frac{q}{4\\pi\\varepsilon_0 r}$ (si V nul à l'infini).|${PEM2}
+10066|<span style="color: rgb(0, 255, 0);">(A.R)</span> Forme des surfaces équipotentielles d'une charge ponctuelle ?|Sphères centrées sur la charge.|${PEM2}
+10067|<span style="color: rgb(255, 170, 0);">(A.R)</span> Évolution du potentiel avec la distance ? Orientation du champ ?|Le champ $\\vec{E}$ est dirigé vers les potentiels décroissants.|${PEM2}
+10068|<span style="color: rgb(255, 170, 0);">(A.R)</span> Potentiel créé par plusieurs charges ponctuelles ?|$V(P) = \\sum_i \\frac{q_i}{4\\pi\\varepsilon_0 r_i}$ (additivité du potentiel).|${PEM2}
+10069|<span style="color: rgb(0, 255, 0);">(L.L)</span> Expression du gradient et lien avec la différentielle.|$\\vec{grad}f = \\frac{\\partial f}{\\partial x}\\vec{u}_x + \\frac{\\partial f}{\\partial y}\\vec{u}_y + \\frac{\\partial f}{\\partial z}\\vec{u}_z$<br>$df = \\vec{grad}f \\cdot d\\vec{l}$|${PEM2}
+10070|<span style="color: rgb(0, 255, 0);">(L.L)</span> $\\vec{grad}f$ est normal à quoi ?|Aux surfaces iso-f (surfaces où $f = cste$).|${PEM2}
+10071|<span style="color: rgb(255, 170, 0);">(L.L)</span> Relation intégrale champ-potentiel.|$\\int_A^B \\vec{E} \\cdot d\\vec{l} = V_A - V_B$|${PEM2}
+10072|<span style="color: rgb(255, 170, 0);">(L.L)</span> Relation locale champ-potentiel.|$\\vec{E} = -\\vec{grad} V$|${PEM2}
+10073|<span style="color: rgb(255, 170, 0);">(L.L)</span> Retrouver $\\vec{E} = -\\vec{grad}V$ via la relation intégrale.|$dV = -\\vec{E}\\cdot d\\vec{l}$. Or $dV = \\vec{grad}V \\cdot d\\vec{l}$. Donc $\\vec{E} = -\\vec{grad}V$.|${PEM2}
+10074|<span style="color: rgb(255, 170, 0);">(C.J)</span> Énergie potentielle électrostatique $E_p$ d'une charge $q_0$ dans un potentiel $V$.|$E_p = q_0 V$|${PEM2}
+10075|<span style="color: rgb(255, 170, 0);">(C.J)</span> Lien entre force et énergie potentielle.|$\\vec{F} = q_0\\vec{E} = -q_0\\vec{grad}V = -\\vec{grad}E_p$|${PEM2}
+10076|<span style="color: rgb(0, 255, 0);">(C.J)</span> Unité du potentiel ?|Volt (V)|${PEM2}
+10077|<span style="color: rgb(0, 255, 0);">(C.J)</span> Unité du champ $\\vec{E}$ ?|Volt par mètre ($V.m^{-1}$) ou Newton par Coulomb ($N.C^{-1}$).|${PEM2}
+10078|<span style="color: rgb(0, 255, 0);">(C.J)</span> Sens des lignes de champ ?|Vers les potentiels décroissants.|${PEM2}
+10079|<span style="color: rgb(0, 255, 0);">(C.J)</span> Orientation lignes de champ / équipotentielles ?|Orthogonales.|${PEM2}
+10080|<span style="color: rgb(0, 255, 0);">(T.B.)</span> 5 étapes du théorème de Gauss.|1. Symétries et invariances (direction et variables de $\\vec{E}$).<br>2. Choix de la surface de Gauss (Sg) fermée.<br>3. Calcul du flux $\\Phi = \\oiint \\vec{E}\\cdot d\\vec{S}$.<br>4. Calcul de $Q_{int}$.<br>5. Résolution $\\Phi = Q_{int}/\\varepsilon_0$.|${PE345}
+10081|<span style="color: rgb(255, 170, 0);">Ylan</span> Flux de $\\vec{E}$ d'une charge ponctuelle à travers une sphère centrée.|$\\Phi = \\frac{q}{\\varepsilon_0}$|${PE345}
+10082|<span style="color: rgb(255, 170, 0);">Ylan</span> Champ $\\vec{E}$ d'un fil infini chargé ($\\lambda$).|$\\vec{E}(r) = \\frac{\\lambda}{2\\pi \\varepsilon_0 r} \\vec{u}_r$|${PE345}
+10083|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Orientation de $d\\vec{S}$ pour Gauss ?|Vers l'extérieur de la surface fermée.|${PE345}
+10084|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Énoncé du théorème de Gauss.|Le flux du champ électrique à travers une surface fermée est proportionnel à la charge totale contenue à l'intérieur : $\\oiint_S \\vec{E} \\cdot d\\vec{S} = \\frac{Q_{int}}{\\varepsilon_0}$.|${PE345}
+10085|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Champ créé par un cylindre infini uniformément chargé en volume ($\\rho, R$).|$r < R : \\vec{E} = \\frac{\\rho r}{2\\varepsilon_0}\\vec{u}_r$<br>$r > R : \\vec{E} = \\frac{\\rho R^2}{2\\varepsilon_0 r}\\vec{u}_r$|${PE345}
+10086|<span style="color: rgb(255, 170, 0);">(Arthur)</span> Champ $\\vec{E}$ à l'extérieur d'un condensateur plan idéal ?|Nul ($\\|\\vec{E}\\| = 0$).|${PE345}
+10087|<span style="color: rgb(255, 170, 0);">(Manuel)</span> Norme du champ $\\vec{E}$ entre les armatures d'un condensateur plan ?|$E = \\frac{\\sigma}{\\varepsilon_0} = \\frac{U}{e}$|${PE345}
+10088|<span style="color: rgb(0, 255, 0);">Victor</span> Champ créé par un plan infini chargé ($\\sigma$).|$\\vec{E} = \\pm \\frac{\\sigma}{2\\varepsilon_0} \\vec{u}_z$ (divergent si $\\sigma > 0$).|${PE345}
+10089|<span style="color: rgb(255, 170, 0);">(Ilyass)</span> Forme du champ pour un condensateur cylindrique infini.|Radial : $\\vec{E}(M) = E(r)\\vec{u}_r$.|${PE345}
+10090|<span style="color: rgb(255, 170, 0);">Victor</span> Champ condensateur plan par superposition.|Somme des champs de deux plans infinis (+$\\sigma$ et -$\\sigma$).<br>Intérieur : champs s'ajoutent $\\to \\sigma/\\varepsilon_0$.<br>Extérieur : champs s'annulent $\\to 0$.|${PE345}
+10091|<span style="color: rgb(255, 170, 0);">Victor</span> Potentiel $V(z)$ dans un condensateur plan ($V(0)=0$).|$V(z) = E \\cdot z = \\frac{\\sigma}{\\varepsilon_0}z$ (variation linéaire).|${PE345}
+10092|<span style="color: rgb(0, 255, 0);">(Océane)</span> Allure des lignes de champ connaissant les équipotentielles.<br><img src="images/im3.jpg">|Perpendiculaires aux équipotentielles et dirigées vers les potentiels faibles.<br><img src="images/im1.jpg">|${PE345}
+10093|<span style="color: rgb(255, 170, 0);">(Daouda)</span> Tube de champ vide de charges : relation $E_1 S_1$ vs $E_2 S_2$.|Conservation du flux : $E_1 S_1 = E_2 S_2$.<br>Si la section diminue, le champ augmente (resserrement des lignes).|${PE345}
+10094|<span style="color: rgb(255, 170, 0);">(Vincent)</span> Tableau analogies gravitation/électrostatique.|<img src="images/paste-8274af54e4ef8158c9147e47a8c1d6073f3a1f0a.jpg">|${PE345}
+10095|<span style="color: rgb(255, 170, 0);">V.Iulian</span> Circulation de $\\vec{B}$ sur un rectangle coupant un solénoïde infini.|Seul le côté intérieur contribue : $C = B \\cdot L$.<br>Théorème d'Ampère $\\to B L = \\mu_0 (n L I) \\to B = \\mu_0 n I$.|${PEM6}
+10096|<span style="color: rgb(255, 170, 0);">V.Iulian</span> Bobines de Helmholtz (courants même sens).|Création d'un champ magnétique quasi-uniforme au centre, entre les deux bobines.|${PEM6}
+10097|<span style="color: rgb(255, 170, 0);">(A.P)</span> Carte de champ de deux fils parallèles.<br><img src="images/20231127_205031.jpg">|Courants de sens opposés (lignes de champ se repoussent, champ intense entre les fils).|${PEM6}
+10098|<span style="color: #cccc00;">(M.W)</span> Symétries Courants / Champ $\\vec{B}$.|Plan de symétrie des courants $\\to$ Plan d'antisymétrie pour $\\vec{B}$ ($\\vec{B} \\perp$ plan).<br>Plan d'antisymétrie des courants $\\to$ Plan de symétrie pour $\\vec{B}$ ($\\vec{B} \\in$ plan).|${PEM6}
+10099|<span style="color: #cccc00;">(M.W)</span> Interpréter le resserrement des lignes de champ.|Champ plus intense.|${PEM6}
+10100|<span style="color: rgb(255, 170, 0);">(BM)</span> Circulation de $\\vec{B}$.|$C = \\oint \\vec{B} \\cdot d\\vec{l}$|${PEM6}
+10101|<span style="color: rgb(255, 170, 0);">(BM)</span> Théorème d'Ampère.|$\\oint_\\Gamma \\vec{B} \\cdot d\\vec{l} = \\mu_0 I_{enlacé}$|${PEM6}
+10102|<span style="color: rgb(255, 170, 0);">(BM)</span> Intensité enlacée (distrib. volumique).|$I = \\iint_S \\vec{j} \\cdot d\\vec{S}$|${PEM6}
+10103|<span style="color: rgb(255, 170, 0);">(BM)</span> Intensité enlacée (filiforme).|Somme algébrique des courants traversant la surface s'appuyant sur le contour (règle main droite).|${PEM6}
+10104|<span style="color: rgb(255, 170, 0);">(BM)</span> Méthode calcul $\\vec{B}$ avec Ampère.|1. Symétries (direction $\\vec{B}$, variables).<br>2. Contour d'Ampère adapté (cercle, rectangle...).<br>3. Calcul circulation $C$.<br>4. Calcul $I_{enlacé}$.<br>5. Égalité.|${PEM6}
+10105|<span style="color: rgb(255, 170, 0);">(BM)</span> Flux de $\\vec{B}$ surface fermée ?|Toujours nul ($\\vec{B}$ est à flux conservatif).|${PEM6}
+10106|<span style="color: rgb(255, 170, 0);">(BM)</span> Ordre de grandeur champ magnétique terrestre.|$50 \\mu T$ ($5 \\cdot 10^{-5} T$).|${PEM6}
+10107|<span style="color: rgb(255, 170, 0);">(BM)</span> Champ à 1 cm d’un fil (10 A).|$\\sim 200 \\mu T$.|${PEM6}
+10108|<span style="color: rgb(0, 255, 0);">(BM)</span> Champ aimant néodyme.|0.1 à 1 Tesla.|${PEM6}
+10109|<span style="color: rgb(0, 255, 0);">(BM)</span> Champ électroaimant labo.|1 à 10 Tesla.|${PEM6}
+10110|<span style="color: rgb(255, 170, 0);">(S.E)</span> Ampère pour un fil infini.|Contour circulaire.<br>$B(r) \\cdot 2\\pi r = \\mu_0 I \\Rightarrow B = \\frac{\\mu_0 I}{2\\pi r}$ (Ortho-radial).|${PEM6}
+10111|<span style="color: rgb(255, 170, 0);">(S.E)</span> Ampère solénoïde infini.|$B = \\mu_0 n I$ à l'intérieur, nul à l'extérieur.|${PEM6}
+10112|<span style="color: rgb(0, 255, 0);">(M.B.T.)</span> Moment magnétique d'une spire plane.|$\\vec{\\mathcal{M}} = I S \\vec{n}$ ($A.m^2$).|${PEM8}
+10113|<span style="color: rgb(0, 255, 0);">(M.B.T)</span> Condition dipôle magnétique.|Dimension de la boucle $a \\ll$ distance d'observation $r$.|${PEM8}
+10114|<span style="color: rgb(0, 255, 0);">(A.R.)</span> Lignes de champ dipôle magnétique.|Similaires à celles d'un aimant droit (boucles sortant du Nord, entrant au Sud).|${PEM8}
+10115|<span style="color: rgb(255, 170, 0);">(A.R)</span> Action champ $\\vec{B}$ sur dipôle.|Uniforme : Couple (tendance à s'aligner).<br>Non-uniforme : Couple + Force (attraction vers champ fort).|${PEM8}
+10116|Énergie potentielle d'un dipôle $\\vec{m}$ dans $\\vec{B}$.|$E_p = -\\vec{m} \\cdot \\vec{B}$|${PEM8}
+10117|Orientation moment magnétique terrestre.|Du pôle Nord géo vers pôle Sud géo (l'inverse du champ).|${PEM8}
+10118|<span style="color: rgb(255, 170, 0);">Ylan</span> Qu'est-ce qu'un doublet de charges ?|Deux charges $+q$ et $-q$ séparées d'une distance $a$.|${PEM9}
+10119|<span style="color: rgb(255, 170, 0);">Ylan</span> Moment dipolaire $\\vec{p}$.|$\\vec{p} = q \\overrightarrow{NP}$ (de la charge - vers la +).|${PEM9}
+10120|<span style="color: rgb(255, 170, 0);">Ylan</span> Approximation dipolaire.|Distance d'observation $r \\gg a$ (taille du dipôle).|${PEM9}
+10121|<span style="color: rgb(255, 170, 0);">Victor</span> Énergie potentielle dipôle électrique dans $\\vec{E}$.|$E_p = -\\vec{p} \\cdot \\vec{E}$|${PEM9}
+10122|<span style="color: rgb(0, 255, 0);">Ylan</span> Décroissance V et E dipôle vs charge ponctuelle ?|Dipôle décroit plus vite.<br>V en $1/r^2$ (vs $1/r$).<br>E en $1/r^3$ (vs $1/r^2$).|${PEM9}
+10123|<span style="color: rgb(255, 170, 0);">Ylan</span> Potentiel dipôle (polaire).|$V(r, \\theta) = \\frac{p \\cos \\theta}{4\\pi \\varepsilon_0 r^2}$|${PEM9}
+10124|<span style="color: rgb(0, 255, 0);">Victor</span> Dipôle rigide ?|Norme $p$ constante.|${PEM9}
+10125|<span style="color: rgb(255, 170, 0);">Victor</span> Force sur dipôle dans champ uniforme ?|Nulle ($\\vec{F} = \\vec{0}$).|${PEM9}
+10126|<span style="color: rgb(255, 170, 0);">Ylan</span> Champ $\\vec{E}$ dipolaire (coord. sphériques).|$\\vec{E} = \\frac{p}{4\\pi\\varepsilon_0 r^3} (2\\cos\\theta \\vec{u}_r + \\sin\\theta \\vec{u}_\\theta)$|${PEM9}
+10127|<span style="color: rgb(255, 170, 0);">Victor</span> Action champ uniforme sur dipôle.|Couple uniquement : $\\vec{\\Gamma} = \\vec{p} \\wedge \\vec{E}$ (tend à aligner $\\vec{p}$ sur $\\vec{E}$).|${PEM9}
+10128|<span style="color: rgb(0, 255, 0);">Ylan</span> Lignes de champ dipôle.<br><img src="images/paste-f94a6b6040693dd84af9aa136b7c19529ad0bf87.jpg">|Boucles partant du + vers le -.|${PEM9}
+10129|<span style="color: rgb(0, 255, 0);">(Yuye)</span> Moment dipolaire moléculaire ?|Séparation permanente des barycentres des charges + et - (ex: H2O).|${PEM9}
+10130|<span style="color: rgb(255, 170, 0);">Victor</span> Action champ non-uniforme sur dipôle.|Couple (orientation) + Force (déplacement vers zones de champ fort).|${PEM9}
+10131|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Force ion-dipôle.|Attractive (en $1/r^3$ ou plus).|${PEM9}
+10132|<span style="color: rgb(0, 255, 0);">(Yuye)</span> Dipôle induit.|Déformation du nuage électronique par un champ externe, créant un moment $\\vec{p}$ temporaire.|${PEM9}
+10133|Couple subi par un dipôle.|$\\vec{\\Gamma} = \\vec{p} \\wedge \\vec{E}$|${PEM9}
+10134|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Forme locale Maxwell.|MG: $div \\vec{E} = \\rho/\\varepsilon_0$<br>MF: $div \\vec{B} = 0$<br>MFa: $\\vec{rot} \\vec{E} = -\\partial_t \\vec{B}$<br>MA: $\\vec{rot} \\vec{B} = \\mu_0 \\vec{j} + \\mu_0\\varepsilon_0 \\partial_t \\vec{E}$|${PEM10}
+10135|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Conservation de la charge (locale).|$div \\vec{j} + \\frac{\\partial \\rho}{\\partial t} = 0$|${PEM10}
+10136|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Démontrer conservation charge 1D.|Bilan sur tranche dx : variation charge = entrant - sortant.|${PEM10}
+10137|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Relation $\\varepsilon_0, \\mu_0, c$.|$\\varepsilon_0 \\mu_0 c^2 = 1$|${PEM10}
+10138|<span style="color: rgb(255, 170, 0);">(Daouda Cisse)</span> Forme intégrale Maxwell-Gauss.|Flux $\\vec{E}$ sortant = $Q_{int}/\\varepsilon_0$.|${PEM10}
+10139|<span style="color: rgb(255, 170, 0);">(Marion Vincent)</span> Forme intégrale Maxwell-Flux.|Flux $\\vec{B}$ à travers surface fermée = 0.|${PEM10}
+10140|<span style="color: rgb(255, 170, 0);">(Marion Vincent)</span> Forme intégrale Maxwell-Faraday.|Circulation $\\vec{E}$ = - dérivée flux magnétique ($e = -d\\Phi/dt$).|${PEM10}
+10141|<span style="color: rgb(255, 170, 0);">(Oceane Arabi)</span> Forme intégrale Maxwell-Ampère.|Circulation $\\vec{B} = \\mu_0 (I_{cond} + I_{déplac})$.|${PEM10}
+10142|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Maxwell dans le vide ($\\rho=0, \\vec{j}=\\vec{0}$).|Couplage symétrique, $\\vec{E}$ et $\\vec{B}$ obéissent à l'équation d'onde.|${PEM10}
+10143|<span style="color: rgb(0, 255, 0);">(Marion Vincent)</span> Maxwell en statique.|Découplage : Électrostatique ($\\vec{rot}\\vec{E}=\\vec{0}$) et Magnétostatique ($div\\vec{B}=0$).|${PEM10}
+10144|<span style="color: rgb(255, 170, 0);">(Daouda Cisse)</span> Équation de d'Alembert pour $\\vec{E}$ dans le vide.|$\\Delta \\vec{E} - \\frac{1}{c^2} \\frac{\\partial^2 \\vec{E}}{\\partial t^2} = \\vec{0}$|${PEM10}
+10145|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Équation de Poisson.|$\\Delta V + \\frac{\\rho}{\\varepsilon_0} = 0$|${PEM10}
+10146|<span style="color: rgb(255, 170, 0);">(Vincent Marion)</span> Équation de Laplace.|$\\Delta V = 0$ (Poisson sans charges).|${PEM10}
+10147|Courant de déplacement.|$\\vec{j}_D = \\varepsilon_0 \\frac{\\partial \\vec{E}}{\\partial t}$|${PEM10}
+10148|Conservation charge stationnaire ?|$div \\vec{j} = 0$ (Loi des nœuds).|${PEM10}
+10149|<span style="color: rgb(255, 170, 0);">(M.A)</span> Opérateurs en complexe (OPP).|$\\vec{\\nabla} \\to -j\\vec{k}$<br>$\\frac{\\partial}{\\partial t} \\to j\\omega$|${PEM11}
+10150|<span style="color: rgb(255, 170, 0);">(M.A)</span> Solution générale d'Alembert 1D.|$f(x,t) = f_1(t - x/c) + f_2(t + x/c)$ (Onde prog + Onde régressive).|${PEM11}
+10151|<span style="color: rgb(255, 170, 0);">(M.A)</span> Interprétation $f(t-x/c)$.|Propagation vers les x croissants sans déformation.|${PEM11}
+10152|<span style="color: rgb(255, 170, 0);">M.W</span> $\\vec{E}$ en $\\cos(\\omega t - kx)$. Direction ?|Vers les +x (signes opposés dans la phase).|${PEM11}
+10153|<span style="color: rgb(255, 170, 0);">(M.A)</span> Structure OPP dans le vide.|Trièdre direct $(\\vec{E}, \\vec{B}, \\vec{k})$.<br>Transverse.<br>$B = E/c$.|${PEM11}
+10154|<span style="color: rgb(255, 170, 0);">(M.A)</span> Relation vectorielle $\\vec{E}, \\vec{B}$ vide.|$\\vec{B} = \\frac{\\vec{u} \\wedge \\vec{E}}{c}$|${PEM11}
+10155|<span style="color: rgb(255, 170, 0);">(M.A)</span> OPPM ?|Onde Plane Progressive Monochromatique (sinusoïdale).|${PEM11}
+10156|<span style="color: rgb(255, 170, 0);">M.W</span> Polarisation circulaire.|Composantes orthog. de même amplitude déphasées de $\\pi/2$.|${PEM11}
+10157|<span style="color: rgb(255, 170, 0);">M.W</span> Polarisation rectiligne.|Direction du champ constante.|${PEM11}
+10158|<span style="color: rgb(255, 170, 0);">(M.A)</span> Expression générale $\\vec{E}$ OPPM.|$\\vec{E}_0 \\cos(\\omega t - \\vec{k}\\cdot\\vec{r} + \\varphi)$|${PEM11}
+10159|<span style="color: rgb(255, 170, 0);">(M.A)</span> Relation de dispersion vide.|$\\omega = ck$ ($k = \\omega/c$).|${PEM11}
+10160|<span style="color: rgb(0, 255, 0);">(BM)</span> d'Alembert 3D vectorielle.|$\\Delta \\vec{E} - \\frac{1}{c^2} \\ddot{\\vec{E}} = \\vec{0}$|${PEM11}
+10161|<span style="color: rgb(0, 255, 0);">(A.P)</span> Vecteur de Poynting.|$\\vec{\\Pi} = \\frac{\\vec{E} \\wedge \\vec{B}}{\\mu_0}$ (Puissance surfacique, $W.m^{-2}$).|${PEM12}
+10162|<span style="color: rgb(0, 255, 0);">(A.P)</span> Poynting OPP vide.|$\\vec{\\Pi} = \\varepsilon_0 c E^2 \\vec{u}$ (colinéaire à la propagation).|${PEM12}
+10163|(V.I) Densité énergie magnétique.|$u_m = \\frac{B^2}{2\\mu_0}$|${PEM12}
+10164|(V.I) Densité énergie EM totale.|$u_{em} = \\frac{\\varepsilon_0 E^2}{2} + \\frac{B^2}{2\\mu_0}$|${PEM12}
+10165|(V.I) Conditions ARQS.|Temps : propagation instantanée ($\\tau \\ll T$).<br>Espace : taille circuit négligeable ($L \\ll \\lambda$).|${PEM12}
+10166|(V.I) Maxwell ARQS magnétique.|On néglige le courant de déplacement dans Maxwell-Ampère ($\\vec{rot}\\vec{B} \\approx \\mu_0 \\vec{j}$).|${PEM12}
+10167|(V.I) Équipartition énergie OPP vide.|$u_e = u_m$ donc $u_{em} = \\varepsilon_0 E^2$.|${PEM12}
+10168|<span style="color: rgb(0, 255, 0);">(E-S)</span> Puissance fournie à une charge.|$\\mathcal{P} = \\vec{F} \\cdot \\vec{v} = q \\vec{E} \\cdot \\vec{v}$ (la force magnétique ne travaille pas).|${PEM12}
+10169|<span style="color: rgb(255, 170, 0);">(V.I)</span> Loi d’Ohm locale.|$\\vec{j} = \\gamma \\vec{E}$|${PEM12}
+10170|(V.I) Conducteur ohmique.|Matériau vérifiant la loi d'Ohm locale (proportionnalité j/E).|${PEM12}
+10171|(V.I) Densité énergie électrique condensateur.|$u_e = \\frac{1}{2}\\varepsilon_0 E^2$|${PEM12}
+10172|<span style="color: rgb(0, 255, 0);">(E-S)</span> Puissance volumique joule.|$\\mathcal{P}_v = \\vec{j} \\cdot \\vec{E} = \\gamma E^2$|${PEM12}
+10173|<span style="color: rgb(0, 255, 0);">(E-S)</span> Bilan d'énergie intégral (Poynting).|Variation énergie interne = Puissance Joule + Flux Poynting entrant.|${PEM12}
+10174|<span style="color: rgb(255, 170, 0);">(E-S)</span> Bilan d'énergie local (Poynting).|$\\frac{\\partial u_{em}}{\\partial t} + div \\vec{\\Pi} = -\\vec{j} \\cdot \\vec{E}$|${PEM12}
+10175|<span style="color: rgb(255, 170, 0);">(O.M)</span> Conditions aux limites cavité conductrice parfaite.|$\\vec{E}_{tg} = \\vec{0}$ sur les parois (Nœuds de champ électrique).|${PEM13}
+10176|<span style="color: rgb(255, 170, 0);">(O.M)</span> Forme onde stationnaire cavité.|Variables séparées : $\\sin(kx)\\cos(\\omega t)$.|${PEM13}
+10177|<span style="color: rgb(255, 170, 0);">(O.M)</span> Quantification cavité.|Condition aux limites impose $k = p \\frac{\\pi}{a}$ (modes propres).|${PEM13}
+10178|<span style="color: rgb(255, 170, 0);">(O.M)</span> Signification entier p (modes).|Nombre de "fuseaux" (demi-longueurs d'onde) dans la cavité.|${PEM13}
+10179|(L.S) Nœuds/Ventres E vs B.|Décalés de $\\lambda/4$. Nœud de E $\\leftrightarrow$ Ventre de B.|${PEM13}
+10180|(L.S) Réflexion conducteur parfait (Incidence normale).|$\\vec{E}_r = -\\vec{E}_i$ (en $z=0$). Onde stationnaire pure.|${PEM13}
+10181|(L.S) Champs E et B résultants réflexion métal.|E : Onde stationnaire (Nœud en surface).<br>B : Onde stationnaire (Ventre en surface).|${PEM13}
+10182|Nature onde dans cavité.|Onde stationnaire (superposition incident + réfléchi).|${PEM13}
+10183|(MAG) Équation propagation conducteur ohmique.|Terme de diffusion en dérivée première ($\\mu_0 \\gamma \\partial_t \\vec{E}$).|${PEM13}
+10184|(MAG) Relation dispersion conducteur (complexe).|$k^2 = \\frac{\\omega^2}{c^2} - j\\mu_0\\gamma\\omega$|${PEM13}
+10185|(MAG) Épaisseur de peau $\\delta$.|Distance caractéristique d'atténuation. $\\delta = \\sqrt{\\frac{2}{\\mu_0 \\gamma \\omega}}$.|${PEM13}
+10186|(MAG) Vitesse phase bon conducteur.|$v_\\phi = \\omega \\delta$. Très faible devant c.|${PEM13}
+10187|(MAG) Caractéristiques onde bon conducteur.|S'atténue très vite. B très supérieur à E/c (magnétique dominant).|${PEM13}
+10188|(MAG) Déphasage E/B bon conducteur.|B est en retard de 45° ($\\pi/4$) sur E.|${PEM13}
+10189|<span style="color: rgb(0, 0, 255);">(MAG)</span> Conducteur parfait.|$\\gamma \\to \\infty$, $\\delta \\to 0$. Champ nul à l'intérieur.|${PEM13}
+10190|Champ réfléchi conducteur parfait.|Opposé au champ incident (pour annuler la composante tangentielle).|${PEM13}
+10191|Poynting moyen onde stationnaire.|Nul (pas de transport d'énergie moyen).|${PEM13}
+10192|Charge surfacique conducteur parfait sous onde.|Nulle (généralement).|${PEM13}
+10193|Courant surfacique conducteur parfait.|$\\vec{j}_s = \\frac{1}{\\mu_0} \\vec{n} \\wedge \\vec{B}_{surf}$ (Discontinuité de B).|${PEM13}
+10194|Origine onde réfléchie.|Rayonnement des courants surfaciques induits.|${PEM13}
+10195|<span style="color: rgb(255, 170, 0);">(LPB)</span> Relation dispersion plasma.|$\\omega^2 = \\omega_p^2 + k^2c^2$|${PEM14}
+10196|<span style="color: rgb(0, 255, 0);">(TS)</span> Définition plasma.|Gaz ionisé globalement neutre (ions + électrons). Ex: Ionosphère.|${PEM14}
+10197|<span style="color: rgb(255, 170, 0);">(LPB)</span> Onde dans plasma (Maxwell).|Neutralité conservée ($div E = 0$). Structure TEM.|${PEM14}
+10198|<span style="color: rgb(255, 170, 0);">(TS)</span> Vitesse électron dans plasma (modèle Drude sans frottement).|$\\vec{v}$ en quadrature avec $\\vec{E}$ (retard $\\pi/2$).|${PEM14}
+10199|<span style="color: rgb(255, 170, 0);">(TS)</span> Conductivité plasma.|Imaginaire pure (pas de dissipation joule moyenne).|${PEM14}
+10200|<span style="color: rgb(0, 255, 0);">(TS)</span> Puissance moyenne cédée au plasma.|Nulle (car courant et champ en quadrature).|${PEM14}
+10201|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Équation Klein-Gordon (Plasma).|$\\Delta \\vec{E} - \\frac{1}{c^2} \\partial_{tt} \\vec{E} = \\mu_0 \\partial_t \\vec{j}$|${PEM14}
+10202|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Plasma $\\omega > \\omega_p$.|Propagation possible. Milieu dispersif ($v_\\phi > c$).|${PEM14}
+10203|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Plasma $\\omega < \\omega_p$.|Onde évanescente (réflexion totale). Pénétration réactive sur distance $\\delta$.|${PEM14}
+10204|Dipôle oscillant.|Charge q oscillant autour d'une position d'équilibre (modèle d'émission atomique).|${PEM15}
+10205|<span style="color: rgb(255, 170, 0);">(F.H)</span> Indicatrice rayonnement dipôle.|Forme de tore ("donut"). Nulle dans l'axe, max équateur.|${PEM15}
+10206|<span style="color: rgb(255, 170, 0);">(F.H)</span> Zone rayonnement.|Zone lointaine où le champ décroit en $1/r$ (structure locale d'onde plane).|${PEM15}
+10207|Approx $a \\ll \\lambda$.|Dipôle petit devant la longueur d'onde (rayonnement cohérent).|${PEM15}
+10208|Approx $a \\ll r$.|Approximation dipolaire (observation loin de la source).|${PEM15}
+10209|<span style="color: rgb(0, 255, 0);">(Y.Z)</span> Structure onde rayonnée.|Locale plane (E, B, u_r trièdre), transverse.|${PEM15}
+10210|(Y.Z) Puissance rayonnée dipôle.|Proportionnelle à $\\omega^4$ et $\\sin^2\\theta$. Anisotrope.|${PEM15}
+10211|<span style="color: rgb(255, 170, 0);">(Y.Z.)</span> Bilan puissance sphère lointaine.|Constante (conservation énergie flux sortant).|${PEM15}
+10212|<span style="color: rgb(255, 170, 0);">(O.M)</span> Domaine visible.|400 nm (Bleu) - 800 nm (Rouge).|${PO1}
+10213|<span style="color: rgb(255, 170, 0);">(O.M)</span> Snell-Descartes réfraction.|$n_1 \\sin i_1 = n_2 \\sin i_2$|${PO1}
+10214|<span style="color: rgb(255, 170, 0);">(O.M)</span> Surface d'onde.|Lieu des points de même phase (sphère pour source ponctuelle, plan pour onde plane).|${PO1}
+10215|<span style="color: rgb(0, 255, 0);">(O.M)</span> Théorème de Malus.|Rayons lumineux \\perp Surfaces d'onde.|${PO1}
+10216|<span style="color: rgb(255, 170, 0);">(O.M)</span> Créer onde plane.|Source ponctuelle au foyer objet d'une lentille convergente.|${PO1}
+10217|<span style="color: rgb(255, 170, 0);">(O.M)</span> Différence de marche lame (réflexion).|$\\delta = 2ne$ (+ $\\lambda/2$ si réflexion dure).|${PO1}
+10218|<span style="color: rgb(255, 170, 0);">(L.S)</span> Chemin optique.|$(AB) = \\int n dl$. Si homogène : $n \\times AB$.|${PO1}
+10219|<span style="color: rgb(255, 170, 0);">(O.M)</span> Malus $\\to$ Descartes.|Égalité des chemins optiques entre deux plans d'onde.|${PO1}
+10220|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-238a7158d0fbb60d39022fd285b56f918dd29e0d.jpg">|<img src="images/paste-1a5c9e434fc7fba5cee47a88b0c5589fdd2023f6.jpg">|${PO1}
+10221|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-1fbffd340ad708be06cde27faac42463c5d01824.jpg">|<img src="images/paste-f34dd382a3eb1540065c45ad246b2e942af5a970.jpg">|${PO1}
+10222|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Définition indice optique.|$n = c/v$|${PO1}
+10223|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Signification chemin optique.|Distance parcourue dans le vide pendant la même durée.|${PO1}
+10224|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Principe de Fermat.|La lumière emprunte le chemin qui rend le temps de parcours stationnaire (minimal).|${PO1}
+10225|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Sens propagation $\\cos(\\omega t - kx)$.|Vers les x positifs.|${PO1}
+10226|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-390cb59c26a1294587ee88e68cae62913c043f95.jpg">|<img src="images/paste-ec7e86b684f990ff7afa6167e99cfbfdfaffdee8.jpg">|${PO1}
+10227|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.1 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.1.PNG">|<img src="images/paste-73a055b197e1d292b6d4db07cc3d139ebebc4320.jpg">|${PO1}
+10228|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.2 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.2.PNG">|<img src="images/paste-f063776cbb7c0576250e5ab8e21e2b6f3d706359.jpg">|${PO1}
+10229|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.3 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.3.PNG">|<img src="images/paste-3574f56ff02dc7444f84ead0c013a0c3870f9199.jpg">|${PO1}
+10230|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.4 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.4.PNG">|<img src="images/paste-1f7e79eb3eae3a9f6fa526e2156258251e313b9b.jpg">|${PO1}
+10231|<span style="color: rgb(255, 170, 0);">(S.D.S)</span> Lame verre incidence normale avec défaut.|Rayons rectilignes. Surface d'onde déformée (retard au niveau du défaut).|${PO1}
+10232|<span style="color: rgb(255, 170, 0);">(S.D.S)</span> Déphasage dû surépaisseur $\\Delta e$.|$\\Delta \\phi = -\\frac{2\\pi}{\\lambda_0} \\Delta e (n_{verre} - n_{air})$|${PO1}
+10233|<span style="color: rgb(0, 255, 0);">(B.R.)</span> Période temporelle visible.|Femtoseconde ($10^{-15}s$).|${PO2}
+10234|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Temps réponse détecteurs.|Œil/Capteurs lents ($\\sim ms$). Mesurent valeur moyenne $\\langle E^2 \\rangle$ (Intensité).|${PO2}
+10235|<span style="color: rgb(255, 170, 0);">(T.S)</span> Modèle train d'onde.|Sinusoïdes de durée finie $\\tau_c$ (temps cohérence) à phases aléatoires.|${PO2}
+10236|<span style="color: rgb(0, 255, 0);">(T.S)</span> Relation largeur spectrale / durée.|$\\Delta f \\cdot \\Delta t \\sim 1$|${PO2}
+10237|<span style="color: rgb(255, 170, 0);">(T.S)</span> Longueur de cohérence $L_c$.|$L_c = c \\tau_c$. Condition interférences : $\\delta < L_c$.|${PO2}
+10238|<span style="color: rgb(255, 170, 0);">(T.S)</span> Ordres grandeur $L_c$.|Blanche : $\\mu m$.<br>Spectrale : $mm$.<br>Laser : $m$ ou $km$.|${PO2}
+10239|<span style="color: rgb(255, 170, 0);">(T.S)</span> Types interféromètres.|Division du front d'onde (Young).<br>Division d'amplitude (Michelson).|${PO2}
+10240|<span style="color: rgb(255, 170, 0);">(LPB)</span> Conditions Constructive/Destructive.|Brillante : $\\delta = m \\lambda$.<br>Sombre : $\\delta = (m+1/2)\\lambda$.|${PO2}
+10241|<span style="color: rgb(255, 170, 0);">(LPB)</span> Contraste.|$C = \\frac{I_{max}-I_{min}}{I_{max}+I_{min}}$|${PO2}
+10242|<span style="color: rgb(0, 255, 0);">(LPB)</span> Formule de Fresnel.|<img src="images/Capture d'écran 2023-12-07 193849.png">|${PO2}
+10243|<span style="color: rgb(255, 170, 0);">Z.S</span> Ordre grandeur $\\tau_c$ lampe spectrale.|Picoseconde ($10^{-12}s$).|${PO2}
+10244|Conditions interférences.|Cohérence (même source), même fréquence, $\\delta < L_c$.<br>$I = I_1 + I_2 + 2\\sqrt{I_1 I_2}\\cos(2\\pi \\delta / \\lambda)$|${PO2}
+10245|Calcul intensité complexe.|$I \\propto | \\underline{A}_{tot} |^2$|${PO2}
+10246|<span style="color: rgb(255, 170, 0);">(Y)</span> Trous d'Young : $\\delta$ et $I$.|$\\delta = \\frac{ax}{D}$.<br>$I(x) = 2I_0(1+\\cos(\\frac{2\\pi a x}{\\lambda D}))$ (Franges rectilignes).|${PO3}
+10247|Interférences non localisées.|Visibles partout dans le champ (ex: Young source ponctuelle).|${PO3}
+10248|Interfrange $i$ Young.|$i = \\frac{\\lambda D}{a}$|${PO3}
+10249|(F.H) Young source excentrée.|$\\delta = \\frac{ax}{D} + \\delta_{source}$ (Translation du système de franges).|${PO3}
+10250|<span style="color: rgb(255, 170, 0);">(F.H)</span> Schéma Young infini.|<img src="images/paste-9a60a5058a996c2a13547706b58d971c86f71533.jpg">|${PO3}
+10251|(F.H) Young infini différence marche.|$\\delta = a \\sin \\theta \\approx \\frac{ax}{f'}$|${PO3}
+10252|(F.H) Phase Young infini.|$\\Delta \\phi = \\frac{2\\pi a x}{\\lambda f'}$|${PO3}
+10253|(F.H) Interfrange Young infini.|$i = \\frac{\\lambda f'}{a}$|${PO3}
+10254|<span style="color: rgb(255, 170, 0);">(Y)</span> Position franges Young.|Brillantes : $x = k i$.<br>Sombres : $x = (k+1/2) i$.|${PO3}
+10255|<span style="color: rgb(255, 170, 0);">(M.S)</span> Éléments Michelson.|Séparatrice, Compensatrice, Miroir fixe, Miroir mobile, Source, Écran.|${PO4}
+10256|<span style="color: rgb(255, 170, 0);">(M.S)</span> Position miroirs.|Quasi-perpendiculaires (image de l'un quasi-parallèle à l'autre).|${PO4}
+10257|<span style="color: rgb(255, 170, 0);">(M.S)</span> Angle séparatrice.|45 degrés.|${PO4}
+10258|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle vis rotation.|Régler l'angle $\\alpha$ du coin d'air (parallélisme).|${PO4}
+10259|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle séparatrice.|Division d'amplitude (créer 2 faisceaux cohérents).|${PO4}
+10260|<span style="color: rgb(0, 255, 0);">(M.S)</span> Rôle chariotage.|Régler l'épaisseur $e$ de la lame d'air (différence de marche).|${PO4}
+10261|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle anti-calorique.|Protéger les miroirs de la chaleur source.|${PO4}
+10262|<span style="color: rgb(255, 170, 0);">(M.S)</span> Modifier différence marche Michelson.|Charioter (changer $e$) ou incliner M2 (changer $\\alpha$ et localisation).|${PO4}
+10263|<span style="color: rgb(255, 170, 0);">(M.S)</span> Sources secondaires Michelson.|Images de la source par les deux bras (M1 et M2).|${PO4}
+10264|Michelson Coin d'air.|Franges rectilignes d'égale épaisseur ($e(x)$).<br>Localisées sur les miroirs.<br>$i = \\frac{\\lambda}{2\\alpha}$.|${PO4}
+10265|<span style="color: rgb(255, 170, 0);">(M.S)</span> Schéma équivalent Michelson.|Lame d'air ou Coin d'air entre M1 et M'2 (image de M2).|${PO4}
+10266|<span style="color: rgb(255, 170, 0);">(M.S)</span> Figures interférences Michelson.|Coin d'air : Franges rectilignes.<br>Lame d'air : Anneaux (égale inclinaison).<br>Contact optique : Teinte plate.|${PO4}
+10267|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Éclairage Lame d'air.|Source étendue (pour avoir tous les angles d'incidence).|${PO4}
+10268|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Observation Lame d'air.|À l'infini (foyer lentille). Franges d'égale inclinaison (Anneaux).|${PO4}
+10269|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Config Coin d'air.|Éclairage // (incidence normale). Observation projection miroirs.|${PO4}
+10270|Différence marche Coin d'air.|$\\delta = 2 e(x) = 2 \\alpha x$|${PO4}
+10271|Différence marche Lame d'air.|$\\delta = 2 e \\cos(i)$ (dépend de l'angle).|${PO4}
+10272|<span style="color: rgb(0, 255, 0);">(C.J)</span> Ordre interférence Lame d'air.|$p = \\frac{2e \\cos i}{\\lambda}$.<br>Max au centre ($i=0$).|${PO4}
+10273|<span style="color: rgb(255, 170, 0);">(L.L)</span> Passage Coin $\\to$ Lame.|Redresser M2 pour parallélisme (augmenter l'interfrange jusqu'à l'infini).|${PO4}
 10274|<span style="color: rgb(0, 255, 0);">(L.L)</span> Contact optique.|$e=0, \\alpha=0$. $\\delta=0$ partout. Teinte plate brillante.|${PO4}
-10275|<span style="color: rgb(255, 170, 0);">(A.R)</span> Justification formes franges.|Lame $\\delta(i)$ : iso-i = cercles.<br>Coin $\\delta(x)$ : iso-x = droites.|${PO4}
-`.trim();
+10275|<span style="color: rgb(255, 170, 0);">(A.R)</span> Justification formes franges.|Lame $\\delta(i)$ : iso-i = cercles.<br>Coin $\\delta(x)$ : iso-x = droites.|${PO4}`;
