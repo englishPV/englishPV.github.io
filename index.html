@@ -61,7 +61,8 @@
     .scroll-y { overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; } .scroll-lock { overflow: hidden; touch-action: none!important; }
     .list, .flexcol { display: flex; flex-direction: column; gap: 8px; min-height: 0; } .stack { display: flex; flex-direction: column; gap: 6px; }
     .row, .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .grid2 { gap: 10px; } .row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-    .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; }
+    .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; outline: none; appearance: none; }
+    .input:focus { border-color: var(--primary); }
     
     .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
     
@@ -425,11 +426,110 @@ function goChapter(id,push=true){
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('')
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
+
+/* --- RECHERCHE AJOUTÉE ICI --- */
 async function goCards(cid,push=true){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Cartes (${pool.length})</div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid">${pool.map(x=>{const{f,b}=getSides(x,c);return`<div class="card-block grade-${x.grade||'unseen'}" data-id="${x.id}"><div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}</div>`}).join('')}</div></div></div>`;
-  await Media.resolve(v); await tsLat(v); $('#cardsGrid').onclick=e=>{const b=e.target.closest('.card-block');if(b){$$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')});b.classList.toggle('flipped')}}
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); 
+  State.view='cards'; State.chapterId=cid; 
+  const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
+  setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
+
+  // Structure HTML
+  v.innerHTML=`
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div style="flex-shrink:0">
+            <div class="section-title">Cartes (${pool.length})</div>
+            <div style="margin-bottom:10px">
+                <input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+        <div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px">
+            <div class="cards-grid" id="gridCont"></div>
+        </div>
+    </div>`;
+
+  // Fonction de rendu avec logique de tri avancée
+  const render = async (q='') => {
+    const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const cleanQ = norm(q);
+    
+    let filtered = [];
+
+    if (!cleanQ) {
+        filtered = pool;
+    } else {
+        // Étape 1 : Identifier et noter les correspondances
+        const scored = pool.map(x => {
+            const {f,b} = getSides(x,c);
+            const tf = norm(f); // Texte Front normalisé
+            const tb = norm(b); // Texte Back normalisé (pour l'anglais/français)
+            
+            const fStart = tf.startsWith(cleanQ);
+            const bStart = tb.startsWith(cleanQ);
+            const fIn = tf.includes(cleanQ);
+            const bIn = tb.includes(cleanQ);
+
+            // Si aucune correspondance, on ignore
+            if (!fIn && !bIn) return null;
+
+            // Calcul du score de priorité
+            // Score 1 (Haute priorité) : Commence par le mot (Front ou Back)
+            // Score 2 (Basse priorité) : Contient le mot
+            let score = 2;
+            let len = 100000; // Sert à trier les plus petits mots en premier
+
+            if (fStart || bStart) {
+                score = 1;
+                // On prend la taille du mot qui match le début pour que "Cat" arrive avant "Catalog"
+                const l1 = fStart ? tf.length : 100000;
+                const l2 = bStart ? tb.length : 100000;
+                len = Math.min(l1, l2);
+            } else {
+                // Juste "contient"
+                score = 2;
+                // On trie aussi par taille pour la lisibilité
+                const l1 = fIn ? tf.length : 100000;
+                const l2 = bIn ? tb.length : 100000;
+                len = Math.min(l1, l2);
+            }
+
+            return { card: x, score, len };
+        }).filter(x => x !== null);
+
+        // Étape 2 : Trier (Score d'abord, puis taille croissante)
+        scored.sort((a, b) => {
+            if (a.score !== b.score) return a.score - b.score; // Les "Commence par" d'abord
+            return a.len - b.len; // Les mots les plus courts d'abord
+        });
+
+        filtered = scored.map(s => s.card);
+    }
+
+    const html = filtered.map(x=>{
+        const{f,b}=getSides(x,c);
+        return`<div class="card-block grade-${x.grade||'unseen'}" data-id="${x.id}"><div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}</div>`
+    }).join('');
+
+    const grid = $('#gridCont');
+    if(filtered.length === 0) grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`;
+    else grid.innerHTML = html;
+
+    await Media.resolve(grid);
+    await tsLat(grid);
+  };
+
+  await render(); // Rendu initial
+
+  $('#cardSearch').oninput = (e) => render(e.target.value);
+  $('#cardsGrid').onclick=e=>{
+      const b=e.target.closest('.card-block');
+      if(b){
+          $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')});
+          b.classList.toggle('flipped');
+      }
+  };
 }
+
 async function goDaily(cid,k,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='daily'; State.chapterId=cid; State.dailyKey=k; const c=getCh(cid), sub=getSub(); setTop({title:`Activité • ${fmtDayFR(k)}`}); setBot({actions:!1,revision:!1});
   const log=c.virtual?(findGrp(sub,c._groupId)?getLogGrp(sub,findGrp(sub,c._groupId),k):[]):(c.stats.dailyLog[k]||[]), v=$('#view'); if(!log.length){v.innerHTML=`<div class="card"><div class="section-title">Activité ${fmtDayFR(k)}</div><div class="muted">Aucune donnée.</div></div>`;return}
