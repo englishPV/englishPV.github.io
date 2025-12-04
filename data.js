@@ -1,7 +1,7 @@
 /* --- CONSTANTS & CATEGORIES --- */
 // -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
-const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers"; CO="THE CORONAVIRUS CRISIS"; 
+const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers"; CO="THE CORONAVIRUS CRISIS"; ED="EATING DISORDERS";
 
 // -- SUJETS PHYSIQUE --
 const PM="M2", PM3="M3", PM4="M4";
@@ -10,7 +10,7 @@ const PO1="O1", PO2="O2", PO3="O3", PO4="O4";
 
 // -- EMOJIS --
 const C_EMOJIS = {
-  [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚', [CO]:'⚕️', 
+  [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚', [CO]:'⚕️', [ED]:'🍽️',
   [PM]:'⚙️', [PM3]:'🌍', [PM4]:'🤝',
   [PEM1]:'⚡️', [PEM2]:'🧲', [PE345]:'🧲', [PEM6]:'🧲', [PEM8]:'🧲', [PEM9]:'🧲', [PEM10]:'🧲', [PEM11]:'🧲', [PEM12]:'🧲', [PEM13]:'🧲', [PEM14]:'🧲', [PEM15]:'🧲',
   [PO1]:'🌈', [PO2]:'🌈', [PO3]:'🌈', [PO4]:'🌈',
@@ -1268,6 +1268,90 @@ const RAW_EN = `
 1242|une visioconférence|a videoconference|${CO}
 1243|mettre qn en chômage partiel|to furlough sb|${CO}
 1244|achats (sous l’emprise de la) panique|panic buying|${CO}
+1245|la nourriture|food|${HI}
+1246|les denrées alimentaires, les aliments|foodstuffs|${HI}
+1247|se nourrir de qch|to feed oneself on sth|${HI}
+1248|cuisiner|to cook|${HI}
+1249|faire la cuisine|to do the cooking|${HI}
+1250|les habitudes alimentaires|eating habits, eating patterns|${HI}
+1251|la consommation de fruits et de légumes|fruit and vegetable intake|${HI}
+1252|la consommation quotidienne de sel|daily salt intake|${HI}
+1253|le poids|weight|${HI}
+1254|se peser|to weigh oneself|${HI}
+1255|peser 55 kg|to weigh 55 kg|${HI}
+1256|prendre du poids|to put on, gain weight|${HI}
+1257|être trop gros, en surpoids|to be overweight|${HI}
+1258|avoir dix kilos de trop|to be ten kilos overweight|${HI}
+1259|le surpoids, la surcharge pondérale|overweight|${HI}
+1260|gros, gras|fat|${HI}
+1261|obèse|obese|${HI}
+1262|l’obésité|obesity|${HI}
+1263|l’obésité des enfants|childhood obesity|${HI}
+1264|grassouillet, dodu|plump|${HI}
+1265|corpulent|stout, corpulent|${HI}
+1266|le tour de taille|the waistline|${HI}
+1267|la graisse superflue|flab|${HI}
+1268|une bedaine, une panse|a paunch|${HI}
+1269|la boulimie|bulimia|${HI}
+1270|boulimique|bulimic|${HI}
+1271|ne pas pouvoir s’empêcher de manger|to be a compulsive eater|${HI}
+1272|s’empiffrer de chocolat|to binge on chocolate|${HI}
+1273|les excès de nourriture|binge eating|${HI}
+1274|les excès de boisson|binge drinking|${HI}
+1275|faire des excès (de nourriture, de boisson)|to go on a binge|${HI}
+1276|résister à la tentation|to resist temptation|${HI}
+1277|céder à la tentation|to give in to temptation|${HI}
+1278|un fast food|a fast food restaurant|${HI}
+1279|manger des cochonneries|to eat junk food|${HI}
+1280|les aliments préparés|processed foods|${HI}
+1281|les aliments riches en graisses|fatty foods|${HI}
+1282|les féculents|starch, starchy foods|${HI}
+1283|les légumes|vegetables|${HI}
+1284|les fruits|fruit|${HI}
+1285|les légumes verts|green vegetables, greens|${HI}
+1286|les boissons gazeuses|sodas, fizzy drinks|${HI}
+1287|une barre chocolatée|a chocolate bar|${HI}
+1288|un accro au chocolat|a chocaholic, a chocoholic|${HI}
+1289|être accro à qch|to be addicted to sth|${HI}
+1290|l’accoutumance, la dépendance|addiction|${HI}
+1291|qui crée une accoutumance, addictogène|addictive|${HI}
+1292|maigre|thin|${HI}
+1293|maigrelet, maigrichon|skinny, scrawny|${HI}
+1294|être mince et musclé|to be lean and muscular|${HI}
+1295|anguleux, décharné|bony|${HI}
+1296|mince, svelte|slim, slender, svelte|${HI}
+1297|être trop maigre, ne pas peser assez|to be underweight|${HI}
+1298|l’anorexie|anorexia|${HI}
+1299|anorexique|anorexic|${HI}
+1300|devenir anorexique|to develop anorexia|${HI}
+1301|être diagnostiqué anorexique|to be diagnosed with anorexia|${HI}
+1302|se laisser mourir de faim|to starve oneself to death|${HI}
+1303|commencer / faire un régime|to go on / be on a diet|${HI}
+1304|un régime amaigrissant|a slimming diet|${HI}
+1305|une alimentation saine|a healthy diet|${HI}
+1306|une alimentation équilibrée / mal équilibrée|balanced / unbalanced diet|${HI}
+1307|les aliments basses calories|diet foods|${HI}
+1308|les aliments diététiques|health foods|${HI}
+1309|un magasin de produits diététiques|a health food shop|${HI}
+1310|la nourriture biologique, les aliments bio|organic food|${HI}
+1311|un restaurant diététique|an organic restaurant|${HI}
+1312|végétarien|vegetarian|${HI}
+1313|un nutritionniste|a nutritionist|${HI}
+1314|un diététicien|a dietician, a dietitian|${HI}
+1315|sédentaire|sedentary|${HI}
+1316|un mode de vie sédentaire, la sédentarité|a sedentary lifestyle|${HI}
+1317|perdre du poids|to lose weight|${HI}
+1318|être en forme, en bonne santé|to be fit|${HI}
+1319|surveiller sa ligne / garder la ligne|to watch / keep one’s figure|${HI}
+1320|l’exercice physique|physical exercise|${HI}
+1321|faire de la gymnastique|to do (physical) exercises|${HI}
+1322|faire de l’exercice|to take exercise|${HI}
+1323|faire du sport|to do sport|${HI}
+1324|pratiquer un sport|to practise a sport|${HI}
+1325|la santé, la forme|fitness|${HI}
+1326|un mordu de culture physique|a fitness freak, a fitness fanatic|${HI}
+1327|aller dans une salle de gym|to go to the gym|${HI}
+1328|faire de la musculation|to work out|${HI}
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
 8001|battre|beat / beat / beaten|${VI}
