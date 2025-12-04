@@ -1,7 +1,7 @@
 /* --- CONSTANTS & CATEGORIES --- */
 // -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
-const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDD OM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers"; CO="THE CORONAVIRUS CRISIS"; ED="EATING DISORDERS";
+const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers", CO="THE CORONAVIRUS CRISIS", ED="EATING DISORDERS";
 
 // -- SUJETS PHYSIQUE --
 const PM="M2", PM3="M3", PM4="M4";
@@ -1426,7 +1426,7 @@ const RAW_EN = `
 8070|cesser (de)|quit / quit / quit|${VI}
 8071|lire|read / read / read|${VI}
 8072|chevaucher|ride / rode / ridden|${VI}
-8G73|sonner|ring / rang / rung|${VI}
+8073|sonner|ring / rang / rung|${VI}
 8074|s’élever, se lever|rise / rose / risen|${VI}
 8075|courir|run / ran / run|${VI}
 8076|scier|saw / sawed / sawn|${VI}
@@ -1758,4 +1758,5 @@ const RAW_PHY = `
 10272|<span style="color: rgb(0, 255, 0);">(C.J)</span> Ordre interférence Lame d'air.|$p = \\frac{2e \\cos i}{\\lambda}$.<br>Max au centre ($i=0$).|${PO4}
 10273|<span style="color: rgb(255, 170, 0);">(L.L)</span> Passage Coin $\\to$ Lame.|Redresser M2 pour parallélisme (augmenter l'interfrange jusqu'à l'infini).|${PO4}
 10274|<span style="color: rgb(0, 255, 0);">(L.L)</span> Contact optique.|$e=0, \\alpha=0$. $\\delta=0$ partout. Teinte plate brillante.|${PO4}
-10275|<span style="color: rgb(255, 170, 0);">(A.R)</span> Justification formes franges.|Lame $\\delta(i)$ : iso-i = cercles.<br>Coin $\\delta(x)$ : iso-x = droites.|${PO4}`;
+10275|<span style="color: rgb(255, 170, 0);">(A.R)</span> Justification formes franges.|Lame $\\delta(i)$ : iso-i = cercles.<br>Coin $\\delta(x)$ : iso-x = droites.|${PO4}
+`;
