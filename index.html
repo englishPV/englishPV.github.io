@@ -426,7 +426,7 @@ function goChapter(id,push=true){
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
-/* --- RECHERCHE AJOUTÉE ICI --- */
+/* --- RECHERCHE --- */
 async function goCards(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); 
   State.view='cards'; State.chapterId=cid; 
@@ -457,36 +457,28 @@ async function goCards(cid,push=true){
     if (!cleanQ) {
         filtered = pool;
     } else {
-        // Étape 1 : Identifier et noter les correspondances
         const scored = pool.map(x => {
             const {f,b} = getSides(x,c);
-            const tf = norm(f); // Texte Front normalisé
-            const tb = norm(b); // Texte Back normalisé (pour l'anglais/français)
+            const tf = norm(f); 
+            const tb = norm(b);
             
             const fStart = tf.startsWith(cleanQ);
             const bStart = tb.startsWith(cleanQ);
             const fIn = tf.includes(cleanQ);
             const bIn = tb.includes(cleanQ);
 
-            // Si aucune correspondance, on ignore
             if (!fIn && !bIn) return null;
 
-            // Calcul du score de priorité
-            // Score 1 (Haute priorité) : Commence par le mot (Front ou Back)
-            // Score 2 (Basse priorité) : Contient le mot
             let score = 2;
-            let len = 100000; // Sert à trier les plus petits mots en premier
+            let len = 100000; 
 
             if (fStart || bStart) {
                 score = 1;
-                // On prend la taille du mot qui match le début pour que "Cat" arrive avant "Catalog"
                 const l1 = fStart ? tf.length : 100000;
                 const l2 = bStart ? tb.length : 100000;
                 len = Math.min(l1, l2);
             } else {
-                // Juste "contient"
                 score = 2;
-                // On trie aussi par taille pour la lisibilité
                 const l1 = fIn ? tf.length : 100000;
                 const l2 = bIn ? tb.length : 100000;
                 len = Math.min(l1, l2);
@@ -495,10 +487,9 @@ async function goCards(cid,push=true){
             return { card: x, score, len };
         }).filter(x => x !== null);
 
-        // Étape 2 : Trier (Score d'abord, puis taille croissante)
         scored.sort((a, b) => {
-            if (a.score !== b.score) return a.score - b.score; // Les "Commence par" d'abord
-            return a.len - b.len; // Les mots les plus courts d'abord
+            if (a.score !== b.score) return a.score - b.score; 
+            return a.len - b.len; 
         });
 
         filtered = scored.map(s => s.card);
@@ -572,10 +563,31 @@ function startRevMulti(ids,vid,flt,push=true){
   const scored=pool.map(i=>{const g=i.card.grade||'unseen',base={unseen:6,echec:5,difficile:3.5,bien:2,facile:1}[g]||1,due=(i.card.dueAt&&i.card.dueAt>0)?(Date.now()-i.card.dueAt>0?(1+M.min(3,(Date.now()-i.card.dueAt)/864e5)):0.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(0.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w), sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
   State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
+
+/* --- CORRECTION BUG SESSION --- */
 function bldQ(c,pool,sz){
-  const sh=a=>{for(let i=a.length-1;i>0;i--){const j=M.floor(M.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}, nc=[], lc=[], dr=[];
-  pool.forEach(x=>{const g=x.grade||'unseen';if(g==='unseen')nc.push(x);else if(g==='echec'||g==='difficile')lc.push(x);else if(x.dueAt<=Date.now())dr.push(x)}); return[...sh(lc),...sh(dr),...sh(nc)].slice(0,sz)
+  // Mélangeur
+  const sh=a=>{for(let i=a.length-1;i>0;i--){const j=M.floor(M.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  
+  // Catégories
+  const nc=[], lc=[], dr=[], ot=[];
+  
+  pool.forEach(x=>{
+      const g=x.grade||'unseen';
+      // 1. Non vues
+      if(g==='unseen') nc.push(x);
+      // 2. Difficiles / Echec
+      else if(g==='echec'||g==='difficile') lc.push(x);
+      // 3. Dues (date dépassée)
+      else if(x.dueAt<=Date.now()) dr.push(x);
+      // 4. AUTRES (Facile/Bien pas encore dues mais sélectionnées dans le filtre)
+      else ot.push(x);
+  });
+  
+  // On priorise: Difficile > Due > Non vue > Autres (pour combler)
+  return [...sh(lc),...sh(dr),...sh(nc),...sh(ot)].slice(0,sz)
 }
+
 function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.index],ch=_real(i.chapId);return{card:ch.cards.find(x=>x.id===i.cardId),chap:ch}}else{const ch=getCh(r.chapterId);return{card:ch.cards.find(x=>x.id===r.queue[r.index]),chap:ch}} }
 function subG(nxt){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
@@ -602,7 +614,24 @@ function drawBars(cid,v){ const el=D.getElementById(cid); if(!el)return; const c
 function opDayBar(e,id,cid){ const h=Bar7Hit[id]; if(!h)return; const x=e.clientX-e.target.getBoundingClientRect().left, i=h.bars.findIndex(b=>x>=b.x&&x<=b.x+b.w); if(i>=0)goDaily(cid,dayKeyIdx(7,i)) }
 function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=180, h=180, cx=90, cy=90, R=84, r=54; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=30;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,69,start,end);ctx.lineWidth=30;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+5); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
 function hChartClk(e,id,ch){ const h=ChartHit[id]; if(!h)return; const r=e.target.getBoundingClientRect(), dx=(e.clientX-r.left)*(180/r.width)-h.cx, dy=(e.clientY-r.top)*(180/r.height)-h.cy, d=M.hypot(dx,dy); if(d<h.innerR||d>h.outerR)return; let a=M.atan2(dy,dx); if(a<-1.57)a+=6.28; const hit=h.arcs.find(s=>a>=s.start&&a<=s.end); if(hit)updFilt(ch,hit.key) }
-function togFilt(c,k){ const s=c.filters.grades, keys=Object.keys(s), act=keys.filter(x=>s[x]); if(act.length===keys.length){keys.forEach(x=>s[x]=!1);s[k]=!0}else if(act.length===1&&s[k])s[k]=!0;else{s[k]=!s[k];if(!Object.values(s).some(Boolean))s[k]=!0} }
+
+/* --- CORRECTION BUG FILTRES (togFilt) --- */
+function togFilt(c,k){ 
+  const s=c.filters.grades, keys=Object.keys(s), act=keys.filter(x=>s[x]); 
+  
+  if(act.length===keys.length){ 
+    // Si TOUT est coché et qu'on clique sur un, on isole celui-là
+    keys.forEach(x=>s[x]=!1); 
+    s[k]=!0;
+  } else if(act.length===1&&s[k]){ 
+    // Si UN SEUL est coché et qu'on le clique, on RAFFICHE TOUT
+    keys.forEach(x=>s[x]=!0);
+  } else {
+    // Sinon on bascule normalement
+    s[k]=!s[k]; 
+    if(!Object.values(s).some(Boolean)) s[k]=!0; // On empêche de tout décocher
+  } 
+}
 
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
