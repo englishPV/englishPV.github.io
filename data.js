@@ -34,8 +34,26 @@ const PHY_MAP = {
 
 // Fusion des Emojis
 const C_EMOJIS = {
-  [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚', [CO]:'⚕️', [ED]:'🍽️'
+  // --- Anglais (Société & Politique) ---
+  [CD]:  '🗳️',  // Democracy (Urne de vote : plus précis que le bâtiment)
+  [CG]:  '🧬',  // Genetics (ADN : parfait)
+  [CI]:  '🛂',  // Immigration (Contrôle passeport : évoque le passage de frontière)
+  [CIT]: '🤝',  // International Relations (Poignée de main : diplomatie)
+  [CU]:  '👷',  // Labor (Ouvrier : aspect humain du travail)
+  [CR]:  '⚖️',  // Crime (Balance : Justice/Légal)
+  [PC]:  '💉',  // Capital Punishment (Seringue/Injection : distinct de la mort générale)
+  [CF]:  '♀️',  // Status of Women (Symbole classique)
+  
+  // --- Anglais (Santé & Individu) ---
+  [HI]:  '🩺',  // HEALTH ISSUES (Stéthoscope : médecine générale)
+  [IF]:  '🗽',  // INDIVIDUAL FREEDOM (Statue de la Liberté : symbole fort)
+  [IDR]: '💊',  // ILLEGAL DRUGS (Pilule)
+  [VI]:  '📝',  // Verbes Irréguliers (Note/Papier : l'apprentissage par cœur)
+  [CO]:  '🦠',  // THE CORONAVIRUS CRISIS (Microbe : pour ne pas confondre avec Santé)
+  [ED]:  '🍏'   // EATING DISORDERS (Pomme : évoque la nourriture/diététique)
 };
+
+// Ajout dynamique des emojis de Physique
 Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 
