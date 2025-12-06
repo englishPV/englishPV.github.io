@@ -1,21 +1,15 @@
 /* --- CONSTANTS & CATEGORIES --- */
-// -- SUJETS ANGLAIS --
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
 const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers", CO="THE CORONAVIRUS CRISIS", ED="EATING DISORDERS";
 
-// -- SUJETS PHYSIQUE --
-const PM="M2", PM3="M3", PM4="M4";
-const PEM1="EM1", PEM2="EM2", PE345="E3-E4-E5", PEM6="EM6", PEM7="EM7", PEM8="EM8(Pas de E7)", PEM9="EM9", PEM10="EM10", PEM11="EM11", PEM12="EM12", PEM13="EM13", PEM14="EM14", PEM15="EM15";
-const PO1="O1", PO2="O2", PO3="O3", PO4="O4";
-
-// -- EMOJIS --
+/* --- EMOJIS --- */
 const C_EMOJIS = {
+  // Anglais
   [CD]:'🏛️', [CG]:'🧬', [CI]:'🧳', [CIT]:'🌐', [CU]:'💼', [CR]:'⚖️', [PC]:'💀', [CF]:'♀️', [HI]:'⚕️', [IF]:'🗽', [IDR]:'💊', [VI]:'📚', [CO]:'⚕️', [ED]:'🍽️',
-  [PM]:'⚙️', [PM3]:'🌍', [PM4]:'🤝',
-  [PEM1]:'⚡️', [PEM2]:'🧲', [PE345]:'🧲', [PEM6]:'🧲', [PEM8]:'🧲', [PEM9]:'🧲', [PEM10]:'🧲', [PEM11]:'🧲', [PEM12]:'🧲', [PEM13]:'🧲', [PEM14]:'🧲', [PEM15]:'🧲',
-  [PO1]:'🌈', [PO2]:'🌈', [PO3]:'🌈', [PO4]:'🌈',
-  // Fallbacks texte au cas où
-  'Politique':'🏛️', 'Business':'💼', 'Education':'🎓', 'Thanksgiving':'🦃'
+  // Physique (Mapping des noms de decks)
+  'EM15':'📡', 'EM2':'⚡', 'EM6':'🧲', 'EM8':'🧭', 'EM9':'⚛️', 
+  'EM 3, 4 et 5':'∫', 'M1':'🚀', 'M2':'🎡', 'M3':'🌍', 'M4':'⛸️',
+  'O1':'🔦', 'O2':'〰️', 'O3':'🌈', 'O4':'🔬'
 };
 
 /* --- RAW DATA CONTENT --- */
@@ -1482,281 +1476,1203 @@ const RAW_EN = `
 
 `.trim();
 
+
+// C'EST ICI QUE VOS DONNÉES SONT INSÉRÉES
 const RAW_PHY = `
-10000|<span style="color: rgb(255, 170, 0);">(Shems)</span> Qu'est-ce qu'un référentiel galiléen ?|Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifié : tout objet isolé ou pseudo-isolé est soit immobile, soit en mouvement rectiligne uniforme dans ce référentiel.|${PM}
-10001|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Tout référentiel [...] rapport à un référentiel galiléen est galiléen.|<b>en translation rectiligne et uniforme par</b>|${PM}
-10002|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Si la translation de R' par rapport à R galiléen n’est pas rectiligne ou pas uniforme, R′ [...]|<b>n’est pas galiléen</b>|${PM}
-10003|<span style="color: rgb(0, 255, 0);">V.Iulian</span> Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]|<b>n’est jamais galiléen.</b>|${PM}
-10004|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg">|<img src="images/paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg">|${PM}
-10005|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-d77f3722e5a6b97cce4097de2c62d12a8d197b00.jpg">|<img src="images/paste-94c2181742a47574197e38c01becf17fe5e14056.jpg"><br>Avec O' un point fixe de R'|${PM}
-10006|<span style="color: rgb(0, 255, 0);"><u><b>(MAG)</b></u></span><img src="images/paste-cb677b12d3a6508a44f3f9b492a67a4a71774fca.jpg">|Cas de R' en translation par rapport à R : $\\vec{f}_{ic}=\\vec{0}$ donc $P(\\vec{f}_{ic})=0$<br><br>Cas de R' en rotation par rapport à R : $P(\\vec{f}_{ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ) \\cdot \\vec{v}_{M/R'}=0$<br><br>TPC : $\\frac{dE_{c/R'}}{dt}=\\sum_i P(\\vec{F}_i)_{/R'} + P(\\vec{f}_{ie})_{/R'}$|${PM}
-10007|<span style="color: rgb(255, 170, 0);"><u><b>(MAG)</b></u></span> Justifier que $\\vec{f}_{ic}$ ne travaille pas et exprimer le TEC dans R' non gal.|En translation : $\\vec{f}_{ic}=\\vec{0}$ donc $P(\\vec{f}_{ic})=0$.<br>En rotation : $\\vec{f}_{ic} \\perp \\vec{v}_{M/R'}$ donc $P(\\vec{f}_{ic}) = 0$.<br><br>Csq : $W(\\vec{f}_{ic}) = 0$.<br>TEC dans R' : $\\Delta E_{c/R'}=\\sum W(\\vec{F}_i)_{/R'} + W(\\vec{f}_{ie})_{/R'}$|${PM}
-10008|<b><span style="color: rgb(255, 170, 0);">(MAG)</span></b><span style="color: rgb(0, 85, 255);"> Sur l'exemple d'un manège avec sièges suspendus à des chaînes :</span><br><img src="images/paste-a933d76dcbeef4f62508fa32bd894eade0892cea.jpg"><br><img src="images/paste-162500c424b12166f0f9f7c8345e074e19a42672.jpg">|<img src="images/paste-7d986b294569fcc662beb25c0076c304bcdbb34e.jpg">|${PM}
-10009|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>Exprimer la force d'inertie de Coriolis et la force d'inertie d'entraînement dans le cas d'une rotation de R' par rapport à R.|$\\vec{f}_{ic} = -2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'}$<br>$\\vec{f}_{ie} = m \\Omega^2 \\overrightarrow{HM}$ (force centrifuge)|${PM}
-10010|<span style="color: rgb(0, 255, 0);">(INC)</span> TEM dans R' repère non galiléen.|Si $\\vec{f}_{ie}$ est conservative, elle dérive d'une énergie potentielle $E_{p,fie}$ telle que $W(\\vec{f}_{ie})=-\\Delta E_{p,fie}$.<br><br>Alors TEM : $\\Delta E_{m/R'}=\\sum W(\\vec{F}_{i,NC/R'})$<br><br>Si $\\vec{f}_{ie}$ est non conservative :<br>TEM : $\\Delta E_{m/R'}=\\sum W(\\vec{F}_{i,NC/R'})+W(\\vec{f}_{ie/R'})$|${PM}
-10011|<span style="color: rgb(255, 170, 0);">(Orlan M) </span>En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un référentiel R' non galiléen.|Loi de composition des accélérations : $m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + m\\vec{a}_c + m\\vec{a}_e$<br>PFD dans R : $m \\vec{a}_{M/R} = \\sum \\vec{F}_i$<br>Donc : $m \\vec{a}_{M/R'} = \\sum \\vec{F}_i - m \\vec{a}_c - m \\vec{a}_e$<br>Avec $\\vec{f}_{ie} = - m \\vec{a}_e$ et $\\vec{f}_{ic} = - m \\vec{a}_c$.|${PM}
-10012|<span style="color: rgb(255, 170, 0);">(Orlan M)</span> Exprimer $\\vec{f}_{ic}$ et $\\vec{f}_{ie}$ dans le cas d'une translation de R' par rapport à R.|$\\vec{f}_{ic} = \\vec{0}$ (car $\\vec{a}_c = \\vec{0}$)<br>$\\vec{f}_{ie} = -m(\\vec{a}(O')_{/R})$|${PM}
-10013|<span style="color: rgb(255, 170, 0);">(LPB)</span><span style="color: rgb(0, 255, 0);"> </span>Comment est défini réellement le poids ?|Le poids est défini expérimentalement comme la force opposée à la tension d'un fil tenant un corps à l'équilibre dans le référentiel terrestre.<br>$\\vec{P} = \\vec{F}_G + \\vec{f}_{ie}$ (Attraction gravitaire + force d'inertie d'entraînement axifuge).|${PM3}
-10014|<span style="color: rgb(0, 255, 0);">(LPB)</span> Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique.|L'existence des marées (deux hautes et deux basses par jour) dues aux forces d'inertie différentielles.<br><img src="images/Capture d’écran 2023-10-07 161935.png">|${PM3}
-10015|<span style="color: rgb(0, 255, 0);">(TS) </span>Donner des exemples qui mettent en évidence le caractère non galiléen du référentiel terrestre.|- La déviation vers l'Est (chute libre).<br>- Le sens de rotation des cyclones.<br>- Le pendule de Foucault.|${PM3}
-10016|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire de rotation du référentiel terrestre par rapport au référentiel géocentrique.|$\\omega = \\frac{2\\pi}{86164} \\approx 7.3 \\times 10^{-5} \\text{ rad/s}$ (Jour sidéral).|${PM3}
-10017|<span style="color: rgb(255, 170, 0);">(TS)</span> Donner la vitesse angulaire caractérisant la translation elliptique du référentiel géocentrique par rapport au référentiel de Copernic (Héliocentrique).|$\\Omega \\approx 2.0 \\times 10^{-7} \\text{ rad/s}$ (Révolution annuelle).|${PM3}
-10018|<span style="color: rgb(255, 170, 0);">(TS) </span>Quelles forces fera apparaître le PFD dans $R_T$ non galiléen ?|- Le poids $\\vec{P}$ (qui contient déjà $\\vec{f}_{ie}$).<br>- La force d'inertie de Coriolis $\\vec{f}_{ic}$.<br>- Les autres forces physiques appliquées.|${PM3}
-10019|(B.K.)<img src="images/paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg"><br>Qu'est-ce qui est à l'origine de cette déviation vers l'Est ? Dans l'hémisphère Sud, le sens change-t-il ?|C'est la force d'inertie de Coriolis.<br>La déviation se fait également vers l'Est dans l'hémisphère Sud (pour une chute libre).|${PM3}
-10020|<span style="color: rgb(0, 255, 0);">(enzo m) </span><u>Contexte : Appli 3 Pendule de Foucault</u><br>On a : $\\begin{cases} \\ddot x +\\omega_0^2 x \\approx 2\\Omega \\sin(\\lambda)\\dot y & (1) \\\\ \\ddot y +\\omega_0^2 y \\approx -2\\Omega \\sin(\\lambda)\\dot x & (2) \\end{cases}$<br>Quelle est la <b>méthode</b> pour obtenir une équation différentielle selon $\\underline{Z} = x+jy$ ?|Méthode : faire $(1) + j(2)$.<br>Cela donne : $\\underline{\\ddot Z} + \\omega_0^2\\underline{Z} = -2j\\Omega \\sin(\\lambda)\\underline{\\dot Z}$.<br>On résout pour $\\underline{Z}$ puis on identifie $x=Re(\\underline{Z})$ et $y=Im(\\underline{Z})$.|${PM3}
-10021|<span style="color: rgb(0, 255, 0);">(enzo m)</span> <u>Contexte : Appli 3 Pendule de Foucault</u><br><img src="images/paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg" width="495"><br>Solutions : $\\begin{cases} x(t) = x_0\\cos(\\omega_0t)\\cos(-\\Omega \\sin\\lambda t)\\\\ y(t) = x_0\\cos(\\omega_0t)\\sin(-\\Omega \\sin\\lambda t)\\end{cases}$<br>Expression de la période T de rotation du plan d'oscillation et de la période propre $T_0$ ?|$T = \\left|\\frac{2\\pi}{\\Omega \\sin\\lambda}\\right|$ (rotation du plan)<br>$T_0 = \\frac{2\\pi}{\\omega_0}$ (oscillations propres)|${PM3}
-10022|<img src="images/anki appli 2.png"><span style="color: rgb(255, 170, 0);">Ziad SABRI</span> <img src="images/paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg" style="float: left;">Expression de $\\vec{g}$ en fonction de la latitude $\\lambda$. Où est-il max/min ?|$\\vec{g} = \\vec{G}_{Newton} + \\vec{a}_e = -G \\frac{m_T}{R_T^2} \\vec{e}_{z_{P}} + \\Omega^2 R_T \\cos(\\lambda) \\vec{e}_{HM}$<br>En projetant :<br>$\\vec{g} \\approx -\\left( \\frac{Gm_T}{R_T^2} - \\Omega^2 R_T \\cos^2(\\lambda) \\right) \\vec{e}_{z_P} - (\\Omega^2 R_T \\cos\\lambda \\sin\\lambda) \\vec{e}_{y_P}$<br><br>$g$ est max aux pôles (car distance au centre min et effet centrifuge nul) et min à l'équateur.|${PM3}
-10023|(B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre ?|La force d'inertie d'entraînement (différentielle) due au fait que le référentiel géocentrique est en translation elliptique (non galiléen) par rapport au référentiel héliocentrique.|${PM3}
-10024|(B.K.) Quelle force d'inertie explique le sens de rotation des cyclones ? Dans quel sens tournent-ils ?|Force d'inertie de Coriolis.<br>Hémisphère Nord : Sens anti-horaire (trigonométrique).<br>Hémisphère Sud : Sens horaire.<br><img src="images/paste-71cc5358ce5c51ce02d2e1d9d2e63300dba80598.jpg">|${PM3}
-10025|Valeur de $\\vec{v}_{g}$ (vitesse de glissement) dans le cas de non glissement (adhérence).|On a : $\\vec{v}_{g} = \\vec{0}$|${PM4}
-10026|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le non-glissement (statique) :|$\\|\\vec{T}\\| \\le f_s \\|\\vec{N}\\|$ avec $f_s$ le coefficient de frottement statique.|${PM4}
-10027|<span style="color: rgb(0, 255, 0);">(FH) </span>Loi de Coulomb pour le glissement (dynamique) :|$\\|\\vec{T}\\| = f_d \\|\\vec{N}\\|$ avec $f_d$ le coefficient de frottement dynamique.|${PM4}
-10028|<span style="color: rgb(0, 255, 0);">(Yannick) </span>Les forces de frottement sont-elles conservatives ?|Non, elles ne sont généralement pas conservatives (dissipation d'énergie).|${PM4}
-10029|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Quel peut être le signe de la puissance d'une force de contact ?|Généralement négatif (freinage/dissipation).<br>Parfois positif si la force de frottement est motrice (ex: tapis roulant entraînant un colis, roue motrice sans glissement).<br><img src="images/paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg" width="265">|${PM4}
-10030|Que dire sur la puissance totale des forces de contact inter-solides ?|$P(\\vec{R}_{1\\to 2}) + P(\\vec{R}_{2\\to 1}) = \\vec{T} \\cdot \\vec{v}_g \\le 0$<br>Elle est nulle si adhérence ($\\vec{v}_g=\\vec{0}$) ou glissement sans frottement ($\\vec{T}=\\vec{0}$).<br>Elle est négative s'il y a glissement avec frottement (dissipation).|${PM4}
-10031|<span style="color: rgb(255, 170, 0);">(Yannick) </span>Décomposition de la réaction de contact $\\vec{R}_{1\\to 2}$.|$\\vec{R} = \\vec{N} + \\vec{T}$<br>- $\\vec{N}$ : Réaction normale (orthogonale au plan tangent).<br>- $\\vec{T}$ : Réaction tangentielle ou force de frottement (dans le plan tangent).|${PM4}
-10032|<span style="color: rgb(255, 170, 0);">(INC)</span> Qu’est-ce que <b>la vitesse de glissement</b> ?|$\\vec{v_g}_{2/1} = \\vec{v}(I_2) - \\vec{v}(I_1)$<br>C'est la vitesse relative du point de contact du solide 2 par rapport au point de contact du solide 1.|${PM4}
-10033|<span style="color: rgb(0, 255, 0);">(Ali H.)</span> <img src="images/paste-15e45e099744e7f013048018acad29cb70089200.jpg">|<img src="images/paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg"><br><img src="images/paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg">|${PM4}
-10034|<span style="color: rgb(0, 255, 0);">(Ali H.)</span><img src="images/paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg">|<img src="images/paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg">|${PM4}
-10035|(INC) Énoncer le principe de Curie.|Les effets produits doivent avoir au moins les mêmes éléments de symétrie que les causes qui les produisent.|${PEM1}
-10036|(INC) Dimensions et unités des densités de charge (volumique, surfacique, linéique).|Volumique $\\rho$ : $C.m^{-3}$<br>Surfacique $\\sigma$ : $C.m^{-2}$<br>Linéique $\\lambda$ : $C.m^{-1}$|${PEM1}
-10037|<span style="color: rgb(0, 255, 0);">(INC)</span> Charge élémentaire dq pour un volume, une surface, une ligne ?|$dq = \\rho d\\tau$<br>$dq = \\sigma dS$<br>$dq = \\lambda dl$|${PEM1}
-10038|<span style="color: rgb(255, 170, 0);">(INC)</span> Condition pour qu'une distribution soit invariante par rotation autour d'un axe $\\Delta$ ?|La densité de charge ne doit dépendre que de la distance à l'axe (en cylindrique) ou au centre (en sphérique), pas de l'angle de rotation.|${PEM1}
-10039|<span style="color: rgb(255, 170, 0);">(INC)</span> Condition pour qu'une distribution soit invariante par translation suivant $\\Delta$ ?|La densité de charge $\\rho(M)$ est indépendante de la coordonnée le long de l'axe $\\Delta$ (ex: $\\rho$ ne dépend pas de $z$).|${PEM1}
-10040|<span style="color: rgb(0, 255, 0);">(INC)</span> Choix de coordonnées selon les invariances.|Translation $\\to$ Cartésiennes ou Cylindriques.<br>Rotation $\\to$ Cylindriques ou Sphériques.|${PEM1}
-10041|<span style="color: rgb(255, 170, 0);">(INC)</span> Propriété du champ $\\vec{E}$ par rapport à un plan d’antisymétrie de la charge.|Si $\\Pi$ est un plan d'antisymétrie des charges ($\\rho(M') = -\\rho(M)$), alors $\\vec{E}$ appartient au plan $\\Pi$ pour tout point de ce plan. (Le vecteur champ est symétrique par rapport au plan).|${PEM1}
-10042|(INC) Propriété du champ $\\vec{E}$ par rapport à un plan de symétrie de la charge.|Si $\\Pi$ est un plan de symétrie des charges ($\\rho(M') = \\rho(M)$), alors $\\vec{E}$ est contenu dans ce plan pour tout point appartenant à ce plan.|${PEM1}
-10043|(INC) Orientation du champ $\\vec{E}$ sur un plan de symétrie.|Le champ $\\vec{E}$ en un point M d'un plan de symétrie est contenu dans ce plan.|${PEM1}
-10044|<span style="color: rgb(255, 170, 0);">(INC)</span> Continuité de $\\vec{E}$ pour une distribution volumique ?|$\\vec{E}$ est défini et continu en tout point de l'espace.|${PEM1}
-10045|<span style="color: rgb(255, 170, 0);">(INC)</span> Continuité de $\\vec{E}$ pour une distribution surfacique ?|$\\vec{E}$ subit une discontinuité à la traversée de la surface chargée : $\\vec{E}_2 - \\vec{E}_1 = \\frac{\\sigma}{\\varepsilon_0}\\vec{n}_{1\\to 2}$.|${PEM1}
-10046|(INC) Continuité de $\\vec{E}$ pour des charges ponctuelles ?|$\\vec{E}$ n'est pas défini (diverge) sur les charges ponctuelles.|${PEM1}
-10047|<span style="color: rgb(0, 255, 0);">(INC)</span> Définition d'un plan de symétrie des charges.|Plan tel que la distribution reste inchangée par symétrie miroir (\\% charge identique image).|${PEM1}
-10048|<span style="color: rgb(0, 255, 0);">(INC)</span> Définition d'un plan d'antisymétrie des charges.|Plan tel que la charge en un point image est l'opposée de la charge au point objet (\\% charge inversée).|${PEM1}
-10049|<span style="color: rgb(255, 170, 0);">(INC)</span> Loi de Coulomb.|$\\vec{F}_{1 \\to 2} = \\frac{1}{4 \\pi \\epsilon _0} \\frac{q_1 q_2}{r^2} \\vec{u}_{1 \\to 2}$|${PEM1}
-10050|<span style="color: rgb(0, 255, 0);">(INC)</span> Comment est décrite la répartition des charges ?|Par une fonction scalaire densité ($\\rho, \\sigma, \\lambda$) dépendant des coordonnées.|${PEM1}
-10051|<span style="color: rgb(255, 170, 0);">(INC)</span> Principe de superposition pour le champ électrique.|Le champ total est la somme vectorielle des champs créés par chaque charge élémentaire.|${PEM1}
-10052|(INC) Force totale sur une charge due à un ensemble de charges.|Somme vectorielle des forces individuelles (superposition).|${PEM1}
-10053|<span style="color: rgb(0, 255, 0);">(INC)</span> Champ électrostatique créé par une charge ponctuelle q en S au point P.|$\\vec{E}(P) = \\frac{q}{4\\pi\\epsilon_0} \\frac{\\overrightarrow{SP}}{SP^3}$|${PEM1}
-10054|<span style="color: rgb(255, 170, 0);">(INC)</span> Direction de $\\vec{E}$ si $q > 0$.|Divergent (s'éloigne de la charge).|${PEM1}
-10055|<span style="color: rgb(255, 170, 0);">(INC)</span> Direction de $\\vec{E}$ si $q < 0$.|Convergent (se dirige vers la charge).|${PEM1}
-10056|<span style="color: rgb(0, 255, 0);">(INC)</span> Interaction entre charges de signes opposés.|Attractive.|${PEM1}
-10057|<span style="color: rgb(0, 255, 0);">(INC)</span> Interaction entre charges de même signe.|Répulsive.|${PEM1}
-10058|<span style="color: rgb(0, 255, 0);">(INC)</span> Nom de $\\epsilon_0$.|Permittivité diélectrique du vide.|${PEM1}
-10059|<span style="color: rgb(0, 255, 0);">(INC)</span> Quand considérer une distribution comme surfacique ?|Quand l'épaisseur est négligeable devant les autres dimensions et la distance d'observation.|${PEM1}
-10060|<span style="color: rgb(0, 255, 0);">(INC)</span> Quand considérer une distribution comme linéique ?|Quand la section transverse est négligeable.|${PEM1}
-10061|<img src="images/paste-de3005b71b3b26e6cbfb7bc7e487288057e44965.jpg">|<img src="images/paste-4e5b864acd14971b75ee4cfa20de066c86177c58.jpg">|${PEM1}
-10062|<img src="images/paste-036e005e8785d46a0d662e7e88fa5533bfe23c98.jpg">|<img src="images/paste-75d5efd4f249c0e30de16f6754802351a3a09811.jpg">|${PEM1}
-10063|<span style="color: rgb(0, 255, 0);">(A.R)</span> Circulation du champ $\\vec E$ de A à B ? Dépendance au chemin ?|$C_{A \\to B} = \\int_A^B \\vec E \\cdot d\\vec{l} = V_A - V_B$.<br>Indépendante du chemin suivi (car $\\vec{E}$ dérive d'un potentiel).|${PEM2}
-10064|<span style="color: rgb(0, 255, 0);">(A.R)</span> Circulation du champ électrostatique sur un contour fermé ?|Nulle. $\\oint \\vec E \\cdot d\\vec{l} = 0$ (car champ conservatif).|${PEM2}
-10065|<span style="color: rgb(255, 170, 0);">(A.R)</span> Potentiel électrostatique créé par une charge $q$ à distance $r$ ?|$V(r) = \\frac{q}{4\\pi\\varepsilon_0 r}$ (si V nul à l'infini).|${PEM2}
-10066|<span style="color: rgb(0, 255, 0);">(A.R)</span> Forme des surfaces équipotentielles d'une charge ponctuelle ?|Sphères centrées sur la charge.|${PEM2}
-10067|<span style="color: rgb(255, 170, 0);">(A.R)</span> Évolution du potentiel avec la distance ? Orientation du champ ?|Le champ $\\vec{E}$ est dirigé vers les potentiels décroissants.|${PEM2}
-10068|<span style="color: rgb(255, 170, 0);">(A.R)</span> Potentiel créé par plusieurs charges ponctuelles ?|$V(P) = \\sum_i \\frac{q_i}{4\\pi\\varepsilon_0 r_i}$ (additivité du potentiel).|${PEM2}
-10069|<span style="color: rgb(0, 255, 0);">(L.L)</span> Expression du gradient et lien avec la différentielle.|$\\vec{grad}f = \\frac{\\partial f}{\\partial x}\\vec{u}_x + \\frac{\\partial f}{\\partial y}\\vec{u}_y + \\frac{\\partial f}{\\partial z}\\vec{u}_z$<br>$df = \\vec{grad}f \\cdot d\\vec{l}$|${PEM2}
-10070|<span style="color: rgb(0, 255, 0);">(L.L)</span> $\\vec{grad}f$ est normal à quoi ?|Aux surfaces iso-f (surfaces où $f = cste$).|${PEM2}
-10071|<span style="color: rgb(255, 170, 0);">(L.L)</span> Relation intégrale champ-potentiel.|$\\int_A^B \\vec{E} \\cdot d\\vec{l} = V_A - V_B$|${PEM2}
-10072|<span style="color: rgb(255, 170, 0);">(L.L)</span> Relation locale champ-potentiel.|$\\vec{E} = -\\vec{grad} V$|${PEM2}
-10073|<span style="color: rgb(255, 170, 0);">(L.L)</span> Retrouver $\\vec{E} = -\\vec{grad}V$ via la relation intégrale.|$dV = -\\vec{E}\\cdot d\\vec{l}$. Or $dV = \\vec{grad}V \\cdot d\\vec{l}$. Donc $\\vec{E} = -\\vec{grad}V$.|${PEM2}
-10074|<span style="color: rgb(255, 170, 0);">(C.J)</span> Énergie potentielle électrostatique $E_p$ d'une charge $q_0$ dans un potentiel $V$.|$E_p = q_0 V$|${PEM2}
-10075|<span style="color: rgb(255, 170, 0);">(C.J)</span> Lien entre force et énergie potentielle.|$\\vec{F} = q_0\\vec{E} = -q_0\\vec{grad}V = -\\vec{grad}E_p$|${PEM2}
-10076|<span style="color: rgb(0, 255, 0);">(C.J)</span> Unité du potentiel ?|Volt (V)|${PEM2}
-10077|<span style="color: rgb(0, 255, 0);">(C.J)</span> Unité du champ $\\vec{E}$ ?|Volt par mètre ($V.m^{-1}$) ou Newton par Coulomb ($N.C^{-1}$).|${PEM2}
-10078|<span style="color: rgb(0, 255, 0);">(C.J)</span> Sens des lignes de champ ?|Vers les potentiels décroissants.|${PEM2}
-10079|<span style="color: rgb(0, 255, 0);">(C.J)</span> Orientation lignes de champ / équipotentielles ?|Orthogonales.|${PEM2}
-10080|<span style="color: rgb(0, 255, 0);">(T.B.)</span> 5 étapes du théorème de Gauss.|1. Symétries et invariances (direction et variables de $\\vec{E}$).<br>2. Choix de la surface de Gauss (Sg) fermée.<br>3. Calcul du flux $\\Phi = \\oiint \\vec{E}\\cdot d\\vec{S}$.<br>4. Calcul de $Q_{int}$.<br>5. Résolution $\\Phi = Q_{int}/\\varepsilon_0$.|${PE345}
-10081|<span style="color: rgb(255, 170, 0);">Ylan</span> Flux de $\\vec{E}$ d'une charge ponctuelle à travers une sphère centrée.|$\\Phi = \\frac{q}{\\varepsilon_0}$|${PE345}
-10082|<span style="color: rgb(255, 170, 0);">Ylan</span> Champ $\\vec{E}$ d'un fil infini chargé ($\\lambda$).|$\\vec{E}(r) = \\frac{\\lambda}{2\\pi \\varepsilon_0 r} \\vec{u}_r$|${PE345}
-10083|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Orientation de $d\\vec{S}$ pour Gauss ?|Vers l'extérieur de la surface fermée.|${PE345}
-10084|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Énoncé du théorème de Gauss.|Le flux du champ électrique à travers une surface fermée est proportionnel à la charge totale contenue à l'intérieur : $\\oiint_S \\vec{E} \\cdot d\\vec{S} = \\frac{Q_{int}}{\\varepsilon_0}$.|${PE345}
-10085|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Champ créé par un cylindre infini uniformément chargé en volume ($\\rho, R$).|$r < R : \\vec{E} = \\frac{\\rho r}{2\\varepsilon_0}\\vec{u}_r$<br>$r > R : \\vec{E} = \\frac{\\rho R^2}{2\\varepsilon_0 r}\\vec{u}_r$|${PE345}
-10086|<span style="color: rgb(255, 170, 0);">(Arthur)</span> Champ $\\vec{E}$ à l'extérieur d'un condensateur plan idéal ?|Nul ($\\|\\vec{E}\\| = 0$).|${PE345}
-10087|<span style="color: rgb(255, 170, 0);">(Manuel)</span> Norme du champ $\\vec{E}$ entre les armatures d'un condensateur plan ?|$E = \\frac{\\sigma}{\\varepsilon_0} = \\frac{U}{e}$|${PE345}
-10088|<span style="color: rgb(0, 255, 0);">Victor</span> Champ créé par un plan infini chargé ($\\sigma$).|$\\vec{E} = \\pm \\frac{\\sigma}{2\\varepsilon_0} \\vec{u}_z$ (divergent si $\\sigma > 0$).|${PE345}
-10089|<span style="color: rgb(255, 170, 0);">(Ilyass)</span> Forme du champ pour un condensateur cylindrique infini.|Radial : $\\vec{E}(M) = E(r)\\vec{u}_r$.|${PE345}
-10090|<span style="color: rgb(255, 170, 0);">Victor</span> Champ condensateur plan par superposition.|Somme des champs de deux plans infinis (+$\\sigma$ et -$\\sigma$).<br>Intérieur : champs s'ajoutent $\\to \\sigma/\\varepsilon_0$.<br>Extérieur : champs s'annulent $\\to 0$.|${PE345}
-10091|<span style="color: rgb(255, 170, 0);">Victor</span> Potentiel $V(z)$ dans un condensateur plan ($V(0)=0$).|$V(z) = E \\cdot z = \\frac{\\sigma}{\\varepsilon_0}z$ (variation linéaire).|${PE345}
-10092|<span style="color: rgb(0, 255, 0);">(Océane)</span> Allure des lignes de champ connaissant les équipotentielles.<br><img src="images/im3.jpg">|Perpendiculaires aux équipotentielles et dirigées vers les potentiels faibles.<br><img src="images/im1.jpg">|${PE345}
-10093|<span style="color: rgb(255, 170, 0);">(Daouda)</span> Tube de champ vide de charges : relation $E_1 S_1$ vs $E_2 S_2$.|Conservation du flux : $E_1 S_1 = E_2 S_2$.<br>Si la section diminue, le champ augmente (resserrement des lignes).|${PE345}
-10094|<span style="color: rgb(255, 170, 0);">(Vincent)</span> Tableau analogies gravitation/électrostatique.|<img src="images/paste-8274af54e4ef8158c9147e47a8c1d6073f3a1f0a.jpg">|${PE345}
-10095|<span style="color: rgb(255, 170, 0);">V.Iulian</span> Circulation de $\\vec{B}$ sur un rectangle coupant un solénoïde infini.|Seul le côté intérieur contribue : $C = B \\cdot L$.<br>Théorème d'Ampère $\\to B L = \\mu_0 (n L I) \\to B = \\mu_0 n I$.|${PEM6}
-10096|<span style="color: rgb(255, 170, 0);">V.Iulian</span> Bobines de Helmholtz (courants même sens).|Création d'un champ magnétique quasi-uniforme au centre, entre les deux bobines.|${PEM6}
-10097|<span style="color: rgb(255, 170, 0);">(A.P)</span> Carte de champ de deux fils parallèles.<br><img src="images/20231127_205031.jpg">|Courants de sens opposés (lignes de champ se repoussent, champ intense entre les fils).|${PEM6}
-10098|<span style="color: #cccc00;">(M.W)</span> Symétries Courants / Champ $\\vec{B}$.|Plan de symétrie des courants $\\to$ Plan d'antisymétrie pour $\\vec{B}$ ($\\vec{B} \\perp$ plan).<br>Plan d'antisymétrie des courants $\\to$ Plan de symétrie pour $\\vec{B}$ ($\\vec{B} \\in$ plan).|${PEM6}
-10099|<span style="color: #cccc00;">(M.W)</span> Interpréter le resserrement des lignes de champ.|Champ plus intense.|${PEM6}
-10100|<span style="color: rgb(255, 170, 0);">(BM)</span> Circulation de $\\vec{B}$.|$C = \\oint \\vec{B} \\cdot d\\vec{l}$|${PEM6}
-10101|<span style="color: rgb(255, 170, 0);">(BM)</span> Théorème d'Ampère.|$\\oint_\\Gamma \\vec{B} \\cdot d\\vec{l} = \\mu_0 I_{enlacé}$|${PEM6}
-10102|<span style="color: rgb(255, 170, 0);">(BM)</span> Intensité enlacée (distrib. volumique).|$I = \\iint_S \\vec{j} \\cdot d\\vec{S}$|${PEM6}
-10103|<span style="color: rgb(255, 170, 0);">(BM)</span> Intensité enlacée (filiforme).|Somme algébrique des courants traversant la surface s'appuyant sur le contour (règle main droite).|${PEM6}
-10104|<span style="color: rgb(255, 170, 0);">(BM)</span> Méthode calcul $\\vec{B}$ avec Ampère.|1. Symétries (direction $\\vec{B}$, variables).<br>2. Contour d'Ampère adapté (cercle, rectangle...).<br>3. Calcul circulation $C$.<br>4. Calcul $I_{enlacé}$.<br>5. Égalité.|${PEM6}
-10105|<span style="color: rgb(255, 170, 0);">(BM)</span> Flux de $\\vec{B}$ surface fermée ?|Toujours nul ($\\vec{B}$ est à flux conservatif).|${PEM6}
-10106|<span style="color: rgb(255, 170, 0);">(BM)</span> Ordre de grandeur champ magnétique terrestre.|$50 \\mu T$ ($5 \\cdot 10^{-5} T$).|${PEM6}
-10107|<span style="color: rgb(255, 170, 0);">(BM)</span> Champ à 1 cm d’un fil (10 A).|$\\sim 200 \\mu T$.|${PEM6}
-10108|<span style="color: rgb(0, 255, 0);">(BM)</span> Champ aimant néodyme.|0.1 à 1 Tesla.|${PEM6}
-10109|<span style="color: rgb(0, 255, 0);">(BM)</span> Champ électroaimant labo.|1 à 10 Tesla.|${PEM6}
-10110|<span style="color: rgb(255, 170, 0);">(S.E)</span> Ampère pour un fil infini.|Contour circulaire.<br>$B(r) \\cdot 2\\pi r = \\mu_0 I \\Rightarrow B = \\frac{\\mu_0 I}{2\\pi r}$ (Ortho-radial).|${PEM6}
-10111|<span style="color: rgb(255, 170, 0);">(S.E)</span> Ampère solénoïde infini.|$B = \\mu_0 n I$ à l'intérieur, nul à l'extérieur.|${PEM6}
-10112|<span style="color: rgb(0, 255, 0);">(M.B.T.)</span> Moment magnétique d'une spire plane.|$\\vec{\\mathcal{M}} = I S \\vec{n}$ ($A.m^2$).|${PEM8}
-10113|<span style="color: rgb(0, 255, 0);">(M.B.T)</span> Condition dipôle magnétique.|Dimension de la boucle $a \\ll$ distance d'observation $r$.|${PEM8}
-10114|<span style="color: rgb(0, 255, 0);">(A.R.)</span> Lignes de champ dipôle magnétique.|Similaires à celles d'un aimant droit (boucles sortant du Nord, entrant au Sud).|${PEM8}
-10115|<span style="color: rgb(255, 170, 0);">(A.R)</span> Action champ $\\vec{B}$ sur dipôle.|Uniforme : Couple (tendance à s'aligner).<br>Non-uniforme : Couple + Force (attraction vers champ fort).|${PEM8}
-10116|Énergie potentielle d'un dipôle $\\vec{m}$ dans $\\vec{B}$.|$E_p = -\\vec{m} \\cdot \\vec{B}$|${PEM8}
-10117|Orientation moment magnétique terrestre.|Du pôle Nord géo vers pôle Sud géo (l'inverse du champ).|${PEM8}
-10118|<span style="color: rgb(255, 170, 0);">Ylan</span> Qu'est-ce qu'un doublet de charges ?|Deux charges $+q$ et $-q$ séparées d'une distance $a$.|${PEM9}
-10119|<span style="color: rgb(255, 170, 0);">Ylan</span> Moment dipolaire $\\vec{p}$.|$\\vec{p} = q \\overrightarrow{NP}$ (de la charge - vers la +).|${PEM9}
-10120|<span style="color: rgb(255, 170, 0);">Ylan</span> Approximation dipolaire.|Distance d'observation $r \\gg a$ (taille du dipôle).|${PEM9}
-10121|<span style="color: rgb(255, 170, 0);">Victor</span> Énergie potentielle dipôle électrique dans $\\vec{E}$.|$E_p = -\\vec{p} \\cdot \\vec{E}$|${PEM9}
-10122|<span style="color: rgb(0, 255, 0);">Ylan</span> Décroissance V et E dipôle vs charge ponctuelle ?|Dipôle décroit plus vite.<br>V en $1/r^2$ (vs $1/r$).<br>E en $1/r^3$ (vs $1/r^2$).|${PEM9}
-10123|<span style="color: rgb(255, 170, 0);">Ylan</span> Potentiel dipôle (polaire).|$V(r, \\theta) = \\frac{p \\cos \\theta}{4\\pi \\varepsilon_0 r^2}$|${PEM9}
-10124|<span style="color: rgb(0, 255, 0);">Victor</span> Dipôle rigide ?|Norme $p$ constante.|${PEM9}
-10125|<span style="color: rgb(255, 170, 0);">Victor</span> Force sur dipôle dans champ uniforme ?|Nulle ($\\vec{F} = \\vec{0}$).|${PEM9}
-10126|<span style="color: rgb(255, 170, 0);">Ylan</span> Champ $\\vec{E}$ dipolaire (coord. sphériques).|$\\vec{E} = \\frac{p}{4\\pi\\varepsilon_0 r^3} (2\\cos\\theta \\vec{u}_r + \\sin\\theta \\vec{u}_\\theta)$|${PEM9}
-10127|<span style="color: rgb(255, 170, 0);">Victor</span> Action champ uniforme sur dipôle.|Couple uniquement : $\\vec{\\Gamma} = \\vec{p} \\wedge \\vec{E}$ (tend à aligner $\\vec{p}$ sur $\\vec{E}$).|${PEM9}
-10128|<span style="color: rgb(0, 255, 0);">Ylan</span> Lignes de champ dipôle.<br><img src="images/paste-f94a6b6040693dd84af9aa136b7c19529ad0bf87.jpg">|Boucles partant du + vers le -.|${PEM9}
-10129|<span style="color: rgb(0, 255, 0);">(Yuye)</span> Moment dipolaire moléculaire ?|Séparation permanente des barycentres des charges + et - (ex: H2O).|${PEM9}
-10130|<span style="color: rgb(255, 170, 0);">Victor</span> Action champ non-uniforme sur dipôle.|Couple (orientation) + Force (déplacement vers zones de champ fort).|${PEM9}
-10131|<span style="color: rgb(255, 170, 0);">(Yuye)</span> Force ion-dipôle.|Attractive (en $1/r^3$ ou plus).|${PEM9}
-10132|<span style="color: rgb(0, 255, 0);">(Yuye)</span> Dipôle induit.|Déformation du nuage électronique par un champ externe, créant un moment $\\vec{p}$ temporaire.|${PEM9}
-10133|Couple subi par un dipôle.|$\\vec{\\Gamma} = \\vec{p} \\wedge \\vec{E}$|${PEM9}
-10134|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Forme locale Maxwell.|MG: $div \\vec{E} = \\rho/\\varepsilon_0$<br>MF: $div \\vec{B} = 0$<br>MFa: $\\vec{rot} \\vec{E} = -\\partial_t \\vec{B}$<br>MA: $\\vec{rot} \\vec{B} = \\mu_0 \\vec{j} + \\mu_0\\varepsilon_0 \\partial_t \\vec{E}$|${PEM10}
-10135|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Conservation de la charge (locale).|$div \\vec{j} + \\frac{\\partial \\rho}{\\partial t} = 0$|${PEM10}
-10136|<span style="color: rgb(0, 255, 0);">(Daouda Cisse)</span> Démontrer conservation charge 1D.|Bilan sur tranche dx : variation charge = entrant - sortant.|${PEM10}
-10137|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Relation $\\varepsilon_0, \\mu_0, c$.|$\\varepsilon_0 \\mu_0 c^2 = 1$|${PEM10}
-10138|<span style="color: rgb(255, 170, 0);">(Daouda Cisse)</span> Forme intégrale Maxwell-Gauss.|Flux $\\vec{E}$ sortant = $Q_{int}/\\varepsilon_0$.|${PEM10}
-10139|<span style="color: rgb(255, 170, 0);">(Marion Vincent)</span> Forme intégrale Maxwell-Flux.|Flux $\\vec{B}$ à travers surface fermée = 0.|${PEM10}
-10140|<span style="color: rgb(255, 170, 0);">(Marion Vincent)</span> Forme intégrale Maxwell-Faraday.|Circulation $\\vec{E}$ = - dérivée flux magnétique ($e = -d\\Phi/dt$).|${PEM10}
-10141|<span style="color: rgb(255, 170, 0);">(Oceane Arabi)</span> Forme intégrale Maxwell-Ampère.|Circulation $\\vec{B} = \\mu_0 (I_{cond} + I_{déplac})$.|${PEM10}
-10142|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Maxwell dans le vide ($\\rho=0, \\vec{j}=\\vec{0}$).|Couplage symétrique, $\\vec{E}$ et $\\vec{B}$ obéissent à l'équation d'onde.|${PEM10}
-10143|<span style="color: rgb(0, 255, 0);">(Marion Vincent)</span> Maxwell en statique.|Découplage : Électrostatique ($\\vec{rot}\\vec{E}=\\vec{0}$) et Magnétostatique ($div\\vec{B}=0$).|${PEM10}
-10144|<span style="color: rgb(255, 170, 0);">(Daouda Cisse)</span> Équation de d'Alembert pour $\\vec{E}$ dans le vide.|$\\Delta \\vec{E} - \\frac{1}{c^2} \\frac{\\partial^2 \\vec{E}}{\\partial t^2} = \\vec{0}$|${PEM10}
-10145|<span style="color: rgb(0, 255, 0);">(Oceane Arabi)</span> Équation de Poisson.|$\\Delta V + \\frac{\\rho}{\\varepsilon_0} = 0$|${PEM10}
-10146|<span style="color: rgb(255, 170, 0);">(Vincent Marion)</span> Équation de Laplace.|$\\Delta V = 0$ (Poisson sans charges).|${PEM10}
-10147|Courant de déplacement.|$\\vec{j}_D = \\varepsilon_0 \\frac{\\partial \\vec{E}}{\\partial t}$|${PEM10}
-10148|Conservation charge stationnaire ?|$div \\vec{j} = 0$ (Loi des nœuds).|${PEM10}
-10149|<span style="color: rgb(255, 170, 0);">(M.A)</span> Opérateurs en complexe (OPP).|$\\vec{\\nabla} \\to -j\\vec{k}$<br>$\\frac{\\partial}{\\partial t} \\to j\\omega$|${PEM11}
-10150|<span style="color: rgb(255, 170, 0);">(M.A)</span> Solution générale d'Alembert 1D.|$f(x,t) = f_1(t - x/c) + f_2(t + x/c)$ (Onde prog + Onde régressive).|${PEM11}
-10151|<span style="color: rgb(255, 170, 0);">(M.A)</span> Interprétation $f(t-x/c)$.|Propagation vers les x croissants sans déformation.|${PEM11}
-10152|<span style="color: rgb(255, 170, 0);">M.W</span> $\\vec{E}$ en $\\cos(\\omega t - kx)$. Direction ?|Vers les +x (signes opposés dans la phase).|${PEM11}
-10153|<span style="color: rgb(255, 170, 0);">(M.A)</span> Structure OPP dans le vide.|Trièdre direct $(\\vec{E}, \\vec{B}, \\vec{k})$.<br>Transverse.<br>$B = E/c$.|${PEM11}
-10154|<span style="color: rgb(255, 170, 0);">(M.A)</span> Relation vectorielle $\\vec{E}, \\vec{B}$ vide.|$\\vec{B} = \\frac{\\vec{u} \\wedge \\vec{E}}{c}$|${PEM11}
-10155|<span style="color: rgb(255, 170, 0);">(M.A)</span> OPPM ?|Onde Plane Progressive Monochromatique (sinusoïdale).|${PEM11}
-10156|<span style="color: rgb(255, 170, 0);">M.W</span> Polarisation circulaire.|Composantes orthog. de même amplitude déphasées de $\\pi/2$.|${PEM11}
-10157|<span style="color: rgb(255, 170, 0);">M.W</span> Polarisation rectiligne.|Direction du champ constante.|${PEM11}
-10158|<span style="color: rgb(255, 170, 0);">(M.A)</span> Expression générale $\\vec{E}$ OPPM.|$\\vec{E}_0 \\cos(\\omega t - \\vec{k}\\cdot\\vec{r} + \\varphi)$|${PEM11}
-10159|<span style="color: rgb(255, 170, 0);">(M.A)</span> Relation de dispersion vide.|$\\omega = ck$ ($k = \\omega/c$).|${PEM11}
-10160|<span style="color: rgb(0, 255, 0);">(BM)</span> d'Alembert 3D vectorielle.|$\\Delta \\vec{E} - \\frac{1}{c^2} \\ddot{\\vec{E}} = \\vec{0}$|${PEM11}
-10161|<span style="color: rgb(0, 255, 0);">(A.P)</span> Vecteur de Poynting.|$\\vec{\\Pi} = \\frac{\\vec{E} \\wedge \\vec{B}}{\\mu_0}$ (Puissance surfacique, $W.m^{-2}$).|${PEM12}
-10162|<span style="color: rgb(0, 255, 0);">(A.P)</span> Poynting OPP vide.|$\\vec{\\Pi} = \\varepsilon_0 c E^2 \\vec{u}$ (colinéaire à la propagation).|${PEM12}
-10163|(V.I) Densité énergie magnétique.|$u_m = \\frac{B^2}{2\\mu_0}$|${PEM12}
-10164|(V.I) Densité énergie EM totale.|$u_{em} = \\frac{\\varepsilon_0 E^2}{2} + \\frac{B^2}{2\\mu_0}$|${PEM12}
-10165|(V.I) Conditions ARQS.|Temps : propagation instantanée ($\\tau \\ll T$).<br>Espace : taille circuit négligeable ($L \\ll \\lambda$).|${PEM12}
-10166|(V.I) Maxwell ARQS magnétique.|On néglige le courant de déplacement dans Maxwell-Ampère ($\\vec{rot}\\vec{B} \\approx \\mu_0 \\vec{j}$).|${PEM12}
-10167|(V.I) Équipartition énergie OPP vide.|$u_e = u_m$ donc $u_{em} = \\varepsilon_0 E^2$.|${PEM12}
-10168|<span style="color: rgb(0, 255, 0);">(E-S)</span> Puissance fournie à une charge.|$\\mathcal{P} = \\vec{F} \\cdot \\vec{v} = q \\vec{E} \\cdot \\vec{v}$ (la force magnétique ne travaille pas).|${PEM12}
-10169|<span style="color: rgb(255, 170, 0);">(V.I)</span> Loi d’Ohm locale.|$\\vec{j} = \\gamma \\vec{E}$|${PEM12}
-10170|(V.I) Conducteur ohmique.|Matériau vérifiant la loi d'Ohm locale (proportionnalité j/E).|${PEM12}
-10171|(V.I) Densité énergie électrique condensateur.|$u_e = \\frac{1}{2}\\varepsilon_0 E^2$|${PEM12}
-10172|<span style="color: rgb(0, 255, 0);">(E-S)</span> Puissance volumique joule.|$\\mathcal{P}_v = \\vec{j} \\cdot \\vec{E} = \\gamma E^2$|${PEM12}
-10173|<span style="color: rgb(0, 255, 0);">(E-S)</span> Bilan d'énergie intégral (Poynting).|Variation énergie interne = Puissance Joule + Flux Poynting entrant.|${PEM12}
-10174|<span style="color: rgb(255, 170, 0);">(E-S)</span> Bilan d'énergie local (Poynting).|$\\frac{\\partial u_{em}}{\\partial t} + div \\vec{\\Pi} = -\\vec{j} \\cdot \\vec{E}$|${PEM12}
-10175|<span style="color: rgb(255, 170, 0);">(O.M)</span> Conditions aux limites cavité conductrice parfaite.|$\\vec{E}_{tg} = \\vec{0}$ sur les parois (Nœuds de champ électrique).|${PEM13}
-10176|<span style="color: rgb(255, 170, 0);">(O.M)</span> Forme onde stationnaire cavité.|Variables séparées : $\\sin(kx)\\cos(\\omega t)$.|${PEM13}
-10177|<span style="color: rgb(255, 170, 0);">(O.M)</span> Quantification cavité.|Condition aux limites impose $k = p \\frac{\\pi}{a}$ (modes propres).|${PEM13}
-10178|<span style="color: rgb(255, 170, 0);">(O.M)</span> Signification entier p (modes).|Nombre de "fuseaux" (demi-longueurs d'onde) dans la cavité.|${PEM13}
-10179|(L.S) Nœuds/Ventres E vs B.|Décalés de $\\lambda/4$. Nœud de E $\\leftrightarrow$ Ventre de B.|${PEM13}
-10180|(L.S) Réflexion conducteur parfait (Incidence normale).|$\\vec{E}_r = -\\vec{E}_i$ (en $z=0$). Onde stationnaire pure.|${PEM13}
-10181|(L.S) Champs E et B résultants réflexion métal.|E : Onde stationnaire (Nœud en surface).<br>B : Onde stationnaire (Ventre en surface).|${PEM13}
-10182|Nature onde dans cavité.|Onde stationnaire (superposition incident + réfléchi).|${PEM13}
-10183|(MAG) Équation propagation conducteur ohmique.|Terme de diffusion en dérivée première ($\\mu_0 \\gamma \\partial_t \\vec{E}$).|${PEM13}
-10184|(MAG) Relation dispersion conducteur (complexe).|$k^2 = \\frac{\\omega^2}{c^2} - j\\mu_0\\gamma\\omega$|${PEM13}
-10185|(MAG) Épaisseur de peau $\\delta$.|Distance caractéristique d'atténuation. $\\delta = \\sqrt{\\frac{2}{\\mu_0 \\gamma \\omega}}$.|${PEM13}
-10186|(MAG) Vitesse phase bon conducteur.|$v_\\phi = \\omega \\delta$. Très faible devant c.|${PEM13}
-10187|(MAG) Caractéristiques onde bon conducteur.|S'atténue très vite. B très supérieur à E/c (magnétique dominant).|${PEM13}
-10188|(MAG) Déphasage E/B bon conducteur.|B est en retard de 45° ($\\pi/4$) sur E.|${PEM13}
-10189|<span style="color: rgb(0, 0, 255);">(MAG)</span> Conducteur parfait.|$\\gamma \\to \\infty$, $\\delta \\to 0$. Champ nul à l'intérieur.|${PEM13}
-10190|Champ réfléchi conducteur parfait.|Opposé au champ incident (pour annuler la composante tangentielle).|${PEM13}
-10191|Poynting moyen onde stationnaire.|Nul (pas de transport d'énergie moyen).|${PEM13}
-10192|Charge surfacique conducteur parfait sous onde.|Nulle (généralement).|${PEM13}
-10193|Courant surfacique conducteur parfait.|$\\vec{j}_s = \\frac{1}{\\mu_0} \\vec{n} \\wedge \\vec{B}_{surf}$ (Discontinuité de B).|${PEM13}
-10194|Origine onde réfléchie.|Rayonnement des courants surfaciques induits.|${PEM13}
-10195|<span style="color: rgb(255, 170, 0);">(LPB)</span> Relation dispersion plasma.|$\\omega^2 = \\omega_p^2 + k^2c^2$|${PEM14}
-10196|<span style="color: rgb(0, 255, 0);">(TS)</span> Définition plasma.|Gaz ionisé globalement neutre (ions + électrons). Ex: Ionosphère.|${PEM14}
-10197|<span style="color: rgb(255, 170, 0);">(LPB)</span> Onde dans plasma (Maxwell).|Neutralité conservée ($div E = 0$). Structure TEM.|${PEM14}
-10198|<span style="color: rgb(255, 170, 0);">(TS)</span> Vitesse électron dans plasma (modèle Drude sans frottement).|$\\vec{v}$ en quadrature avec $\\vec{E}$ (retard $\\pi/2$).|${PEM14}
-10199|<span style="color: rgb(255, 170, 0);">(TS)</span> Conductivité plasma.|Imaginaire pure (pas de dissipation joule moyenne).|${PEM14}
-10200|<span style="color: rgb(0, 255, 0);">(TS)</span> Puissance moyenne cédée au plasma.|Nulle (car courant et champ en quadrature).|${PEM14}
-10201|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Équation Klein-Gordon (Plasma).|$\\Delta \\vec{E} - \\frac{1}{c^2} \\partial_{tt} \\vec{E} = \\mu_0 \\partial_t \\vec{j}$|${PEM14}
-10202|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Plasma $\\omega > \\omega_p$.|Propagation possible. Milieu dispersif ($v_\\phi > c$).|${PEM14}
-10203|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Plasma $\\omega < \\omega_p$.|Onde évanescente (réflexion totale). Pénétration réactive sur distance $\\delta$.|${PEM14}
-10204|Dipôle oscillant.|Charge q oscillant autour d'une position d'équilibre (modèle d'émission atomique).|${PEM15}
-10205|<span style="color: rgb(255, 170, 0);">(F.H)</span> Indicatrice rayonnement dipôle.|Forme de tore ("donut"). Nulle dans l'axe, max équateur.|${PEM15}
-10206|<span style="color: rgb(255, 170, 0);">(F.H)</span> Zone rayonnement.|Zone lointaine où le champ décroit en $1/r$ (structure locale d'onde plane).|${PEM15}
-10207|Approx $a \\ll \\lambda$.|Dipôle petit devant la longueur d'onde (rayonnement cohérent).|${PEM15}
-10208|Approx $a \\ll r$.|Approximation dipolaire (observation loin de la source).|${PEM15}
-10209|<span style="color: rgb(0, 255, 0);">(Y.Z)</span> Structure onde rayonnée.|Locale plane (E, B, u_r trièdre), transverse.|${PEM15}
-10210|(Y.Z) Puissance rayonnée dipôle.|Proportionnelle à $\\omega^4$ et $\\sin^2\\theta$. Anisotrope.|${PEM15}
-10211|<span style="color: rgb(255, 170, 0);">(Y.Z.)</span> Bilan puissance sphère lointaine.|Constante (conservation énergie flux sortant).|${PEM15}
-10212|<span style="color: rgb(255, 170, 0);">(O.M)</span> Domaine visible.|400 nm (Bleu) - 800 nm (Rouge).|${PO1}
-10213|<span style="color: rgb(255, 170, 0);">(O.M)</span> Snell-Descartes réfraction.|$n_1 \\sin i_1 = n_2 \\sin i_2$|${PO1}
-10214|<span style="color: rgb(255, 170, 0);">(O.M)</span> Surface d'onde.|Lieu des points de même phase (sphère pour source ponctuelle, plan pour onde plane).|${PO1}
-10215|<span style="color: rgb(0, 255, 0);">(O.M)</span> Théorème de Malus.|Rayons lumineux \\perp Surfaces d'onde.|${PO1}
-10216|<span style="color: rgb(255, 170, 0);">(O.M)</span> Créer onde plane.|Source ponctuelle au foyer objet d'une lentille convergente.|${PO1}
-10217|<span style="color: rgb(255, 170, 0);">(O.M)</span> Différence de marche lame (réflexion).|$\\delta = 2ne$ (+ $\\lambda/2$ si réflexion dure).|${PO1}
-10218|<span style="color: rgb(255, 170, 0);">(L.S)</span> Chemin optique.|$(AB) = \\int n dl$. Si homogène : $n \\times AB$.|${PO1}
-10219|<span style="color: rgb(255, 170, 0);">(O.M)</span> Malus $\\to$ Descartes.|Égalité des chemins optiques entre deux plans d'onde.|${PO1}
-10220|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-238a7158d0fbb60d39022fd285b56f918dd29e0d.jpg">|<img src="images/paste-1a5c9e434fc7fba5cee47a88b0c5589fdd2023f6.jpg">|${PO1}
-10221|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-1fbffd340ad708be06cde27faac42463c5d01824.jpg">|<img src="images/paste-f34dd382a3eb1540065c45ad246b2e942af5a970.jpg">|${PO1}
-10222|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Définition indice optique.|$n = c/v$|${PO1}
-10223|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Signification chemin optique.|Distance parcourue dans le vide pendant la même durée.|${PO1}
-10224|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Principe de Fermat.|La lumière emprunte le chemin qui rend le temps de parcours stationnaire (minimal).|${PO1}
-10225|<span style="color: rgb(255, 170, 0);"><b>(MAG)</b></span> Sens propagation $\\cos(\\omega t - kx)$.|Vers les x positifs.|${PO1}
-10226|<span style="color: rgb(0, 255, 0);"><b>(MAG)</b></span><br><img src="images/paste-390cb59c26a1294587ee88e68cae62913c043f95.jpg">|<img src="images/paste-ec7e86b684f990ff7afa6167e99cfbfdfaffdee8.jpg">|${PO1}
-10227|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.1 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.1.PNG">|<img src="images/paste-73a055b197e1d292b6d4db07cc3d139ebebc4320.jpg">|${PO1}
-10228|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.2 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.2.PNG">|<img src="images/paste-f063776cbb7c0576250e5ab8e21e2b6f3d706359.jpg">|${PO1}
-10229|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.3 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.3.PNG">|<img src="images/paste-3574f56ff02dc7444f84ead0c013a0c3870f9199.jpg">|${PO1}
-10230|<span style="color: rgb(255, 170, 0);">(L.S)</span> Exercice 6.4 : Construire l'image A' de A et tracer l'allure des surfaces d'onde.<br><img src="images/6.4.PNG">|<img src="images/paste-1f7e79eb3eae3a9f6fa526e2156258251e313b9b.jpg">|${PO1}
-10231|<span style="color: rgb(255, 170, 0);">(S.D.S)</span> Lame verre incidence normale avec défaut.|Rayons rectilignes. Surface d'onde déformée (retard au niveau du défaut).|${PO1}
-10232|<span style="color: rgb(255, 170, 0);">(S.D.S)</span> Déphasage dû surépaisseur $\\Delta e$.|$\\Delta \\phi = -\\frac{2\\pi}{\\lambda_0} \\Delta e (n_{verre} - n_{air})$|${PO1}
-10233|<span style="color: rgb(0, 255, 0);">(B.R.)</span> Période temporelle visible.|Femtoseconde ($10^{-15}s$).|${PO2}
-10234|<span style="color: rgb(255, 170, 0);">(B.R.)</span> Temps réponse détecteurs.|Œil/Capteurs lents ($\\sim ms$). Mesurent valeur moyenne $\\langle E^2 \\rangle$ (Intensité).|${PO2}
-10235|<span style="color: rgb(255, 170, 0);">(T.S)</span> Modèle train d'onde.|Sinusoïdes de durée finie $\\tau_c$ (temps cohérence) à phases aléatoires.|${PO2}
-10236|<span style="color: rgb(0, 255, 0);">(T.S)</span> Relation largeur spectrale / durée.|$\\Delta f \\cdot \\Delta t \\sim 1$|${PO2}
-10237|<span style="color: rgb(255, 170, 0);">(T.S)</span> Longueur de cohérence $L_c$.|$L_c = c \\tau_c$. Condition interférences : $\\delta < L_c$.|${PO2}
-10238|<span style="color: rgb(255, 170, 0);">(T.S)</span> Ordres grandeur $L_c$.|Blanche : $\\mu m$.<br>Spectrale : $mm$.<br>Laser : $m$ ou $km$.|${PO2}
-10239|<span style="color: rgb(255, 170, 0);">(T.S)</span> Types interféromètres.|Division du front d'onde (Young).<br>Division d'amplitude (Michelson).|${PO2}
-10240|<span style="color: rgb(255, 170, 0);">(LPB)</span> Conditions Constructive/Destructive.|Brillante : $\\delta = m \\lambda$.<br>Sombre : $\\delta = (m+1/2)\\lambda$.|${PO2}
-10241|<span style="color: rgb(255, 170, 0);">(LPB)</span> Contraste.|$C = \\frac{I_{max}-I_{min}}{I_{max}+I_{min}}$|${PO2}
-10242|<span style="color: rgb(0, 255, 0);">(LPB)</span> Formule de Fresnel.|<img src="images/Capture d'écran 2023-12-07 193849.png">|${PO2}
-10243|<span style="color: rgb(255, 170, 0);">Z.S</span> Ordre grandeur $\\tau_c$ lampe spectrale.|Picoseconde ($10^{-12}s$).|${PO2}
-10244|Conditions interférences.|Cohérence (même source), même fréquence, $\\delta < L_c$.<br>$I = I_1 + I_2 + 2\\sqrt{I_1 I_2}\\cos(2\\pi \\delta / \\lambda)$|${PO2}
-10245|Calcul intensité complexe.|$I \\propto | \\underline{A}_{tot} |^2$|${PO2}
-10246|<span style="color: rgb(255, 170, 0);">(Y)</span> Trous d'Young : $\\delta$ et $I$.|$\\delta = \\frac{ax}{D}$.<br>$I(x) = 2I_0(1+\\cos(\\frac{2\\pi a x}{\\lambda D}))$ (Franges rectilignes).|${PO3}
-10247|Interférences non localisées.|Visibles partout dans le champ (ex: Young source ponctuelle).|${PO3}
-10248|Interfrange $i$ Young.|$i = \\frac{\\lambda D}{a}$|${PO3}
-10249|(F.H) Young source excentrée.|$\\delta = \\frac{ax}{D} + \\delta_{source}$ (Translation du système de franges).|${PO3}
-10250|<span style="color: rgb(255, 170, 0);">(F.H)</span> Schéma Young infini.|<img src="images/paste-9a60a5058a996c2a13547706b58d971c86f71533.jpg">|${PO3}
-10251|(F.H) Young infini différence marche.|$\\delta = a \\sin \\theta \\approx \\frac{ax}{f'}$|${PO3}
-10252|(F.H) Phase Young infini.|$\\Delta \\phi = \\frac{2\\pi a x}{\\lambda f'}$|${PO3}
-10253|(F.H) Interfrange Young infini.|$i = \\frac{\\lambda f'}{a}$|${PO3}
-10254|<span style="color: rgb(255, 170, 0);">(Y)</span> Position franges Young.|Brillantes : $x = k i$.<br>Sombres : $x = (k+1/2) i$.|${PO3}
-10255|<span style="color: rgb(255, 170, 0);">(M.S)</span> Éléments Michelson.|Séparatrice, Compensatrice, Miroir fixe, Miroir mobile, Source, Écran.|${PO4}
-10256|<span style="color: rgb(255, 170, 0);">(M.S)</span> Position miroirs.|Quasi-perpendiculaires (image de l'un quasi-parallèle à l'autre).|${PO4}
-10257|<span style="color: rgb(255, 170, 0);">(M.S)</span> Angle séparatrice.|45 degrés.|${PO4}
-10258|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle vis rotation.|Régler l'angle $\\alpha$ du coin d'air (parallélisme).|${PO4}
-10259|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle séparatrice.|Division d'amplitude (créer 2 faisceaux cohérents).|${PO4}
-10260|<span style="color: rgb(0, 255, 0);">(M.S)</span> Rôle chariotage.|Régler l'épaisseur $e$ de la lame d'air (différence de marche).|${PO4}
-10261|<span style="color: rgb(255, 170, 0);">(M.S)</span> Rôle anti-calorique.|Protéger les miroirs de la chaleur source.|${PO4}
-10262|<span style="color: rgb(255, 170, 0);">(M.S)</span> Modifier différence marche Michelson.|Charioter (changer $e$) ou incliner M2 (changer $\\alpha$ et localisation).|${PO4}
-10263|<span style="color: rgb(255, 170, 0);">(M.S)</span> Sources secondaires Michelson.|Images de la source par les deux bras (M1 et M2).|${PO4}
-10264|Michelson Coin d'air.|Franges rectilignes d'égale épaisseur ($e(x)$).<br>Localisées sur les miroirs.<br>$i = \\frac{\\lambda}{2\\alpha}$.|${PO4}
-10265|<span style="color: rgb(255, 170, 0);">(M.S)</span> Schéma équivalent Michelson.|Lame d'air ou Coin d'air entre M1 et M'2 (image de M2).|${PO4}
-10266|<span style="color: rgb(255, 170, 0);">(M.S)</span> Figures interférences Michelson.|Coin d'air : Franges rectilignes.<br>Lame d'air : Anneaux (égale inclinaison).<br>Contact optique : Teinte plate.|${PO4}
-10267|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Éclairage Lame d'air.|Source étendue (pour avoir tous les angles d'incidence).|${PO4}
-10268|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Observation Lame d'air.|À l'infini (foyer lentille). Franges d'égale inclinaison (Anneaux).|${PO4}
-10269|<span style="color: rgb(0, 255, 0);">(C.E.)</span> Config Coin d'air.|Éclairage // (incidence normale). Observation projection miroirs.|${PO4}
-10270|Différence marche Coin d'air.|$\\delta = 2 e(x) = 2 \\alpha x$|${PO4}
-10271|Différence marche Lame d'air.|$\\delta = 2 e \\cos(i)$ (dépend de l'angle).|${PO4}
-10272|<span style="color: rgb(0, 255, 0);">(C.J)</span> Ordre interférence Lame d'air.|$p = \\frac{2e \\cos i}{\\lambda}$.<br>Max au centre ($i=0$).|${PO4}
-10273|<span style="color: rgb(255, 170, 0);">(L.L)</span> Passage Coin $\\to$ Lame.|Redresser M2 pour parallélisme (augmenter l'interfrange jusqu'à l'infini).|${PO4}
-10274|<span style="color: rgb(0, 255, 0);">(L.L)</span> Contact optique.|$e=0, \\alpha=0$. $\\delta=0$ partout. Teinte plate brillante.|${PO4}
-10275|<span style="color: rgb(255, 170, 0);">(A.R)</span> Justification formes franges.|Lame $\\delta(i)$ : iso-i = cercles.<br>Coin $\\delta(x)$ : iso-x = droites.|${PO4}
-`;
+==================================================
+DECK : EM15
+==================================================
+
+Q: Définir le dipole oscillant.
+R: >>> [IMAGE_ID: paste-eb2c6fd00e3b25d364dc61ba7017cf4dd65d9990.jpg] <<<
+--------------------
+Q: (F.H) Représenter l'indicatrice de rayonnement :
+R: >>> [IMAGE_ID: paste-1c03ac8bb67ec008b75f62d57a7cc2c181de2dad.jpg] >> [IMAGE_ID: paste-4916eec46c60d4430b71a9afe98595aa130044bd.jpg] >> [IMAGE_ID: paste-63b4fdc36be49d8390c5adc4e721a62990b428b7.jpg] <<<
+--------------------
+Q: (F.H) Définir la zone de rayonnement d'un dipôle
+R: >>> [IMAGE_ID: paste-39f01c3e9e7291d506d17d40165d29f2b130efc6.jpg] <<<
+--------------------
+Q: Donner la signification de l'approximation \\(a \\ll \\lambda\\)
+R: Lorsqu'on fait l'approximation \\(a\\ll\\lambda \\) on néglige le retard lié à la propagation au sein même de la distribution. Cela revient à considérer qu’un point \\(M\\) éloigné du dipôle reçoit au même instant \\(t \\) des informations qui ont été émises en même temps à \\(t -\\frac{r}{c}\\) (avec \\(r= OM\\) ) par les différents points sources de la distribution.
+On peut aussi interpreter l'approximation comme ceci : les mouvements des charges sont non relativistes.
+--------------------
+Q: Donner la signification de l'approximation \\(a\\ll r\\) .
+R: On se situe dans l'approximation dipolaire.
+--------------------
+Q: (Y.Z) Dans la zone de rayonnement, quelle est la structure du champ électromagnétique ?
+R: \\[\\text{ Dans la zone de rayonnement, le champ électromagnétique a localement la structure d'une OPP se propageant selon le vecteur }\\vec{u}_r.\\]
+--------------------
+Q: \\[\\text (Y.Z) {<}\\vec{\\pi}\\text{>} \\text{ est proportionnel à } \\sin^2 \\theta , \\text {que peut on dire alors de l'émission dipolaire ?}\\]
+R: \\[\\text{Elle est anisotrope.}\\]
+>>> [IMAGE_ID: paste-18fee75962840b4f99af169dc2f01ec022847b92.jpg] <<<
+--------------------
+Q: (Y.Z.) Comment interpréter le fait que la puissance moyenne rayonnée à travers une sphère de centre O et de rayon R (\\(<P_{ray}>\\)) est indépendante de R?
+R: >>> [IMAGE_ID: paste-c72c9182f9f87b963549dd7649a13753d092847d.jpg] <<<
+--------------------
+
+==================================================
+DECK : EM2
+==================================================
+
+Q: (A.R) Quelle est la définition de la circulation du champ électrostatique \\(\\vec E\\) de \\(A\\) à \\(B\\) le long de \\((\\Gamma)\\) ?
+Dépend-elle du chemin suivi \\((\\Gamma)\\) pour aller de A à B?
+R: \\[C_{A \\to B(\\Gamma)}=\\int_{A(\\Gamma)}^{B}{\\vec E \\ldotp \\vec{dl} }\\]Cette circulation est indépendante du chemin suivi car elle peut s'écrire sous la forme de la variation d'une fonction qui est le potentiel électrostatique:
+\\(C_{A \\to B}=\\int_{A}^{B}{\\vec E \\ldotp \\vec{dl} }=-(V_B-V_A)\\)
+--------------------
+Q: (A.R) Que vaut la circulation du champ électrostatique le long d'un contour fermé? Justifier.
+R: La circulation du champ électrostatique entre le point \\(A\\) et \\(B\\) est indépendante du chemin parcouru.
+Si le chemin est fermé: B et A sont confonds donc \\(V_A=V_B\\) et donc la circulation du champ est nulle\\[C_{A \\to B=A} = \\oint \\vec E \\ldotp \\vec{dl} =-(V_B -V_A )=-(V_A -V_A)= 0\\]
+--------------------
+Q: (A.R) Quelle est la formule donnant le potentiel électrostatique créé en un point \\(P\\) par une charge source \\(q\\) ?
+R: Potentiel électrostatique :
+\\[V(P) = {{1}\\over{4\\pi \\varepsilon_0}}{q \\over r} + K\\]\\(r\\) : distance du point \\(P\\) par rapport à la charge source
+\\(q\\) : charge source
+K: une constante
+--------------------
+Q: (A.R) Quelle est la forme des surfaces équipotentielles d'une charge ponctuelle.
+R: Ce sont des sphères dont le centre est la position de la charge ponctuelle.
+--------------------
+Q: (A.R) Comment évolue le potentiel électrostatique à mesure que l'on s'éloigne d'une charge ponctuelle ? Comment oriente-t-on les flèches du champ électrostatique sur un schéma ?
+R: Selon le signe de \\(q\\):
+Si \\(q > 0\\) le potentiel décroît lorsque l'on s'éloigne de la chargeSi \\(q < 0\\) le potentiel croît lorsque l'on s'éloigne de la charge
+Le champ électrostatique est orienté dans le sens des potentiels décroissants.
+Mnémotechnique : \\(q > 0 \\text{ devient } q \\rightarrow 0 \\)  et \\(q < 0 \\text{ devient } q \\leftarrow 0 \\)
+--------------------
+Q: (A.R) Quelle formule donne le potentiel électrostatique créé par plusieurs charges ponctuelles en un point \\(P\\) ?
+R: \\[V(P) = {1 \\over {4 \\pi \\varepsilon_0}}\\sum_i {q_i \\over r_i}\\]
+\\(q_i\\) : charge en Coulomb (C) portée par la \\(i\\)-ème charge
+\\(r_i\\) : distance entre la \\(i\\)-ème charge et le point \\(P\\)
+On a choisi \\(V=0\\) quand \\(\\forall i \\; r_i\\rightarrow \\infty\\)
+--------------------
+Q: (L.L) Dans le repère orthonormé \\((0, \\vec{\\mathbf{u}}_x, \\vec{\\mathbf{u}}_y, \\vec{\\mathbf{u}}_z)\\), donnez \\({d} f\\) puis \\(\\vec{grad}f\\) et enfin la relation entre les deux.
+R: df = \\(\\left(\\frac{\\partial f}{\\partial x}\\right)dx + \\left(\\frac{\\partial f}{\\partial y}\\right)dy + \\left(\\frac{\\partial f}{\\partial z}\\right)dz\\)
+\\(\\vec{grad}f=\\left(\\frac{\\partial f}{\\partial x}\\right)\\vec{u}_x + \\left(\\frac{\\partial f}{\\partial y}\\right)\\vec{u}_y + \\left(\\frac{\\partial f}{\\partial z}\\right)\\vec{u}_z\\)
+\\(df=\\vec{grad}f.\\vec{dl}\\)
+--------------------
+Q: (L.L) \\(\\vec{grad}f\\) est normal à quelle surface ?
+R: \\(\\vec{grad}f\\) est normal à la surface d'équation f(x,y,z) = cst
+--------------------
+Q: (L.L) Quelle est la relation intégrale liant le champ électrostatique et le potentiel électrostatique?
+R: \\(C_{A \\to B}=\\int_{A}^{B} \\vec{E} \\cdot d\\vec{l}=- \\int_{A}^{B} dV=(V_A -V_B)\\)
+--------------------
+Q: (L.L) Quelle est la relation locale liant le champ électrostatique et le potentiel électrostatique?
+R: \\(\\vec{E} = -\\vec{grad} V\\)
+--------------------
+Q: (L.L) Comment retrouver la relation locale
+\\(\\vec{E} = -\\vec{grad} V\\) à l'aide de la relation intégrale associée ?
+R: On a \\(\\int_{A}^{B} \\vec{E} \\cdot d\\vec{l}\\) = - (\\(V_B - V_A\\)) or \\(V_B - V_A\\) = \\(\\int_{A}^{B} dV\\) donc \\(\\vec{E} \\cdot d\\vec{l} = -dV\\)
+enfin \\(dV = \\vec{grad}V \\cdot \\vec{dl}\\) donc \\(\\vec{E}.\\vec{dl} = -\\vec{grad}V.\\vec{dl}\\) ainsi \\(\\vec{E} = -\\vec{grad} V\\)
+--------------------
+Q: (C.J) L'énergie potentielle électrostatique Ep d'une charge q0 placée dans un champ extérieur \\(\\vec E\\) tel que \\(\\vec E\\)= \\(- \\vec{ grad} V\\) vérifie la relation :
+R: \\(E_p = q_0V\\)
+--------------------
+Q: (C.J) Comment passer de la relation \\(\\vec{E} = -\\vec {grad} V\\) à la relation\\(\\vec{F} = -\\vec {grad} E_p\\)
+R: En multipliant par \\(q_0\\) car
+\\(\\vec{F} = q_0 \\vec{E}\\) et \\(E_p=q_0 V\\)
+--------------------
+Q: (C.J) Quelle est l'unité du potentiel électrostatique ?
+R: Le volt (V)
+--------------------
+Q: (C.J) Quelle est l'unité du champ \\(\\vec E\\)
+R: C'est \\(V\\ldotp m^{-1}\\)
+--------------------
+Q: (C.J) Dans quel sens sont orientées les lignes du champ électrostatique ?
+R: Dans le sens des potentiels décroissants
+--------------------
+Q: (C.J) Comment sont orientés les lignes du champ électrostatique par rapport aux surfaces équipotentielles ?
+R: Orthogonalement
+--------------------
+
+==================================================
+DECK : EM6
+==================================================
+
+Q: V.Iulian
+>>> [IMAGE_ID: img7045909058837530815.jpg] <<<
+R: >>> [IMAGE_ID: paste-b98860cd7c1b407c918bcc5209c0a68b396e8223.jpg] >> [IMAGE_ID: paste-e349a260a12b99bdc732b3868f7f557cb6dda0ea.jpg] <<<
+--------------------
+Q: V.Iulian
+>>> [IMAGE_ID: img2498669175369567868.jpg] <<<
+R: 1)
+>>> [IMAGE_ID: paste-ee06f45381f644b5348501214aa8bf553c0ae70b.jpg] >> [IMAGE_ID: paste-911334ecc07bc5a2c3f229921025f3087e0a090f.jpg] >> [IMAGE_ID: paste-41ed89d5aace0dfa0fd4142e6295a2fc8c00ca46.jpg] <<<
+Et pour les symétries :
+Le plan parallèle aux spires et équidistant des deux est un plan d’antisymétrie. Les lignes de champ sont symé-triques de part et d’autre de ce plan et en un point de ce plan lui appartiennent.
+--------------------
+Q: (A.P)
+>>> [IMAGE_ID: 20231127_205031.jpg] <<<
+R: 1) Les lignes du champ B sont des cercles concentriques contenus dans le plan orthogonal au fil.
+>>> [IMAGE_ID: paste-929588aa3d6f7ca46e3907765deffbcc31ebe543.jpg] >> [IMAGE_ID: paste-8c5f8f95d90ce3a0ee2536285b9588e66db63e68.jpg] <<<
+--------------------
+Q: (M.W) Commenter les symétries dans le cas d'une distribution de courant.
+R: C'est à dire que pour un plan de symétrie d'une distribution de courant, ce même plan sera un plan d'antisymétrie pour le champ magnétique.
+csq: Soit M et M' deux points symétriques l'un de l'autre par rapport à un plan de symétrie de la distribution de courant. ALors le champ
+\\(\\vec B(M')\\) est l'opposé du symétrique du champ
+\\(\\vec B(M)\\). csq: en un point M de ce plan de symétrie de la distribution de courant, le champ \\(\\vec B(M)\\)sera normal au plan.
+De même un plan d'antisymétrie d'une distribution de courant sera un plan de symétrie pour le champ magnétique.
+csq: Soit M et M' deux points symétriques l'un de l'autre par rapport à un plan d'anti symatrie de la distribution de courant. ALors le champ
+\\(\\vec B(M')\\) est le symétrique du champ\\(\\vec B(M)\\). csq: en un point M de ce plan d'anti symétrie de la distribution de courant, le champ \\(\\vec B(M)\\)sera contenu dans le plan.
+--------------------
+Q: (M.W) Interpréter le cas où les lignes d'un champ magnétique se resserrent.
+R: Là où les lignes de champs se resserrent, le champ magnétique est plus intense.
+--------------------
+Q: (BM) Soit \\(\\Gamma\\) une courbe fermée et orientée (choix arbitraire) et \\(\\vec{dl}\\) un vecteur déplacement élémentaire le long de \\(\\Gamma \\)(orienté dans le même sens).
+Donner l'expression de la circulation du champ \\(\\vec{B}\\) le long du contour \\(\\Gamma\\) fermé.
+R: C = \\(\\oint_{\\Gamma}\\vec{B}.\\vec{dl}\\)
+--------------------
+Q: (BM) Donner l'énoncé du théorème d'Ampère.
+R: La circulation du champ \\(\\vec{B}\\) le long d'un contour fermé orienté \\(\\Gamma\\) (contour d'Ampère) est égale au produit de \\(\\mu_{0}\\) par l'intensité \\(I_{e}\\) enlacée, intensité qui traverse une surface S orientée s'appuyant sur \\(\\Gamma\\):\\(C = \\oint_{\\Gamma}\\vec{B}.\\vec{dl} = \\mu_{0}I_{e}\\)
+--------------------
+Q: (BM) Quelle est l'expression de l'intensité enlacée (du théorème d'ampère) pour une distribution volumique de courant (préciser les orientations).
+R: \\(I_{e} = \\int\\int_{S}\\vec{j}.\\vec{dS}\\) avec S une surface reposant sur
+\\(\\Gamma\\) et \\(\\vec{dS}\\) orienté suivant l'orientation de \\(\\Gamma\\) (règle du tire bouchon ou de la main droite).
+--------------------
+Q: (BM) Quelle est l'expression de I enlacée (du théorème d'ampère) dans le cas de courants filiformes.
+R: \\(I_e =\\sum_{k}\\epsilon_{k}I_{k}\\)
+avec:
+\\(I_k\\) les intensités des courants qui traversent \\(\\Gamma\\)
+\\(\\epsilon_{k} = 1 \\) si \\(I_{k}\\) dans le sens de \\(\\vec{n}\\) (vecteur unitaire orienté à partir de \\(\\Gamma\\)) sinon \\(\\epsilon_{k} = -1\\)
+--------------------
+Q: (BM) Enoncer les différentes étapes de la méthode de calcul de \\(\\vec{B}(M)\\) par le théorème d'Ampère.
+R: 1) Etude des symétires et invariances de \\(\\vec{B}(M)\\) : Choix du système de coordonnées
+2) Choix contour d'Ampère (ligne fermé \\(\\Gamma\\)) tel que:
+a) \\(\\vec{B}   // \\vec{dl}\\) (ie ligne de champ)
+b) \\(||\\vec B ||\\) constant le long du contour
+3) Si la ligne n'est pas fermée alors la compléter par des portions de lignes telles que \\(\\vec{B}   \\perp  \\vec{dl}\\) ou telles que \\(\\vec B=\\vec 0\\)
+4) Rerpésenter \\(\\Gamma\\) et l'orienter sur le schéma.
+5) Calcul de \\(\\oint\\vec{B} \\cdot\\vec{dl}\\) le long de \\(\\Gamma\\).
+6) Calcul de \\(\\mu_{0}I_{e}\\) (potentiellement plusieurs cas à traiter)
+7) Appliquer le théorème d'Ampère.
+--------------------
+Q: (BM) Que vaut la valeur du flux du champ magnétique à travers une surface fermée ?
+R: Il est nul. (ce résultat est admis)
+Soit C = \\(\\Phi = \\unicode{x222F}_{\\mathscr{S}_g} \\vec{B } \\cdot  \\vec{dS}  =0\\)
+On dit que le champ\\( \\vec{B } \\) est à flux conservatif car cela implique que le flux du champ \\( \\vec{B } \\) est le même à travers n'importe quelle section d'un tube de champ \\( \\vec{B } \\) .
+--------------------
+Q: (BM) Donner l'ordre de grandeur du champ magnétique terrestre à la surface de la Terre.
+R: \\(5.10^{-5}T\\)
+--------------------
+Q: (BM) Donner l'ordre de grandeur du champ à 1cm d’un fil rectiligne parcouru par un courant d’intensité 10A
+R: \\(2.10^{-4} T\\)
+--------------------
+Q: (BM) Donner l'ordre de grandeur du champ à 1mm d’un aimant permanent au néodyme
+R: 0,1 à 1 T
+--------------------
+Q: (BM) Donner l'ordre de grandeur du champ magnétique d'un élécrtoaimant.
+R: 10 à 100 T
+--------------------
+Q: (S.E)
+>>> [IMAGE_ID: paste-214e83666ae763236aea7c77a43581a64232fe68.jpg] <<<
+On supposera le fil infini.
+R: >>> [IMAGE_ID: paste-7edb2b9f50f23eac4176399c3ea5d9a799a4afd8.jpg] <<<
+--------------------
+Q: (S.E)
+>>> [IMAGE_ID: paste-fa84d71882fccd01306a9563169c424e60dbdf56.jpg] <<<
+R: >>> [IMAGE_ID: paste-ed68266b1711dc9559d0ae00bb0133c98c544ddd.jpg] <<<
+--------------------
+
+==================================================
+DECK : EM8
+==================================================
+
+Q: (M.B.T.) Exprimer la formule du moment magnétique d'un circuit filiforme plan bouclé et parcouru par un courant d'intensité \\(I\\) en expliquant les termes. Donner l'unité du moment magnétique.
+R: Soit un circuit filiforme plan bouclé parcouru par un courant d'intensité \\(I\\).
+Le moment magnétique \\(\\vec{\\mathcal{M}}\\) du courant est défini par:
+\\[\\vec{\\mathcal{M}} = I\\vec{S} = IS\\vec{n}\\]
+où :
+•    \\(S\\) désigne l'aire de la surface délimitée par la boucle de courant
+•    \\(\\vec{n}\\) désigne le vecteur unitaire orthogonal au plan contenant le circuit et orienté suivant la règle de la main droite.
+>>> [IMAGE_ID: IMG_825B15755F55-1.jpeg] <<<
+Le moment s'exprime en \\(A\\cdot m^2\\)
+--------------------
+Q: (M.B.T) Dans quelles conditions peut-on parler d'un dipôle magnétique pour une source de champ magnétique?
+R: Une source de champ magnétique constitue un dipôle magnétique si :
+elle peut être modélisée par une boucle de courant de moment magnétique non nul \\(\\vec{\\mathcal{M}}\\)son extension spatiale de taille caracteristique \\(a\\) est très petite devant les autres dimensions caractéristiques (approximation dipolaire : \\(OM \\gg a \\))
+--------------------
+Q: (A.R.) Représenter les lignes de champs d'un dipôle magnétique sur un schéma dans le plan.
+R: >>> [IMAGE_ID: cartechamps-1.png] <<<
+--------------------
+Q: (A.R) Décrire qualitativement l'action d'un champ magnétique extérieur (uniforme / non uniforme) sur un dipôle magnétique.
+R: Cas champ magnétique uniforme: le dipôle magnétique s'oriente selon les lignes de champ du champ magnétique extérieur.
+Cas champ magnétique extérieur non unforme: idem et en plus le dipôle est attiré vers les zones de champ magnétique extérieur intense.
+--------------------
+Q: Quelle est l'expression de l'énergie potentielle d'un dipôle de moment magnétique \\(\\overrightarrow{m}\\) situé en O et placé dans un champ mégnétique extérieur \\(\\overrightarrow {B_{ext}}(O)\\)?
+R: \\(E_p=-\\overrightarrow{m} . \\overrightarrow{B_{ext}} (O)\\)
+--------------------
+Q: Si d'un point de vue magnétique on assimile la Terre à un dipôle magnétique situé en son centre, quel est alors l'orientation de son moment magnétique? Quelle est l'orientation des lignes de champ magnétique terrestre au niveau des pôles?
+R: \\(\\overrightarrow{m}\\) est dirigé du nord géographique vers le sud géographique.
+Les lignes de champ magnétique terrestre "sortent" du pôle sud et "entrent" au pôle nord.
+--------------------
+
+==================================================
+DECK : EM9
+==================================================
+
+Q: Ylan / Qu'est-ce un doublet de charges ?
+R: Un doublet de charges est composé de deux charges opposées \\(+q >0\\) au point P et \\(-q\\) au point N séparées d'une distance \\(a = PN\\).
+Il est caractérisé par son moment dipolaire: \\(\\overrightarrow {p}=q\\overrightarrow {NP}\\)
+--------------------
+Q: Ylan / Définition du moment dipolaire et unité ?
+R: \\(\\text{Le moment dipolaire est } \\vec{p} = q\\vec{NP} \\)
+Avec N (resp. P) le barycentre des charges négatives (resp. Positives) et q la somme des charges positives de la distribution.\\(\\text{Ce vecteur est dirigé de la charge négative vers la positive et son unité est le C.m ou le Debye symbole D}\\)
+--------------------
+Q: Ylan / Cadre de l'approximation dipolaire ?
+R: >>> [IMAGE_ID: Capture d] <<<
+L'approximation dipolaire correspond à étudier les propriétés du dipôle électrostatique "loin" de ce dernier (r=OM >> a avec a=NP).
+--------------------
+Q: Victor \\ Energie potentielle \\(E_{p}\\) d'un dipôle électirique rigide de moment dipolaire \\(\\vec{p}\\) situé au point O et placé dans un champ extérieur \\(\\overrightarrow{E_{ext}}(O)\\)?
+R: \\({E_{p}} = -\\vec{p} .\\vec{E}_{ext}(O) \\)
+--------------------
+Q: Ylan / Le potentiel décroît-t-il plus vite ou moins vite avec un dipôle ou avec une unique charge ponctuelle ? Même question avec le champ électrostatique
+R: Dans les deux cas, il décroît plus vite avec un dipôle car l'expression du potentiel V(M) varie en \\(1/r²\\) pour un dipôle alors qu'il varie en \\(1/r\\) pour une charge ponctuelle et pour le champ, E(M) varie en \\(1/r^3\\)pour un dipôle alors qu'il varie en \\(1/r²\\) pour une charge ponctuelle
+--------------------
+Q: Ylan / Retrouver l'expression du potentiel créé par un dipôle électrostatique dans le cas d'un doublet de charges ?
+R: On commence par exprimer le potentiel en M en appliquant le théorème de superposition \\(V(M)=V_P (M) + V_N (M)=\\frac{q}{4\\pi \\epsilon_0}(\\frac{1}{PM} - \\frac{1}{NM})\\) (somme des potentiels créés par 2 charges ponctuelles)
+Puis on utilise la relation de Chasles pour exprimer \\(\\overrightarrow{PM}=\\overrightarrow{PO}+\\overrightarrow{OM}\\) et \\(\\overrightarrow{NM}=\\overrightarrow{NO}+\\overrightarrow{OM}\\) et en déduire les distances PM et NM:
+De même \\(NM =\\sqrt{(a/2)^2+r^2+a\\ r\\ cos(\\theta)}\\)
+Et on finit par effectuer un DL à l'ordre 1 en \\(a/r\\) pour exprimer \\(PM^{-1}\\) et \\(NM^{-1}\\) avec a=NP:
+\\(\\frac{1}{PM}=\\frac{1}{r} (1+\\frac{a}{2r} cos(\\theta))\\)
+De même:  \\(\\frac{1}{NM}=\\frac{1}{r} (1-\\frac{a}{2r} cos(\\theta))\\)
+On injecte les expression de PM et NP dans V(M):
+\\(V(M)=\\frac{q}{4\\pi \\epsilon_0 r^2} cos(\\theta)=\\frac{p\\ cos\\theta }{4\\pi\\epsilon_0r^2}\\)
+Autre notation: \\(V(M)=\\frac{\\overrightarrow{p}.\\overrightarrow{OM}}{4\\pi\\epsilon_0 OM^3}\\)
+(car \\(\\overrightarrow{p}=p\\cos\\theta  \\overrightarrow{u_r}-p\\sin\\theta  \\overrightarrow{u_\\theta } \\) et \\(\\overrightarrow{OM}=r \\overrightarrow{u_r}\\))
+>>> [IMAGE_ID: Capture d] <<<
+--------------------
+Q: Victor \\ Qu'est-ce qu'un dipôle électrostatique rigide ?
+R: La norme de son moment dipolaire est constante.
+--------------------
+Q: Victor Que vaut la résultante des forces subies par un dipôle dans un champ électrostatique extérieur \\(\\vec{E}_{ext}\\) uniforme ?
+R: La résultante des forces est nulle. Il s'agit d'un couple de forces.
+--------------------
+Q: Ylan / Etablir le champ électrostatique créé par un dipôle électrostatique dans le cas d'un doublet de charges sachant que le potentiel créé par ce doublet de charge en est:
+\\(V(M)=\\frac{p\\ cos\\theta }{4\\pi\\epsilon_0r^2}=\\frac{\\overrightarrow{p}.\\overrightarrow{OM}}{4\\pi\\epsilon_0 OM^3}\\)
+Donnée: en coordonnées sphériques:
+\\(\\overrightarrow{grad} f= \\frac{\\partial {f}}{\\partial r} \\overrightarrow{u_r}+\\frac{1}{r}\\frac{\\partial {f}}{\\partial \\theta} \\overrightarrow{u_\\theta}+\\frac{1}{r sin\\theta}\\frac{\\partial {f}}{\\partial \\varphi } \\overrightarrow{u_\\varphi}\\)
+R: Utiliser la relation locale \\(\\vec{E}=-\\vec{grad}(V)\\)
+\\(\\overrightarrow{E}=- \\frac{\\partial {V}}{\\partial r} \\overrightarrow{u_r}-\\frac{1}{r}\\frac{\\partial {V}}{\\partial \\theta} \\overrightarrow{u_\\theta}=\\frac{p}{4\\pi\\epsilon_0r^3} (2 cos\\theta \\ \\overrightarrow{u_r}+sin\\theta \\ \\overrightarrow{u_\\theta})\\)
+Autre notation:
+\\(\\overrightarrow{E}=\\frac{1}{4\\pi\\epsilon_0OM^5} (3\\ (\\overrightarrow{p}.\\overrightarrow{OM})\\ \\overrightarrow{OM} - OM^2  \\ \\overrightarrow{p} \\  \\ )\\)
+(car \\(\\overrightarrow{p}=p\\cos\\theta  \\overrightarrow{u_r}-p\\sin\\theta  \\overrightarrow{u_\\theta } \\) et \\(\\overrightarrow{OM}=r \\overrightarrow{u_r}\\))
+>>> [IMAGE_ID: Capture d] <<<
+--------------------
+Q: Victor \\
+Comment agit un champ électrostatique extérieur uniforme sur un dipôle électrostatique?
+R: Le dipôle s'oriente (direction et sens) suivant les lignes de champ de \\(\\vec{E}_{ext}\\) .
+--------------------
+Q: Ylan / Représenter les lignes de champ et les courbes équipotentielles du champ créé par un dipôle électrostatique
+R: >>> [IMAGE_ID: paste-f94a6b6040693dd84af9aa136b7c19529ad0bf87.jpg] Courbes non orientées : équipotentielles
+Courbes orientées : ligne de champ
+--------------------
+Q: (Yuye) A quoi correspond un moment dipôlaire moléculaire ?
+R: Les molécules, bien que globalement neutres, peuvent présenter un moment dipolaire non nul. En effet, la disposition spatiale des atomes et leur différence de propriétés (électronégativité) peuvent les rendre dissymétriques. Le barycentre des charges positives et celui des charges négatives peuvent ne pas être confondus. Dans ce cas, la molécule présente un moment dipolaire permanent.
+>>> [IMAGE_ID: 0.png] <<<
+--------------------
+Q: Victor \\
+Comment agit un champ électrostatique non uniforme sur un dipôle électrostatique?
+R: Effet d'orientation: Le dipôle s'oriente (direction et sens) suivant les lignes de champ de \\(\\vec{E}_{ext}\\) .
+Effet de déplacement: Le dipôle est attiré vers les zones de champ \\(\\vec{E}_{ext}\\) intense.
+--------------------
+Q: (Yuye) Quelle est l'expression de la force exercée par un ion \\(Na^+\\) sur le dipôle que constitue une molécule d'eau placée en M à une distance z de l'ion.
+Donnée: Résultante des forces subit par un dipôle placé dans un champ extérieur: \\(\\overrightarrow{F}=\\overrightarrow{grad} (\\vec{p}.\\overrightarrow{E_{ext}})(O)\\)
+R: Le champ électrostatique créé par l’ion \\(Na^+\\) au point M où se situe le dipôle est \\(\\vec E_{ext}(M) = \\frac {e} {4 \\pi \\epsilon_0 z^2} \\vec u_z\\).
+Effet d’orientation→Le dipôle s’oriente suivant \\(\\vec u_z\\) (\\(\\vec p = p \\vec u_z\\))
+Le dipôle subit la force \\(\\vec F = p \\frac {dE_{ext}}{dz}(z)\\vec u_z = - \\frac {2pe}{4 \\pi \\epsilon_0 z^3 } \\vec u_z\\), orientée dans le sens des intensités croissantes du champ électrostatique.
+La molécule d’eau est attirée par l’ion → Effet de déplacement
+>>> [IMAGE_ID: 0-067d29de6397b7932ac10e579ca73727b1f13e21.png] <<<
+--------------------
+Q: (Yuye) Qu'est-ce le dipôle induit?
+R: En présence d'un champ électrique extérieur il s'exerce des forces de sens contraire sur les charges + et − d'un atome ou d'une molécule. Il apparaît une séparation des barycentres des charges > 0 et < 0.
+L'atome ou la molécule sont alors dits polarisables et nous avons un moment dipolaire "induit" par la présence du champ électrique.
+--------------------
+Q: Etablir l'expression du moment résultant du couple de force subi par un doublet de charges dans un champ électrostatique extérieur \\(\\overrightarrow{E_{ext}}\\) uniforme ?
+R: \\(\\overrightarrow{\\Gamma}=\\overrightarrow {M}_O(\\overrightarrow{F_P})+\\overrightarrow {M}_O(\\overrightarrow{F_N})\\)
+\\(\\overrightarrow{\\Gamma}=\\overrightarrow {OP}\\wedge(q \\ \\overrightarrow{ E_{ext}})+\\overrightarrow {ON}\\wedge(-q \\ \\overrightarrow{ E_{ext}})\\)
+\\(\\overrightarrow{\\Gamma}=q (\\overrightarrow {OP}-\\overrightarrow {ON})\\wedge \\overrightarrow{ E_{ext}}\\)
+\\(\\overrightarrow{\\Gamma}=q \\ \\overrightarrow {NP}\\wedge\\overrightarrow{ E_{ext}}\\)
+\\(\\overrightarrow{\\Gamma}=\\overrightarrow {p}\\wedge \\overrightarrow{ E_{ext}}\\)
+--------------------
+
+==================================================
+DECK : EM 3, 4 et 5
+==================================================
+
+Q: (T.B.)Quelles sont les 5 étapes pour appliquer le théorème de Gauss ?
+R: 1. Etude des invariances \\(\\rightarrow\\)choix du système de coordonnées et variables dont dépend la norme de \\(\\vec{E}\\)
+Etude des symétries\\(\\rightarrow\\)direction de\\(\\vec{E}\\)
+2. Choix de la surface de Gauss qui doit être fermée (essayer une surface telle que \\(||\\vec{E}||=cste\\) et si besoin la complétée avec des surfaces orthogonales à  \\(\\vec{E}\\)
+3. Calcul du flux de \\(\\vec{E}\\) à travers la surface de Gauss choisie (Une seule expression à cherchée)
+4. Calcul de \\(Q_{int}\\) la charge située à l'intérieure de la surface de Gauss. (plusieurs cas peuvent être à considérer)
+5. Appliquer le théorème de Gauss
+--------------------
+Q: Ylan /
+\\[\\text{Soit une charge ponctuelle } q, \\text{ une surface fermée } S \\text{ (Sphere de rayon } R, \\text{ centrée sur la charge } q)\\]\\[\\text{Déterminer le flux du champ } \\vec{E} \\text{ créé par la charge q à travers la surface fermée S}\\]
+R: \\[\\vec{E}(M \\in S) = \\frac{q}{4\\pi\\varepsilon_0R²}\\vec{u_r}\\]\\[\\phi = \\unicode{x222F}_{\\mathscr{S}} \\vec{E } \\cdot  \\vec{dS}= \\unicode{x222F}_{\\mathscr{S}}  \\frac{q}{4\\pi\\varepsilon_0R²}.\\vec{u_r}. dS.\\vec{u_r}=\\frac{q}{4\\pi\\varepsilon_0R²}\\iint_SdS=\\frac{q}{\\varepsilon_0}\\]
+--------------------
+Q: Ylan/\\(\\text{Etablir l’expression du champ } \\vec{E} \\text{ créé en un point quelconque M de l’espace par une distribution linéique de charges de densité λ uniformément répartie le long d’un fil rectiligne infini.}\\)
+R: \\[\\text{On a : } \\lambda = cste\\]
+\\[\\text{Etude des invariances : } ||\\vec{E}||(r,\\cancel\\theta,\\cancel{z})\\]
+\\[\\text{Etude des symétries :} \\vec{E} \\ \\text{suivant}\\  \\vec{u_r}\\]
+\\[\\text{Bilan : } \\vec{E}(M) = E(r)\\vec{u_r}\\]\\[\\text{On choisit comme surface de Gauss un cylindre de rayon r et de hauteur h fermée par deux disques}\]
+>>> [IMAGE_ID: Capture d] \\[\\phi  =\\unicode{x222F}_{\\mathscr{S}_g} E(r) \\vec{u_r } \\cdot  dS\\vec{u_r}= E(r)2\\pi rh\\]\\(Q_{int} = \\int_C\\lambda dl = \\lambda h \\text{ car C est la portion du fil dans }S_g\\)
+\\[\\text{On applique maintenant le théorème de Gauss : }
+2\\pi rhE(r) = \\frac{\\lambda h}{ \\varepsilon_0}\\]
+\\[\\text{Finalement, on obtient : } \\vec{E} =\\frac{\\lambda }{2\\pi r\\varepsilon_0} \\vec{u_r} \\]
+--------------------
+Q: (Yuye) Comment définir le vecteur \\(d\\overrightarrow{S_M}\\) ?
+R: \\(d\\overrightarrow{S_M}\\) est un vecteur \\(\\bot\\) à la surface élémentaire \\(dS_M\\) centrée sur le point M.
+>>> [IMAGE_ID: IMG_20231115_205047.jpg] 2e cas: Soit S est une surface fermée, alors \\(d\\overrightarrow{S_M}\\) est orienté vers l'extérieur de la surface fermée.
+--------------------
+Q: (Yuye) Théorème de Gauss pour une surface fermée quelconque
+R: Le théorème de Gauss s'écrit :
+\\[\\Phi=\\unicode{x222F}_{\\mathscr{S}_g} \\vec{E}(M)d\\vec{S}_M=\\frac{Q_{int}}{\\varepsilon_0}\\]où :
+\\(S_g\\) est une surface fermée quelconque.
+\\(M\\) est un point sur cette surface.
+\\(\\Phi\\) est le flux du champ électrosatique à travers cette surface.
+\\(\\vec{E}(M)\\) est le champ électrique en M.
+\\(d\\vec{S}_M\\) est le vecteur \\(\\bot\\) à la surface élémentaire \\(dS_M\\) centrée sur M, dirigé vers l'extérieur de \\({\\mathscr{S}_g}\\)
+\\(Q_{int}\\) est la charge totale que contient \\(S_g\\).
+\\(\\varepsilon_0\\) est la permittivité.
+--------------------
+Q: (Yuye) Établir le champ créé par un cylindre à base circulaire de rayon de \\(R\\) et de hauteur considérée comme infini et uniformément chargé en volume avec une densité volumique de charge [$]\\rho[/$].
+R: >>> [IMAGE_ID: IMG_20231115_205047-9a9355bb58d3059ca8f62b4d7ffd956dab49ccab.jpg] Invariances: \\(\\vec{E}(M)=E_r(r)\\overrightarrow{u_r}+E_\\theta(r)\\overrightarrow{u_\\theta}+E_z(r)\\overrightarrow{u_z}\\) .Symétries: \\((M,\\overrightarrow{u_z}, \\overrightarrow{u_r})\\) , \\((M,\\overrightarrow{u_r}, \\overrightarrow{u_\\theta})\\)deux plans de symétries de la distribution de charges passant par M \\(\\Rightarrow\\) \\(\\vec{E}\\) suivant \\(\\overrightarrow{u_r}\\) .Bilan: \\(\\vec{E}(M)=E_r(r)\\overrightarrow{u_r}\\) .Suface de Gauss: cylindre à base circulaire de rayon \\(r\\) et de hauteur \\(h\\) fermé (cf schéma): \\(S_g = S_1 \\cup S_2 \\cup S_3\\) . Calcul de \\(\\Phi\\) : \\(\\Phi=\\unicode{x222F}_{\\mathscr{S}_g} \\vec{E}.d\\vec{S} \\)
+\\(=\\iint_{M\\in{S_1}}\\vec{E}(M)d\\vec{S}+\\iint_{M\\in{S_2}}\\vec{E}(M)d\\vec{S}+\\iint_{M\\in{S_3}}\\vec{E}(M)d\\vec{S}\\)
+\\(=\\iint_{M\\in{S_1}}\\vec{E}(M)d\\vec{S}\\)
+\\(=\\iint_{M\\in{S_1}}E_r(r)\\overrightarrow{u_r}.(dS\\overrightarrow{u_r})\\)
+\\(=E_r(r)\\iint_{M\\in{S_1}}dS\\)
+\\(=E_r(r)2{\\pi}rh\\)
+Calcul de \\(Q_{int}\\) :1er cas: \\(r < R\\)
+\\(Q_{int}=\\rho \\pi r^2h\\)
+2e cas: \\(r > R\\)
+\\(Q_{int}=\\rho \\pi R^2h\\)
+Théorème de Gauss:1er cas: \\(r < R\\)
+\\(E_r(r)2{\\pi}rh=\\frac{\\rho\\pi{r^2}h}{\\varepsilon_0}\\) \\(\\Rightarrow\\) \\(E_r(r)=\\frac{\\rho r}{2\\varepsilon_0}\\) \\(\\Rightarrow\\) \\(E_r(r)=\\frac{\\rho r}{2\\varepsilon_0}\\overrightarrow{u_r}\\)
+2e cas: \\(r > R\\)
+\\(E_r(r)2{\\pi}rh=\\frac{\\rho\\pi{R^2}h}{\\varepsilon_0}\\)\\(\\Rightarrow\\)\\(E_r(r)=\\frac{\\rho R^2}{2\\varepsilon_0 r}\\)\\(\\Rightarrow E_r(r)=\\frac{\\rho R^2}{2\\varepsilon_0 r}\\overrightarrow{u_r}\\)
+Évolution du champ électrique \\(E_r(r) \\) en fonction de\\(r\\) :
+>>> [IMAGE_ID: IMG_20231115_221031.jpg] <<<
+--------------------
+Q: (Arthur) Quel est le champ électrostatique à l'extérieur (de l'espace interarmature) d'un condensateur plan?
+R: \\[\\vec{E} = \\vec{0}\\]
+--------------------
+Q: (Manuel) Quelle est la norme du champ électrostatique entre les deux armatures d'un condensateur plan?
+R: \\[||\\vec{E}|| = \\frac{\\sigma}{\\varepsilon_{0}} = \\frac{Q}{S\\varepsilon_{0}}\\]Avec :
+•  \\(\\sigma = \\frac{Q}{S}\\) la valeur absolue de la densité surfacique de charge des armatures et \\(Q\\) la valeur absolue de leur charge.
+•  \\(\\varepsilon_{0}\\) la permittivité du vide
+--------------------
+Q: Victor / Déterminer l’expression du champ électrostatique créé en un point M par une distribution surfacique de
+charges de densité σ uniformément réparties sur un plan infiniment étendu.
+>>> [IMAGE_ID: plan-b84c87801652a62f616c58fbe3773f90809cb387.png] <<<
+R: Invariances
+Invariance par translation selon x et selon y  \\(=> \\vec{E}(M) = E_x(\\cancel{x},\\cancel{y},z)\\vec{u_x} + E_y(\\cancel{x},\\cancel{y},z)\\vec{u_y} + E_z(\\cancel{x},\\cancel{y},z)\\vec{u_z} \\)
+Symétries
+Les plans orthogonaux au plan infini sont des plans de symétries de la distribution de charges
+\\((M,\\vec{u_x},\\vec{u_z})\\) et aussi le plan \\((M,\\vec{u_y},\\vec{u_z})\\)
+donc \\(=> E_y  = 0\\) et \\(E_x = 0 \\)
+Bilan
+\\(\\vec{E}(M) = E_z(z)\\vec{u_z}\\)
+Surface de Gauss
+On choisit un parallépipède à base carré de côté a et symétrique par rapport au plan chargé.
+\\(\\mathscr{S}_g = \\mathscr{S}_h \\cup \\mathscr{S}_b \\cup \\mathscr{S}_1 \\cup \\mathscr{S}_2 \\cup \\mathscr{S}_3 \\cup \\mathscr{S}_4\\)
+>>> [IMAGE_ID: plan-e73174d5f9184eeeafc3dd30474a2ce6087c52f2.png] Flux
+\\(\\Phi = \\unicode{x222F}_{\\mathscr{S}_g} \\vec{E } \\cdot  \\vec{dS}  = \\iint\\limits_{\\mathscr{S}_h}\\vec{E } \\cdot  \\vec{dS}  + \\iint\\limits_{\\mathscr{S}_b}\\vec{E } \\cdot  \\vec{dS}\\)
+Le flux de \\(\\vec{E}\\) est nul à travers \\(\\mathscr{S}_1 , \\mathscr{S}_2 , \\mathscr{S}_3 \\ et \\  \\mathscr{S}_4 \\)
+\\(\\Phi = \\iint\\limits_{\\mathscr{S}_b}E_z(z)\\vec{u_z} \\cdot  dS\\vec{u_z} +\\iint\\limits_{\\mathscr{S}_b}E_z(-z)\\vec{u_z} \\cdot  (-dS\\vec{u_z})\\)
+\\( \\Phi = 2\\iint\\limits_{\\mathscr{S}_h}E_z(z)\\cdot  dS = 2 E_z(z)\\iint\\limits_{\\mathscr{S}_h}dS = 2 a² Ez(z)\\)
+Qint
+\\(Q_{int}  = \\sigma a²\\)
+Théorème de Gauss
+\\(2a²Ez(z) = {\\sigma a² \\over \\epsilon_0}\\)
+\\(E_z(z) = {\\sigma \\over 2 \\epsilon_0}\\)
+On trouve alors :
+\\(\\vec{E}(M) = {\\sigma \\over 2 \\epsilon_0} \\vec{u_z}\\) pour z >0
+\\(\\vec{E}(M) = -{\\sigma \\over 2 \\epsilon_0} \\vec{u_z}\\) pour z >0
+--------------------
+Q: (Ilyass) On considère un condensateur cylindrique. Montrer que le champ électrostatique en un point quelconque est de la forme \\(\\vec{E}(M) = E(r)\\vec{e_r}\\).
+R: On a une invariance par rotation autour de l'axe \\(Oz\\) et une invariance par translation selon \\(\\vec{u_z}\\) donc la norme de \\(\\vec{E}\\) ne dépend que de \\(r\\).
+Puis les plans \\((M,\\vec{e_r},\\vec{e_z})\\) et \\((M,\\vec{e_r}, \\vec{e_\\theta})\\) sont des plans de symétrie de la distribution de charge donc \\(\\vec{E}(M)\\) est selon \\(\\vec{e_r}\\).
+Ainsi, \\[\\vec{E}(M) = E(r) \\vec{e_r}\\]
+--------------------
+Q: Victor / On s'intéresse ici au cas d'un condensateur constitué de deux armatures planes métalliques en
+regard l'une de l'autre (aire de chaque armature : S), parallèles, distantes de e. Les armatures portent respectivement les densités surfaciques uniformes de charge −σ et +σ. On considèrera les dimensions des armatures beaucoup plus grandes que e, ce qui permet d'utiliser le modèle du condensateur plan illimité.
+>>> [IMAGE_ID: Capture d’écran 2023-11-16 225353.jpg] <<<
+Déterrminer le champ \\(\\vec{E}(M)\\) .
+R: On utilise le théorème de superposition :
+\\(\\vec{E}(M) = \\vec{E_h(}M) + \\vec{E_b(}M)\\)
+avec \\(\\vec{E_h(}M)\\) le champ \\(\\vec{E}\\) crée en M par le plan du haut
+avec \\(\\vec{E_b(}M)\\) le champ \\(\\vec{E}\\) crée en M par le plan du bas
+D'après l'expression du champ créé par un plan infini uniformément chargé en surface :
+\\(\\vec{E_h(}M) = {\\sigma \\over 2\\epsilon_0} \\vec{u_z} \\)   si \\(z > e \\) (1)  | \\(\\vec{E_b(}M) = -{\\sigma \\over 2\\epsilon_0} \\vec{u_z} \\) si \\(z > 0 \\) (3)
+\\(\\vec{E_h(}M) = -{\\sigma \\over 2\\epsilon_0} \\vec{u_z} \\) si \\(z < e \\) (2)  | \\(\\vec{E_b(}M) = {\\sigma \\over 2\\epsilon_0} \\vec{u_z}\\) si \\(z < 0 \\) (4)
+Alors :
+\\(z>e\\)        : \\(\\vec{E}(M) = \\vec{0} \\)             en faisant \\((1)+(3)\\)
+\\(0<z<e\\) : \\(\\vec{E}(M) = -{\\sigma \\over \\epsilon_0} \\vec{u_z}\\)    en faisant \\((2) + (3)\\)
+\\(z<0\\)        : \\(\\vec{E}(M) = \\vec{0} \\)             en faisant \\((2) + (4)\\)
+--------------------
+Q: Victor / On s'intéresse ici au cas d'un condensateur constitué de deux armatures planes métalliques en
+regard l'une de l'autre (aire de chaque armature : S), parallèles, distantes de e. Les armatures portent respectivement les densités surfaciques uniformes de charge \\(−σ\\) et \\(+σ\\). On considèrera les dimensions des armatures beaucoup plus grandes que e, ce qui permet d'utiliser le modèle du condensateur plan illimité.
+>>> [IMAGE_ID: Capture d’écran 2023-11-16 225353.jpg] <<<
+Déterminer l’expression du potentiel électrostatique \\(V(M)\\) (on considèrera que \\(V = 0\\) sur l'armature de densité surfacique négative).
+R: \\(\\vec{E}(M) = -\\vec {grad}(V) = -\\frac{\\partial V}{\\partial x}\\vec{u_x} - \\frac{\\partial V}{\\partial y}\\vec{u_y} - \\frac{\\partial V}{\\partial z}\\vec{u_z}\\)
+pour \\(z > e \\) :
+\\(\\vec{E} = \\vec {0} =>\\frac{\\partial V}{\\partial x}\\ =\\frac{\\partial V}{\\partial y} =\\frac{\\partial V}{\\partial z}= 0  => V = cste\\)    notons \\(V = A\\)
+pour \\(z<0\\) :
+\\(\\vec{E} = \\vec{0} => V = cste \\)      notons \\(V = B\\)
+pour \\(0<z<e \\):
+\\(\\vec{E} = -{\\sigma \\over \\epsilon_0}\\vec{u_z} \\) donc \\(\\frac{\\partial V}{\\partial x} = \\frac{\\partial V}{\\partial y}= 0 \\) donc \\(V(z) = {dV\\over dz} = {\\sigma \\over \\epsilon_0}\\)
+soit \\(V(x) = {\\sigma \\over \\epsilon_0} z + C \\) \\((cst)\\)
+Déterminons \\(A,B,C\\) sachant que \\(V(z)\\) est une fonction continue et que \\(V(z=0) = 0\\) :
+\\(V(z=0)={\\sigma \\over \\epsilon_0} * 0 + C = C  = 0 \\)
+\\(V(z=0)=B=0\\)
+\\(V(z=e) = {\\sigma \\over \\epsilon_0} e=A\\)
+Alors \\(A ={\\sigma \\over \\epsilon_0} e\\)
+Bilan :
+pour   \\(z<0 \\)  : \\(V =0\\)
+pour   \\(0<z<e \\)  : \\(V = {\\sigma \\over \\epsilon_0} z\\)
+pour   \\(z>e\\) : \\(V(z) = {\\sigma \\over \\epsilon_0}e \\)
+--------------------
+Q: (Océane) Cette figure représente les lignes équipotentielles d'une distribution de charges contituée de deux charges ponctuelles.
+Donner l'allure des lignes de champs
+>>> [IMAGE_ID: im3.jpg] <<<
+R: >>> [IMAGE_ID: im1.jpg] <<<
+--------------------
+Q: (Daouda) Démontrer l'égalité suivante dans un tube de champ: E1S1=E2S2 .
+En déduire que dans une zone vide de charge, là où les lignes de champ se reserrent, le champ est plus intense.
+R: >>> [IMAGE_ID: paste-c8c9585695c583cd76823e76b283fed4d0b34b2c.jpg] <<<
+\\(\\Phi_1 =\\iint_{S_1}  \\vec E_1.\\overrightarrow dS_1=-E_1 S_1\\)
+\\(\\Phi_2 =\\iint_{S_2}  \\vec E_2.\\overrightarrow dS_2=E_2 S_2\\)
+\\(\\Phi_3 =\\iint_{S_3}  \\vec E_3.\\overrightarrow dS_3=0\\) car en tout point de \\(S_3\\): \\(\\vec E \\perp \\overrightarrow dS_3\\) car il sagit de la surface latérale d'un tube de champ constituée de lignes en tout point tangentes au champ.
+Donc \\(\\phi=\\phi_1+\\phi_2+\\Phi_3=-E_1 S_1 + E_2 S_2 \\)
+De plus \\( \\unicode{x222F}_{{S}} \\vec{E } \\cdot  \\vec{dS}  =0\\) car il n'y a pas de charge à l'intérieur de S
+Donc \\(E_1 S_1 = E_2 S_2 \\)
+Et donc si \\(S_1 <S_2\\) alors \\(E_1 >E_2\\). Ce qui signifie que là où les lignes de champ se resserent, le champ est plus intense.
+--------------------
+Q: (Vincent) Ecrire le tableau des analogies entre gravitation et électrostatique.
+R: >>> [IMAGE_ID: paste-8274af54e4ef8158c9147e47a8c1d6073f3a1f0a.jpg] <<<
+--------------------
+
+==================================================
+DECK : M1
+==================================================
+
+Q: Yuye / Exemple de mouvement en translation
+R: Translation rectiligne: ascenseur, train sur une voie rectiligne par rapport au sol, ...Translation circulaire: nacelle d'une grande roue, ...Translation elliptique: référentiel géocentrique par rapport au référentiel héliocentrique, ...
+--------------------
+Q: Ylan / Définition d'un référentiel R' en translation par rapport à R
+R: R' est en translation par rapport à R si les axes liés à R' gardent toujours une direction constante par rapport à ceux liés à R et on peut ensuite choisir les axes liés à R' parallèles à ceux liés à R par exemple: \\[\\vec{e_x}=\\vec{e_{x'}} \\text{ , }\\vec{e_y}=\\vec{e_{y'}} \\text{ et }\\vec{e_z}=\\vec{e_{z'}}\\]
+--------------------
+Q: (INC) Donner la loi de composition des accélérations dans le cas d'une translation de R' par rapport à R
+R: \\(\\)On note O' n'importe quel point fixe dans R': \\(\\vec { a_{a}}= \\vec{a_{r}}+\\vec{a_{e}} \\) avec \\(\\vec{a_{c}}=\\vec 0\\) , \\(\\vec{a_{e}}= {(\\frac {d²\\vec{OO'}} {dt²})}_{R}\\) ; \\(\\vec{a_{r}}= {(\\frac {d²\\vec{O'M}} {dt²})}_{R'}\\) et \\(\\vec{a_{a}}= {(\\frac {d²\\vec{OM}} {dt²})}_{R}\\)
+--------------------
+Q: Yuye / Dérivée d'un vecteur dans \\(\\mathcal R\\) dans le cas général
+R: Pour un scalaire a(t), quelque soit le mouvement de \\(\\mathcal R'\\) par rapport à \\(\\mathcal R\\):    \\(\\left(\\frac{da}{dt}\\right)_\\mathcal R = \\left(\\frac{da}{dt}\\right)_\\mathcal {R'}\\)
+On note alors \\(\\frac {da}{dt}\\) ou \\(\\dot a\\).
+Soient \\(x(t)\\), \\(y(t)\\), \\(z(t)\\) trois scalaires et \\(\\vec u\\), \\(\\vec v\\), \\(\\vec w\\) trois vecteurs. Alors:    \\(\\left(\\frac{d}{dt}(x(t)\\vec u + y(t)\\vec v + z(t)\\vec w)\\right)_\\mathcal R\\)
+\\(=\\left(\\frac{d}{dt}x(t)\\vec u\\right)_\\mathcal R+\\left(\\frac{d}{dt}y(t)\\vec v\\right)_\\mathcal R+\\left(\\frac{d}{dt}z(t)\\vec w\\right)_\\mathcal R\\)
+\\(=\\frac{dx}{dt}\\vec u + x(t)\\left(\\frac{d\\vec u}{dt}\\right)_\\mathcal R + \\frac{dy}{dt}\\vec v + y(t)\\left(\\frac{d\\vec v}{dt}\\right)_\\mathcal R + \\frac{dz}{dt}\\vec w + z(t)\\left(\\frac{d\\vec w}{dt}\\right)_\\mathcal R\\)
+--------------------
+Q: Ylan / Soit R' un référentiel en translation par rapport à R , \\(\\vec{u}=a\\vec{e_{x'}}+b\\vec{e_{y'}}+c\\vec{e_{z'}}\\), donner la relation qui lie \\({( \\frac{d\\vec{u}}{dt} )}_R \\ et \\ {(\\frac{d\\vec{u}}{dt})}_{R'} \\)
+R: On a que \\({( \\frac{d\\vec{u}}{dt} )}_R ={(\\frac{d\\vec{u}}{dt})}_{R'} = \\dot{a}\\vec{e_x}+\\dot{b}\\vec{e_y}+\\dot{c}\\vec{e_z}\\)car lorsqu'on dérive les axes liés à R' dans R', leur dérivée est nulle et on a que \\(\\vec{e_x}=\\vec{e_{x'}} \\text{ , }\\vec{e_y}=\\vec{e_{y'}} \\text{ et }\\vec{e_z}=\\vec{e_{z'}}\\)
+Cela signifie donc que lorsque R' est en translation par rapport à R, l'opération de dérivation d'un vecteur est insensible au référentiel.
+--------------------
+Q: Ylan /
+>>> [IMAGE_ID: Capture d] <<<
+R: 1. Il est en mouvement de translation rectiligne uniforme
+2. C'est une droite
+3. Il la voit se déplacer à une vitesse \\(\\vec{V}=v\\vec e_x\\)
+4. Il voit la balle comme un point de vitesse nulle
+5. \\(\\vec v_r= \\vec 0\\)
+--------------------
+Q: (Arthur) Donner la loi de composition des accélérations dans le cas d'une rotation uniforme de R' autour d'un axe fixe dans R' et dans R
+R: [$]\\vec{a_a} = \\vec{a_r} +  \\vec{a_e} +  \\vec{a_c} ~[/$] avec :
+[$]\\\\ \\cdot~\\vec{a_a}=(\\frac{d\\vec{v}_{M/R}}{dt})_{R} [/$] l'accélération absolue (de M dans R)
+[$]\\\\ \\cdot~\\vec{a_r}= (\\frac{d\\vec{v}_{M/R'}}{dt})_{R'}[/$] l'accélération relative (de M dans R')
+[$]\\\\ \\cdot~\\vec{a_e} [/$] l'accélération d'entrainement
+[$]\\vec{a_e} = \\vec{\\Omega}_{R'/R}
+\\wedge(\\vec{\\Omega}_{R'/R} \\wedge\\vec{O'M})= - {\\Omega ^2}_{R'/R} \\ \\overrightarrow{HM}[/$]
+Avec H le projeté orthogonal de M sur l'axe de rotation et O' appartenant à l'axe de rotation.
+[$]\\cdot~\\vec{a_c}[/$] l'accélération de Coriolis
+[$]\\vec{a_c} = 2 ~\\vec{\\Omega}_{R'/R} \\wedge\\vec{v}_{M/R'}[/$]
+--------------------
+Q: (Manuel) Laquelle de ces deux figures représente un mouvement de rotation ?
+>>> [IMAGE_ID: IMG_0804.JPG] <<<
+R: La figure de droite
+--------------------
+Q: Victor /
+Rappler la définition d'un référentiel.
+R: Pour étuider le mouvement d'un corps, il est nécessaire de préciser par rapport à quoi nous raisonnons. On se fixe dans un référentiel d'étude.
+On étudie le mouvement de ce corps par rapport à un objet de référence (immobile dans le référentiel d'étude).
+--------------------
+Q: Victor /
+Rappeler la définition d'un repère.
+R: On a besoin d'un repère pour donner la position d'un point dans un référentiel.
+Un repère est défini par un point (origine) et une base (qui en physique sera orthonormée directe).
+--------------------
+Q: Victor /
+Soit R et R' deux référentiels. Lorsque R' est en translation par rapport à R, que pouvez-vous dire des vitesses et des accélérations des points fixes de R' dans R? Prouvez-le.
+R: Lorsque R' est en translation par rapport à R, tous les points fixes de R' ont à chaque instant même vitesse et même accélération dans R.
+Preuve:
+Soit A,B 2 points fixes dans R'.
+Comme A,B fixes dans R' , \\(\\vec{AB}\\) est un vecteur constant dans R'
+\\(=> ({d \\vec{AB} \\over dt}) _{R'} =\\vec{0}\\)
+Rappel: \\(({d \\vec{AB} \\over dt})_R = ({d \\vec{AB} \\over dt})_{R'} \\) car R' est en translation par rapport à R
+Donc  \\(({d \\vec{AB} \\over dt})_R = \\vec{0} \\)
+Or \\(\\vec{AB} = \\vec{AO} +\\vec{OB}\\)
+\\(({d \\vec{AB} \\over dt})_R = ({d \\vec{AO} \\over dt})_R+ ({d \\vec{OB} \\over dt})_{R} = \\vec{0}\\)
+\\(({d \\vec{OB} \\over dt})_R = ({d \\vec{OA} \\over dt})_{R}\\)
+\\(=> \\vec{v_{B/R}} = \\vec{v_{A/R}}\\)
+--------------------
+Q: (Manuel) Exprimer \\(\\overrightarrow{e_{x'}}\\) et \\(\\overrightarrow{e_{y'}}\\) en fonction de \\(\\overrightarrow{e_{x}}, \\overrightarrow{e_{y}}\\) et \\(\\theta\\). Puis, exprimer \\(\\left(\\frac{\\mbox{d}\\overrightarrow{e_{x'}}}{\\mbox{d}t}\\right)_{R}\\)et \\(\\left(\\frac{\\mbox{d}\\overrightarrow{e_{y'}}}{\\mbox{d}t}\\right)_{R}\\)dans ce cas là.
+>>> [IMAGE_ID: IMG_EEFB83B295DE-1.jpeg] <<<
+R: \\[\\begin{align}\\overrightarrow{e_{x'}} &= \\cos(\\theta)\\overrightarrow{e_{x}} + \\sin(\\theta)\\overrightarrow{e_{y}}
+\\\\
+\\overrightarrow{e_{y'}}&= -\\sin(\\theta)\\overrightarrow{e_{x}} + \\cos(\\theta)\\overrightarrow{e_{y}}
+\\\\
+\\text{Ensuite}
+\\\\
+\\left(\\frac{\\mbox{d}\\overrightarrow{e_{x'}}}{\\mbox{d}t}\\right)_{R} &= \\overrightarrow{\\Omega}_{R'/R} \\wedge \\overrightarrow{e_{x'}}=\\dot{\\theta}   \\overrightarrow{e_{y'}}
+\\\\
+\\left(\\frac{\\mbox{d}\\overrightarrow{e_{y'}}}{\\mbox{d}t}\\right)_{R} &= \\overrightarrow{\\Omega}_{R'/R} \\wedge \\overrightarrow{e_{y'}}=-\\dot{\\theta}   \\overrightarrow{e_{x'}}
+\\end{align}\\]
+--------------------
+Q: (INC) Citez la loi de composition des vitesses (avec un système M, un réferentiel absolu R et un réferentiel relatif R').
+R: [latex]$\\vec{v_a} = \\vec{v_r} + \\vec{v_e}$[/latex]
+[latex]\\scriptsize{Avec:\\begin{itemize}
+\\item $\\vec{v_a}=\\overrightarrow {v_{M/R}} $ la vitesse absolue
+\\item $\\vec{v_r}=\\overrightarrow {v_{M/R'}}$ la vitesse relative
+\\item $\\vec{v_e}$ la vitesse d'entraînement (vitesse absolue du point coïcident).\\newline \\end{itemize}[/latex]
+Soit: [$]\\overrightarrow {v_{M/R}} = \\overrightarrow {v_{M/R'}} + \\overrightarrow {v_e} [/$]
+--------------------
+Q: (INC) Pour un réferentiel R' en translation par rapport à un réferentiel R, citez la formule de la vitesse d'entraînement (vitesse absolue du point coïncident).
+R: [latex]$\\vec{v}_e = {(\\frac{d\\overrightarrow{OO'}} {dt})}_{R} = \\vec{v}_{O'/R}$[/latex]
+[latex]\\scriptsize{Avec:\\begin{itemize}
+\\item $O$ l'origine du repère de R
+\\item $O'$ un point fixe quelconque dans R'
+\\newline\\end{itemize}
+On dérive par rapport à R !!![/latex]
+--------------------
+Q: (INC) Pour un réferentiel R' en rotation autour d'un axe fixe dans R (et dans R') avec O et O' confondus et appartenant à l'axe de rotation, donner la vitesse d'entraînement (vitesse absolue du point coïncident).
+R: [latex]$\\vec{v_e} = \\vec{\\Omega}_{(R'/R)} \\wedge \\vec{O'M} = \\vec{\\Omega}_{(R'/R)} \\wedge \\vec{HM}$[/latex]
+[latex]\\scriptsize{Avec:\\begin{itemize}
+\\item $\\vec{v_e}$ la vitesse d'entraînement
+\\item $\\vec{\\Omega}_{(R'/R)}$ la vitesse angulaire de rotation de R' par rapport à R
+\\item $H$ le projeté orthogonal de M sur l'axe fixe.\\newline\\end{itemize} }[/latex]
+--------------------
+
+==================================================
+DECK : M2
+==================================================
+
+Q: (Shems) Qu'est-ce qu'un referentiel galiléen?
+R: Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .
+--------------------
+Q: V.Iulian
+Tout référentiel {{c1::en translation rectiligne et uniforme par}} rapport à un référentiel galiléen est galiléen
+R: 
+--------------------
+Q: V.Iulian
+Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′{{c1::n’est pas galiléen}}
+R: 
+--------------------
+Q: V.Iulian
+Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen {{c1::n’est jamais galiléen.}}
+R: 
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg] <<<
+R: >>> [IMAGE_ID: paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg] <<<
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-d77f3722e5a6b97cce4097de2c62d12a8d197b00.jpg] <<<
+R: >>> [IMAGE_ID: paste-94c2181742a47574197e38c01becf17fe5e14056.jpg] <<<
+Avec O' un point fixe de R'
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-cb677b12d3a6508a44f3f9b492a67a4a71774fca.jpg] <<<
+R: Cas de R' en translation par rapport à R: [$]\\vec{f_{ic}}=\\vec{0}[/$] donc [$]P(\\vec{f_{ic}})=0[/$]
+Cas de R' en rotation par rapport à R: [$]P(\\vec{f_ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ). \\vec{v}_{M/R'}=0[/$]
+TPC: [$]\\frac{dEc_{/R'}}{dt}=\\sum_i P(\\vec{F_i})/R'+P(\\vec{f_{ie}})/R' [/$]
+--------------------
+Q: (MAG)Justifier que fic ne travaille pas et exprimer le TEC dans R' non gal.
+R: [$]P(\\vec{f_ic}) = 0[/$]
+En effet lorsque R' est en translation par rapport à R [$]\\vec{f_{ic}}=\\vec{0}[/$] donc [$]P(\\vec{f_{ic}})=0[/$]
+et lorsque R' en rotation par rapport à R: [$]P(\\vec{f_ic}) = (-2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} ). \\vec{v}_{M/R'}=0[/$]
+csq1: [$]W(\\vec{f_{ic}})=\\int P(\\vec{f_{ic}}).dt=0[/$] i.e. [$]\\vec{f_{ic}}[/$] ne travaille pas.
+csq2: TEC dans R': [$]\\Delta Ec_{/R'}=\\sum_i W(\\vec{F_i})/R'+W(\\vec{f_{ie}})/R' [/$][/$]
+--------------------
+Q: (MAG) sur l'expl d'un manège avec sièges suspendus à des chaînes:
+>>> [IMAGE_ID: paste-a933d76dcbeef4f62508fa32bd894eade0892cea.jpg] >> [IMAGE_ID: paste-162500c424b12166f0f9f7c8345e074e19a42672.jpg] <<<
+R: >>> [IMAGE_ID: paste-7d986b294569fcc662beb25c0076c304bcdbb34e.jpg] <<<
+--------------------
+Q: (Orlan M) Exprimer la force d'inertie de Coriolis et la force d'inertie d'entrainement dans le cas d'une rotation de R' par rapport à R
+R: [$]\\vec{f_ic} = -2m \\vec{\\Omega}_{R'/R} \\wedge \\vec{v}_{M/R'} [/$]
+et
+[$]\\vec{f_ie} = m \\Omega^2 \\overrightarrow{HM} [/$]
+--------------------
+Q: (INC) TEM dans R' repère non galiléen
+R: [latex] Si $\\vec{f_{ie}} $ est conservative, $\\vec{f_{ie}}$ dérive d'une énergie potentielle $E_{p,f_{ie}}$ qui est contenue dans $E_m$ et qui est tq: $W(\\vec{f_{ie}})=-\\Delta E_{p,f_{ie}}$ \\newline
+Alors TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'}) $ \\newline
+Si $\\vec{f}_{ie}$ est non conservative \\newline
+TEM: $\\Delta Em_{/R'}=\\sum_i W(\\vec{F}_{iNC/R'})+W(\\vec{f}_{ie/R'}) $[/latex]
+--------------------
+Q: (Orlan M) En partant du PFD écrit dans un référentiel galiléen R, établir l'expression du PFD dans un réfrentiel R' non galileen.
+R: On part de la loi de composition des vitesses [$]m \\vec{a}_{M/R} = m \\vec{a}_{M/R'} + \\vec{a_c} + \\vec{a_e}  [/$]
+de plus [$]m \\vec{a}_{M/R} = \\sum_i \\vec{F_i} [/$]
+En réarrangant les termes on a[$]m \\vec{a}_{M/R'} = \\sum_i \\vec{F_i} -m \\vec{a_c} - m \\vec{a_e} [/$]
+avec [$] - m \\vec{a_e} [/$] qui est la force d'inertie d'entrainement et [$] - m \\vec{a_c} [/$] qui est la force d'inertie de coriolis
+--------------------
+Q: (Orlan M) Exprimer [$] \\vec{f_{ic}} [/$] et [$] \\vec{f_{ie}} [/$] dans le cas d'une translation de R' par rapport à R
+R: [$] \\vec{f_{ic}} = \\vec{0} [/$] et  [$] \\vec{a_c} = \\vec{0} [/$] dans ce cas
+et
+[$] \\vec{f_{ie}} = -m(\\frac{d^2 \\vec{OO'}}{dt^2})_R [/$]
+--------------------
+
+==================================================
+DECK : M3
+==================================================
+
+Q: (LPB) Comment est défini réellement le poids?
+R: On def le poids d'un corps M de masse m de manière expérimentale: C'est la force opposée à la tension d'un fil au bout duquel est accroché le corps, ce dernier étant en équilibre dans le référentiel terrestre (\\(\\vec{P} = \\vec{F_G}+\\vec{f_{ie}}\\) )
+--------------------
+Q: (LPB)Donner un exemple de manifestation du caractère non galiléen du référentiel géocentrique
+R: L'existence de deux marées hautes et deux marées basses par jour sur Terre
+>>> [IMAGE_ID: Capture d’écran 2023-10-07 161935.png] <<<
+--------------------
+Q: (TS) Donner des exemples qui mettent en évidence le caractère non galiléen du référentiel terrestre.
+R: La déviation vers l'est,
+Le sens de rotation des cyclones,
+Le pendule de Foucault
+--------------------
+Q: (TS) Donner la vitesse angulaire de rotation du référentiel terrestre par rapport au référentiel géocentrique
+R: \\(\\omega\\)= \\(\\frac{2\\pi}{24×3600}\\)rad/s=7.3×10\\(^{-5}\\) rad/s
+--------------------
+Q: (TS) Donner la vitesse angulaire caractérisant la translation elliptique du référentiel géocentrique par rapport au référentiel de Copernic
+R: \\(\\Omega\\)=\\(\\frac{2\\pi}{365×24×3600}\\)rad/s=2.0×10\\(^{-7}\\) rad/s
+--------------------
+Q: (TS) Quelles forces fera apparaitre le PFD dans RT non galiléen
+R: Le poids (qui contient [$] \\overrightarrow {f_{ie}}[/$])
+La force d'inertie de Cariolis [$] \\overrightarrow {f_{ic}}[/$]
+D'éventuelles autres forces
+--------------------
+Q: (B.K.)
+>>> [IMAGE_ID: paste-1baa446cfecd2e569059adbdf3a1b56a2baa1f9d.jpg] <<<
+Qu'est-ce qui est à l'origine de cette déviation vers l'Est?
+Dans l'hémisphère Sud, cette déviation se ferait-elle également vers l'Est?
+R: 
+--------------------
+Q: (enzo m) Contexte : Appli 3 Pendule de Foucault
+On a les deux équations suivantes :
+\\(\\begin{cases} \\ddot x +\\omega_0^2 x \\approx 2\\Omega sin(\\lambda)\\dot y \\space\\space\\space\\space\\space\\space\\space\\space(1)\\\\  \\ddot y +\\omega_0^2 y \\approx  -2\\Omega sin(\\lambda)\\dot x\\space\\space\\space\\space\\space(2)  \\end{cases}\\)
+Quelle est la méthode afin d'obtenir une équation différentielle selon Z = x+jy où j2 = -1 ?
+R: Méthode : il faut faire (1)+j(2)
+Ce qui nous donne \\(\\underline {\\ddot Z} + \\omega_0^2\\underline{Z} = -2j\\Omega sin(\\lambda)\\underline{\\dot Z}\\)
+Après avoir résolu cette équation différentielle, on peut trouver x et y avec x=Re(Z) et y=Im(Z).
+--------------------
+Q: (enzo m) Contexte : Appli 3 Pendule de Foucault
+>>> [IMAGE_ID: paste-bbc6e2689d77ff19edb0d95f4b86e2d6c46539ea.jpg] 0 propre des oscillations ?
+R: On a \\(T = \\left|\\frac{2\\pi}{\\Omega sin\\lambda}\\right|\\) <-- période de rotation du plan d'oscillation
+et \\(T = \\frac{2\\pi}{\\omega_0}\\) <-- période propre des oscillations.
+--------------------
+Q: >>> [IMAGE_ID: anki appli 2.png] Ziad SABRI
+>>> [IMAGE_ID: paste-bf200bd2295b0763724fe5a90ee2df44dbf94cbc.jpg] <<<
+Donner en fonction de \\(\\lambda \\) l'expression de l'intensité de pesanteur (\\(\\vec{g}\\)) en un point à la surface de la Terre situé à la latitude \\(\\lambda\\). A quel endroit \\(g\\) est-elle max? min?
+Référentiel terrestre: non gal
+Référentiel géocentrique: gal
+Vitesse angulaire de rotation de la Terre autour de l'axe des pôle:  \\(\\Omega\\)
+Masse et rayon de la Terre: \\(m_T\\) et \\(R_T\\)
+R: Poids d'un objet de masse \\(m\\) à la surface de la Terre:
+Donc \\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}-\\vec{a_e}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2\\overrightarrow{HM}\\)
+Or \\(HM=R_T \\ cos(\\lambda)\\) et \\(\\frac {\\overrightarrow{HM}}{HM}=cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}}\\)
+Donc \\(\\vec{g}=-G \\frac{ m_T}{R_T^2} \\vec{e_{z_{P}}}+\\Omega^2 \\ R_T \\ cos(\\lambda) (cos(\\lambda)\\overrightarrow{e_{z_{P}}}-sin(\\lambda)\\overrightarrow{e_{y_{P}}})\\)
+\\(g\\) est max au pôle sud et min à l'équateur.
+--------------------
+Q: (B.K.) Quelle force d'inertie permet d'expliquer l'existence de deux marées océaniques hautes par jour sur Terre?
+R: 
+--------------------
+Q: (B.K.) Quelle force d'inertie permet d'expliquer le sens de rotation des cyclones?
+Dans quel sens tourne les cyclones dans l'hémisphère Nord? Sud? Expliquer par un schéma.
+R: 
+--------------------
+
+==================================================
+DECK : M4
+==================================================
+
+Q: \\[(F.H)~Valeur~de~\\vec{v}_gs_2/s_1~dans~le~cas~de~non~glissement (i.e. cas~de~l'adhérence) :\\]
+R: \\[On~a :\\vec{v}_gs_2/s_1 = \\vec{0}\\]
+--------------------
+Q: (FH) Loi de Coulomb dans le cas d'un non-glissement :
+R: \\[\\|\\vec{T}\\| \\le fs \\|\\vec{N}\\|~avec~fs~le~coefficient~de~frottement ~statique \\]
+--------------------
+Q: (FH) Loi de Coulomb pour le cas d'un glissement :
+R: \\[\\|\\vec{T}\\| = fd \\|\\vec{N}\\|~avec~fd~le~coefficient~de~frottement ~dynamique\\]
+--------------------
+Q: (Yannick) Les forces de frottement sont elles conservatives ?
+R: Non elles ne sont en général pas conservatives.
+--------------------
+Q: (Yannick) Quel peut-être le signe de la puissance d'une force de contact ?
+R: [latex]Généralement négatif : cas où la réaction tangentielle / force de frottement est une force de freinage \\newline
+Parfois positif : cas où la force de frottement est motrice. Par expl cas d'un solide S2 fixe par rapport à un solide S1 (adhérence) et que S1, mis en mouvement, met S2 en mouvement.[/latex]
+>>> [IMAGE_ID: paste-4636b8c49be9f7c06e3c704079ee7d896489694e.jpg] <<<
+--------------------
+Q: [latex] Que dire sur la puissance totale ( $P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R}$) des forces mises en jeu dans un contact entre 2 solides ? [/latex]
+R: [latex]
+$P(\\vec{R}_{1\\rightarrow 2})_{/R}+P(\\vec{R}_{2\\rightarrow 1})_{/R})=\\vec{T}_{1 \\rightarrow 2} . \\vec{v_g}_{2/1} \\leq 0$ \\newline
+Elle est nulle s'il y a adhérence des 2 solides ($\\vec{v_g}_{2/1} =0$) ou si le glissement se fait sans frottement ($\\vec{T}_{1 \\rightarrow 2}=0$).\\newline
+Elle est négative s'il y a glissement avec frottement.[/latex]
+--------------------
+Q: (Yannick) On modélise l'action de contact de S1 sur S2 par une force [$]\\overrightarrow {R_{1->2}}[/$] appliqué en un point I de la région de contact, comment se décompose [$]\\overrightarrow {R_{1->2}}[/$] ?
+R: [$]\\overrightarrow {R_{1->2}}[/$] se décompose en :
+Une composante orthogonale au plan tangent π commun aux 2 solides, dirigée de S1 vers S2, notée [$]\\overrightarrow {N}[/$] et appelée réaction normale.Une composante appartenant au plan π, notée [$]\\overrightarrow {T}[/$] et appelée réaction tangentielle ou force de frottement. En absence de frottements:  [$]\\overrightarrow {T}=\\overrightarrow{0}[/$]
+--------------------
+Q: (INC) Qu’est-ce que la vitesse de glissement ?
+R: La vitesse de glissement de \\(S_2 / S_1 \\) s'écrit : \\(\\vec{v_g}_{S_2/S_1} = \\vec{v_{I_2}} - \\vec{v_{I_1}} \\)
+(avec \\(I\\) le point de contact entre les deux solides et \\(I_1 \\) (resp. \\(I_2\\)) le point de \\(S_1\\) (resp. \\(S_2\\)) confondu avec \\(I \\) a l'instant \\(t\\) )
+Rem: Elle ne dépend par du référentiel du moment que \\(\\vec{v_{I_2}}\\) et \\( \\vec{v_{I_1}}\\)sont exprimés dans le même référentiel.
+--------------------
+Q: (Ali H.)
+>>> [IMAGE_ID: paste-15e45e099744e7f013048018acad29cb70089200.jpg] <<<
+R: >>> [IMAGE_ID: paste-df8555d46ddffcf14f908e9ecc0196305be18f9e.jpg] >> [IMAGE_ID: paste-f7648fa01530ee8a53f75a02aa6d59e2d1197dcc.jpg] <<<
+--------------------
+Q: (Ali H.)
+>>> [IMAGE_ID: paste-82a4bf897e6c97251d4e1891621f532604b33fce.jpg] <<<
+R: >>> [IMAGE_ID: paste-2381b673878f19aca319c7abd804505aff2d4a55.jpg] <<<
+--------------------
+
+==================================================
+DECK : O1
+==================================================
+
+Q: (O.M) Quel est le domaine des longueurs d'onde du visible ?
+R: Le domaine des longueurs d'onde du visible est entre 400nm (lumière bleu) et 800nm(lumière rouge).
+En dessous on a les Ultra Violet
+Et au dessus les infrarouges
+--------------------
+Q: (O.M) Rappeler les loi de Snell-Descartes de la réfraction.
+>>> [IMAGE_ID: paste-c7bf83916ccaa57839ec7f7820070209eeb04b43.png] <<<
+R: - Le rayon réfracté est dans le plan d'incidence (plan formé par le rayon lumineux incident et la normale au dioptre)
+- [$] n_1 \\sin (i_1) = n_2 \\sin (n_2) [/$]
+--------------------
+Q: (O.M) Définir les notions de surface d'ondes, onde sphérique et onde plane.
+R: Une surface d'onde est l'ensemble des points M tels que: (SM)=cste
+avec S est une source ponctuelle.
+Une onde sphérique est une onde dont les surfaces d'onde sont des sphères.
+Une onde plane est une onde dont les surfaces d'onde sont des plans parallèles entre eux.
+--------------------
+Q: (O.M) Enoncer le théorème de Malus
+R: Les rayons lumineux sont orthogonaux aux surfaces d'ondes
+--------------------
+Q: (O.M)Comment créer une onde plane à l'aide d'une lentille convergente?
+R: Il faut placer une source ponctuelle dans le plan focal objet de la lentille.
+>>> [IMAGE_ID: paste-48a3478626e3577356a1c4dabb89e948360635df.jpg] <<<
+--------------------
+Q: (O.M)
+>>> [IMAGE_ID: paste-6880d97333b2c73cc8f6a00f175f3edd591b0df6.jpg] <<<
+R: >>> [IMAGE_ID: paste-b2c57ac01cf3c781af9cafb014b0e736004e73b1.jpg] <<<
+avec le schema ci contre on a le chemin de la lumière en vert qui se reflechi sur le premier dioptre (AIr/verre) et en bleu le second qui se féfléchit sur le deuxième dioptre (Verre/air).
+Le déphasage est dû au fait que le chemin bleu est plus long que le chemin vert. La différence de chemin optique (i.e. la différence de marche) est donc: \\(\\delta=2\\ n_v \\ e\\) ("chemin bleu moins chemin vert")
+A cette différence de marche correspond le déphasage \\(\\Delta \\phi=\\frac{2\\pi}{\\lambda_0} \\ \\delta=\\frac{2\\pi}{\\lambda_0} \\ 2 \\ n_v \\ e\\) ("chemin vert moins chemin bleu" car "le vert est en avance sur le bleu")
+A ce déphasage s'ajoute le déphasage dû à la réflexion sur le dioptre Air/Verre. Le déphasage devient
+\\(\\Delta \\phi'=\\frac{2\\pi}{\\lambda_0} \\ 2 \\ n_v \\ e +\\pi\\) ("chemin vert moins chemin bleu")
+A ce déphasage correspond la différence de marche:
+\\(\\delta'=\\frac{\\lambda_0}{2\\pi}\\Delta\\Phi'=2 \\ n_v \\ e + \\frac{\\lambda_0}{2\\pi}\\pi=2 \\ n_v \\ e +\\frac{\\lambda_0}{2}\\)("chemin optique bleu moins chemin optique vert") remarque: un déphasage de \\(\\pi \\) correspond à une différence de marche de \\(\\frac{\\lambda_0}{2}\\).
+--------------------
+Q: (L.S)
+Formule du chemin optique (SM) dans le cas particulier d'un milieu homogène d'indice n.
+R: Cas particulier d'un milieu homogène d'indice n:
+n=cste et la lumière se propage en ligne droite donc (SM) = n x SM
+avec SM: la distance entre S et M (i.e: la longueur du segment [SM])
+--------------------
+Q: (O.M)
+>>> [IMAGE_ID: paste-0f0c81aa98bc40398c2ebf1c0d23fc8fc47630bb.jpg] <<<
+R: 1) nous avons des plans d'angles différents avant et apres la lentille tous les deux etant perpendiculaires aux rayons lumineux
+>>> [IMAGE_ID: paste-908f7e57933ff5d07f43f39f477bd0caa338c168.jpg] >> [IMAGE_ID: paste-8a11fcee90ee06a971c4f301f24c39bfe95fe339.jpg] <<<
+Nous savons que les chemins optiques (HB) et (AJ) sont égaux.
+En effet: \\(\\varphi(B)=\\varphi(H)-\\frac{2\\pi}{\\lambda_0}(HB)\\) et \\(\\varphi(J)=\\varphi(A)-\\frac{2\\pi}{\\lambda_0}(AJ)\\)
+Avec \\(\\varphi(H)=\\varphi(A)\\) et \\(\\varphi(B)=\\varphi(J)\\) car A et H sont sur la même surface d'onde de même que J et B sont sur la même surface d'onde.
+On en déduit bien que (HB)=(AJ)
+Or (HB)=n HB et (AJ)=n' AJ (car deux milieux homgènes)
+De plus l'angle formé par HAB est \\(\\theta\\) donc \\(HB=AB \\sin \\theta\\) et de même l'angle formé par JBA est \\(\\theta'\\)donc \\(AJ=AB \\sin \\theta'\\)
+Bilan: \\((HB)=(AJ)\\) implique \\(n\\ AB\\ sin\\theta =n'\\ AB\\ sin\\theta'\\) soit
+\\(n\\  sin\\theta =n'\\  sin\\theta'\\)
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-238a7158d0fbb60d39022fd285b56f918dd29e0d.jpg] <<<
+R: >>> [IMAGE_ID: paste-1a5c9e434fc7fba5cee47a88b0c5589fdd2023f6.jpg] <<<
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-1fbffd340ad708be06cde27faac42463c5d01824.jpg] <<<
+R: >>> [IMAGE_ID: paste-f34dd382a3eb1540065c45ad246b2e942af5a970.jpg] <<<
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-abf29704c23478669ebd5039478a6523c111b79c.jpg] <<<
+Que vaut l'indice du vide?
+Que peut-on dire de l'indice d'un milieu homogène autre que le vide?
+R: \\(n(P)=\\frac{c}{v(P)} \\) avec \\(c=3.10^8 m.s^{-1}\\) la vitesse de la lumière dans le vide et \\(v(P)\\) la vitesse de la lumière en un point P où l'indice optique est \\(n(P)\\).
+L'indice optique du vide vaut 1.
+Pour un milieu homogène qui n'est pas le vide, l'indice optique est constant et >1
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-4a3b3502893e774b283a2676369d0093cb0e0f86.jpg] <<<
+Exprimer le temps mis par la lumière pour aller de S à M noté \\(t_{SM} \\)
+En déduire l'expression du chemin optique (SM).
+Donner sa signification physique.
+R: >>> [IMAGE_ID: paste-4f568a91e39081548c0270f83ae524311324eb5a.jpg] SM que la lumière à mis pour aller de S à M dans un milieu qui a priori n'est pas le vide.
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-6873a781cb1192efdf16baf4eec431a40cb2af19.jpg] <<<
+R: D'après le principe du retour inverse de la lumière. S'il y avait une source ponctuelle en M, la lumière suivrait le même trajet mais en sens inverse.Alors d'après le théorème de Malus, les points A, A' et A'' seraient sur la même surface d'onde. ALors par définition d'une surface d'onde on aurait (MA)=(MA')=(MA").
+Conclusion: (AM)=A'M)=(A"M)
+>>> [IMAGE_ID: paste-9faa5012850c6ad9639e25a0613e7b83e2dc8127.jpg] <<<
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-8fd2d6224be55d861eaf41b65cd9d79c32b0f366.jpg] <<<
+R: Selon les x croissants pour 1 et 4.
+Selon les x décroissants pour 2 et 3.
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-390cb59c26a1294587ee88e68cae62913c043f95.jpg] <<<
+R: >>> [IMAGE_ID: paste-ec7e86b684f990ff7afa6167e99cfbfdfaffdee8.jpg] <<<
+--------------------
+Q: (L.S) __Exercice 6.1__
+Sur le schéma ci-dessous, construire la position du point A′ image de A par la lentille. Tracer ensuite l’allure des surfaces d’onde, en supposant que le point A agit comme une source ponctuelle.
+>>> [IMAGE_ID: 6.1.PNG] <<<
+R: >>> [IMAGE_ID: paste-73a055b197e1d292b6d4db07cc3d139ebebc4320.jpg] <<<
+--------------------
+Q: (L.S) __Exercice 6.2__
+Sur le schéma ci-dessous, construire la position du point A′ image de A par la lentille. Tracer ensuite l’allure des surfaces d’onde, en supposant que le point A agit comme une source ponctuelle.
+>>> [IMAGE_ID: 6.2.PNG] <<<
+R: >>> [IMAGE_ID: paste-f063776cbb7c0576250e5ab8e21e2b6f3d706359.jpg] <<<
+--------------------
+Q: (L.S) __Exercice 6.3__
+Sur le schéma ci-dessous, construire la position du point A′ image de A par la lentille. Tracer ensuite l’allure des surfaces d’onde, en supposant que le point A agit comme une source ponctuelle.
+>>> [IMAGE_ID: 6.3.PNG] <<<
+R: >>> [IMAGE_ID: paste-3574f56ff02dc7444f84ead0c013a0c3870f9199.jpg] <<<
+--------------------
+Q: (L.S) __Exercice 6.4__
+Sur le schéma ci-dessous, construire la position du point A′ image de A par la lentille. Tracer ensuite l’allure des surfaces d’onde, en supposant que le point A agit comme une source ponctuelle monochromatique.
+>>> [IMAGE_ID: 6.4.PNG] <<<
+R: >>> [IMAGE_ID: paste-1f7e79eb3eae3a9f6fa526e2156258251e313b9b.jpg] <<<
+--------------------
+Q: (S.D.S) Une onde plane arrive à incidence normale sur une lame de verre :
+>>> [IMAGE_ID: paste-61357fd753bc69fb69b279a50ab605b256f24f74.jpg] Quelle est l'allure des rayons avant, dans, et après la lame ?
+Quelle est l'allure des surfaces d'ondes avant, dans et après la lame?
+R: D'après la loi de Snell-Descartes (\\(n_1 \\sin i_1 =n_2 \\sin i_2\\)), on en déduit que les rayons incidents ne sont pas déviés (car \\(i_1=0\\) donc \\(i_2=0\\) cas incidence normale)
+Les surfaces d'ondes sont perpendiculaires aux rayons lumineux, mais après la lame, celle des rayons passant par le défaut de la lame est plus proche que celle des autres rayons. Car l'épaiseur \\(\\Delta e\\) induit un retard de phase et qu'une surface d'onde est une surface équiphase.
+>>> [IMAGE_ID: WhatsApp Image 2023-12-10 à 15.48.49_ce6bc42e.jpg]
+--------------------
+Q: (S.D.S)
+Déphasage entre A et A' ? entre B et B' ? (en fonction de \\(e\\), \\(\\Delta e\\), \\(n_v\\)(indice de la lame de verre en gris)  et \\(x = AA' = BB'\\))
+Différence de phase entre A' et B' ?
+>>> [IMAGE_ID: paste-59542684149954daa7ee8ef603ab41b7d315ff58.jpg]
+R: Déphasage entre A et A' :
+\\(\\varphi(A')-\\varphi(A)=\\frac{-2\\pi}{\\lambda_0}(AA')=\\frac{-2\\pi}{\\lambda_0}n_VAA_i-\\frac{2\\pi}{\\lambda_0}n_{air}A_iA'\\)
+\\(\\varphi(A')-\\varphi(A)=\\frac{-2\\pi}{\\lambda_0}(n_V \\ e+n_{air}(x-e))\\)
+Déphasage entre B et B' :
+\\(\\varphi(B')-\\varphi(B)=\\frac{-2\\pi}{\\lambda_0}(BB')=\\frac{-2\\pi}{\\lambda_0}n_VBB_i-\\frac{2\\pi}{\\lambda_0}n_{air}B_iB'\\)
+\\(\\varphi(B')-\\varphi(B)=\\frac{-2\\pi}{\\lambda_0}(n_V(e+\\Delta e)+n_{air}(x-e-\\Delta e))\\)
+Différence de phase entre A' et B' ?
+A et B sont sur la même surface d'onde donc
+\\(\\varphi(A)=\\varphi(B)\\). Ainsi, après simplification des termes, on obtient :
+\\(\\varphi(B')-\\varphi(A')=\\frac{-2\\pi}{\\lambda_0}\\Delta e(n_V-n_{air})\\)
+--------------------
+
+==================================================
+DECK : O2
+==================================================
+
+Q: (B.R.) Ordre de grandeur de la période temporelle d'une onde lumineuse ?
+R: [latex]$10^{-15}\\text{s}$
+[/latex]
+--------------------
+Q: (B.R.) Temps de réponse des detecteurs de lumière ?
+R: [latex]\\begin{itemize}
+\\item oeil : $\\tau_r \\approx 0,1\\text{s}$
+\\item capteur CCD : $\\tau_r \\approx 10^{-4}\\text{s}$
+\\end{itemize}
+[/latex]
+--------------------
+Q: (T.S) Décrire le modèle des trains d'onde
+R: Une onde lumineuse émise par une source de fréquence \\(f_0\\) (respectivement \\(\\lambda_0\\) ou \\(\\omega_0\\)) et de largeur \\(\\Delta f\\) (respectivement \\(\\Delta \\lambda\\) ou \\(\\Delta \\omega\\)) en S est modélisée par une succession de trains d'onde, tous de même durée \\(\\tau_c \\approx \\frac{1}{\\Delta f} \\)pendant lesquels l'onde est parfaitement sinusoïdale de fréquence \\(f_0\\).
+Soit \\(a(S,t)=A cos(\\omega_0 t+\\varphi(S))\\)
+Avec \\(A\\) et \\(\\omega_0\\) des constantes.
+Et \\(\\varphi(S)\\) qui reste constant pendant une durée \\(\\tau_c\\) puis l'émission est suspendue et reprend avec une phase
+\\(\\varphi(S)\\)différente et aléatoire.
+--------------------
+Q: (T.S) un signal dont le spectre a une largeur ∆f va être limité dans le temps d'une durée ∆t telle que :
+R: ∆f×∆t\\(\\approx\\)1
+--------------------
+Q: (T.S) Définir la longueur de cohérence temporelle d'une source, et sa relation avec \\(\\delta\\)(M) pour qu'il y ait des interférences
+R: Longeur de cohérence temporelle: \\(L_c=c\\ \\tau_c\\)
+Pour pouvoir observer des interférences, il faut que:\\(\\delta(M)<L_c\\)
+--------------------
+Q: (T.S) Citer les ordres de grandeur de Lc dans les cas suivants :
+-Lumière blanche
+-Lampe à vapeur de mercure
+-Laser He-Ne
+R: -Lumière blanche\\(L_c\\approx 0,9\\ µm\\)
+-Lampe à vapeur de mercure\\(L_c\\approx 0,3 \\ mm\\)
+-Laser He-Ne: \\(L_c\\approx 400 \\ m\\)
+--------------------
+Q: (T.S) Citer les 2 types de systèmes interférentiels + des exemples de ces systèmes
+R: Systèmes par division de front d'onde. Exemple: Trous d'Young.
+Systèmes par division d'amplitude. Exemple: Interféromètre de Michelson éclairé par une source étendue
+--------------------
+Q: (LPB) Quelle valeurs particulières prennent l'ordre d'interférences, le déphasage et la différence de marche en M, si M est situé sur une frange brillante ? sur une frange sombre?
+R: Sur une frange brillante: l'ordre d'interférence est un entier relatif, le déphasage est un multiple de \\(2\\pi \\) et la différence de marche est un multiple de \\(\\lambda_0\\)
+Sur une frange sombre: l'ordre d'interférence \\(p(M)=\\frac{1}{2}+q\\) , le déphasage \\(\\Phi=\\pi +2q\\pi\\) et la différence de marche \\(\\delta(M)=\\frac{\\lambda_0}{2} + q\\lambda_0\\) avec \\(q\\in \\mathbf{Z}\\)
+--------------------
+Q: (LPB) Définition du contraste?
+R: On définit le contraste par la relation \\(C = \\frac{I_{max} - I_{min}}{I_{max} + I_{min}}\\) où \\(I_{max}\\) et \\(I_{min}\\) représentent l’intensité lumineuse maximale et minimale sur zone d’observation.
+--------------------
+Q: (LPB) Formule de Fresnel? Définir le déphasage, l'ordre d'interférence et la différence de marche.
+R: >>> [IMAGE_ID: Capture d] <<<
+--------------------
+Q: Z.S   [latex]{\\scriptsize Déterminer\\:l'ordre\\:de\\:grandeur\\:de\\:$\\tau_c$ (durée d'un train d'onde)\\:pour\\:la\\:raie\\:verte\\:de\\:mercure\\:(de\\:longueur\\:d'onde\\:moyenne\\:$\\lambda_0 = 546 nm$\\: et de largeur\\:$\\Delta \\lambda=1 nm$)\\\\.}[/latex]
+R: [latex]
+{\\scriptsize
+Faire\\:le\\:lien\\:entre\\:$\\Delta \\lambda$ et $\\tau_c$
+\\\\ \\\\ $\\rightarrow$}
+{\\tiny
+$f = \\cfrac{c}{\\lambda}$
+} \\\\ \\\\
+{\\scriptsize
+$\\rightarrow$ Exprimer\\:la\\:variation\\:de\\:f\\:quand\\:$\\lambda$\\:varie\\:de\\:$\\Delta \\lambda$
+} \\\\ \\\\
+{\\tiny
+$\\hspace*{6mm}$ $\\cfrac{df}{d\\lambda} = -\\cfrac{c}{\\lambda^2}$ \\\\
+$\\hspace*{4mm}$ $\\Rightarrow df = -\\cfrac{c}{\\lambda^2}\\, d\\lambda$ \\\\
+$\\hspace*{4mm}$ $\\Rightarrow \\Delta f = -\\cfrac{c}{\\lambda^2}\\, \\Delta\\lambda$ \\\\
+$\\hspace*{4mm}$ $\\Rightarrow \\tau_c \\approx \\cfrac{1}{\\cfrac{c}{\\lambda^2} \\, \\Delta\\lambda} \\approx \\cfrac{\\lambda^2}{c \\, \\Delta\\lambda}$  \\; car \\;
+$\\tau_c \\approx \\cfrac{1}{\\Delta f}$ \\\\ \\\\ \\\\
+}
+{\\scriptsize
+A.N : $\\cfrac{(546,1 \\times 10^{-9})^{-2}}{3 \\times 10^{8-9}} \\approx 10^{-13}$ \\\\ \\\\
+$\\hspace*{7.5mm}$ $\\tau_c \\approx 10^{-12}$
+[/latex]
+--------------------
+Q: Critère de cohérence: Quand est-ce que deux ondes sont susceptibles d'interférer en un point M de l'espace? Quelle est alors l'expression de l'intensité lumineuse en M?
+Quelle est l'expression de l'intensité lumineuse en un point M de l'espace où deux ondes se superposent sans interférer?
+R: Pour que deux ondes
+puissent interférer en un point M où elles se superposent, il faut
+qu’elles soient issues d’une même source par division de l’onde,
+qu’elles aient même longueur d’onde et que la différence de marche
+en M , notée \\(\\delta(M)\\) soit inférieure à la longueur de cohérence
+temporelle \\(L_c\\) de la source.
+Alors \\(I(M)=I_1(M)+I_2(M)+2\\sqrt{I_2 I_2}\\ cos(\\frac{2\\pi}{\\lambda_0}\\delta(M)) \\)
+Si un de ces critères
+n’est pas vérifié, les ondes ne peuvent pas interférer. Alors: \\(I(M)=I_1 (M)+I_2(M)\\)
+--------------------
+Q: Calcul de l'intensité lumineuse en notation complexe?
+R: \\(I=\\frac{1}{2} K \\underline{a}\\ \\underline{a^*}\\)
+Avec \\(\\underline{a}\\) le complexe associé à l'amplitude de vibration \\(a\\) et \\(\\underline{a^*}\\) sont complexe conjugué.
+Rappel: avec les grandeurs réelles: \\(I=K<a^2 (M,t)>\\)
+--------------------
+
+==================================================
+DECK : O3
+==================================================
+
+Q: (Y)
+1) Représenter le dispositif des trous d'Young éclairé par une source ponctuelle à distance finie et un écran d'observation à grande distance finie. Tracer les rayons lumineux.
+2) Exprimer la différence de marche et l'intensité lumineuse en un point de l'écran d'observation
+R: 1)
+>>> [IMAGE_ID: paste-b443fcf093a3ca4302e5e76ea046eb563521e601.jpg]
+D'où :
+\\(δ(M) = n (S_2M - S_1M)\\)
+Ensuite, déterminons l'expression de \\( (S_2M - S_1M)\\) :
+. Coordonnées :
+\\(M = (x,y,0)\\)
+\\(S_1 = (\\frac {a}{2},0,-D)\\)
+\\(S_2 = (\\frac {-a}{2},0,-D)\\)
+puis \\(S_1M = \\) \\(\\sqrt{\\left(x - \\frac{a}{2}\\right)^2 + y^2 + D^2}\\)
+et \\(S_2M =\\) \\(\\sqrt{\\left(x + \\frac{a}{2}\\right)^2 + y^2 + D^2}\\)
+Puisque \\(D >> a, D >> x \\space et \\space D >> y,\\) on va effectuer un développement limité de la forme \\((1 + \\epsilon)^{\\alpha} \\approx 1 + \\alpha \\epsilon\\)
+d'où :
+\\(S_1M = \\) \\(\\sqrt{D^2 \\left(1 + \\frac{(x - \\frac{a}{2})^2 + y^2}{D^2}\\right)}\\)  = \\(D \\sqrt{1 + \\frac{(x - \\frac{a}{2})^2 + y^2}{D^2}} \\approx D \\left(1 + \\frac{(x - \\frac{a}{2})^2 + y^2}{2D^2}\\right)\\)
+\\(S_2M = \\) \\(D \\left(1 + \\frac{(x + \\frac{a}{2})^2 + y^2}{2D^2}\\right)\\)
+puis :
+\\(\\delta(M) = n \\cdot \\left[ D \\left(1 + \\frac{(x + \\frac{a}{2})^2 + y^2}{2D^2}\\right) - D \\left(1 + \\frac{(x - \\frac{a}{2})^2 + y^2}{2D^2}\\right) \\right]\\)
+Finalement :
+\\(\\boxed{\\delta(M) = n \\cdot \\frac{ax}{D}}\\)
+Déterminons maintenant l'intensité lumineuse :
+D'après la formule de Fresnel :
+\\(I = 2I_0 \\left(1 + \\cos\\left(\\frac{2\\pi}{\\lambda_0} \\delta(M)\\right)\\right)\\)
+d'où
+\\(\\boxed{I = 2I_0 \\left(1 + \\cos\\left(\\frac{2\\pi}{\\lambda_0} \\cdot n \\cdot \\frac{ax}{D}\\right)\\right)}\\)
+--------------------
+Q: Quand dit-on que les interférences sont non localisées ? Donner un exemple.
+R: Lorsque les interférences sont visibles et bien contrastées quelque soit la position de l’écran
+dans le champ d’interférence, ont dit que les interférences sont non localisées. (Exemple: interférences obtenues avec les trous d'Young)
+--------------------
+Q: Pour une source centrée ou excentrée donner l'interfrange  \\(i \\) dans le cas du montage des trous d'Young sans lentilles.
+R: L'interfrange \\(i\\) s'exprime : \\(i = \\frac{\\lambda _0 D}{n_{air}\\ a}\\)
+--------------------
+Q: \\((F.H)~Déterminer~la~différence~de~marche~pour~le~dispositif~ci-dessous : \\)
+>>> [IMAGE_ID: imgfh1.jpg] <<<
+R: \\(\\delta(M) =(SM)_2-(SM)_1 = n_{air}(SS_2+S_2M-SS_1-S_1M)\\)
+\\(= n_{air}(SS_2-SS_1) + n_{air}(S_2M-S_1M)\\)
+\\(Or~S_2M-S_1M = \\frac{ax}{D}~(Trous~de~Young~classique)~et~par~analogie,~ SS_2-SS_1 = -\\frac{ab}{l} \\)\\(On~a~alors~\\delta(M) = n_{air}(\\frac{ax}{D}-\\frac{ab}{l})\\)
+--------------------
+Q: (F.H) Réaliser le schéma du montage avec 2 lentilles :
+R: >>> [IMAGE_ID: paste-9a60a5058a996c2a13547706b58d971c86f71533.jpg] <<<
+Faire uniquement le tracer des rayons rouges.
+--------------------
+Q: \\((F.H)~Déterminer~la~différence~de~marche~pour~le~dispositif~ci-dessous : \\)
+>>> [IMAGE_ID: imgfh3.jpg] <<<
+R: Imaginons qu'il y ait en M une source ponctuelle. Dans ce cas, d'après le principe du retour inverse de la lumière le trajet suivi par la lumière serait le même mais en sens inverse. Alors d'après le théorème de Malus, dans ce cas, \\(S_1\\) et \\(H\\) seraient sur le même plan d'onde. Nous en déduisons que \\((S_1 M)=(HM)\\)
+\\(\\delta(M)=(SM)_2-(SM)_1=(SS_2)+(S_2M)-(SS_1)-(S_1M)\\)
+Or \\(S_1\\) et \\(S_2\\) sont sur le même plan d'onde donc \\((SS_1)=(SS_2)\\)
+et donc
+\\(\\delta(M)=(S_2M)-(S_1M)=(S_2H)+(HM)-(S_1M)=(S_2H)\\)
+Or \\((S_2 H)=a sin \\theta\\) et dans les condition de Gauss
+\\(sin\\theta\\approx tan\\theta=x/f'_2\\)
+Donc \\((S_2 H)\\approx \\frac{ax}{f'_2}\\)et \\(\\delta(M)=\\frac{n_{air} a x}{f'_2}\\)
+--------------------
+Q: \\((F.H)~Exprimer~la~différence~de~phase~\\Delta\\phi(M)~dans\\ le\\ cas \\ où\\ ~\\delta(M)=\\frac{ax}{f'_2}\\)
+R: \\(\\begin{align}On~a~\\Delta\\phi(M)&=\\frac{2\\pi}{\\lambda_0}\\delta(M)\\\\ &= \\frac{2\\pi ax}{\\lambda_0 f'_2}     \\end{align}\\)
+--------------------
+Q: (F.H) Expression de l'interfrange pour un montage des trous d'Young avec une lentille convergente après les trous d'Young et un écran dans le plan focal image de cette lentille:
+R: \\(On~a:~i=\\frac{\\lambda_0f'_2}{n_{air} a}\\)
+--------------------
+Q: (Y)
+Sachant que l'intensité lumineuse de la figure d'interférences obtenue avec le montage ci-dessous s'écrit:\\(\\boxed{I = 2I_0 \\left(1 + \\cos\\left(\\frac{2\\pi}{\\lambda_0} \\cdot n \\cdot \\frac{ax}{D}\\right)\\right)}\\)
+>>> [IMAGE_ID: paste-b443fcf093a3ca4302e5e76ea046eb563521e601.jpg] <<<
+Déterminer l'allure des franges d'interférences.
+Donner l'expression de l'interfrange.
+Donner les positions de franges brillantes et de franges sombres.
+R: On remarque que \\(I\\) ne dépend que de x : les points sur l'écran qui ont même intensité lumineuse ont la même coordonnée x. Les franges d'interférences sont donc des droites d'équation \\(x = cst\\) perpendiculaires à la direction de \\([S_1S_2]\\)
+L'interfrange correspond à la période spatiale de la fonction \\(I(x)\\) soit \\(i=\\frac{2\\pi}{\\frac{2\\pi}{\\lambda_0} \\frac{na}{D}}=\\frac{\\lambda_0 D}{na}\\)
+Positions des franges brillantes :
+(On considère ici n = 1)
+Soit \\(q\\) un entier relatif
+\\( \\boxed { p(M) = \\frac{\\delta(M)}{\\lambda_0} =\\frac{\\ a\\ x}{\\lambda_0D}} \\ =q\\ \\Leftrightarrow \\ \\frac{ax}{D} = q\\lambda_0 \\Leftrightarrow\\boxed {x_{franges brillantes} =  q \\left(\\frac{D \\lambda_0}{a}\\right)}\\)
+Positions des franges sombres :
+\\(\\frac{\\delta(M)}{\\lambda_0}  = q + \\frac{1}{2} \\Leftrightarrow  \\frac{ax}{D} =\\lambda_0 (q + \\frac{1}{2})\\ \\Leftrightarrow  \\boxed {x_{frangessombres}
+=  (q+\\frac{1}{2}) \\left(\\frac{D \\lambda_0}{a}\\right)}\\)
+--------------------
+
+==================================================
+DECK : O4
+==================================================
+
+Q: (M.S) Quels sont les éléments constitutifs de l'interféromètre de Michelson ?
+R: Deux miroirs M1 et M2, une séparatrice (SP), une compensatrice (C), des vis de rotation (rapide et lente) et une vis de chariotage.
+--------------------
+Q: (M.S) Comment sont positionnés les miroirs M1 et M2 l'un par rapport à l'autre ?
+R: Ils sont presque perpendiculaires.
+--------------------
+Q: (M.S) Quel est l'angle approximatif formé par la séparatrice avec les miroirs ?
+R: Environ 45°.
+--------------------
+Q: (M.S) À quoi servent les vis de rotation rapide et lente ?
+R: À modifier l'angle entre les deux miroirs
+--------------------
+Q: (M.S) Quelle est la fonction de la lame semi-réfléchissante appelée séparatrice (SP) ?
+R: Elle réfléchit une partie de la lumière et en transmet une autre partie.
+Cela permet d'effectuer une division de l'onde et de faire de superposer deux rayons lumineux issus d'une même source mais ayant suivi des chemins différents.
+--------------------
+Q: (M.S) Quelle est la fonction de la vis de chariotage ?
+R: Elle permet de translater le miroir M1.
+--------------------
+Q: (M.S) Quel est le rôle du VAC (verre anticalorique) à l'entrée du Michelson ?
+R: Filtrer le rayonnement infrarouge source d'échauffement et d'endommagement des éléments optiques
+--------------------
+Q: (M.S) À quel angle d'incidence arrive le faisceau lumineux sur la séparatrice du Michelson ?
+R: Environ 45°
+--------------------
+Q: (M.S) Comment peut-on modifier la différence de marche entre les deux rayons lumineux dans le Michelson ?
+R: En faisant tourner les miroirs ou en chariotant pour translater le miroir qui peut l'être.
+--------------------
+Q: (M.S) Qu'est-ce qu'une source secondaire dans l'interféromètre de Michelson ?
+R: Ce sont les points d'où semblent provenir les rayons lumineux après réflexion sur les miroirs M1 et M2 et sur la séparatrice.
+--------------------
+Q: >>> [IMAGE_ID: paste-c17d437c97f3bbf3f4ed711c99e018069921b86b.jpg] >> [IMAGE_ID: paste-8a64e728b34680870d0170f9fe9c2e51a6fa1d44.jpg] <<<
+R: 1.
+\\(\\space \\delta(M) = 2n_{air} \\alpha x\\)
+\\(\\begin{align}I(M) &= 2I_0(1+\\cos(\\frac{2\\pi}{\\lambda_0}\\delta(M)))\\\\ &=2I_0(1+\\cos(\\frac{2\\pi}{\\lambda_0}2n_{air} \\alpha x))\\\\ &=2I_0(1+\\cos(\\frac{4\\pi}{\\lambda_0}n_{air} \\alpha x(M)))\\\\  \\end{align}\\)
+\\(I(M) \\text{ constante} \\implies x(M)\\text{ constante}\\)
+Équation d'une frange, les franges sont des droites parallèles à l'arête de coin d'air
+2.
+\\(p(M) = \\frac{\\delta(M)}{\\lambda_0} = \\frac{2n_{air}\\alpha x}{\\lambda_0}\\)
+3.
+\\(2n_{air}\\alpha x_q = q\\lambda_0\\) avec \\(q\\in \\mathbb{Z}\\)
+\\(\\begin{align}i &= x_{q+1} - x_q\\\\ &= \\frac{\\lambda_0}{2n_{air}\\alpha}\\end{align}\\)
+4.
+\\(\\delta = 2 n_{air} e(x)\\)
+D'une frange brillante à la suivante \\(\\delta\\) varie de \\(\\lambda_0\\) donc \\(e \\text{ varie de } \\frac{\\lambda_0}{2n_{air}}\\approx \\frac{\\lambda_0}{2}\\)c'est bien ce qui figure sur le schéma.
+5.
+Diminuer l'angle du coin d'air permet de se rapprocher du contact optique.
+6.
+Lorsqu'on se rapproche du contact optique l'interfrange augmente.
+7.
+Lorsque l'on translate \\(M_1\\), le montage reste un montage coin d'air. Les franges restent rectilignes, l'interfrange n'est pas modifiée. Les franges vont défiler dans le sens du glissement de l'arête du coin d'air.
+--------------------
+Q: (M.S) Qu'est-ce un schéma équivalent de l'interféromètre de Michelson ?
+R: Un schéma où la séparatrice et le miroir M2 sont remplacés par un miroir virtuel M'2 (Le miroir virtuel est le symétrique de M2 par rapport à la séparatrice.).
+>>> [IMAGE_ID: paste-d07d84a1f13b8af6982560be0ba3e124ca557624.jpg] <<<
+--------------------
+Q: (M.S) Quelle figure d'interférences est observée dans la configuration du coin d'air , dans la configuration de la lame d'air et  dans la configuration du contact optique ?
+R: Dans la configuration du coin d'air, on observe des franges rectilignes appelées franges d'égale épaisseur.
+>>> [IMAGE_ID: paste-a3d5a705a818368d1da37f0122ff6c7d746e1f15.jpg] >> [IMAGE_ID: paste-4223f67d2af5c4eb29fa2b09005fbbf651ba46bb.jpg] >> [IMAGE_ID: paste-47c013e3cf015048cca208a22e792ce8bb1282c6.jpg] <<<
+--------------------
+Q: (C.E.) Condition d’éclairage pour un interféromètre de Michelson réglé en lame d’air :
+R: Ce qui différencie un anneau d’un autre est l’angle d’incidence 𝑖. Pour observer des anneaux concentriques de rayons variables il faut donc que la source lumineuse émette un faisceau constitué de rayons d’angles variables pour que ces rayons arrivent sous des incidences variables sur la lame d’air.
+Dans la pratique il faut faire converger la lumière sur les miroirs en utilisant un condenseur (lentille de très courte focale).
+Remarque : faire converger la lumière sur les miroirs permet également d’augmenter la luminosité de la figure d’interférences.
+--------------------
+Q: (C E) Condition d’observation pour un interféromètre de Michelson réglé en lame d’air :
+R: Les interférences étant localisées à l’infini, on peut les observer en projetant l’image sur un écran placé au foyer image d’une lentille convergente.
+Rem: On peut aussi les observer à l’œil nu (pas dans le cas
+d’une source laser), en regardant le miroir 𝑀2, mais sans accomoder et en plaçant une feuille de papier entre
+la source et le condenseur pour ne pas être ébloui (et pour que la feuille absorbe les UV de la lampe à vapeur
+de mercure)
+--------------------
+Q: (C.E.) Conditions d’éclairage et d’observation pour un interféromètre de Michelson réglé en coin d’air :
+R: Éclairage par un faisceau de lumière quasi parallèle sous incidence quasi normale pour que 𝛿 ≈ 2 e(𝑀) (avec e(M) l'épaisseur locale du coin d'air)
+Observation : Les interférences étant localisées au voisinage des miroirs, on peut les observer en faisant l’image du miroir 𝑀2 sur l’écran à l’aide d’une lentille convergente
+Rem: On peut aussi les observer à l’œil nu (pas dans le cas d’une source laser), en regardant le miroir 𝑀2, et en plaçant une feuille de papier entre la source et le condenseur pour ne pas être ébloui (et pour que la feuille absorbe les UV de la lampe à vapeur de mercure).
+--------------------
+Q: Quelle est l'espression de la différence de marche dans le cas d'un Michelson réglé en coin d'air? Où sont localisées les interférences?
+R: Différence de marche: \\(\\delta(M)\\approx 2 n_{air} e(M)\\)
+Les interférences sont localisées au voisinage des miroirs.
+--------------------
+Q: Etablir l'expression de la différence de marche dans le cas d'un Michelson réglé en lame d'air. Où sont localisées les interférences?
+R: Les interférences sont localisées à l'infini.
+>>> [IMAGE_ID: paste-07ac48dd5b6af09d4fbe94e765ffc7d4bec2e7fb.jpg] <<<
+e
+\\(\\delta(M)=(SM)_2 -(SM)_1=[(SI)+(IJ)+(JK)+(KM)]-[(SI)+(IM)]\\)
+Or \\((IJ)=(JK)\\) donc \\(\\delta(M)=2(IJ)+(KM)]-(IM)\\)
+De plus d'après le principe du retour inverse de la lumière + le théorème de Malus \\((LM)=(KM)\\)
+Donc \\(\\delta(M)=2(IJ)+(KM)]-(IL)-(LM)=2(IJ)-(IL)=n_{air} (2 \\ IJ - IL)\\)
+Or \\(cos(i)=\\frac {e}{IJ}\\) donc \\(IJ=\\frac{e}{cos(i)}\\)
+De plus \\(sin(i)=\\frac{IL}{IK}\\) donc \\(IL=IK \\ sin(i)\\)
+et comme \\(tan(i)=\\frac{IK/2}{e}\\) soit \\(IK=2\\ e \\ tan(i)\\)
+On obtient : \\(IL=2\\ e\\ tan(i) \\ sin(i)=2\\ e\\ \\frac{sin^2 (i)}{cos(i)} \\)
+Finalement: \\(2\\ IJ - IL=\\frac{2\\ e}{cos(i)}-2\\ e \\frac{sin^2 (i)}{cos(i)}= \\frac {2e}{cos(i)} \\ (1-sin^2 (i))=2e\\cos(i)\\)
+Bilan: \\(\\delta(M)=2\\ n_{air} \\ e \\ cos(i)\\)
+--------------------
+Q: (C.J)
+>>> [IMAGE_ID: schémaexo2optique4.PNG] max et pmin ?
+2) Que se passe t'il quant au nombre d'anneaux si θmax augmente ?
+R: 1) On a alors  \\(p(M)=\\frac{2e cos(i)}{\\lambda_0}\\)p est maximal au centre de la figure d'interférence (centre des anneaux) lorsque i = 0. Donc \\(p_{max}=\\frac{2e}{\\lambda_0}\\)
+p diminue lorsqu'on s'éloigne du centre de la figure d'interférence, ainsi comme imax = θmax  on a
+\\(p_{min}=\\frac{2e cos(\\theta_{max})}{\\lambda_0}\\)
+2)Si θmax augmente alors pmin diminue et on voit plus d'anneaux
+--------------------
+Q: (L.L) Comment annuler l'angle \\(\\alpha\\) du coin d'air dans un interféromètre de Michelson ?
+R: Pour annuler \\(\\alpha\\), il faut faire tourner un des deux miroirs dans le sens qui augmente l'interfrange jusqu'à ce que l'on ne voit plus qu'un champ uniforme sur l'écran.
+--------------------
+Q: (L.L) Qu'observe-t-on au contact optique dans un interféromètre de Michelson?
+R: Au contact optique, l'épaisseur de la lame d'air et l'angle du coin d'air sont nuls. La différence de marche devient donc nulle pour tout rayon incident sur la surface des miroirs. L'éclairement sur l'écran devient uniforme, et aucune frange n'est visible.
+--------------------
+Q: (A.R) Dans un Michelson en lame d'air, quelle est l'expression de la différence de marche \\(\\delta(M)\\) en fonction de l'épaisseur \\(e\\) de la lame et de l'angle d'incidence \\(i\\)
+R: \\(\\delta(M) = 2\\ n_{air}\\ e\\cdot cos(i)\\)
+--------------------
+Q: (A.R) Quelle est l'allure de la figure d'interférence en lame d'air ? en coin d'air ? Justifier
+R: En lame d'air, l'intensité lumineuse en un point de l'écran ne dépend que de l'angle d'incidence donc les franges sont circulaires.En coin d'air, l'intensité lumineuse en un point de l'écran dépend de l'épaisseur d'air traversée dans le coin d'air, on a donc des franges qui sont des droites parallèles à l'arête du coin d'air.
+--------------------
+Q: (A.R) En lame d'air, comment évolue la figure d'interférence lorsque l'on diminue l'épaisseur de la lame d'air ? Quel est le cas limite ?
+R: Lorsque l'on diminue l'épaisseur de la lame d'air, on diminue le rayon des anneaux de la figure d'interférence.
+On fait rentrer les anneaux. On voit de moins en moins d'anneaux.
+Le cas limite est appelé contact optique. On observe alors une seule couleur unie sur tout l'écran appelée teinte plate.
+`.trim();
