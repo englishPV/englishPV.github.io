@@ -2,8 +2,11 @@
 const CD="Democracy", CG="Genetics", CI="Immigration", CIT="International Relations", CU="Labor", CR="Crime", PC="Capital Punishment", CF="Status of Women";
 const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verbes Irréguliers", CO="THE CORONAVIRUS CRISIS", ED="EATING DISORDERS";
 
+// Constantes ajoutées pour couvrir les variables de la Map Emoji et la fin du texte brut
+const EDU="Education", ECO="Economy", SPO="Sports", GUN="Gun Control", REL="Religion", ENV="Environment", TEC="Technology", MED="Media";
+const THA="Thanksgiving", BUS="Business", POL="Politique"; 
+
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
-// C'est ici qu'on définit l'ordre d'affichage et les jolis noms
 const PHY_MAP = {
   // --- Mécanique ---
   "M1": { title: "M1 - Cinématique du point", emoji: "🚀" },
@@ -34,28 +37,42 @@ const PHY_MAP = {
 
 // Fusion des Emojis
 const C_EMOJIS = {
-  // --- Anglais (Société & Politique) ---
-  [CD]:  '🗳️',  // Democracy (Urne de vote : plus précis que le bâtiment)
-  [CG]:  '🧬',  // Genetics (ADN : parfait)
-  [CI]:  '🛂',  // Immigration (Contrôle passeport : évoque le passage de frontière)
-  [CIT]: '🤝',  // International Relations (Poignée de main : diplomatie)
-  [CU]:  '👷',  // Labor (Ouvrier : aspect humain du travail)
-  [CR]:  '⚖️',  // Crime (Balance : Justice/Légal)
-  [PC]:  '💉',  // Capital Punishment (Seringue/Injection : distinct de la mort générale)
-  [CF]:  '♀️',  // Status of Women (Symbole classique)
-  
-  // --- Anglais (Santé & Individu) ---
-  [HI]:  '🩺',  // HEALTH ISSUES (Stéthoscope : médecine générale)
-  [IF]:  '🗽',  // INDIVIDUAL FREEDOM (Statue de la Liberté : symbole fort)
-  [IDR]: '💊',  // ILLEGAL DRUGS (Pilule)
-  [VI]:  '📝',  // Verbes Irréguliers (Note/Papier : l'apprentissage par cœur)
-  [CO]:  '🦠',  // THE CORONAVIRUS CRISIS (Microbe : pour ne pas confondre avec Santé)
-  [ED]:  '🍏'   // EATING DISORDERS (Pomme : évoque la nourriture/diététique)
+  // --- Politique & Société ---
+  [CD]:  '🗳️',   // Democracy
+  [CIT]: '🌐',   // International Relations
+  [IF]:  '🗽',   // Individual Freedom
+  [CR]:  '🚔',   // Crime
+  [PC]:  '⚖️',   // Capital Punishment
+  [GUN]: '🔫',   // Gun Control
+  [REL]: '🛐',   // Religion
+  [POL]: '🏛️',   // Politique (Ajouté pour la fin du texte)
+
+  // --- Social & Économie ---
+  [CI]:  '🧳',   // Immigration
+  [CF]:  '♀️',    // Status of Women
+  [CU]:  '💼',   // Labor
+  [EDU]: '🎓',   // Education
+  [ECO]: '📈',   // Economy
+  [SPO]: '🏆',   // Sports
+  [BUS]: '💼',   // Business (Ajouté pour la fin du texte)
+  [THA]: '🦃',   // Thanksgiving (Ajouté pour la fin du texte)
+
+  // --- Sciences, Santé & Tech ---
+  [CG]:  '🧬',   // Genetics
+  [HI]:  '🩺',   // Health Issues
+  [CO]:  '🦠',   // Coronavirus
+  [ED]:  '🍽️',   // Eating Disorders
+  [IDR]: '💊',   // Illegal Drugs
+  [ENV]: '🌱',   // Environment
+  [TEC]: '💻',   // Technology
+  [MED]: '📰',   // Media
+
+  // --- Grammaire ---
+  [VI]:  '📝'    // Verbes Irréguliers
 };
 
-// Ajout dynamique des emojis de Physique
+// On rajoute ensuite tes chapitres de physique à cet objet
 Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
-
 
 
 /* --- RAW DATA CONTENT --- */
@@ -567,188 +584,188 @@ const RAW_EN = `
 503|retraite|retirement|${CU}
 504|partir en pré-retraite|to take early retirement|${CU}
 505|âge de la retraite|retirement age|${CU}
-506|bien réussir à l'école|to do well at school|Education
-507|lire l'anglais couramment|to read English fluently|Education
-508|être bon en sport|to be good at sports|Education
-509|faire l'école buissonnière|to play truant|Education
-510|absentéisme|truancy|Education
-511|suivre un cours d'anglais|to take a class in English|Education
-512|donner du travail à la maison|to set homework|Education
-513|rendre un travail|to hand in a piece of work|Education
-514|les subtilités de la langue anglaise|the intricacies of the English language|Education
-515|se lancer|to get started|Education
-516|se conformer à une règle|to obey a rule|Education
-517|obéir à (qqn)|to obey (sone)|Education
-518|avoir des difficultés en maths|to have difficulty with maths|Education
-519|donner un coup de main à (qqn)|to give (sone) a hand|Education
-520|obtenir un diplôme|to graduate|Education
-521|une salle de classe|a classroom|Education
-522|une leçon|a class|Education
-523|rattraper un cours loupé|to catch up a missed lesson|Education
-524|évaluer|to assess, appraise|Education
-525|le programme scolaire|the school curriculum|Education
-526|étudiant de premier cycle|undergraduate|Education
-527|indiscipliné|unruly|Education
-528|incontrôlable|unmanageable|Education
-529|bâcler ses devoirs|to dash off one's work|Education
-530|obtenir une bonne note|to get a good mark|Education
-531|tricher sur son voisin|to eye over one's neighbour's work|Education
-532|principal, directeur (école)|headmaster|Education
-533|élève doué|gifted pupil|Education
-534|réussir un examen haut la main|to pass a test with flying colors|Education
-535|une matière (scolaire)|a (school) subject|Education
-536|une pause de 20 minutes|a 20-minute break|Education
-537|une heure de cours|a teaching-hour|Education
-538|passer dans la classe supérieure|to pass the next grade|Education
-539|travail de paperasse|paperwork|Education
-540|passer un examen|to take an exam|Education
-541|examen blanc|mock exam|Education
-542|se préparer à un examen|to prepare for an exam|Education
-543|échouer à un examen|to flunk a test|Education
-544|recaler (qqn)|to flunk (sone)|Education
-545|être reçu à un examen avec mention|to pass a degree with distinction|Education
-546|abandonner l'école|to drop out of school|Education
-547|un élève décrocheur|a dropout|Education
-548|obtenir une bourse|to get a scholarship|Education
-549|entrer en fac de médecine|to go to a medical school|Education
-550|faire des études de médecine|to study medicine|Education
-551|remettre un évènement à plus tard|to put off an event|Education
-552|sortie scolaire|school trip|Education
-553|faire des recherches sur (qqch)|to do research on (sthg)|Education
-554|cour d'école|schoolyard|Education
-555|un élève de terminale|[UK] a sixth-former|Education
-556|méticuleux|painstaking|Education
-557|sécher un cours|to skip a lesson|Education
-558|se voir accorder la possibilité de [...]|to be provided with an opportunity to [...]|Education
-559|tricher|to cheat|Education
-560|un tricheur|a cheater|Education
-561|être renvoyé|to be expelled|Education
-562|rouler sur un examen|to sail through an exam|Education
-563|sauce (tomate)|dressing|Thanksgiving
-564|chuckle|laughter|Thanksgiving
-565|to gather|to get together|Thanksgiving
-566|a feast|a banquet|Thanksgiving
-567|to reach accross|to make efforts to join|Thanksgiving
-568|one another|each other|Thanksgiving
-569|to winnow away|to filter out and remove|Thanksgiving
-570|widely viewed as|largely regarded as|Thanksgiving
-571|twice|two times|Thanksgiving
-572|to provide|to give|Thanksgiving
-573|the bulk of|the biggest part of|Thanksgiving
-574|to depict|to describe|Thanksgiving
-575|to feature|to represent, show|Thanksgiving
-576|subservient|submissive, docile|Thanksgiving
-577|pilgrims|migrants arriving in America from England in 17th|Thanksgiving
-578|to outnumber|to surpass in number|Thanksgiving
-579|to crouch|almost to sit on the floor|Thanksgiving
-580|a harvest|a crop|Thanksgiving
-581|likely|probably|Thanksgiving
-582|a deed|an [bad] action|Thanksgiving
-583|settlers|colons|Thanksgiving
-584|in retaliation for|in revenge for|Thanksgiving
-585|to broker|to organize, negotiate|Thanksgiving
-586|to grab|to seize|Thanksgiving
-587|gauzy|transparent|Thanksgiving
-588|willfully|deliberately|Thanksgiving
-589|How [s.one] would have it|What [s.one] would like to believe|Thanksgiving
-590|druthers|inclination, penchant|Thanksgiving
-591|blissfully|ecstatically|Thanksgiving
-592|bleached out|washed out|Thanksgiving
-593|to abid|to respect|Thanksgiving
-594|altérer|alter|Thanksgiving
-595|apprentissage en continu|lifelong learning|Thanksgiving
-596|malaise|general feeling of discomfort|Business
-597|stagflation|period of slow economic growth and high unemployment|Business
-598|aftermath|the consequences of a significant unpleasant event|Business
-599|hyperinflation|extremely high and accelerating inflation|Business
-600|third-world countries|countries with lower economic development|Business
-601|martial law|military control over civilian functions of government|Business
-602|gleaming|shining brightly, describe something polished or new|Business
-603|suburban area|residential area on the outskirts of the a city|Business
-604|stagnation|lack of activity, growth, and development|Business
-605|dispirited|having lost emthusiasm and hope|Business
-606|fatalistic|believing that events are inevitable|Business
-607|hollowed out|destroyed or weakened from within|Business
-608|brimming|filled to the point of overflowing (with positive emotions and energy)|Business
-609|rabais, ristourne|discount|Business
-610|chaîne de montage|assembly line|Business
-611|payer comptant|to pay cash|Business
-612|pénurie de main d'oeuvre|labor shortage|Business
-613|productivité|productivity|Business
-614|soumettre sa candidature|to apply|Business
-615|racheter|to buy out|Business
-616|licencier|to lay off|Business
-617|se mettre en grève|to go on strike|Business
-618|service client|customer service|Business
-619|représentant syndical|union representative|Business
-620|commerćant|shopkeeper|Business
-621|virer, mettre à la porte|to fire|Business
-622|se mettre à son compte|to set up one's business|Business
-623|démissionner|to resign|Business
-624|en sureffectif|overstaffed|Business
-625|contrat à durée indéterminée|permanent contract|Business
-626|équipe de nuit|night shift|Business
-627|service, département|department|Business
-628|refondre, réorganiser|to revamp|Business
-629|concurrent|competitor|Business
-630|fusion|merger|Business
-631|faire faillite|to go bankrupt, bust|Business
-632|embaucher|to hire, take on|Business
-633|fiche de paie|pay slip|Business
-634|faire des heures supplémentaires|work overtime|Business
-635|mettre la clé sous la porte|to go out of business, close up shop|Business
-636|fait main|handmade|Business
-637|artisan|craftsman|Business
-638|ouvrier qualifié|skilled worker|Business
-639|entreprise|business|Business
-640|plein emploi|full employment|Business
-641|un maire|a mayor|Politique
-642|homme politique|politician|Politique
-643|s'assurer une majorité|to secure a majority|Politique
-644|déclencher des élections anticipées|to call an early election|Politique
-645|(UK) les éléctions législatives|(UK) the general election|Politique
-646|(US) les éléctions présidentielles|(US) the general election|Politique
-647|les grands partis|mainstream parties|Politique
-648|premier ministre|Prime Minister|Politique
-649|le ministre de l'économie et des finances|(UK) the Chancellor of the Exchequer|Politique
-650|remaniement ministériel|Cabinet reshuffle|Politique
-651|ministre des Affaires étrangères|Foreign minister|Politique
-652|pronncer un discours|to deliver a speech|Politique
-653|une dictature|a dictatorship|Politique
-654|museler, baîlloner|to gag, muzzle|Politique
-655|société civile|civil society|Politique
-656|(UK) syndicats|(UK) trade unions|Politique
-657|(US) syndicats|(US) labor unions|Politique
-658|élections de mi-mandat|mid-term elections|Politique
-659|minisre "frondeur"|rebellious minister|Politique
-660|démissionner|resign, step down|Politique
-661|officier en tant que|to serve as|Politique
-662|opposer son veto à (qqch)|to veto (sthg)|Politique
-663|un projet de loi|a bill|Politique
-664|un groupe de réflexion|a think-tank|Politique
-665|(UK) un ministre|(UK) a Cabinet member|Politique
-666|un directeur de cabinet|a chief of staff|Politique
-667|impôts locaux|local taxes|Politique
-668|cote de popularité|approval ratings|Politique
-669|se présenter à une éléction|to run for election [office]|Politique
-670|prêter serment|to take the oath, be sworn in|Politique
-671|rendre homage à (qqn)|to pay tribute to (sone)|Politique
-672|dirigeant|political leader|Politique
-673|élection truquée|rigged election|Politique
-674|les allocations|social benefits|Politique
-675|revaloriser|to scale up, raise, increase|Politique
-676|l'allocation familliale|the family allowance|Politique
-677|le gel de la production|the production freeze|Politique
-678|un bras de fer|a tug of war|Politique
-679|chancelant|teetering, wavering|Politique
-680|tailored|customized|Politique
-681|rote memorisation|repetition-based learning|Politique
-682|impoverished|cash-strapped|Politique
-683|unencumbered|unburdened|Politique
-684|inquisitiveness|interest, curiosity|Politique
-685|substantially|notably, significatly|Politique
-686|authoritarian|dictatorial, strict|Politique
-687|minimally supervised|lightly monitored|Politique
+506|bien réussir à l'école|to do well at school|${EDU}
+507|lire l'anglais couramment|to read English fluently|${EDU}
+508|être bon en sport|to be good at sports|${EDU}
+509|faire l'école buissonnière|to play truant|${EDU}
+510|absentéisme|truancy|${EDU}
+511|suivre un cours d'anglais|to take a class in English|${EDU}
+512|donner du travail à la maison|to set homework|${EDU}
+513|rendre un travail|to hand in a piece of work|${EDU}
+514|les subtilités de la langue anglaise|the intricacies of the English language|${EDU}
+515|se lancer|to get started|${EDU}
+516|se conformer à une règle|to obey a rule|${EDU}
+517|obéir à (qqn)|to obey (sone)|${EDU}
+518|avoir des difficultés en maths|to have difficulty with maths|${EDU}
+519|donner un coup de main à (qqn)|to give (sone) a hand|${EDU}
+520|obtenir un diplôme|to graduate|${EDU}
+521|une salle de classe|a classroom|${EDU}
+522|une leçon|a class|${EDU}
+523|rattraper un cours loupé|to catch up a missed lesson|${EDU}
+524|évaluer|to assess, appraise|${EDU}
+525|le programme scolaire|the school curriculum|${EDU}
+526|étudiant de premier cycle|undergraduate|${EDU}
+527|indiscipliné|unruly|${EDU}
+528|incontrôlable|unmanageable|${EDU}
+529|bâcler ses devoirs|to dash off one's work|${EDU}
+530|obtenir une bonne note|to get a good mark|${EDU}
+531|tricher sur son voisin|to eye over one's neighbour's work|${EDU}
+532|principal, directeur (école)|headmaster|${EDU}
+533|élève doué|gifted pupil|${EDU}
+534|réussir un examen haut la main|to pass a test with flying colors|${EDU}
+535|une matière (scolaire)|a (school) subject|${EDU}
+536|une pause de 20 minutes|a 20-minute break|${EDU}
+537|une heure de cours|a teaching-hour|${EDU}
+538|passer dans la classe supérieure|to pass the next grade|${EDU}
+539|travail de paperasse|paperwork|${EDU}
+540|passer un examen|to take an exam|${EDU}
+541|examen blanc|mock exam|${EDU}
+542|se préparer à un examen|to prepare for an exam|${EDU}
+543|échouer à un examen|to flunk a test|${EDU}
+544|recaler (qqn)|to flunk (sone)|${EDU}
+545|être reçu à un examen avec mention|to pass a degree with distinction|${EDU}
+546|abandonner l'école|to drop out of school|${EDU}
+547|un élève décrocheur|a dropout|${EDU}
+548|obtenir une bourse|to get a scholarship|${EDU}
+549|entrer en fac de médecine|to go to a medical school|${EDU}
+550|faire des études de médecine|to study medicine|${EDU}
+551|remettre un évènement à plus tard|to put off an event|${EDU}
+552|sortie scolaire|school trip|${EDU}
+553|faire des recherches sur (qqch)|to do research on (sthg)|${EDU}
+554|cour d'école|schoolyard|${EDU}
+555|un élève de terminale|[UK] a sixth-former|${EDU}
+556|méticuleux|painstaking|${EDU}
+557|sécher un cours|to skip a lesson|${EDU}
+558|se voir accorder la possibilité de [...]|to be provided with an opportunity to [...]|${EDU}
+559|tricher|to cheat|${EDU}
+560|un tricheur|a cheater|${EDU}
+561|être renvoyé|to be expelled|${EDU}
+562|rouler sur un examen|to sail through an exam|${EDU}
+563|sauce (tomate)|dressing|${THA}
+564|chuckle|laughter|${THA}
+565|to gather|to get together|${THA}
+566|a feast|a banquet|${THA}
+567|to reach accross|to make efforts to join|${THA}
+568|one another|each other|${THA}
+569|to winnow away|to filter out and remove|${THA}
+570|widely viewed as|largely regarded as|${THA}
+571|twice|two times|${THA}
+572|to provide|to give|${THA}
+573|the bulk of|the biggest part of|${THA}
+574|to depict|to describe|${THA}
+575|to feature|to represent, show|${THA}
+576|subservient|submissive, docile|${THA}
+577|pilgrims|migrants arriving in America from England in 17th|${THA}
+578|to outnumber|to surpass in number|${THA}
+579|to crouch|almost to sit on the floor|${THA}
+580|a harvest|a crop|${THA}
+581|likely|probably|${THA}
+582|a deed|an [bad] action|${THA}
+583|settlers|colons|${THA}
+584|in retaliation for|in revenge for|${THA}
+585|to broker|to organize, negotiate|${THA}
+586|to grab|to seize|${THA}
+587|gauzy|transparent|${THA}
+588|willfully|deliberately|${THA}
+589|How [s.one] would have it|What [s.one] would like to believe|${THA}
+590|druthers|inclination, penchant|${THA}
+591|blissfully|ecstatically|${THA}
+592|bleached out|washed out|${THA}
+593|to abid|to respect|${THA}
+594|altérer|alter|${THA}
+595|apprentissage en continu|lifelong learning|${THA}
+596|malaise|general feeling of discomfort|${BUS}
+597|stagflation|period of slow economic growth and high unemployment|${BUS}
+598|aftermath|the consequences of a significant unpleasant event|${BUS}
+599|hyperinflation|extremely high and accelerating inflation|${BUS}
+600|third-world countries|countries with lower economic development|${BUS}
+601|martial law|military control over civilian functions of government|${BUS}
+602|gleaming|shining brightly, describe something polished or new|${BUS}
+603|suburban area|residential area on the outskirts of the a city|${BUS}
+604|stagnation|lack of activity, growth, and development|${BUS}
+605|dispirited|having lost emthusiasm and hope|${BUS}
+606|fatalistic|believing that events are inevitable|${BUS}
+607|hollowed out|destroyed or weakened from within|${BUS}
+608|brimming|filled to the point of overflowing (with positive emotions and energy)|${BUS}
+609|rabais, ristourne|discount|${BUS}
+610|chaîne de montage|assembly line|${BUS}
+611|payer comptant|to pay cash|${BUS}
+612|pénurie de main d'oeuvre|labor shortage|${BUS}
+613|productivité|productivity|${BUS}
+614|soumettre sa candidature|to apply|${BUS}
+615|racheter|to buy out|${BUS}
+616|licencier|to lay off|${BUS}
+617|se mettre en grève|to go on strike|${BUS}
+618|service client|customer service|${BUS}
+619|représentant syndical|union representative|${BUS}
+620|commerćant|shopkeeper|${BUS}
+621|virer, mettre à la porte|to fire|${BUS}
+622|se mettre à son compte|to set up one's business|${BUS}
+623|démissionner|to resign|${BUS}
+624|en sureffectif|overstaffed|${BUS}
+625|contrat à durée indéterminée|permanent contract|${BUS}
+626|équipe de nuit|night shift|${BUS}
+627|service, département|department|${BUS}
+628|refondre, réorganiser|to revamp|${BUS}
+629|concurrent|competitor|${BUS}
+630|fusion|merger|${BUS}
+631|faire faillite|to go bankrupt, bust|${BUS}
+632|embaucher|to hire, take on|${BUS}
+633|fiche de paie|pay slip|${BUS}
+634|faire des heures supplémentaires|work overtime|${BUS}
+635|mettre la clé sous la porte|to go out of business, close up shop|${BUS}
+636|fait main|handmade|${BUS}
+637|artisan|craftsman|${BUS}
+638|ouvrier qualifié|skilled worker|${BUS}
+639|entreprise|business|${BUS}
+640|plein emploi|full employment|${BUS}
+641|un maire|a mayor|${POL}
+642|homme politique|politician|${POL}
+643|s'assurer une majorité|to secure a majority|${POL}
+644|déclencher des élections anticipées|to call an early election|${POL}
+645|(UK) les éléctions législatives|(UK) the general election|${POL}
+646|(US) les éléctions présidentielles|(US) the general election|${POL}
+647|les grands partis|mainstream parties|${POL}
+648|premier ministre|Prime Minister|${POL}
+649|le ministre de l'économie et des finances|(UK) the Chancellor of the Exchequer|${POL}
+650|remaniement ministériel|Cabinet reshuffle|${POL}
+651|ministre des Affaires étrangères|Foreign minister|${POL}
+652|pronncer un discours|to deliver a speech|${POL}
+653|une dictature|a dictatorship|${POL}
+654|museler, baîlloner|to gag, muzzle|${POL}
+655|société civile|civil society|${POL}
+656|(UK) syndicats|(UK) trade unions|${POL}
+657|(US) syndicats|(US) labor unions|${POL}
+658|élections de mi-mandat|mid-term elections|${POL}
+659|minisre "frondeur"|rebellious minister|${POL}
+660|démissionner|resign, step down|${POL}
+661|officier en tant que|to serve as|${POL}
+662|opposer son veto à (qqch)|to veto (sthg)|${POL}
+663|un projet de loi|a bill|${POL}
+664|un groupe de réflexion|a think-tank|${POL}
+665|(UK) un ministre|(UK) a Cabinet member|${POL}
+666|un directeur de cabinet|a chief of staff|${POL}
+667|impôts locaux|local taxes|${POL}
+668|cote de popularité|approval ratings|${POL}
+669|se présenter à une éléction|to run for election [office]|${POL}
+670|prêter serment|to take the oath, be sworn in|${POL}
+671|rendre homage à (qqn)|to pay tribute to (sone)|${POL}
+672|dirigeant|political leader|${POL}
+673|élection truquée|rigged election|${POL}
+674|les allocations|social benefits|${POL}
+675|revaloriser|to scale up, raise, increase|${POL}
+676|l'allocation familliale|the family allowance|${POL}
+677|le gel de la production|the production freeze|${POL}
+678|un bras de fer|a tug of war|${POL}
+679|chancelant|teetering, wavering|${POL}
+680|tailored|customized|${POL}
+681|rote memorisation|repetition-based learning|${POL}
+682|impoverished|cash-strapped|${POL}
+683|unencumbered|unburdened|${POL}
+684|inquisitiveness|interest, curiosity|${POL}
+685|substantially|notably, significatly|${POL}
+686|authoritarian|dictatorial, strict|${POL}
+687|minimally supervised|lightly monitored|${POL}
 688|crime, criminality|la criminalité|${CR}
 689|the crime rate|le taux de criminalité|${CR}
 690|organized crime|la criminalité organisée, le grand banditisme|${CR}
