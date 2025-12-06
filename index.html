@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Flashcards 9:16</title>
+  <title>Physique Flashcards</title>
   <style>
     /* --- VARIABLES & THEME --- */
     :root {
@@ -133,13 +133,37 @@
     } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
     
+    /* --- MATHJAX FIXES (FORCE LE TEXTE À LA LIGNE) --- */
     mjx-container { 
       overflow-x: auto; 
       overflow-y: hidden; 
-      max-width: 100%; 
-      display: block!important; 
+      max-width: 100% !important; 
+      display: inline-block !important; 
       padding: 4px 0;
+      white-space: normal !important; /* Allow wrapping */
+      vertical-align: middle;
     }
+    mjx-mtext {
+        white-space: normal !important;
+        display: inline !important;
+    }
+    mjx-math {
+        white-space: normal !important;
+        max-width: 100%;
+    }
+    .img-placeholder {
+        display: block;
+        background: rgba(255,255,255,0.05);
+        color: #8aa0d3;
+        padding: 15px;
+        border: 2px dashed rgba(255,255,255,0.1);
+        border-radius: 8px;
+        margin: 15px auto;
+        font-style: italic;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
     img { 
       display: block; 
       max-width: 100%; 
@@ -174,7 +198,7 @@
       padding: 14px; 
       background: 0 0; 
       max-height: none; /* Laisser la carte prendre sa hauteur */
-  overflow: visible;
+      overflow: visible;
       display: flex;
       flex-direction: column;
     }
@@ -218,7 +242,64 @@
 <script src="data.js"></script>
 
 <script>
-/* --- LOGIC START --- */
+/* --- LOGIC POUR NETTOYER ET PARSER LA PHYSIQUE --- */
+
+// 1. Nettoyage du LaTeX pour éviter le scroll horizontal
+function formatText(text) {
+    if (!text) return '';
+    // Images
+    let formatted = text.replace(/>>>\s*\[IMAGE_ID:\s*(.+?)\]\s*<<</g, '<div class="img-placeholder">Image manquante (ID: $1)</div>');
+    formatted = formatted.replace(/>>\s*\[IMAGE_ID:\s*(.+?)\]/g, '<div class="img-placeholder">Image manquante (ID: $1)</div>');
+    
+    // Nettoyage des phrases entières mises en LaTeX inutilement (ex: \\[ \text{...} \\])
+    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, function(match, content) {
+        if (content.includes(' ')) return content; // Si c'est une phrase, on retire le LaTeX
+        return match;
+    });
+
+    // Retours à la ligne
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    // Nettoyage balises custom
+    formatted = formatted.replace(/\[latex\]/g, '').replace(/\[\/latex\]/g, '');
+    formatted = formatted.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
+    
+    return formatted;
+}
+
+// 2. Parser spécifique pour le format Physique (Deck : / Q: / R:)
+const parsePhysicsData = (rawData) => {
+    if (!rawData) return [];
+    const decks = rawData.split(/={10,}\s*DECK\s*:\s*/);
+    const result = [];
+    let idCounter = 0;
+
+    decks.forEach(deckBlock => {
+        if (!deckBlock.trim()) return;
+        const lines = deckBlock.split('\n');
+        const deckName = lines[0].trim();
+        const content = deckBlock.substring(deckName.length).replace(/^=+/gm, '').trim();
+        const cards = content.split(/-{10,}/);
+
+        cards.forEach(rawCard => {
+            if (!rawCard.trim()) return;
+            const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/);
+            const rMatch = rawCard.match(/R:\s*([\s\S]*)/);
+
+            if (qMatch && rMatch) {
+                result.push({
+                    id: 'phy-' + (idCounter++),
+                    front: formatText(qMatch[1].trim()),
+                    back: formatText(rMatch[1].trim()),
+                    chapter: deckName
+                });
+            }
+        });
+    });
+    return result;
+};
+
+/* --- CORE APP LOGIC --- */
 const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-14';
 
 const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
@@ -260,10 +341,12 @@ function applyLB(){ const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight, w=L
 function setLBPan(nx,ny){ LB.x=nx; LB.y=ny; applyLB() }
 function setLBScale(ns,f=!1){ const os=LB.s, s=clamp(ns,LB.mnS,LB.mxS); if(!f&&M.abs(s-os)<1e-4)return; const cx=LB.stage.clientWidth/2, cy=LB.stage.clientHeight/2; LB.s=s; LB.x=cx-s*((cx-LB.x)/os); LB.y=cy-s*((cy-LB.y)/os); applyLB() }
 
-/* --- DATABASE & IMPORT --- */
+/* --- DATA LOADING --- */
 const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
-// NOTE: RAW_EN et RAW_PHY sont maintenant chargés depuis data.js
-const dataEN = parseRaw(RAW_EN), dataPHY = parseRaw(RAW_PHY);
+
+// Chargement des variables globales depuis data.js
+const dataEN = parseRaw(RAW_EN);
+const dataPHY = parsePhysicsData(RAW_PHY);
 
 const StateStore = {
   db: null,
@@ -319,7 +402,7 @@ async function impSimpSub(n,l){
 let data;
 const ChartHit={}, Bar7Hit={};
 function buildChs(l){ const by={}; l.forEach(r=>{ const n=r.chapter||'Sans catégorie'; (by[n]=by[n]||[]).push(r) }); return{chapters:Object.keys(by).map(n=>{ const cds=by[n].map(r=>({id:`${slugify(n)}-${r.id}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0})); return{id:'chap-'+slugify(n),title:n,description:getEmoji(n)?`${getEmoji(n)} ${n}`:n,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds} }), app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',showEmoji:!0,radius:14}}} }
-const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]}), buildCanon=() => [buildSub('Anglais',dataEN),buildSub('Physique',dataPHY)];
+const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]}), buildCanon=() => [buildSub('Physique',dataPHY), buildSub('Anglais',dataEN)];
 function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} }
 function saveData(){ try{const s=JSON.stringify(data);LS.setItem(KEY,s);StateStore.set('state',s)}catch{} }
 function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); data.subjects.forEach(s=>s.chapters.forEach(ch=>{ ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(x=>{const m=ch.stats[x]||{};Object.keys(m).forEach(d=>{if(d<k)delete m[d]})}); if(ch.stats.dailyLog)Object.values(ch.stats.dailyLog).forEach(a=>{if(a.length>200)a.splice(0,a.length-200)}) })) }
