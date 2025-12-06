@@ -133,7 +133,7 @@
     } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
     
-    /* --- MATHJAX FIXES (FORCE LE TEXTE À LA LIGNE) --- */
+    /* --- MATHJAX FIXES & IMAGES --- */
     mjx-container { 
       overflow-x: auto; 
       overflow-y: hidden; 
@@ -242,25 +242,30 @@
 <script src="data.js"></script>
 
 <script>
-/* --- LOGIC POUR NETTOYER ET PARSER LA PHYSIQUE --- */
+/* --- LOGIC POUR NETTOYER ET PARSER LA PHYSIQUE + IMAGES --- */
 
-// 1. Nettoyage du LaTeX pour éviter le scroll horizontal
 function formatText(text) {
     if (!text) return '';
-    // Images
-    let formatted = text.replace(/>>>\s*\[IMAGE_ID:\s*(.+?)\]\s*<<</g, '<div class="img-placeholder">Image manquante (ID: $1)</div>');
-    formatted = formatted.replace(/>>\s*\[IMAGE_ID:\s*(.+?)\]/g, '<div class="img-placeholder">Image manquante (ID: $1)</div>');
     
-    // Nettoyage des phrases entières mises en LaTeX inutilement (ex: \\[ \text{...} \\])
+    // 1. GESTION DES IMAGES (C'EST ICI QUE ÇA SE PASSE)
+    // On remplace [IMAGE_ID: nom.jpg] par <img src="images/nom.jpg">
+    // La regex détecte ">>> [IMAGE_ID: ...]" ou ">> [IMAGE_ID: ...]" ou juste "[IMAGE_ID: ...]"
+    let formatted = text.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (match, filename) => {
+        const cleanName = filename.trim();
+        // On pointe vers le dossier 'images/' situé à la racine
+        return `<img src="images/${cleanName}" alt="Schéma" loading="lazy">`;
+    });
+    
+    // 2. Nettoyage des phrases entières mises en LaTeX inutilement (ex: \\[ \text{...} \\])
     formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, function(match, content) {
         if (content.includes(' ')) return content; // Si c'est une phrase, on retire le LaTeX
         return match;
     });
 
-    // Retours à la ligne
+    // 3. Retours à la ligne
     formatted = formatted.replace(/\n/g, '<br>');
     
-    // Nettoyage balises custom
+    // 4. Nettoyage balises custom
     formatted = formatted.replace(/\[latex\]/g, '').replace(/\[\/latex\]/g, '');
     formatted = formatted.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
     
