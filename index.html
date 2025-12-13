@@ -776,57 +776,49 @@ function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
 
 function bindSz() {
-    const P = data.app.prefs;
-    const up = () => {
-        D.documentElement.style.setProperty('--fs-term', P.fsTerm + 'px');
-        D.documentElement.style.setProperty('--fs-def', P.fsDef + 'px');
-    };
+    const el = $('.review-scroller'); // On applique le zoom sur le conteneur global
+    if (!el) return;
 
-    $$('.review-card .term, .review-card .definition').forEach(el => {
-        let sy = null, sv = null, isResize = false;
-        const face = el.classList.contains('term') ? 'term' : 'def';
+    let startDist = 0;
+    let startFsTerm = 0;
+    let startFsDef = 0;
 
-        const get = () => face === 'term' ? P.fsTerm : P.fsDef;
-        const set = v => {
-            if (face === 'term') P.fsTerm = clamp(v, 12, 60);
-            else P.fsDef = clamp(v, 14, 72);
-            up();
-        };
+    // Calcul de la distance entre deux points (Pythagore)
+    const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
 
-        const onPointerDown = e => {
-            if (e.target.tagName === 'IMG' || window.getSelection().toString()) return;
-            sy = e.clientY;
-            sv = get();
-            isResize = false;
-            D.addEventListener('pointermove', onPointerMove);
-            D.addEventListener('pointerup', onPointerEnd);
-            D.addEventListener('pointercancel', onPointerEnd);
-        };
+    el.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            // Empêche le zoom natif du navigateur si possible
+            if (e.cancelable) e.preventDefault(); 
+            
+            startDist = getDist(e.touches);
+            startFsTerm = data.app.prefs.fsTerm;
+            startFsDef = data.app.prefs.fsDef;
+        }
+    }, { passive: false });
 
-        const onPointerMove = e => {
-            if (sy === null) return;
-            const dy = e.clientY - sy;
-            if (!isResize && Math.abs(dy) > 10) {
-                isResize = true;
-            }
-            if (isResize) {
-                e.preventDefault(); 
-                set(sv - Math.round(dy / 4));
-            }
-        };
+    el.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && startDist > 0) {
+            if (e.cancelable) e.preventDefault();
 
-        const onPointerEnd = () => {
-            if (isResize) {
-                saveData();
-            }
-            sy = null;
-            isResize = false;
-            D.removeEventListener('pointermove', onPointerMove);
-            D.removeEventListener('pointerup', onPointerEnd);
-            D.removeEventListener('pointercancel', onPointerEnd);
-        };
-        
-        el.addEventListener('pointerdown', onPointerDown);
+            const dist = getDist(e.touches);
+            const scale = dist / startDist; // Facteur de grossissement
+
+            // Mise à jour des préférences avec limites (clamp)
+            // On applique le scale aux valeurs initiales capturées au touchstart
+            data.app.prefs.fsTerm = clamp(Math.round(startFsTerm * scale), 12, 70);
+            data.app.prefs.fsDef = clamp(Math.round(startFsDef * scale), 14, 80);
+
+            applyUI(); // Met à jour le CSS immédiatement
+        }
+    }, { passive: false });
+
+    el.addEventListener('touchend', (e) => {
+        // Si on relâche un doigt, on arrête le zoom et on sauvegarde
+        if (e.touches.length < 2 && startDist > 0) {
+            startDist = 0;
+            saveData();
+        }
     });
 }
 
