@@ -776,49 +776,57 @@ function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
 
 function bindSz() {
-    const el = $('.review-scroller'); // On applique le zoom sur le conteneur global
-    if (!el) return;
+    // On sélectionne à la fois les zones de Question (term) et de Réponse (definition)
+    const elements = $$('.review-card .term, .review-card .definition');
 
-    let startDist = 0;
-    let startFsTerm = 0;
-    let startFsDef = 0;
-
-    // Calcul de la distance entre deux points (Pythagore)
+    // Fonction utilitaire pour la distance
     const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
 
-    el.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            // Empêche le zoom natif du navigateur si possible
-            if (e.cancelable) e.preventDefault(); 
-            
-            startDist = getDist(e.touches);
-            startFsTerm = data.app.prefs.fsTerm;
-            startFsDef = data.app.prefs.fsDef;
-        }
-    }, { passive: false });
+    elements.forEach(el => {
+        let startDist = 0;
+        let startVal = 0;
+        
+        // On détermine si cet élément spécifique est un Terme (Question) ou une Déf (Réponse)
+        const isTerm = el.classList.contains('term');
 
-    el.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2 && startDist > 0) {
-            if (e.cancelable) e.preventDefault();
+        el.addEventListener('touchstart', (e) => {
+            // On ne déclenche que si 2 doigts touchent CET élément (ou ses enfants)
+            if (e.touches.length === 2) {
+                if (e.cancelable) e.preventDefault();
+                
+                startDist = getDist(e.touches);
+                // On capture la taille actuelle correspondante (Question OU Réponse)
+                startVal = isTerm ? data.app.prefs.fsTerm : data.app.prefs.fsDef;
+            }
+        }, { passive: false });
 
-            const dist = getDist(e.touches);
-            const scale = dist / startDist; // Facteur de grossissement
+        el.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && startDist > 0) {
+                if (e.cancelable) e.preventDefault();
 
-            // Mise à jour des préférences avec limites (clamp)
-            // On applique le scale aux valeurs initiales capturées au touchstart
-            data.app.prefs.fsTerm = clamp(Math.round(startFsTerm * scale), 12, 70);
-            data.app.prefs.fsDef = clamp(Math.round(startFsDef * scale), 14, 80);
+                const dist = getDist(e.touches);
+                const scale = dist / startDist;
+                
+                // Calcul de la nouvelle taille
+                const newVal = clamp(Math.round(startVal * scale), 12, 90);
 
-            applyUI(); // Met à jour le CSS immédiatement
-        }
-    }, { passive: false });
+                // Mise à jour ciblée
+                if (isTerm) {
+                    data.app.prefs.fsTerm = newVal;
+                } else {
+                    data.app.prefs.fsDef = newVal;
+                }
 
-    el.addEventListener('touchend', (e) => {
-        // Si on relâche un doigt, on arrête le zoom et on sauvegarde
-        if (e.touches.length < 2 && startDist > 0) {
-            startDist = 0;
-            saveData();
-        }
+                applyUI(); // Met à jour le visuel immédiatement
+            }
+        }, { passive: false });
+
+        el.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2 && startDist > 0) {
+                startDist = 0;
+                saveData(); // Sauvegarde quand on relâche
+            }
+        });
     });
 }
 
