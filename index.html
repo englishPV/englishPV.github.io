@@ -658,8 +658,16 @@ function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const fT=ppLat(f), bT=ppLat(b);
   
-  v.innerHTML=`<div class="review-wrap"><div class="review-top"><div>${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="term" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div></div>`;
-  tsLat(v).then(()=>{Media.resolve(v);initGest()}); const bar=$('#reviewActionsBar');
+  // Modif ici: Ajout du bouton Undo dans le header
+  const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
+
+  v.innerHTML=`<div class="review-wrap"><div class="review-top"><div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="term" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div></div>`;
+  
+  tsLat(v).then(()=>{Media.resolve(v);initGest()}); 
+  // Modif ici: Activation du bouton
+  if(r.history.length) $('#undoBtn').onclick = undoRev; 
+
+  const bar=$('#reviewActionsBar');
   
   if(!r.flipped){
       bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
@@ -678,7 +686,7 @@ function goRecap(push=true){
 }
 function startRev(cid,push=true){
   if(!cid)return; const c=getCh(cid); if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push); const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); if(!pool.length){alert('Aucune carte.');return}
-  const q=bldQ(c,pool,c.settings.sessionSize); State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
+  const q=bldQ(c,pool,c.settings.sessionSize); State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
 function startRevMulti(ids,vid,flt,push=true){
   const all=ids.map(_real).filter(Boolean), pool=[]; all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen'])pool.push({chapId:ch.id,card:c})})); if(!pool.length){alert('Aucune carte.');return}
@@ -700,8 +708,40 @@ function bldQ(c,pool,sz){
 }
 
 function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.index],ch=_real(i.chapId);return{card:ch.cards.find(x=>x.id===i.cardId),chap:ch}}else{const ch=getCh(r.chapterId);return{card:ch.cards.find(x=>x.id===r.queue[r.index]),chap:ch}} }
-function subG(nxt){
+
+  
+  function undoRev(){
+  const r = State.review;
+  if(!r.history.length) return;
+  
+  const snap = r.history.pop(); // Récupère le dernier état
+  r.index = snap.idx; // Revient à la carte précédente
+  
+  // Restaure les données
+  const {card, chap} = getCur(); 
+  Object.assign(card, snap.cardState); // Remet les anciennes valeurs de la carte (grade, ef, dueAt...)
+  chap.stats = snap.statsState; // Remet les stats globales du chapitre
+  
+  // Supprime la réponse enregistrée
+  if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
+  
+  // On revient en mode "Réponse affichée" pour permettre de re-noter immédiatement
+  r.flipped = true; 
+  saveData();
+  renRev();
+}
+  
+  function subG(nxt){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
+  
+  // Modif ici: Sauvegarde de l'historique
+  r.history.push({
+      idx: r.index,
+      cardState: deepClone(card), // Copie exacte de la carte avant modif
+      statsState: deepClone(chap.stats), // Copie des stats globales
+      ansIdx: r.answers.length
+  });
+
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
   card.grade=nxt; syncG(chap); card.perfEma=(1-.3)*(card.perfEma??.5)+.3*(nxt==='facile'?1:nxt==='bien'?0.75:nxt==='difficile'?0.35:0);
   schNx(card,nxt,now); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
