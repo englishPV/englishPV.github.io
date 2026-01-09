@@ -10,7 +10,7 @@
     :root {
       --bg: #0b1020; --surface: #12172b; --card: #161c33; --text: #e6ecff; --muted: #8aa0d3;
       --primary: #6366f1; --primary-600: #5457e6; --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b; --red: #ef4444;
-      --ring: #e5e7eb; --border: #232a48;
+      --border: #232a48;
       --fs-term: 20px; --fs-def: 24px; --radius-md: 14px;
       
       /* Buttons */
@@ -64,11 +64,12 @@
     .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; outline: none; appearance: none; }
     .input:focus { border-color: var(--primary); }
     
-    .card, .deck-item, .review-card, .viewer, .card-item, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
+    /* Nettoyage CSS #9 & #8 */
+    .card, .deck-item, .review-card, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
     
     /* Deck & Lists */
-    .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer;   -webkit-user-select: none; /* Important pour iOS/Safari */
-  -webkit-touch-callout: none; /* Empêche le menu contextuel/loupe au maintien */
+    .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer;   -webkit-user-select: none;
+  -webkit-touch-callout: none;
    
   user-select: none; position: relative; overflow: hidden; touch-action: pan-y; }
     .deck-item .slide { display: flex; align-items: center; gap: 8px; padding: 8px 0; transition: transform .18s ease; will-change: transform; width: 100%; }
@@ -97,7 +98,7 @@
     .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
     
-    .review-card, .viewer { 
+    .review-card { 
       flex: 1; 
       display: flex; 
       flex-direction: column;
@@ -143,7 +144,7 @@
       max-width: 100% !important; 
       display: inline-block !important; 
       padding: 4px 0;
-      white-space: normal !important; /* Allow wrapping */
+      white-space: normal !important;
       vertical-align: middle;
     }
     mjx-mtext {
@@ -200,7 +201,7 @@
       border-radius: 14px; 
       padding: 14px; 
       background: 0 0; 
-      max-height: none; /* Laisser la carte prendre sa hauteur */
+      max-height: none; 
       overflow: visible;
       display: flex;
       flex-direction: column;
@@ -241,84 +242,21 @@
     </div>
   </div>
 
-<!-- CHARGEMENT DU FICHIER DE DONNÉES EXTERNE -->
 <script src="data.js"></script>
 
 <script>
-/* --- LOGIC POUR NETTOYER ET PARSER LA PHYSIQUE + IMAGES --- */
-
-function formatText(text) {
-    if (!text) return '';
-    
-    // 1. GESTION DES IMAGES (C'EST ICI QUE ÇA SE PASSE)
-    // On remplace [IMAGE_ID: nom.jpg] par <img src="images/nom.jpg">
-    // La regex détecte ">>> [IMAGE_ID: ...]" ou ">> [IMAGE_ID: ...]" ou juste "[IMAGE_ID: ...]"
-    let formatted = text.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (match, filename) => {
-        const cleanName = filename.trim();
-        // On pointe vers le dossier 'images/' situé à la racine
-        return `<img src="images/${cleanName}" alt="Schéma" loading="lazy">`;
-    });
-    
-    // 2. Nettoyage des phrases entières mises en LaTeX inutilement (ex: \\[ \text{...} \\])
-    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, function(match, content) {
-        if (content.includes(' ')) return content; // Si c'est une phrase, on retire le LaTeX
-        return match;
-    });
-
-    // 3. Retours à la ligne
-    formatted = formatted.replace(/\n/g, '<br>');
-    
-    // 4. Nettoyage balises custom
-    formatted = formatted.replace(/\[latex\]/g, '').replace(/\[\/latex\]/g, '');
-    formatted = formatted.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
-    
-    return formatted;
-}
-
-// 2. Parser spécifique pour le format Physique (Deck : / Q: / R:)
-// 2. Parser spécifique pour le format Physique
-const parsePhysicsData = (rawData) => {
-    if (!rawData) return [];
-    const decks = rawData.split(/={10,}\s*DECK\s*:\s*/);
-    const result = [];
-    let idCounter = 0;
-
-    decks.forEach(deckBlock => {
-        if (!deckBlock.trim()) return;
-        const lines = deckBlock.split('\n');
-        const deckCode = lines[0].trim(); // ex: EM8
-        
-        // On récupère le nom complet depuis data.js, sinon on garde le code
-        const deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) 
-                         ? PHY_MAP[deckCode].title 
-                         : deckCode;
-
-        const content = deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim();
-        const cards = content.split(/-{10,}/);
-
-        cards.forEach(rawCard => {
-            if (!rawCard.trim()) return;
-            const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/);
-            const rMatch = rawCard.match(/R:\s*([\s\S]*)/);
-
-            if (qMatch && rMatch) {
-                result.push({
-                    id: 'phy-' + (idCounter++),
-                    front: formatText(qMatch[1].trim()),
-                    back: formatText(rMatch[1].trim()),
-                    chapter: deckName
-                });
-            }
-        });
-    });
-    return result;
-};
-
 /* --- CORE APP LOGIC --- */
 const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-21';
 
+// --- OPTIMISATION #4: CONSTANTES GLOBALES ---
+const GRADES = ['unseen','echec','difficile','bien','facile'];
+const GRADE_INIT = () => ({unseen:0,echec:0,difficile:0,bien:0,facile:0});
+const GRADE_FILTERS = () => ({unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0});
+
 const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
-const clamp = (n,mn,mx) => M.max(mn, M.min(mx, n));
+// --- OPTIMISATION #6: CLAMP SIMPLIFIÉ ---
+const clamp = (n,mn,mx) => n<mn?mn:n>mx?mx:n;
+
 const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const todayKey = () => dateKey(new Date());
@@ -334,6 +272,53 @@ const fmtDur = ms => { const s=M.round(ms/1000); return`${M.floor(s/60)}:${Strin
 function fmtDayFR(k){ const [Y,M,D]=k.split('-').map(Number), d=new Date(Y,M-1,D); return`${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]} ${String(D).padStart(2,'0')} ${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][M-1]} ${Y}` }
 
 W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
+
+function formatText(text) {
+    if (!text) return '';
+    let formatted = text.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (match, filename) => {
+        const cleanName = filename.trim();
+        return `<img src="images/${cleanName}" alt="Schéma" loading="lazy">`;
+    });
+    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, function(match, content) {
+        if (content.includes(' ')) return content;
+        return match;
+    });
+    formatted = formatted.replace(/\n/g, '<br>');
+    formatted = formatted.replace(/\[latex\]/g, '').replace(/\[\/latex\]/g, '');
+    formatted = formatted.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
+    return formatted;
+}
+
+const parsePhysicsData = (rawData) => {
+    if (!rawData) return [];
+    const decks = rawData.split(/={10,}\s*DECK\s*:\s*/);
+    const result = [];
+    let idCounter = 0;
+    decks.forEach(deckBlock => {
+        if (!deckBlock.trim()) return;
+        const lines = deckBlock.split('\n');
+        const deckCode = lines[0].trim();
+        const deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) 
+                         ? PHY_MAP[deckCode].title 
+                         : deckCode;
+        const content = deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim();
+        const cards = content.split(/-{10,}/);
+        cards.forEach(rawCard => {
+            if (!rawCard.trim()) return;
+            const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/);
+            const rMatch = rawCard.match(/R:\s*([\s\S]*)/);
+            if (qMatch && rMatch) {
+                result.push({
+                    id: 'phy-' + (idCounter++),
+                    front: formatText(qMatch[1].trim()),
+                    back: formatText(rMatch[1].trim()),
+                    chapter: deckName
+                });
+            }
+        });
+    });
+    return result;
+};
 
 /* --- LIGHTBOX --- */
 const LB = { el:null, stage:null, cnv:null, img:null, cnt:null, imgs:[], idx:0, bw:0, bh:0, s:1, mnS:1, mxS:5, x:0, y:0, ptrs:new Map(), sDist:0, sS:1, sX:0, sY:0, psX:0, psY:0, tm:!1 };
@@ -359,15 +344,10 @@ function setLBScale(ns,f=!1){ const os=LB.s, s=clamp(ns,LB.mnS,LB.mxS); if(!f&&M
 /* --- DATA LOADING --- */
 const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
 
-// Chargement des variables globales depuis data.js
 const dataEN = parseRaw(RAW_EN);
 const dataPHY = parsePhysicsData(RAW_PHY);
 
-const StateStore = {
-  db: null,
-  async open(){ if(this.db)return this.db; return this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_state',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}) },
-  async set(k,v){ const d=await this.open(), tx=d.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k) }
-};
+// --- OPTIMISATION #5: SUPPRESSION DE STATESTORE ---
 const Media = {
   db: null, cache: new Map(),
   async open(){ if(this.db)return this.db; this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_media',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('files'))r.result.createObjectStore('files',{keyPath:'key'})};r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}); return this.db },
@@ -397,7 +377,9 @@ async function impApkg(f){
     db.close();
     const chs=[]; for(const [n,arr] of byD){
       const cds=arr.map(r=>({id:`${slugify(n)}-${r.id}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
-      chs.push({id:'chap-'+slugify(n),title:n,description:`${getEmoji(n)||'📦'} ${n}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0})
+      chs.push({id:'chap-'+slugify(n),title:n,description:`${getEmoji(n)||'📦'} ${n}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
+      filters:{grades:GRADE_FILTERS()},
+      stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0})
     }
     const sj={id:`import-${slugify(f.name)}`,title:f.name.replace(/\.[^.]+$/,''),chapters:chs,imported:!0}; data.subjects.push(sj); data.app.currentSubjectId=sj.id; saveData()
   } catch(e) { alert("Import APKG Err: "+e.message) }
@@ -408,7 +390,7 @@ async function impSimpSub(n,l){
   const by={}; l.forEach(x=>{ const c=(x.chapter||'Général').trim()||'Général'; (by[c]=by[c]||[]).push({front:Media.rwHTML(String(x.front||''),{}),back:Media.rwHTML(String(x.back||''),{})}) });
   const chs=Object.entries(by).map(([cn,arr])=>{
     const cds=arr.map((r,i)=>({id:`${slugify(cn)}-${i}-${Date.now()}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
-    return{id:'chap-'+slugify(cn),title:cn,description:`📦 ${cn}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0}
+    return{id:'chap-'+slugify(cn),title:cn,description:`📦 ${cn}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:GRADE_FILTERS()},stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0}
   });
   const s={id:`import-${slugify(n)}-${Date.now()}`,title:n,chapters:chs,imported:!0}; data.subjects.push(s); data.app.currentSubjectId=s.id; saveData(); goDeck(!1)
 }
@@ -419,22 +401,16 @@ const ChartHit={}, Bar7Hit={};
 function buildChs(l){ 
   const by={}; 
   l.forEach(r=>{ const n=r.chapter||'Sans catégorie'; (by[n]=by[n]||[]).push(r) }); 
-  
-  // Logique de tri
   let sortedKeys = Object.keys(by);
-  
-  // Si PHY_MAP existe, on trie selon l'ordre des clés définies dans PHY_MAP
   if(typeof PHY_MAP !== 'undefined') {
       const orderMap = {};
       Object.values(PHY_MAP).forEach((v, i) => orderMap[v.title] = i);
-      
       sortedKeys.sort((a, b) => {
           const idxA = orderMap[a] !== undefined ? orderMap[a] : 999;
           const idxB = orderMap[b] !== undefined ? orderMap[b] : 999;
           return idxA - idxB;
       });
   }
-
   return {
       chapters: sortedKeys.map(n=>{ 
           const cds=by[n].map(r=>({
@@ -447,8 +423,8 @@ function buildChs(l){
               title:n,
               description: getEmoji(n) ? `${getEmoji(n)} ${n}` : n,
               settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
-              filters:{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},
-              stats:{gradeCounts:{unseen:cds.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},
+              filters:{grades:GRADE_FILTERS()},
+              stats:{gradeCounts:{...GRADE_INIT(),unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},
               cards:cds
           } 
       }), 
@@ -456,8 +432,18 @@ function buildChs(l){
   };
 }
 const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]}), buildCanon=() => [buildSub('Physique',dataPHY), buildSub('Anglais',dataEN)];
-function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} }
-function saveData(){ try{const s=JSON.stringify(data);LS.setItem(KEY,s);StateStore.set('state',s)}catch{} }
+
+// --- OPTIMISATION #2: LOADDATA ET SAVEDATA ---
+function loadData(){ 
+  try{
+    const r=LS.getItem(KEY);
+    if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}
+  }catch{} 
+  const s=buildCanon(); 
+  return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} 
+}
+function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
+
 function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); data.subjects.forEach(s=>s.chapters.forEach(ch=>{ ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(x=>{const m=ch.stats[x]||{};Object.keys(m).forEach(d=>{if(d<k)delete m[d]})}); if(ch.stats.dailyLog)Object.values(ch.stats.dailyLog).forEach(a=>{if(a.length>200)a.splice(0,a.length-200)}) })) }
 const getSub = () => data.subjects.find(x=>x.id===data.app.currentSubjectId)||data.subjects[0];
 const setSub = id => { if(data.subjects.find(s=>s.id===id)){data.app.currentSubjectId=id;saveData()} };
@@ -473,7 +459,7 @@ const grpEmojis = (s,g) => { const z=new Set(); g.chapIds.forEach(id=>{const c=s
 const valGrps = s => { const all=new Set(s.chapters.map(c=>c.id)); s.groups=ensGrps(s).map(g=>({...g,chapIds:g.chapIds.filter(x=>all.has(x))})).filter(g=>g.chapIds.length>=2) };
 
 function buildGrpStats(s,g){
-  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), c={unseen:0,echec:0,difficile:0,bien:0,facile:0};
+  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), c=GRADE_INIT();
   chs.forEach(ch=>{ const k=getLive(ch); for(let x in c)c[x]+=k[x] });
   const st={totalReviews:chs.reduce((a,b)=>a+(b.stats.totalReviews||0),0),dailyReviews:{},dailyDurMs:{},dailyDurCount:{},dailyChanges:{}}, base=new Date();
   for(let i=0;i<60;i++){
@@ -487,7 +473,7 @@ function buildGrpStats(s,g){
 function buildVirt(s,g){
   const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
   chs.forEach(ch=>ch.cards.forEach(c=>cards.push({...c,id:`virt-${ch.id}-${c.id}`,_origin:{chapId:ch.id,cardId:c.id}})));
-  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards}
+  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards}
 }
 function addGrp(s,ids){ const u=[...new Set(ids)].filter(Boolean); if(u.length<2)return; ensGrps(s).push({id:'g'+Date.now().toString(36),chapIds:u,createdAt:Date.now(),title:'',emoji:''}) }
 function toGrp(s,gid,cid){ const g=findGrp(s,gid); if(g&&!g.chapIds.includes(cid))g.chapIds.push(cid) }
@@ -496,7 +482,7 @@ function delGrp(s,gid){ s.groups=ensGrps(s).filter(g=>g.id!==gid) }
 
 const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey:null, virtualChapter:null };
 const _real = id => getChs().find(c=>c.id===id), getCh = id => (State.virtualChapter?.id===id) ? State.virtualChapter : _real(id);
-function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:{unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0}};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); goChapter(ch.id,!1) }
+function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:GRADE_FILTERS()};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); goChapter(ch.id,!1) }
 const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id); if(i<0||!s.chapters[i].imported||!confirm('Supprimer ?'))return!1; ensGrps(s).forEach(g=>g.chapIds=g.chapIds.filter(x=>x!==id)); valGrps(s); s.chapters.splice(i,1); if(!s.chapters.length&&s.imported){data.subjects=data.subjects.filter(x=>x.id!==s.id);data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 };
 
 /* --- NAVIGATION & UI --- */
@@ -557,7 +543,7 @@ function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buil
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${['unseen','echec','difficile','bien','facile'].map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWk(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div><div class="bar7-wrap"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWk(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div><div class="bar7-wrap"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('')
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
@@ -700,27 +686,16 @@ function startRevMulti(ids,vid,flt,push=true){
   State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
 
-/* --- CORRECTION BUG SESSION --- */
 function bldQ(c,pool,sz){
-  // Mélangeur
   const sh=a=>{for(let i=a.length-1;i>0;i--){const j=M.floor(M.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-  
-  // Catégories
   const nc=[], lc=[], dr=[], ot=[];
-  
   pool.forEach(x=>{
       const g=x.grade||'unseen';
-      // 1. Non vues
       if(g==='unseen') nc.push(x);
-      // 2. Difficiles / Echec
       else if(g==='echec'||g==='difficile') lc.push(x);
-      // 3. Dues (date dépassée)
       else if(x.dueAt<=Date.now()) dr.push(x);
-      // 4. AUTRES (Facile/Bien pas encore dues mais sélectionnées dans le filtre)
       else ot.push(x);
   });
-  
-  // On priorise: Difficile > Due > Non vue > Autres (pour combler)
   return [...sh(lc),...sh(dr),...sh(nc),...sh(ot)].slice(0,sz)
 }
 
@@ -743,7 +718,7 @@ function schNx(c,g,now){
   c.streak=clamp(c.streak,-8,12); c.dueAt=now+c.intervalDays*864e5
 }
 
-const getLive=c=>{const o={unseen:0,echec:0,difficile:0,bien:0,facile:0};c.cards.forEach(x=>o[x.grade||'unseen']++);return o}, syncG=c=>c.stats.gradeCounts=getLive(c), getTod=c=>c.stats.dailyReviews[todayKey()]||0, getTodCh=c=>c.stats.dailyChanges[todayKey()]||{changed:0,total:0}, cntAv=c=>c.cards.filter(x=>c.filters.grades[x.grade||'unseen']).length;
+const getLive=c=>{const o=GRADE_INIT();c.cards.forEach(x=>o[x.grade||'unseen']++);return o}, syncG=c=>c.stats.gradeCounts=getLive(c), getTod=c=>c.stats.dailyReviews[todayKey()]||0, getTodCh=c=>c.stats.dailyChanges[todayKey()]||{changed:0,total:0}, cntAv=c=>c.cards.filter(x=>c.filters.grades[x.grade||'unseen']).length;
 const getSucc=c=>{const k=c.stats.gradeCounts,g=k.bien+k.facile,t=g+k.echec+k.difficile;return t?M.round(g/t*100):0}, get7dAvgMs=c=>{const b=new Date();let s=0,cnt=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);const k=dateKey(d);s+=(c.stats.dailyDurMs[k]||0);cnt+=(c.stats.dailyDurCount[k]||0)}return cnt?M.round(s/cnt):0}, get7dAvg=c=>{const b=new Date(),arr=[];for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);arr.push(c.stats.dailyReviews[dateKey(d)]||0)}return M.round(avg(arr))}, getWk=c=>{const b=new Date();let s=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);s+=(c.stats.dailyReviews[dateKey(d)]||0)}return s}, getLastN=(c,n)=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(c.stats.dailyReviews[dateKey(d)]||0)}return a}, getLbls=n=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][d.getDay()])}return a}, dayKeyIdx=(n,i)=>{const b=new Date();b.setDate(b.getDate()-((n-1)-i));return dateKey(b)};
 
 function drawBars(cid,v){ const el=D.getElementById(cid); if(!el)return; const ctx=el.getContext('2d'), dpr=W.devicePixelRatio||1, w=el.clientWidth, h=60; el.width=w*dpr; el.height=h*dpr; ctx.scale(dpr,dpr); const max=M.max(1,...v), barW=M.floor((w-36)/7); ctx.fillStyle='#94a3b8'; ctx.fillRect(0,h-14,w,1); let x=0; const bars=[]; v.forEach(n=>{const bh=M.max(3,(n/max)*(h-20));ctx.fillStyle='#6366f1';ctx.fillRect(x,h-14-bh,barW,bh);ctx.fillStyle='#e2e8f0';ctx.fillText(n,x+barW/2-3,h);bars.push({x,w:barW});x+=barW+6}); Bar7Hit[cid]={cssW:w,bars} }
@@ -751,54 +726,40 @@ function opDayBar(e,id,cid){ const h=Bar7Hit[id]; if(!h)return; const x=e.client
 function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=180, h=180, cx=90, cy=90, R=84, r=54; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=30;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,69,start,end);ctx.lineWidth=30;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+5); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
 function hChartClk(e,id,ch){ const h=ChartHit[id]; if(!h)return; const r=e.target.getBoundingClientRect(), dx=(e.clientX-r.left)*(180/r.width)-h.cx, dy=(e.clientY-r.top)*(180/r.height)-h.cy, d=M.hypot(dx,dy); if(d<h.innerR||d>h.outerR)return; let a=M.atan2(dy,dx); if(a<-1.57)a+=6.28; const hit=h.arcs.find(s=>a>=s.start&&a<=s.end); if(hit)updFilt(ch,hit.key) }
 
-/* --- CORRECTION BUG FILTRES (togFilt) --- */
+// --- OPTIMISATION #7: TOGFILT OPTIMISÉ ---
 function togFilt(c,k){ 
-  const s=c.filters.grades, keys=Object.keys(s), act=keys.filter(x=>s[x]); 
-  
-  if(act.length===keys.length){ 
-    // Si TOUT est coché et qu'on clique sur un, on isole celui-là
-    keys.forEach(x=>s[x]=!1); 
-    s[k]=!0;
-  } else if(act.length===1&&s[k]){ 
-    // Si UN SEUL est coché et qu'on le clique, on RAFFICHE TOUT
-    keys.forEach(x=>s[x]=!0);
-  } else {
-    // Sinon on bascule normalement
-    s[k]=!s[k]; 
-    if(!Object.values(s).some(Boolean)) s[k]=!0; // On empêche de tout décocher
-  } 
+  const s=c.filters.grades, keys=Object.keys(s), actCnt=keys.reduce((n,x)=>n+(s[x]?1:0),0);
+  if(actCnt===keys.length){ keys.forEach(x=>s[x]=(x===k)); }
+  else if(actCnt===1&&s[k]){ keys.forEach(x=>s[x]=!0); }
+  else { s[k]=!s[k]; if(!s[k]&&actCnt===1) s[k]=!0; }
 }
 
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div><div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div><div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
-  $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:{unseen:c.cards.length,echec:0,difficile:0,bien:0,facile:0},totalReviews:0,dailyReviews:{},dailyLog:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}}; $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; 
+  $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; 
+  
+  // --- BUG #1: DOUBLE DAILYLOG CORRIGÉ ---
+  $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:GRADE_INIT(),totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}}; 
+  $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; 
 }
 
 function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-value'), ren=()=>val.textContent=get(), com=()=>{saveData();applyUI()}; ren(); let sy=null, sv=null; const pd=e=>{e.preventDefault();e.stopPropagation()}; el.onpointerdown=e=>{sy=e.clientY;sv=get();el.setPointerCapture?.(e.pointerId);pd(e)}; el.onpointermove=e=>{if(sy==null)return;set(sv+M.round((sy-e.clientY)/6)*step);ren();applyUI();pd(e)}; el.onpointerup=()=>{if(sy!=null)com();sy=null}; el.onwheel=e=>{e.preventDefault();set(get()+(e.deltaY>0?-step:step));ren();com()} }
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
 
 function bindSz() {
-    // On sélectionne à la fois les zones de Question (term) et de Réponse (definition)
     const elements = $$('.review-card .term, .review-card .definition');
-
-    // Fonction utilitaire pour la distance
     const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
 
     elements.forEach(el => {
         let startDist = 0;
         let startVal = 0;
-        
-        // On détermine si cet élément spécifique est un Terme (Question) ou une Déf (Réponse)
         const isTerm = el.classList.contains('term');
 
         el.addEventListener('touchstart', (e) => {
-            // On ne déclenche que si 2 doigts touchent CET élément (ou ses enfants)
             if (e.touches.length === 2) {
                 if (e.cancelable) e.preventDefault();
-                
                 startDist = getDist(e.touches);
-                // On capture la taille actuelle correspondante (Question OU Réponse)
                 startVal = isTerm ? data.app.prefs.fsTerm : data.app.prefs.fsDef;
             }
         }, { passive: false });
@@ -806,28 +767,18 @@ function bindSz() {
         el.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2 && startDist > 0) {
                 if (e.cancelable) e.preventDefault();
-
                 const dist = getDist(e.touches);
                 const scale = dist / startDist;
-                
-                // Calcul de la nouvelle taille
                 const newVal = clamp(Math.round(startVal * scale), 12, 90);
-
-                // Mise à jour ciblée
-                if (isTerm) {
-                    data.app.prefs.fsTerm = newVal;
-                } else {
-                    data.app.prefs.fsDef = newVal;
-                }
-
-                applyUI(); // Met à jour le visuel immédiatement
+                if (isTerm) { data.app.prefs.fsTerm = newVal; } else { data.app.prefs.fsDef = newVal; }
+                applyUI(); 
             }
         }, { passive: false });
 
         el.addEventListener('touchend', (e) => {
             if (e.touches.length < 2 && startDist > 0) {
                 startDist = 0;
-                saveData(); // Sauvegarde quand on relâche
+                saveData(); 
             }
         });
     });
