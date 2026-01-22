@@ -4,7 +4,7 @@ const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verb
 
 // Constantes ajoutées pour couvrir les variables de la Map Emoji et la fin du texte brut
 const EDU="Education", ECO="Economy", SPO="Sports", GUN="Gun Control", REL="Religion", ENV="Environment", TEC="Technology", MED="Media";
-const THA="Thanksgiving", BUS="Business", POL="Politique"; 
+const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace"; 
 
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
 const PHY_MAP = {
@@ -46,7 +46,7 @@ const C_EMOJIS = {
   [GUN]: '🔫',   // Gun Control
   [REL]: '🛐',   // Religion
   [POL]: '🏛️',   // Politique
-
+[WP]: '⚔️',
   // --- Social & Économie ---
   [CI]:  '🧳',   // Immigration
   [CF]:  '♀️',    // Status of Women
@@ -1410,6 +1410,111 @@ const RAW_EN = String.raw`
 1326|un mordu de culture physique|a fitness freak, a fitness fanatic|${ED}
 1327|aller dans une salle de gym|to go to the gym|${ED}
 1328|faire de la musculation|to work out|${ED}
+1329|faites l’amour, pas la guerre|make love, not war|${WP}
+1330|conflit, litige, contentieux|a dispute|${WP}
+1331|un litige frontalier|a border dispute|${WP}
+1332|un conflit armé|an armed conflict|${WP}
+1333|être mêlé à un conflit|be embroiled in a conflict|${WP}
+1334|ennemi|enemy|${WP}
+1335|un désaccord, une dispute, une querelle|disagreement, row|${WP}
+1336|une épreuve de force, un bras de fer|a showdown|${WP}
+1337|militaire / civil|military / civilian|${WP}
+1338|les militaires|the military|${WP}
+1339|un belliciste|a warmonger|${WP}
+1340|la propagande belliciste|warmongering|${WP}
+1341|un militariste|a militarist|${WP}
+1342|militariste|militaristic|${WP}
+1343|être en guerre / en paix|to be at war / at peace|${WP}
+1344|déclarer la guerre à un pays|to declare war on a country|${WP}
+1345|faire la guerre à un ennemi|to wage war on an enemy, against an enemy|${WP}
+1346|un allié|an ally|${WP}
+1347|éclater|to break out|${WP}
+1348|se battre|to fight|${WP}
+1349|attaquer / défendre|to attack / to defend|${WP}
+1350|conquérir|to conquer|${WP}
+1351|la conquête|conquest|${WP}
+1352|envahir|to invade|${WP}
+1353|assiéger|to besiege|${WP}
+1354|les forces armées|armed forces|${WP}
+1355|un corps expéditionnaire|a task force|${WP}
+1356|les troupes|troops|${WP}
+1357|les forces aéronavales|air and sea forces|${WP}
+1358|une campagne militaire|a military campaign|${WP}
+1359|le champ de bataille|the battlefield|${WP}
+1360|déployer|to deploy|${WP}
+1361|le déploiement|deployment|${WP}
+1362|retirer des troupes d’un endroit|to withdraw troops from a place|${WP}
+1363|le retrait|withdrawal|${WP}
+1364|un blocus|a blockade|${WP}
+1365|vaincre un adversaire|to defeat an adversary|${WP}
+1366|un revers|a setback|${WP}
+1367|des représailles|reprisals, retaliation|${WP}
+1368|user de représailles envers qn|to retaliate against sb|${WP}
+1369|un vainqueur|a victor|${WP}
+1370|un militaire, un soldat|a serviceman, a soldier|${WP}
+1371|un militaire de carrière|a professional soldier, a career soldier|${WP}
+1372|s’engager, s’enrôler dans l’armée de l’air|to join the Air Force, to enlist in the Air Force|${WP}
+1373|recruter|to recruit|${WP}
+1374|une recrue|a recruit|${WP}
+1375|un officier|an officer|${WP}
+1376|un objecteur de conscience|a conscientious objector|${WP}
+1377|déserter|to desert|${WP}
+1378|un déserteur|a deserter|${WP}
+1379|des armes|weapons, arms|${WP}
+1380|des armes de destruction massive|weapons of mass destruction, WMDs|${WP}
+1381|un arsenal|an arsenal|${WP}
+1382|des munitions|ammunition, munitions|${WP}
+1383|une bombe|a bomb|${WP}
+1384|bombarder|to bomb|${WP}
+1385|un bombardement|a bombing, a bombardment|${WP}
+1386|un bombardier|a bomber|${WP}
+1387|des armes intelligentes|smart weapons|${WP}
+1388|une frappe, une intervention aérienne|an air strike|${WP}
+1389|une frappe chirurgicale|a surgical strike|${WP}
+1390|un bombardier furtif|a stealth bomber|${WP}
+1391|un porte-avions|an aircraft carrier|${WP}
+1392|un avion de chasse, un chasseur|a fighter (plane)|${WP}
+1393|un drone, un avion téléguidé|a drone, an unmanned aerial vehicle (UAV)|${WP}
+1394|un missile|a missile|${WP}
+1395|la guerre des nerfs / d’usure|war of nerves / of attrition|${WP}
+1396|la guerre nucléaire / biologique / chimique|nuclear / biological / chemical warfare|${WP}
+1397|massacre|massacre, slaughter|${WP}
+1398|effusion de sang, carnage, boucherie|bloodshed|${WP}
+1399|les blessés|the wounded|${WP}
+1400|les morts et les blessés|the casualties|${WP}
+1401|bilan des victimes|death toll|${WP}
+1402|le renseignement|intelligence|${WP}
+1403|espionner un ennemi|to spy on an enemy|${WP}
+1404|satellite-espion|a spy satellite, a surveillance satellite|${WP}
+1405|un crime de guerre|a war crime|${WP}
+1406|un criminel de guerre|a war criminal|${WP}
+1407|un crime contre l’humanité|a crime against humanity|${WP}
+1408|un génocide|a genocide|${WP}
+1409|purification ethnique|ethnic cleansing|${WP}
+1410|exterminer|to exterminate|${WP}
+1411|un cessez-le-feu|a ceasefire|${WP}
+1412|une trêve|a truce|${WP}
+1413|se rendre|to surrender|${WP}
+1414|un armistice|an armistice|${WP}
+1415|le désarmement|disarmament|${WP}
+1416|un pacifiste|a peace campaigner, a pacifist, a peacenik|${WP}
+1417|un bourbier|a quagmire|${WP}
+1418|l’enlisement|stalemate|${WP}
+1419|des pourparlers de paix|peace talks|${WP}
+1420|le processus de paix|the peace process|${WP}
+1421|un accord de paix|a peace agreement, a peace accord, a peace settlement|${WP}
+1422|un traité de paix|a peace treaty|${WP}
+1423|le dividende de la paix|the peace dividend|${WP}
+1424|un prisonnier de guerre|a prisoner of war, a POW|${WP}
+1425|être porté disparu|to be reported missing|${WP}
+1426|s’absenter sans permission, manquer à l’appel|to be absent without leave, AWOL|${WP}
+1427|un ancien combattant|a veteran, a vet|${WP}
+1428|un amputé|an amputee|${WP}
+1429|être estropié, mutilé pour la vie|be maimed for life|${WP}
+1430|névrose post-traumatique|Post Traumatic Stress Disorder, PTSD|${WP}
+
+
+
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
 8001|battre|beat / beat / beaten|${VI}
