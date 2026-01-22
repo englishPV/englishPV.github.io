@@ -368,58 +368,67 @@ async function impApkg(f){
     const b = await f.arrayBuffer();
     const z = await JSZip.loadAsync(b); 
     
-    // 2. Récupération des médias
+    // 2. Médias
     let mm = {}; 
     const me = z.file(/^media(\.json)?$/i)[0];
-    if(me) {
-        try { mm = JSON.parse(await me.async('string')); } catch(e) {}
-    }
+    if(me) { try { mm = JSON.parse(await me.async('string')); } catch(e) {} }
     
     const iId = `apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
     const mnk = {};
     
-    // Sauvegarde des images
     for(const [ns,rn] of Object.entries(mm)){ 
         const e = z.file(new RegExp(`^${ns}$`))[0]; 
         if(!e) continue; 
         const k = `${iId}/${rn||ns}`; 
         await Media.save(k, await e.async('blob'), {name:rn||ns}); 
-        mnk[rn] = k; 
-        mnk[ns] = k; 
+        mnk[rn] = k; mnk[ns] = k; 
     }
 
-    // 3. Chargement de la Base de Données
-    const col = z.file(/collection\.anki2(1|\.db)?/i)[0]; 
+    // 3. Recherche du fichier base de données
+    // On cherche d'abord explicitement le fichier standard
+    let col = z.file("collection.anki2");
+    // Si pas trouvé, on cherche avec la regex (pour .anki21 ou autre variante)
+    if (!col) col = z.file(/collection\.anki2(1|\.db)?/i)[0];
+    
     if(!col) throw new Error("Fichier collection.anki2 introuvable dans l'archive.");
     
-    // Initialisation SQL
-    const SQL = await ensureSQL();
+    // 4. Vérification du format SQLite (Le "Header Check")
     const dbData = new Uint8Array(await col.async('uint8array'));
+    
+    // On vérifie les 16 premiers octets. Un fichier SQLite commence TOUJOURS par "SQLite format 3"
+    const header = String.fromCharCode.apply(null, dbData.subarray(0, 15));
+    if (header !== "SQLite format 3") {
+        throw new Error(
+            "Format de fichier trop récent (compressé Zstd).\n\n" +
+            "Solution : Dans Anki, lors de l'export, cochez la case\n" +
+            "'Support des anciennes versions' (Legacy)."
+        );
+    }
+
+    // 5. Chargement SQL
+    const SQL = await ensureSQL();
     const db = new SQL.Database(dbData);
     
-    // Récupération du nom des Decks
     let dk = {};
     try {
         const r = db.exec('select decks from col limit 1');
         if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}');
     } catch(e) {}
 
-    // 4. Lecture des cartes (La requête SQL critique)
     let rows;
     try {
         rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
     } catch(e) {
-        throw new Error("Erreur SQL lors de la lecture des cartes: " + e.message);
+        throw new Error("Erreur SQL : " + e.message);
     }
     
     if(!rows || !rows[0]) {
         db.close();
-        throw new Error("Aucune carte trouvée dans la base de données.");
+        throw new Error("Aucune carte trouvée.");
     }
     
     const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
     
-    // 5. Traitement des données
     for(const r of vals){ 
         const row = Object.fromEntries(cols.map((c,i) => [c,r[i]]));
         const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › ');
@@ -428,12 +437,10 @@ async function impApkg(f){
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
 
-        // Gestion carte inversée (ord=1)
         if (row.ord == 1 && fl.length >= 2) {
             frontVal = fl[1];
             backVal = fl[0];
         } 
-        // Ajout des champs supplémentaires au verso
         if (fl.length > 2) {
              backVal += '<br><br>' + fl.slice(2).join('<br>');
         }
@@ -449,16 +456,13 @@ async function impApkg(f){
     
     db.close();
 
-    // 6. Création des chapitres
     const chs = []; 
     for(const [n,arr] of byD){
       const cds = arr.map(r => ({
           id: `${slugify(n)}-${r.id}`,
-          front: r.front, 
-          back: r.back,
+          front: r.front, back: r.back,
           grade: 'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
       }));
-      
       chs.push({
           id: 'chap-'+slugify(n),
           title: n,
@@ -481,14 +485,14 @@ async function impApkg(f){
     data.subjects.push(sj); 
     data.app.currentSubjectId = sj.id; 
     saveData();
-    // Succès géré par goDeck
-    
+
   } catch(e) { 
     console.error(e);
-    alert("Erreur Import: " + e.message);
-    throw e; // Relance l'erreur pour arrêter le processus
+    alert("❌ " + e.message);
+    throw e;
   }
 }
+
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
 async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(o)) impSimpSub(f.name.replace(/\.[^.]+$/,''),o); else if(o.cards) impSimpSub(o.subject||f.name,o.cards) }
