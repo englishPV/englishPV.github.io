@@ -363,19 +363,18 @@ const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`h
 async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
 
 async function impApkg(f){
-  try {
-    // 1. Décompression du ZIP (APKG)
-    const b=await f.arrayBuffer(), z=await JSZip.loadAsync(b); 
-    let mm={}; 
+    // 1. Décompression
+    const b=await f.arrayBuffer();
+    const z=await JSZip.loadAsync(b); 
     
-    // 2. Gestion des médias (images/sons)
-    // Le fichier 'media' est un JSON qui mappe "1" -> "image.jpg"
+    // 2. Gestion des médias
+    let mm={}; 
     const me=z.file(/^media(\.json)?$/i)[0];
     if(me) try{mm=JSON.parse(await me.async('string'))}catch{}
     
-    const iId=`apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`, mnk={};
+    const iId=`apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
+    const mnk={};
     
-    // On extrait et sauvegarde chaque image dans IndexedDB
     for(const [ns,rn] of Object.entries(mm)){ 
         const e=z.file(new RegExp(`^${ns}$`))[0]; 
         if(!e)continue; 
@@ -384,60 +383,55 @@ async function impApkg(f){
         mnk[rn]=k; mnk[ns]=k 
     }
 
-    // 3. Ouverture de la base de données SQLite (collection.anki2)
+    // 3. Chargement DB
     const col=z.file(/collection\.anki2(1|\.db)?/i)[0]; 
-    if(!col) throw new Error("Fichier collection.anki2 manquant (Ce n'est pas un APKG valide)");
+    if(!col) throw new Error("Archive invalide : fichier collection.anki2 manquant");
     
-    const db=new(await ensureSQL()).Database(new Uint8Array(await col.async('uint8array'))); 
+    // Initialisation SQL (Peut prendre un peu de mémoire)
+    const sqlLoad = await ensureSQL();
+    const dbData = new Uint8Array(await col.async('uint8array'));
+    const db = new sqlLoad.Database(dbData);
     
-    // Récupération des noms des paquets (Decks)
+    // Récupération Noms Decks (Optionnel, pas grave si ça échoue)
     let dk={};
     try{
         const r=db.exec('select decks from col limit 1');
         if(r[0]?.values[0]) dk=JSON.parse(r[0].values[0][0]||'{}');
-    }catch(e){ console.warn("Impossible de lire les noms des decks", e); }
+    }catch(e){ console.warn("Info Deck manquant:", e); }
 
-    // 4. Requête pour récupérer les cartes et les notes
-    // On récupère aussi 'ord' qui indique si c'est une carte normale (0) ou inversée (1, etc.)
-    let rows; 
-    try{
-        rows=db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
-    }catch{throw new Error("Erreur de lecture DB Anki")}
+    // 4. Requête Principale - SANS TRY/CATCH pour voir la vraie erreur
+    // C'est ici que ça bloquait. Si ça échoue, le message exact s'affichera.
+    const rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
     
-    if(!rows[0])return;
+    if(!rows || !rows[0]){
+        db.close();
+        throw new Error("La base de données est vide ou illisible.");
+    }
     
     const byD=new Map(), cols=rows[0].columns, vals=rows[0].values;
     
+    // 5. Traitement des données
     for(const r of vals){ 
         const row=Object.fromEntries(cols.map((c,i)=>[c,r[i]]));
-        
-        // Nom du deck
         const dn=(dk[row.did]?.name||`Deck ${row.did}`).replace(/::/g,' › ');
-        
-        // Les champs sont séparés par le caractère \x1f
         const fl=(row.flds||'').split('\x1f');
         
-        // --- AMÉLIORATION ICI --- 
-        // Logique simple pour gérer Recto/Verso basique
+        // Logique Recto/Verso
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
 
-        // Si c'est une carte générée par un modèle inversé (souvent ord = 1)
-        // et qu'on a assez de champs, on inverse question/réponse
-        if (row.ord == 1 && fl.length >= 2) {
+        if (row.ord == 1 && fl.length >= 2) { // Carte inversée
             frontVal = fl[1];
             backVal = fl[0];
         } 
-        // Si plus de 2 champs (ex: Audio, Exemple), on ajoute le reste au verso
-        if (fl.length > 2) {
+        if (fl.length > 2) { // Champs supplémentaires
              backVal += '<br><br>' + fl.slice(2).join('<br>');
         }
-        // ------------------------
 
         const ca=byD.get(dn)||[]; 
         ca.push({
             id:String(row.id),
-            front:Media.rwHTML(frontVal,mnk), // Réécriture des liens images
+            front:Media.rwHTML(frontVal,mnk),
             back:Media.rwHTML(backVal,mnk)
         }); 
         byD.set(dn,ca);
@@ -445,7 +439,7 @@ async function impApkg(f){
     
     db.close();
 
-    // 5. Création de la structure pour votre site
+    // 6. Sauvegarde
     const chs=[]; 
     for(const [n,arr] of byD){
       const cds=arr.map(r=>({
@@ -453,7 +447,6 @@ async function impApkg(f){
           front:r.front, back:r.back,
           grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
       }));
-      
       chs.push({
           id:'chap-'+slugify(n),
           title:n,
@@ -470,8 +463,10 @@ async function impApkg(f){
     data.subjects.push(sj); 
     data.app.currentSubjectId=sj.id; 
     saveData();
-    alert("Import terminé avec succès !");
-    goDeck(!1); // Rafraîchir l'affichage
+    // Pas d'alert ici, on laisse goDeck gérer le succès
+}
+    
+ 
 
   } catch(e) { 
     console.error(e);
