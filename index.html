@@ -413,35 +413,94 @@ const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id);
 /* --- DEADLINE & LOGIC --- */
 function getUrgency(item) {
     if (!item.deadline) return '';
-    const now = new Date();
-    const ddl = new Date(item.deadline);
-    const diff = (ddl - now) / (1000 * 60 * 60 * 24);
-    if (diff < 0) return 'rgba(239, 68, 68, 0.4)'; // En retard
-    if (diff > 30) return '';
-    const opacity = 0.3 * (1 - (diff / 30));
-    return `rgba(239, 68, 68, ${opacity})`;
+    
+    // Récupération des stats (compatible Chapitre ou Groupe)
+    let k;
+    if (item.cards) {
+        // C'est un chapitre
+        k = item.stats.gradeCounts || getLive(item);
+    } else {
+        // C'est un groupe, on doit reconstruire les stats via la globale getSub()
+        k = buildGrpStats(getSub(), item).counts;
+    }
+
+    const total = (k.unseen + k.echec + k.difficile + k.bien + k.facile) || 1;
+    // Nouvelle définition des "Mauvaises" : inclut les Non Vues
+    const bad = k.unseen + k.echec + k.difficile;
+    
+    // Calcul du temps restant
+    const now = new Date(); now.setHours(0,0,0,0);
+    const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
+    const diffTime = ddl - now;
+    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    // --- LOGIQUE ROUGE (Urgence) ---
+    if (bad > 0) {
+        // Si plus de 7 jours, pas de rouge
+        if (days > 7) return '';
+        
+        // Calcul de l'intensité (0 à 7 jours)
+        // 7 jours = 0, 0 jour = 1
+        let ratio = 1 - (days / 7);
+        
+        // Bornes (si en retard, on reste à max)
+        if (days < 0) ratio = 1; 
+        if (ratio < 0) ratio = 0;
+
+        // Opacité max de 0.5 pour rester lisible
+        const opacity = 0.5 * ratio;
+        
+        if (opacity <= 0.01) return '';
+        return `rgba(239, 68, 68, ${opacity})`;
+    } 
+    
+    // --- LOGIQUE VERTE (Maîtrise) ---
+    else {
+        // Plus de mauvaises cartes, on passe au vert.
+        // L'intensité dépend de la proportion de "Facile" vs "Bien".
+        // Tout "Bien" = Vert léger (0.15)
+        // Tout "Facile" = Vert plus fort (0.4)
+        
+        const easyRatio = k.facile / total;
+        // Base 0.15 + Bonus jusqu'à 0.25 selon le ratio de Facile
+        const opacity = 0.15 + (easyRatio * 0.25);
+        
+        return `rgba(34, 197, 94, ${opacity})`;
+    }
 }
 
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
-    const now = new Date();
-    now.setHours(0,0,0,0);
-    const ddl = new Date(ch.deadline);
-    ddl.setHours(0,0,0,0);
-    const days = Math.ceil((ddl - now) / 864e5);
     
+    const now = new Date(); now.setHours(0,0,0,0);
+    const ddl = new Date(ch.deadline); ddl.setHours(0,0,0,0);
+    const diffTime = ddl - now;
+    // Nombre de jours inclusifs (si c'est pour demain, days=1)
+    let days = Math.ceil(diffTime / 864e5);
+    
+    // Si c'est aujourd'hui ou en retard, on considère qu'il reste "1 jour de travail" (aujourd'hui)
+    if (days <= 0) days = 1;
+
     const k = ch.stats.gradeCounts || getLive(ch);
-    let pool = k.echec + k.difficile;
-    let label = "cartes (Échec/Diff.)";
+    
+    // Pool 1 : Non vues + Echec + Difficile
+    let pool = k.unseen + k.echec + k.difficile;
+    let label = "cartes (Mauvaises)";
+    
+    // Pool 2 : Si tout est vu et correct, on perfectionne les "Bien"
     if (pool === 0) {
         pool = k.bien;
         label = "cartes (Bien)";
+        
+        // Si vraiment tout est facile
+        if (pool === 0) return { val: 0, text: "Objectif atteint !" };
     }
     
-    if (days <= 1) return { val: pool, text: "Aujourd'hui !" };
-    return { val: Math.ceil(pool / (days - 1)), text: `${label} / jour` };
+    // Calcul par jour
+    const daily = Math.ceil(pool / days);
+    
+    return { val: daily, text: `${label} / jour` };
 }
-
 /* --- NAVIGATION & UI --- */
 const Nav = {
   stack: [],
