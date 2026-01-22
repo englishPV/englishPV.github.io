@@ -364,11 +364,16 @@ async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase()
 
 async function impApkg(f){
   try {
-    // 1. Décompression
+    // 1. Décompression du ZIP
     const b = await f.arrayBuffer();
-    const z = await JSZip.loadAsync(b); 
+    let z;
+    try {
+        z = await JSZip.loadAsync(b);
+    } catch(e) {
+        throw new Error("Ce fichier n'est pas un ZIP/APKG valide.");
+    }
     
-    // 2. Médias
+    // 2. Gestion des médias
     let mm = {}; 
     const me = z.file(/^media(\.json)?$/i)[0];
     if(me) { try { mm = JSON.parse(await me.async('string')); } catch(e) {} }
@@ -384,60 +389,67 @@ async function impApkg(f){
         mnk[rn] = k; mnk[ns] = k; 
     }
 
-    // 3. Recherche du fichier DB
+    // 3. Recherche du fichier de base de données
     let col = z.file("collection.anki2");
     if (!col) col = z.file(/collection\.anki2(1|\.db)?/i)[0];
-    if(!col) throw new Error("Fichier collection.anki2 introuvable dans l'archive.");
     
-    // 4. Chargement SQL
-    const SQL = await ensureSQL();
+    if(!col) throw new Error("Fichier de données introuvable dans l'archive.");
+    
+    // 4. ANALYSE DU TYPE DE FICHIER (Correction du bug Maths vs Thermo)
     const dbData = new Uint8Array(await col.async('uint8array'));
     
-    // VÉRIFICATION CRITIQUE DU HEADER SQLITE
-    // Les nouveaux exports Anki ne commencent pas par "SQLite format 3"
-    const header = String.fromCharCode.apply(null, dbData.subarray(0, 15));
-    if (header !== "SQLite format 3") {
-        throw new Error(
-            "⚠️ FORMAT ANKI NON SUPPORTÉ\n\n" +
-            "Vous avez exporté ce fichier avec le nouveau format Anki.\n" +
-            "Pour que ça fonctionne ici, vous devez :\n\n" +
-            "1. Retourner sur Anki (iPhone/PC)\n" +
-            "2. Faire 'Exporter'\n" +
-            "3. COCHER la case 'Support des anciennes versions' (Legacy)\n" +
-            "4. Réimporter le nouveau fichier."
+    // On lit les premiers caractères du fichier pour savoir ce que c'est
+    const header = String.fromCharCode.apply(null, dbData.subarray(0, 50));
+    
+    // Cas 1 : C'est le fichier "Please update..." (Le cas Maths.apkg)
+    if (header.includes("Please update") || header.includes("Anki version")) {
+        alert(
+            "⛔️ FICHIER NON SUPPORTÉ\n\n" +
+            "Ce fichier '" + f.name + "' utilise le nouveau format Anki compressé.\n" +
+            "Le navigateur ne peut pas le lire directement.\n\n" +
+            "SOLUTION :\n" +
+            "1. Retournez dans Anki.\n" +
+            "2. Faites Exporter.\n" +
+            "3. COCHEZ 'Support des anciennes versions' (Legacy).\n" +
+            "4. Réessayez."
         );
+        return; // On arrête tout
     }
 
+    // Cas 2 : C'est une vraie base de données SQLite (Le cas Thermo.apkg)
+    if (!header.startsWith("SQLite")) {
+        // C'est peut-être le nouveau format ZSTD compressé binaire sans texte
+        alert("⛔️ Format inconnu. Veuillez réexporter en cochant 'Support des anciennes versions'.");
+        return;
+    }
+
+    // Si on est ici, c'est que c'est du SQLite valide, on charge SQL.js
+    const SQL = await ensureSQL();
     let db;
     try {
         db = new SQL.Database(dbData);
     } catch(sqlErr) {
-        throw new Error("Erreur lecture DB: " + sqlErr.message);
+        throw new Error("La base de données est corrompue ou illisible.");
     }
 
-    // Récupération Noms Decks
+    // --- À partir d'ici, c'est la lecture standard des cartes ---
     let dk = {};
     try {
         const r = db.exec('select decks from col limit 1');
         if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}');
     } catch(e) {}
 
-    // Lecture des cartes
     let rows;
     try {
-        // Cette requête est standard pour les anciennes versions (Legacy)
         rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
     } catch(e) {
         db.close();
-        throw new Error(
-            "⚠️ Structure de base de données inconnue.\n" +
-            "Assurez-vous d'avoir coché 'Support des anciennes versions' lors de l'export Anki."
-        );
+        throw new Error("Impossible de lire les tables (Format DB incompatible).");
     }
     
     if(!rows || !rows[0]) {
         db.close();
-        throw new Error("Aucune carte trouvée dans ce paquet.");
+        throw new Error("Le paquet est vide.");
     }
     
     const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
@@ -450,7 +462,6 @@ async function impApkg(f){
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
 
-        // Gestion basique des types de cartes inversées
         if (row.ord == 1 && fl.length >= 2) {
             frontVal = fl[1];
             backVal = fl[0];
@@ -470,7 +481,7 @@ async function impApkg(f){
     
     db.close();
 
-    // Création des structures
+    // Création des structures dans l'app
     const chs = []; 
     for(const [n,arr] of byD){
       const cds = arr.map(r => ({
@@ -500,13 +511,13 @@ async function impApkg(f){
     data.subjects.push(sj); 
     data.app.currentSubjectId = sj.id; 
     saveData();
+    // Le rafraichissement se fait dans le onchange
 
   } catch(e) { 
     console.error(e);
-    alert(e.message); 
+    alert("Erreur import : " + e.message);
   }
 }
-
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
 async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(o)) impSimpSub(f.name.replace(/\.[^.]+$/,''),o); else if(o.cards) impSimpSub(o.subject||f.name,o.cards) }
