@@ -387,37 +387,33 @@ async function impApkg(f){
     // 3. Recherche du fichier DB
     let col = z.file("collection.anki2");
     if (!col) col = z.file(/collection\.anki2(1|\.db)?/i)[0];
-    if(!col) throw new Error("Fichier collection.anki2 introuvable.");
+    if(!col) throw new Error("Fichier collection.anki2 introuvable dans l'archive.");
     
     // 4. Chargement SQL
     const SQL = await ensureSQL();
     const dbData = new Uint8Array(await col.async('uint8array'));
     
-    // Petite vérification du header pour éviter les crashs violents
+    // VÉRIFICATION CRITIQUE DU HEADER SQLITE
+    // Les nouveaux exports Anki ne commencent pas par "SQLite format 3"
     const header = String.fromCharCode.apply(null, dbData.subarray(0, 15));
     if (header !== "SQLite format 3") {
-        throw new Error("Format de fichier non supporté.\nSolution : Exportez depuis Anki en cochant 'Support des anciennes versions'.");
-    }
-
-    const db = new SQL.Database(dbData);
-
-    // --- DÉTECTION DU PROBLÈME ACTUEL ---
-    // On vérifie si la table 'cards' existe. 
-    // Si elle n'existe pas, c'est que c'est la "fausse" base de données avec le message d'erreur.
-    const checkTable = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='cards'");
-    if (!checkTable[0] || !checkTable[0].values.length) {
-        db.close();
         throw new Error(
-            "⚠️ Format Anki trop récent.\n\n" +
-            "Ce fichier contient le nouveau format compressé d'Anki que le web ne peut pas lire.\n\n" +
-            "SOLUTION :\n" +
-            "1. Retournez dans Anki.\n" +
-            "2. Faites Exporter.\n" +
-            "3. Cochez la case 'Support des anciennes versions' (Legacy).\n" +
-            "4. Réessayez."
+            "⚠️ FORMAT ANKI NON SUPPORTÉ\n\n" +
+            "Vous avez exporté ce fichier avec le nouveau format Anki.\n" +
+            "Pour que ça fonctionne ici, vous devez :\n\n" +
+            "1. Retourner sur Anki (iPhone/PC)\n" +
+            "2. Faire 'Exporter'\n" +
+            "3. COCHER la case 'Support des anciennes versions' (Legacy)\n" +
+            "4. Réimporter le nouveau fichier."
         );
     }
-    // -------------------------------------
+
+    let db;
+    try {
+        db = new SQL.Database(dbData);
+    } catch(sqlErr) {
+        throw new Error("Erreur lecture DB: " + sqlErr.message);
+    }
 
     // Récupération Noms Decks
     let dk = {};
@@ -429,9 +425,14 @@ async function impApkg(f){
     // Lecture des cartes
     let rows;
     try {
+        // Cette requête est standard pour les anciennes versions (Legacy)
         rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
     } catch(e) {
-        throw new Error("Erreur SQL : " + e.message);
+        db.close();
+        throw new Error(
+            "⚠️ Structure de base de données inconnue.\n" +
+            "Assurez-vous d'avoir coché 'Support des anciennes versions' lors de l'export Anki."
+        );
     }
     
     if(!rows || !rows[0]) {
@@ -449,6 +450,7 @@ async function impApkg(f){
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
 
+        // Gestion basique des types de cartes inversées
         if (row.ord == 1 && fl.length >= 2) {
             frontVal = fl[1];
             backVal = fl[0];
@@ -498,12 +500,10 @@ async function impApkg(f){
     data.subjects.push(sj); 
     data.app.currentSubjectId = sj.id; 
     saveData();
-    // Succès géré par goDeck
 
   } catch(e) { 
     console.error(e);
-    alert(e.message); // Affiche le message clair à l'utilisateur
-    throw e;
+    alert(e.message); 
   }
 }
 
