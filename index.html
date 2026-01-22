@@ -363,117 +363,132 @@ const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`h
 async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
 
 async function impApkg(f){
+  try {
     // 1. Décompression
-    const b=await f.arrayBuffer();
-    const z=await JSZip.loadAsync(b); 
+    const b = await f.arrayBuffer();
+    const z = await JSZip.loadAsync(b); 
     
-    // 2. Gestion des médias
-    let mm={}; 
-    const me=z.file(/^media(\.json)?$/i)[0];
-    if(me) try{mm=JSON.parse(await me.async('string'))}catch{}
+    // 2. Récupération des médias
+    let mm = {}; 
+    const me = z.file(/^media(\.json)?$/i)[0];
+    if(me) {
+        try { mm = JSON.parse(await me.async('string')); } catch(e) {}
+    }
     
-    const iId=`apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
-    const mnk={};
+    const iId = `apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
+    const mnk = {};
     
+    // Sauvegarde des images
     for(const [ns,rn] of Object.entries(mm)){ 
-        const e=z.file(new RegExp(`^${ns}$`))[0]; 
-        if(!e)continue; 
-        const k=`${iId}/${rn||ns}`; 
-        await Media.save(k,await e.async('blob'),{name:rn||ns}); 
-        mnk[rn]=k; mnk[ns]=k 
+        const e = z.file(new RegExp(`^${ns}$`))[0]; 
+        if(!e) continue; 
+        const k = `${iId}/${rn||ns}`; 
+        await Media.save(k, await e.async('blob'), {name:rn||ns}); 
+        mnk[rn] = k; 
+        mnk[ns] = k; 
     }
 
-    // 3. Chargement DB
-    const col=z.file(/collection\.anki2(1|\.db)?/i)[0]; 
-    if(!col) throw new Error("Archive invalide : fichier collection.anki2 manquant");
+    // 3. Chargement de la Base de Données
+    const col = z.file(/collection\.anki2(1|\.db)?/i)[0]; 
+    if(!col) throw new Error("Fichier collection.anki2 introuvable dans l'archive.");
     
-    // Initialisation SQL (Peut prendre un peu de mémoire)
-    const sqlLoad = await ensureSQL();
+    // Initialisation SQL
+    const SQL = await ensureSQL();
     const dbData = new Uint8Array(await col.async('uint8array'));
-    const db = new sqlLoad.Database(dbData);
+    const db = new SQL.Database(dbData);
     
-    // Récupération Noms Decks (Optionnel, pas grave si ça échoue)
-    let dk={};
-    try{
-        const r=db.exec('select decks from col limit 1');
-        if(r[0]?.values[0]) dk=JSON.parse(r[0].values[0][0]||'{}');
-    }catch(e){ console.warn("Info Deck manquant:", e); }
+    // Récupération du nom des Decks
+    let dk = {};
+    try {
+        const r = db.exec('select decks from col limit 1');
+        if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}');
+    } catch(e) {}
 
-    // 4. Requête Principale - SANS TRY/CATCH pour voir la vraie erreur
-    // C'est ici que ça bloquait. Si ça échoue, le message exact s'affichera.
-    const rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
-    
-    if(!rows || !rows[0]){
-        db.close();
-        throw new Error("La base de données est vide ou illisible.");
+    // 4. Lecture des cartes (La requête SQL critique)
+    let rows;
+    try {
+        rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
+    } catch(e) {
+        throw new Error("Erreur SQL lors de la lecture des cartes: " + e.message);
     }
     
-    const byD=new Map(), cols=rows[0].columns, vals=rows[0].values;
+    if(!rows || !rows[0]) {
+        db.close();
+        throw new Error("Aucune carte trouvée dans la base de données.");
+    }
+    
+    const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
     
     // 5. Traitement des données
     for(const r of vals){ 
-        const row=Object.fromEntries(cols.map((c,i)=>[c,r[i]]));
-        const dn=(dk[row.did]?.name||`Deck ${row.did}`).replace(/::/g,' › ');
-        const fl=(row.flds||'').split('\x1f');
+        const row = Object.fromEntries(cols.map((c,i) => [c,r[i]]));
+        const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › ');
+        const fl = (row.flds||'').split('\x1f');
         
-        // Logique Recto/Verso
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
 
-        if (row.ord == 1 && fl.length >= 2) { // Carte inversée
+        // Gestion carte inversée (ord=1)
+        if (row.ord == 1 && fl.length >= 2) {
             frontVal = fl[1];
             backVal = fl[0];
         } 
-        if (fl.length > 2) { // Champs supplémentaires
+        // Ajout des champs supplémentaires au verso
+        if (fl.length > 2) {
              backVal += '<br><br>' + fl.slice(2).join('<br>');
         }
 
-        const ca=byD.get(dn)||[]; 
+        const ca = byD.get(dn) || []; 
         ca.push({
-            id:String(row.id),
-            front:Media.rwHTML(frontVal,mnk),
-            back:Media.rwHTML(backVal,mnk)
+            id: String(row.id),
+            front: Media.rwHTML(frontVal, mnk),
+            back: Media.rwHTML(backVal, mnk)
         }); 
-        byD.set(dn,ca);
+        byD.set(dn, ca);
     }
     
     db.close();
 
-    // 6. Sauvegarde
-    const chs=[]; 
+    // 6. Création des chapitres
+    const chs = []; 
     for(const [n,arr] of byD){
-      const cds=arr.map(r=>({
-          id:`${slugify(n)}-${r.id}`,
-          front:r.front, back:r.back,
-          grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
+      const cds = arr.map(r => ({
+          id: `${slugify(n)}-${r.id}`,
+          front: r.front, 
+          back: r.back,
+          grade: 'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
       }));
+      
       chs.push({
-          id:'chap-'+slugify(n),
-          title:n,
-          description:`${getEmoji(n)||'📦'} ${n}`,
-          settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
-          filters:{grades:GRADE_FILTERS()},
-          stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},
-          cards:cds,
-          imported:!0
+          id: 'chap-'+slugify(n),
+          title: n,
+          description: `${getEmoji(n)||'📦'} ${n}`,
+          settings: {sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:!1},
+          filters: {grades:GRADE_FILTERS()},
+          stats: {gradeCounts:{...GRADE_INIT(), unseen:cds.length}, totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}},
+          cards: cds,
+          imported: !0
       });
     }
     
-    const sj={id:`import-${slugify(f.name)}`,title:f.name.replace(/\.[^.]+$/,''),chapters:chs,imported:!0}; 
-    data.subjects.push(sj); 
-    data.app.currentSubjectId=sj.id; 
-    saveData();
-    // Pas d'alert ici, on laisse goDeck gérer le succès
-}
+    const sj = {
+        id: `import-${slugify(f.name)}`,
+        title: f.name.replace(/\.[^.]+$/,''),
+        chapters: chs,
+        imported: !0
+    }; 
     
- 
-
+    data.subjects.push(sj); 
+    data.app.currentSubjectId = sj.id; 
+    saveData();
+    // Succès géré par goDeck
+    
   } catch(e) { 
     console.error(e);
-    alert("Erreur Import APKG: "+e.message); 
+    alert("Erreur Import: " + e.message);
+    throw e; // Relance l'erreur pour arrêter le processus
   }
 }
-
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
 async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(o)) impSimpSub(f.name.replace(/\.[^.]+$/,''),o); else if(o.cards) impSimpSub(o.subject||f.name,o.cards) }
@@ -608,10 +623,37 @@ function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.v
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 function goDeck(push=true){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='deck'; State.chapterId=null; const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`,showBack:!1}); setBot({actions:!1,revision:!1}); hideRevAct();
+  safeCloseLB(); 
+  Media.revokeAll(); 
+  if(push) Nav.push(); 
+  State.view='deck'; 
+  State.chapterId=null; 
+  const s=getSub(); 
+  setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); 
+  setBot({actions:!1, revision:!1}); 
+  hideRevAct();
+
   const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
+  
+  // Notez l'attribut accept="*/*" dans l'input ci-dessous pour corriger le grisage sur mobile
   v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0;return`<div class="deck-item" data-type="group" data-id="${g.id}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${chs.filter(c=>!inG.has(c.id)).map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0;return`<div class="deck-item" data-type="chapter" data-id="${c.id}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
-  $('#impB').onclick=()=>$('#impI').click(); $('#impI').onchange=async e=>{try{await importFiles([...e.target.files]);alert('Import OK');saveData();goDeck(!1)}catch(x){alert(x)}finally{e.target.value=''}}; bindDeck()
+  
+  $('#impB').onclick=()=>$('#impI').click(); 
+  
+  // Gestion de l'import avec alerte de succès/échec
+  $('#impI').onchange = async e => {
+      try {
+          await importFiles([...e.target.files]);
+          alert('Import terminé avec succès !');
+          goDeck(!1);
+      } catch(x) {
+          // L'erreur est déjà affichée par impApkg, mais au cas où :
+          console.error(x);
+      } finally {
+          e.target.value='';
+      }
+  }; 
+  bindDeck();
 }
 function bindDeck(){
   const l=$('#dL'); if(!l)return; const sub=getSub(); l.onclick=e=>{if(e.target.matches('.delCh')){e.stopPropagation();if(delImpCh(e.target.dataset.cid))goDeck(!1)}};
