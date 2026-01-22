@@ -64,21 +64,19 @@
     .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; outline: none; appearance: none; }
     .input:focus { border-color: var(--primary); }
     
-    /* Nettoyage CSS #9 & #8 */
     .card, .deck-item, .review-card, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
     
     /* Deck & Lists */
-    .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer;   -webkit-user-select: none;
-  -webkit-touch-callout: none;
-   
-  user-select: none; position: relative; overflow: hidden; touch-action: pan-y; }
-    .deck-item .slide { display: flex; align-items: center; gap: 8px; padding: 8px 0; transition: transform .18s ease; will-change: transform; width: 100%; }
-    .deck-item .right-action { position: absolute; top: 0; right: 0; height: 100%; width: 92px; display: flex; align-items: center; justify-content: center; }
+    .deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer; user-select: none; position: relative; overflow: hidden; touch-action: pan-y; transition: background-color 0.3s ease; }
+    .deck-item .slide { display: flex; align-items: center; gap: 8px; padding: 8px 0; transition: transform .18s ease; will-change: transform; width: 100%; position: relative; z-index: 2; }
+    .deck-item .right-action { position: absolute; top: 0; right: 0; height: 100%; width: 92px; display: flex; align-items: center; justify-content: center; z-index: 1; }
     .deck-item.reveal-delete .slide { transform: translateX(-92px); }
     .deck-item.drop-target { outline: 2px dashed var(--primary); outline-offset: -2px; border-radius: var(--radius-md); background: color-mix(in srgb,var(--primary) 8%,transparent); }
     .deck-item.dragging-origin { opacity: .3; }
     .drag-ghost { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; transform: translate(-9999px,-9999px) scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,.35); background: rgba(0,0,0,.08); border-radius: var(--radius-md); }
     
+    .folder-badge { font-weight: bold; color: var(--primary); margin-left: 6px; font-size: 12px; }
+
     /* Stats & Charts */
     .section-title { font-weight: 900; font-size: 14px; color: var(--primary); letter-spacing: .3px; margin: 0 0 6px; }
     .kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .kpi .k { padding: 0; } .k .label, .stat .label { color: var(--muted); font-size: 12px; } .k .value, .val { font-weight: 900; font-size: 17px; margin-top: 2px; }
@@ -94,90 +92,21 @@
     
     main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
 
-    /* --- FIXES & MODE REVIEW --- */
+    /* Review */
     .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
-    
-    .review-card { 
-      flex: 1; 
-      display: flex; 
-      flex-direction: column;
-      position: relative;
-      overflow: hidden; 
-      min-height: 0;
-      padding: 0;
-    }
-
-    .review-scroller { 
-      flex: 1; 
-      width: 100%; 
-      height: 100%;
-      overflow-y: auto; 
-      overflow-x: hidden; 
-      -webkit-overflow-scrolling: touch; 
-      display: flex; 
-      flex-direction: column;
-      padding: 10px;
-      touch-action: pan-y; 
-      user-select: none;
-    }
-    
-    .review-scroller > * {
-      margin-top: auto;
-      margin-bottom: auto;
-      width: 100%;
-    }
-
-    .term, .definition { 
-        font-size: var(--fs-term)!important; 
-        font-weight: 600; 
-        text-align: center;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    } 
+    .review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; }
+    .review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: none; }
+    .review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
+    .term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
     
-    /* --- MATHJAX FIXES & IMAGES --- */
-    mjx-container { 
-      overflow-x: auto; 
-      overflow-y: hidden; 
-      max-width: 100% !important; 
-      display: inline-block !important; 
-      padding: 4px 0;
-      white-space: normal !important;
-      vertical-align: middle;
-    }
-    mjx-mtext {
-        white-space: normal !important;
-        display: inline !important;
-    }
-    mjx-math {
-        white-space: normal !important;
-        max-width: 100%;
-    }
-    .img-placeholder {
-        display: block;
-        background: rgba(255,255,255,0.05);
-        color: #8aa0d3;
-        padding: 15px;
-        border: 2px dashed rgba(255,255,255,0.1);
-        border-radius: 8px;
-        margin: 15px auto;
-        font-style: italic;
-        font-size: 0.85rem;
-        text-align: center;
-    }
-
-    img { 
-      display: block; 
-      max-width: 100%; 
-      height: auto; 
-      margin: 10px auto; 
-      border-radius: 8px; 
-      background: var(--border); 
-      user-select: none; 
-      object-fit: contain;
-    }
+    /* MathJax & Img */
+    mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100% !important; display: inline-block !important; padding: 4px 0; white-space: normal !important; vertical-align: middle; }
+    mjx-mtext { white-space: normal !important; display: inline !important; }
+    mjx-math { white-space: normal !important; max-width: 100%; }
+    .img-placeholder { display: block; background: rgba(255,255,255,0.05); color: #8aa0d3; padding: 15px; border: 2px dashed rgba(255,255,255,0.1); border-radius: 8px; margin: 15px auto; font-style: italic; font-size: 0.85rem; text-align: center; }
+    img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-radius: 8px; background: var(--border); user-select: none; object-fit: contain; }
 
     .bottom-actions, .revision-bar, .review-actions-bar { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
     .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 4; backdrop-filter: blur(8px) saturate(140%); }
@@ -192,27 +121,13 @@
     .btn--solid.btn--primary { --btn-bg: var(--btn-solid-primary-bg); --btn-bg-h: var(--btn-solid-primary-bg-h); --btn-fg: var(--btn-solid-primary-fg); --btn-bd: var(--btn-solid-primary-bd); }
     .btn--ghost { --btn-bg: transparent; --btn-bg-h: rgba(255,255,255,.06); --btn-fg: var(--muted); --btn-bd: var(--border); } .btn--tiny { padding: 6px 8px; font-size: 13px; border-radius: 8px; }
     
-    /* Cards Grid Fix */
     .cards-grid { display: grid; grid-template-columns: 1fr; gap: 10px; } @media(min-width: 480px) { .cards-grid { grid-template-columns: 1fr 1fr; } }
-    
-    .card-block { 
-      position: relative; 
-      border: 2px solid transparent; 
-      border-radius: 14px; 
-      padding: 14px; 
-      background: 0 0; 
-      max-height: none; 
-      overflow: visible;
-      display: flex;
-      flex-direction: column;
-    }
+    .card-block { position: relative; border: 2px solid transparent; border-radius: 14px; padding: 14px; background: 0 0; max-height: none; overflow: visible; display: flex; flex-direction: column; }
     .card-block .term, .card-block .definition { margin: auto 0; width: 100%; word-break: break-word; }
-    
     .card-block .definition { display: none; text-align: center; margin-top: 6px; } .card-block.flipped .definition { display: block; } .card-block .term { text-align: center; }
     .cb-time { position: absolute; right: 10px; bottom: 8px; font-size: 12px; color: var(--muted); }
     .card-block.grade-echec { border-color: var(--red); } .card-block.grade-difficile { border-color: var(--amber); } .card-block.grade-bien { border-color: var(--blue); } .card-block.grade-facile { border-color: var(--green); } .card-block.grade-unseen { border-color: #9ca3af; }
     
-    /* Settings & Misc */
     .subject-menu { position: absolute; top: 52px; left: 10px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-md); min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,.35); padding: 6px; z-index: 1000; display: none; }
     .subject-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; cursor: pointer; } .subject-item:hover { background: rgba(255,255,255,.06); } .subject-item .name { font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .subject-item .meta { font-size: 12px; color: var(--muted); } .subject-item .subject-actions { margin-left: auto; display: flex; gap: 6px; }
     .wheel { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(255,255,255,.04); touch-action: none; user-select: none; cursor: ns-resize; }
@@ -248,13 +163,11 @@
 /* --- CORE APP LOGIC --- */
 const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-22';
 
-// --- OPTIMISATION #4: CONSTANTES GLOBALES ---
 const GRADES = ['unseen','echec','difficile','bien','facile'];
 const GRADE_INIT = () => ({unseen:0,echec:0,difficile:0,bien:0,facile:0});
 const GRADE_FILTERS = () => ({unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0});
 
 const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
-// --- OPTIMISATION #6: CLAMP SIMPLIFIÉ ---
 const clamp = (n,mn,mx) => n<mn?mn:n>mx?mx:n;
 
 const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -298,9 +211,7 @@ const parsePhysicsData = (rawData) => {
         if (!deckBlock.trim()) return;
         const lines = deckBlock.split('\n');
         const deckCode = lines[0].trim();
-        const deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) 
-                         ? PHY_MAP[deckCode].title 
-                         : deckCode;
+        const deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) ? PHY_MAP[deckCode].title : deckCode;
         const content = deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim();
         const cards = content.split(/-{10,}/);
         cards.forEach(rawCard => {
@@ -347,7 +258,6 @@ const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.l
 const dataEN = parseRaw(RAW_EN);
 const dataPHY = parsePhysicsData(RAW_PHY);
 
-// --- OPTIMISATION #5: SUPPRESSION DE STATESTORE ---
 const Media = {
   db: null, cache: new Map(),
   async open(){ if(this.db)return this.db; this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_media',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('files'))r.result.createObjectStore('files',{keyPath:'key'})};r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}); return this.db },
@@ -364,23 +274,14 @@ async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase()
 
 async function impApkg(f){
   try {
-    // 1. Décompression du ZIP
     const b = await f.arrayBuffer();
     let z;
-    try {
-        z = await JSZip.loadAsync(b);
-    } catch(e) {
-        throw new Error("Ce fichier n'est pas un ZIP/APKG valide.");
-    }
-    
-    // 2. Gestion des médias
+    try { z = await JSZip.loadAsync(b); } catch(e) { throw new Error("Ce fichier n'est pas un ZIP/APKG valide."); }
     let mm = {}; 
     const me = z.file(/^media(\.json)?$/i)[0];
     if(me) { try { mm = JSON.parse(await me.async('string')); } catch(e) {} }
-    
     const iId = `apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
     const mnk = {};
-    
     for(const [ns,rn] of Object.entries(mm)){ 
         const e = z.file(new RegExp(`^${ns}$`))[0]; 
         if(!e) continue; 
@@ -388,135 +289,43 @@ async function impApkg(f){
         await Media.save(k, await e.async('blob'), {name:rn||ns}); 
         mnk[rn] = k; mnk[ns] = k; 
     }
-
-    // 3. Recherche du fichier de base de données
     let col = z.file("collection.anki2");
     if (!col) col = z.file(/collection\.anki2(1|\.db)?/i)[0];
-    
     if(!col) throw new Error("Fichier de données introuvable dans l'archive.");
-    
-    // 4. ANALYSE DU TYPE DE FICHIER (Correction du bug Maths vs Thermo)
     const dbData = new Uint8Array(await col.async('uint8array'));
-    
-    // On lit les premiers caractères du fichier pour savoir ce que c'est
     const header = String.fromCharCode.apply(null, dbData.subarray(0, 50));
-    
-    // Cas 1 : C'est le fichier "Please update..." (Le cas Maths.apkg)
-    if (header.includes("Please update") || header.includes("Anki version")) {
-        alert(
-            "⛔️ FICHIER NON SUPPORTÉ\n\n" +
-            "Ce fichier '" + f.name + "' utilise le nouveau format Anki compressé.\n" +
-            "Le navigateur ne peut pas le lire directement.\n\n" +
-            "SOLUTION :\n" +
-            "1. Retournez dans Anki.\n" +
-            "2. Faites Exporter.\n" +
-            "3. COCHEZ 'Support des anciennes versions' (Legacy).\n" +
-            "4. Réessayez."
-        );
-        return; // On arrête tout
-    }
-
-    // Cas 2 : C'est une vraie base de données SQLite (Le cas Thermo.apkg)
-    if (!header.startsWith("SQLite")) {
-        // C'est peut-être le nouveau format ZSTD compressé binaire sans texte
-        alert("⛔️ Format inconnu. Veuillez réexporter en cochant 'Support des anciennes versions'.");
-        return;
-    }
-
-    // Si on est ici, c'est que c'est du SQLite valide, on charge SQL.js
+    if (header.includes("Please update") || header.includes("Anki version")) { alert("Fichier non supporté (Nouveau format Anki). Veuillez exporter avec 'Support anciennes versions'."); return; }
+    if (!header.startsWith("SQLite")) { alert("Format inconnu."); return; }
     const SQL = await ensureSQL();
     let db;
-    try {
-        db = new SQL.Database(dbData);
-    } catch(sqlErr) {
-        throw new Error("La base de données est corrompue ou illisible.");
-    }
-
-    // --- À partir d'ici, c'est la lecture standard des cartes ---
+    try { db = new SQL.Database(dbData); } catch(sqlErr) { throw new Error("Base de données corrompue."); }
     let dk = {};
-    try {
-        const r = db.exec('select decks from col limit 1');
-        if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}');
-    } catch(e) {}
-
+    try { const r = db.exec('select decks from col limit 1'); if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}'); } catch(e) {}
     let rows;
-    try {
-        rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
-    } catch(e) {
-        db.close();
-        throw new Error("Impossible de lire les tables (Format DB incompatible).");
-    }
-    
-    if(!rows || !rows[0]) {
-        db.close();
-        throw new Error("Le paquet est vide.");
-    }
-    
+    try { rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid'); } catch(e) { db.close(); throw new Error("Erreur DB."); }
+    if(!rows || !rows[0]) { db.close(); throw new Error("Paquet vide."); }
     const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
-    
     for(const r of vals){ 
         const row = Object.fromEntries(cols.map((c,i) => [c,r[i]]));
         const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › ');
         const fl = (row.flds||'').split('\x1f');
-        
         let frontVal = fl[0] || 'Vide';
         let backVal = fl[1] || '';
-
-        if (row.ord == 1 && fl.length >= 2) {
-            frontVal = fl[1];
-            backVal = fl[0];
-        } 
-        if (fl.length > 2) {
-             backVal += '<br><br>' + fl.slice(2).join('<br>');
-        }
-
+        if (row.ord == 1 && fl.length >= 2) { frontVal = fl[1]; backVal = fl[0]; } 
+        if (fl.length > 2) { backVal += '<br><br>' + fl.slice(2).join('<br>'); }
         const ca = byD.get(dn) || []; 
-        ca.push({
-            id: String(row.id),
-            front: Media.rwHTML(frontVal, mnk),
-            back: Media.rwHTML(backVal, mnk)
-        }); 
+        ca.push({ id: String(row.id), front: Media.rwHTML(frontVal, mnk), back: Media.rwHTML(backVal, mnk) }); 
         byD.set(dn, ca);
     }
-    
     db.close();
-
-    // Création des structures dans l'app
     const chs = []; 
     for(const [n,arr] of byD){
-      const cds = arr.map(r => ({
-          id: `${slugify(n)}-${r.id}`,
-          front: r.front, back: r.back,
-          grade: 'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
-      }));
-      chs.push({
-          id: 'chap-'+slugify(n),
-          title: n,
-          description: `${getEmoji(n)||'📦'} ${n}`,
-          settings: {sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:!1},
-          filters: {grades:GRADE_FILTERS()},
-          stats: {gradeCounts:{...GRADE_INIT(), unseen:cds.length}, totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}},
-          cards: cds,
-          imported: !0
-      });
+      const cds = arr.map(r => ({ id: `${slugify(n)}-${r.id}`, front: r.front, back: r.back, grade: 'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0 }));
+      chs.push({ id: 'chap-'+slugify(n), title: n, description: `${getEmoji(n)||'📦'} ${n}`, settings: {sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:!1}, filters: {grades:GRADE_FILTERS()}, stats: {gradeCounts:{...GRADE_INIT(), unseen:cds.length}, totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}}, cards: cds, imported: !0 });
     }
-    
-    const sj = {
-        id: `import-${slugify(f.name)}`,
-        title: f.name.replace(/\.[^.]+$/,''),
-        chapters: chs,
-        imported: !0
-    }; 
-    
-    data.subjects.push(sj); 
-    data.app.currentSubjectId = sj.id; 
-    saveData();
-    // Le rafraichissement se fait dans le onchange
-
-  } catch(e) { 
-    console.error(e);
-    alert("Erreur import : " + e.message);
-  }
+    const sj = { id: `import-${slugify(f.name)}`, title: f.name.replace(/\.[^.]+$/,''), chapters: chs, imported: !0 }; 
+    data.subjects.push(sj); data.app.currentSubjectId = sj.id; saveData();
+  } catch(e) { console.error(e); alert("Erreur import : " + e.message); }
 }
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
@@ -530,7 +339,6 @@ async function impSimpSub(n,l){
   const s={id:`import-${slugify(n)}-${Date.now()}`,title:n,chapters:chs,imported:!0}; data.subjects.push(s); data.app.currentSubjectId=s.id; saveData(); goDeck(!1)
 }
 
-/* --- STATE MANAGEMENT --- */
 let data;
 const ChartHit={}, Bar7Hit={};
 function buildChs(l){ 
@@ -548,19 +356,9 @@ function buildChs(l){
   }
   return {
       chapters: sortedKeys.map(n=>{ 
-          const cds=by[n].map(r=>({
-              id:`${slugify(n)}-${r.id}`,
-              front:r.front, back:r.back,
-              grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
-          })); 
+          const cds=by[n].map(r=>({ id:`${slugify(n)}-${r.id}`, front:r.front, back:r.back, grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0 })); 
           return {
-              id:'chap-'+slugify(n),
-              title:n,
-              description: getEmoji(n) ? `${getEmoji(n)} ${n}` : n,
-              settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
-              filters:{grades:GRADE_FILTERS()},
-              stats:{gradeCounts:{...GRADE_INIT(),unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},
-              cards:cds
+              id:'chap-'+slugify(n), title:n, description: getEmoji(n) ? `${getEmoji(n)} ${n}` : n, settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1}, filters:{grades:GRADE_FILTERS()}, stats:{gradeCounts:{...GRADE_INIT(),unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}}, cards:cds
           } 
       }), 
       app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',showEmoji:!0,radius:14}}
@@ -568,15 +366,7 @@ function buildChs(l){
 }
 const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]}), buildCanon=() => [buildSub('Physique',dataPHY), buildSub('Anglais',dataEN)];
 
-// --- OPTIMISATION #2: LOADDATA ET SAVEDATA ---
-function loadData(){ 
-  try{
-    const r=LS.getItem(KEY);
-    if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}
-  }catch{} 
-  const s=buildCanon(); 
-  return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} 
-}
+function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} }
 function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
 
 function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); data.subjects.forEach(s=>s.chapters.forEach(ch=>{ ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(x=>{const m=ch.stats[x]||{};Object.keys(m).forEach(d=>{if(d<k)delete m[d]})}); if(ch.stats.dailyLog)Object.values(ch.stats.dailyLog).forEach(a=>{if(a.length>200)a.splice(0,a.length-200)}) })) }
@@ -608,9 +398,9 @@ function buildGrpStats(s,g){
 function buildVirt(s,g){
   const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
   chs.forEach(ch=>ch.cards.forEach(c=>cards.push({...c,id:`virt-${ch.id}-${c.id}`,_origin:{chapId:ch.id,cardId:c.id}})));
-  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards}
+  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards,deadline:g.deadline,lastUsed:g.lastUsed}
 }
-function addGrp(s,ids){ const u=[...new Set(ids)].filter(Boolean); if(u.length<2)return; ensGrps(s).push({id:'g'+Date.now().toString(36),chapIds:u,createdAt:Date.now(),title:'',emoji:''}) }
+function addGrp(s,ids){ const u=[...new Set(ids)].filter(Boolean); if(u.length<2)return; ensGrps(s).push({id:'g'+Date.now().toString(36),chapIds:u,createdAt:Date.now(),title:'',emoji:'',lastUsed:Date.now()}) }
 function toGrp(s,gid,cid){ const g=findGrp(s,gid); if(g&&!g.chapIds.includes(cid))g.chapIds.push(cid) }
 function remGrp(s,gid,ids){ const g=findGrp(s,gid); if(g)g.chapIds=g.chapIds.filter(x=>!ids.includes(x)) }
 function delGrp(s,gid){ s.groups=ensGrps(s).filter(g=>g.id!==gid) }
@@ -619,6 +409,38 @@ const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey
 const _real = id => getChs().find(c=>c.id===id), getCh = id => (State.virtualChapter?.id===id) ? State.virtualChapter : _real(id);
 function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:GRADE_FILTERS()};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); goChapter(ch.id,!1) }
 const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id); if(i<0||!s.chapters[i].imported||!confirm('Supprimer ?'))return!1; ensGrps(s).forEach(g=>g.chapIds=g.chapIds.filter(x=>x!==id)); valGrps(s); s.chapters.splice(i,1); if(!s.chapters.length&&s.imported){data.subjects=data.subjects.filter(x=>x.id!==s.id);data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 };
+
+/* --- DEADLINE & LOGIC --- */
+function getUrgency(item) {
+    if (!item.deadline) return '';
+    const now = new Date();
+    const ddl = new Date(item.deadline);
+    const diff = (ddl - now) / (1000 * 60 * 60 * 24);
+    if (diff < 0) return 'rgba(239, 68, 68, 0.4)'; // En retard
+    if (diff > 30) return '';
+    const opacity = 0.3 * (1 - (diff / 30));
+    return `rgba(239, 68, 68, ${opacity})`;
+}
+
+function getDailyGoalCalc(ch) {
+    if(!ch.deadline) return null;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    const ddl = new Date(ch.deadline);
+    ddl.setHours(0,0,0,0);
+    const days = Math.ceil((ddl - now) / 864e5);
+    
+    const k = ch.stats.gradeCounts || getLive(ch);
+    let pool = k.echec + k.difficile;
+    let label = "cartes (Échec/Diff.)";
+    if (pool === 0) {
+        pool = k.bien;
+        label = "cartes (Bien)";
+    }
+    
+    if (days <= 1) return { val: pool, text: "Aujourd'hui !" };
+    return { val: Math.ceil(pool / (days - 1)), text: `${label} / jour` };
+}
 
 /* --- NAVIGATION & UI --- */
 const Nav = {
@@ -652,36 +474,35 @@ function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.v
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 function goDeck(push=true){
-  safeCloseLB(); 
-  Media.revokeAll(); 
+  safeCloseLB(); Media.revokeAll(); 
   if(push) Nav.push(); 
-  State.view='deck'; 
-  State.chapterId=null; 
+  State.view='deck'; State.chapterId=null; 
   const s=getSub(); 
   setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); 
-  setBot({actions:!1, revision:!1}); 
-  hideRevAct();
+  setBot({actions:!1, revision:!1}); hideRevAct();
 
   const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
   
-  // Notez l'attribut accept="*/*" dans l'input ci-dessous pour corriger le grisage sur mobile
-  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0;return`<div class="deck-item" data-type="group" data-id="${g.id}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${chs.filter(c=>!inG.has(c.id)).map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0;return`<div class="deck-item" data-type="chapter" data-id="${c.id}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
+  // TRI 1: DEADLINE (Plus urgent en premier), TRI 2: LAST USED (Plus récent en premier)
+  const sorter = (a, b) => {
+      if (a.deadline && !b.deadline) return -1;
+      if (!a.deadline && b.deadline) return 1;
+      if (a.deadline && b.deadline) {
+          const diff = new Date(a.deadline) - new Date(b.deadline);
+          if (diff !== 0) return diff;
+      }
+      return (b.lastUsed || 0) - (a.lastUsed || 0);
+  };
+
+  grps.sort(sorter);
+  
+  // Filter out chapters in groups and Sort remaining chapters
+  const visibleChs = chs.filter(c=>!inG.has(c.id)).sort(sorter);
+
+  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0; const tint = getUrgency(g); return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?`background-color:${tint}`:''}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0; const tint = getUrgency(c); return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?`background-color:${tint}`:''}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
   
   $('#impB').onclick=()=>$('#impI').click(); 
-  
-  // Gestion de l'import avec alerte de succès/échec
-  $('#impI').onchange = async e => {
-      try {
-          await importFiles([...e.target.files]);
-          alert('Import terminé avec succès !');
-          goDeck(!1);
-      } catch(x) {
-          // L'erreur est déjà affichée par impApkg, mais au cas où :
-          console.error(x);
-      } finally {
-          e.target.value='';
-      }
-  }; 
+  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); alert('Import terminé !'); goDeck(!1); } catch(x) { console.error(x); } finally { e.target.value=''; } }; 
   bindDeck();
 }
 function bindDeck(){
@@ -705,8 +526,34 @@ function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buil
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWk(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div><div class="bar7-wrap"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
-  drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('')
+  
+  const dailyCalc = getDailyGoalCalc(c);
+  
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')))}"></span> ${x}: <b class="count">${k[x]}</b></div>`).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">Semaine</div><div class="value">${getWk(c)}</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div>
+  
+  <div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span>
+        <input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}">
+    </div>
+    ${dailyCalc ? `<div class="mt6" style="text-align:right;font-size:13px;color:var(--primary)">Objectif: <b>${dailyCalc.val}</b> ${dailyCalc.text}</div>` : ''}
+  </div>
+
+  <div class="bar7-wrap mt8"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
+  
+  drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('');
+  
+  $('#deadlineInput').onchange = (e) => {
+      const val = e.target.value;
+      if (c.virtual && c._groupId) {
+          const g = findGrp(getSub(), c._groupId);
+          if (g) g.deadline = val;
+      } else {
+          c.deadline = val;
+      }
+      saveData();
+      goChapter(c.id, false); // Refresh to update goal calculation
+  };
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
@@ -716,92 +563,32 @@ async function goCards(cid,push=true){
   State.view='cards'; State.chapterId=cid; 
   const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
+  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
-  // Structure HTML
-  v.innerHTML=`
-    <div style="flex:1;display:flex;flex-direction:column;min-height:0">
-        <div style="flex-shrink:0">
-            <div class="section-title">Cartes (${pool.length})</div>
-            <div style="margin-bottom:10px">
-                <input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false">
-            </div>
-        </div>
-        <div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px">
-            <div class="cards-grid" id="gridCont"></div>
-        </div>
-    </div>`;
-
-  // Fonction de rendu avec logique de tri avancée
   const render = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const cleanQ = norm(q);
-    
     let filtered = [];
-
-    if (!cleanQ) {
-        filtered = pool;
-    } else {
+    if (!cleanQ) { filtered = pool; } else {
         const scored = pool.map(x => {
-            const {f,b} = getSides(x,c);
-            const tf = norm(f); 
-            const tb = norm(b);
-            
-            const fStart = tf.startsWith(cleanQ);
-            const bStart = tb.startsWith(cleanQ);
-            const fIn = tf.includes(cleanQ);
-            const bIn = tb.includes(cleanQ);
-
+            const {f,b} = getSides(x,c); const tf = norm(f); const tb = norm(b);
+            const fStart = tf.startsWith(cleanQ); const bStart = tb.startsWith(cleanQ); const fIn = tf.includes(cleanQ); const bIn = tb.includes(cleanQ);
             if (!fIn && !bIn) return null;
-
-            let score = 2;
-            let len = 100000; 
-
-            if (fStart || bStart) {
-                score = 1;
-                const l1 = fStart ? tf.length : 100000;
-                const l2 = bStart ? tb.length : 100000;
-                len = Math.min(l1, l2);
-            } else {
-                score = 2;
-                const l1 = fIn ? tf.length : 100000;
-                const l2 = bIn ? tb.length : 100000;
-                len = Math.min(l1, l2);
-            }
-
+            let score = 2; let len = 100000; 
+            if (fStart || bStart) { score = 1; len = Math.min(fStart ? tf.length : 100000, bStart ? tb.length : 100000); } else { score = 2; len = Math.min(fIn ? tf.length : 100000, bIn ? tb.length : 100000); }
             return { card: x, score, len };
         }).filter(x => x !== null);
-
-        scored.sort((a, b) => {
-            if (a.score !== b.score) return a.score - b.score; 
-            return a.len - b.len; 
-        });
-
+        scored.sort((a, b) => { if (a.score !== b.score) return a.score - b.score; return a.len - b.len; });
         filtered = scored.map(s => s.card);
     }
-
-    const html = filtered.map(x=>{
-        const{f,b}=getSides(x,c);
-        return`<div class="card-block grade-${x.grade||'unseen'}" data-id="${x.id}"><div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}</div>`
-    }).join('');
-
+    const html = filtered.map(x=>{ const{f,b}=getSides(x,c); return`<div class="card-block grade-${x.grade||'unseen'}" data-id="${x.id}"><div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}</div>` }).join('');
     const grid = $('#gridCont');
-    if(filtered.length === 0) grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`;
-    else grid.innerHTML = html;
-
-    await Media.resolve(grid);
-    await tsLat(grid);
+    if(filtered.length === 0) grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`; else grid.innerHTML = html;
+    await Media.resolve(grid); await tsLat(grid);
   };
-
-  await render(); // Rendu initial
-
+  await render(); 
   $('#cardSearch').oninput = (e) => render(e.target.value);
-  $('#cardsGrid').onclick=e=>{
-      const b=e.target.closest('.card-block');
-      if(b){
-          $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')});
-          b.classList.toggle('flipped');
-      }
-  };
+  $('#cardsGrid').onclick=e=>{ const b=e.target.closest('.card-block'); if(b){ $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')}); b.classList.toggle('flipped'); } };
 }
 
 async function goDaily(cid,k,push=true){
@@ -819,18 +606,10 @@ function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const fT=ppLat(f), bT=ppLat(b);
-  
-  // Modif ici: Ajout du bouton Undo dans le header
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
-
   v.innerHTML=`<div class="review-wrap"><div class="review-top"><div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div><div class="review-card"><div class="review-scroller">${!r.flipped?`<div class="term" data-face="${ff?'front':'back'}">${ff?fT:bT}</div>`:`<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div></div>`;
-  
-  tsLat(v).then(()=>{Media.resolve(v);initGest()}); 
-  // Modif ici: Activation du bouton
-  if(r.history.length) $('#undoBtn').onclick = undoRev; 
-
+  tsLat(v).then(()=>{Media.resolve(v);initGest()}); if(r.history.length) $('#undoBtn').onclick = undoRev; 
   const bar=$('#reviewActionsBar');
-  
   if(!r.flipped){
       bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
       $('#flipBtn').onclick=()=>{r.flipped=!0;renRev()}
@@ -848,11 +627,24 @@ function goRecap(push=true){
 }
 function startRev(cid,push=true){
   if(!cid)return; const c=getCh(cid); if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push); const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); if(!pool.length){alert('Aucune carte.');return}
+  
+  // UPDATE LAST USED
+  c.lastUsed = Date.now();
+  saveData();
+
   const q=bldQ(c,pool,c.settings.sessionSize); State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
 function startRevMulti(ids,vid,flt,push=true){
   const all=ids.map(_real).filter(Boolean), pool=[]; all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen'])pool.push({chapId:ch.id,card:c})})); if(!pool.length){alert('Aucune carte.');return}
   const scored=pool.map(i=>{const g=i.card.grade||'unseen',base={unseen:6,echec:5,difficile:3.5,bien:2,facile:1}[g]||1,due=(i.card.dueAt&&i.card.dueAt>0)?(Date.now()-i.card.dueAt>0?(1+M.min(3,(Date.now()-i.card.dueAt)/864e5)):0.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(0.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w), sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
+  
+  // UPDATE LAST USED FOR GROUP
+  if(vid.startsWith('group-')){
+     const sub = getSub();
+     const g = findGrp(sub, vid.replace('group-',''));
+     if(g) { g.lastUsed = Date.now(); saveData(); }
+  }
+
   State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
 
@@ -871,39 +663,17 @@ function bldQ(c,pool,sz){
 
 function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.index],ch=_real(i.chapId);return{card:ch.cards.find(x=>x.id===i.cardId),chap:ch}}else{const ch=getCh(r.chapterId);return{card:ch.cards.find(x=>x.id===r.queue[r.index]),chap:ch}} }
 
-  
-  function undoRev(){
-  const r = State.review;
-  if(!r.history.length) return;
-  
-  const snap = r.history.pop(); // Récupère le dernier état
-  r.index = snap.idx; // Revient à la carte précédente
-  
-  // Restaure les données
-  const {card, chap} = getCur(); 
-  Object.assign(card, snap.cardState); // Remet les anciennes valeurs de la carte (grade, ef, dueAt...)
-  chap.stats = snap.statsState; // Remet les stats globales du chapitre
-  
-  // Supprime la réponse enregistrée
+function undoRev(){
+  const r = State.review; if(!r.history.length) return;
+  const snap = r.history.pop(); r.index = snap.idx; 
+  const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState; 
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
-  
-  // On revient en mode "Réponse affichée" pour permettre de re-noter immédiatement
-  r.flipped = true; 
-  saveData();
-  renRev();
+  r.flipped = true; saveData(); renRev();
 }
   
-  function subG(nxt){
+function subG(nxt){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
-  
-  // Modif ici: Sauvegarde de l'historique
-  r.history.push({
-      idx: r.index,
-      cardState: deepClone(card), // Copie exacte de la carte avant modif
-      statsState: deepClone(chap.stats), // Copie des stats globales
-      ansIdx: r.answers.length
-  });
-
+  r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length });
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
   card.grade=nxt; syncG(chap); card.perfEma=(1-.3)*(card.perfEma??.5)+.3*(nxt==='facile'?1:nxt==='bien'?0.75:nxt==='difficile'?0.35:0);
   schNx(card,nxt,now); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
@@ -928,7 +698,6 @@ function opDayBar(e,id,cid){ const h=Bar7Hit[id]; if(!h)return; const x=e.client
 function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=180, h=180, cx=90, cy=90, R=84, r=54; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=30;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,69,start,end);ctx.lineWidth=30;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+5); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
 function hChartClk(e,id,ch){ const h=ChartHit[id]; if(!h)return; const r=e.target.getBoundingClientRect(), dx=(e.clientX-r.left)*(180/r.width)-h.cx, dy=(e.clientY-r.top)*(180/r.height)-h.cy, d=M.hypot(dx,dy); if(d<h.innerR||d>h.outerR)return; let a=M.atan2(dy,dx); if(a<-1.57)a+=6.28; const hit=h.arcs.find(s=>a>=s.start&&a<=s.end); if(hit)updFilt(ch,hit.key) }
 
-// --- OPTIMISATION #7: TOGFILT OPTIMISÉ ---
 function togFilt(c,k){ 
   const s=c.filters.grades, keys=Object.keys(s), actCnt=keys.reduce((n,x)=>n+(s[x]?1:0),0);
   if(actCnt===keys.length){ keys.forEach(x=>s[x]=(x===k)); }
@@ -940,8 +709,6 @@ function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div><div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div><div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
   $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; 
-  
-  // --- BUG #1: DOUBLE DAILYLOG CORRIGÉ ---
   $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:GRADE_INIT(),totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}}; 
   $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; 
 }
@@ -952,37 +719,11 @@ function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>
 function bindSz() {
     const elements = $$('.review-card .term, .review-card .definition');
     const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
-
     elements.forEach(el => {
-        let startDist = 0;
-        let startVal = 0;
-        const isTerm = el.classList.contains('term');
-
-        el.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                if (e.cancelable) e.preventDefault();
-                startDist = getDist(e.touches);
-                startVal = isTerm ? data.app.prefs.fsTerm : data.app.prefs.fsDef;
-            }
-        }, { passive: false });
-
-        el.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2 && startDist > 0) {
-                if (e.cancelable) e.preventDefault();
-                const dist = getDist(e.touches);
-                const scale = dist / startDist;
-                const newVal = clamp(Math.round(startVal * scale), 12, 90);
-                if (isTerm) { data.app.prefs.fsTerm = newVal; } else { data.app.prefs.fsDef = newVal; }
-                applyUI(); 
-            }
-        }, { passive: false });
-
-        el.addEventListener('touchend', (e) => {
-            if (e.touches.length < 2 && startDist > 0) {
-                startDist = 0;
-                saveData(); 
-            }
-        });
+        let startDist = 0; let startVal = 0; const isTerm = el.classList.contains('term');
+        el.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { if (e.cancelable) e.preventDefault(); startDist = getDist(e.touches); startVal = isTerm ? data.app.prefs.fsTerm : data.app.prefs.fsDef; } }, { passive: false });
+        el.addEventListener('touchmove', (e) => { if (e.touches.length === 2 && startDist > 0) { if (e.cancelable) e.preventDefault(); const dist = getDist(e.touches); const scale = dist / startDist; const newVal = clamp(Math.round(startVal * scale), 12, 90); if (isTerm) { data.app.prefs.fsTerm = newVal; } else { data.app.prefs.fsDef = newVal; } applyUI(); } }, { passive: false });
+        el.addEventListener('touchend', (e) => { if (e.touches.length < 2 && startDist > 0) { startDist = 0; saveData(); } });
     });
 }
 
@@ -995,7 +736,5 @@ function init(){ Media.open(); setInterval(saveData,15000); data=loadData(); if(
 init();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/sql-wasm.js"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>
 </html>
