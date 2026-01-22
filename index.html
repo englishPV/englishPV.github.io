@@ -411,62 +411,87 @@ function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(
 const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id); if(i<0||!s.chapters[i].imported||!confirm('Supprimer ?'))return!1; ensGrps(s).forEach(g=>g.chapIds=g.chapIds.filter(x=>x!==id)); valGrps(s); s.chapters.splice(i,1); if(!s.chapters.length&&s.imported){data.subjects=data.subjects.filter(x=>x.id!==s.id);data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 };
 
 /* --- DEADLINE & LOGIC --- */
-function getUrgency(item) {
-    if (!item.deadline) return '';
-    
-    // Récupération des stats (compatible Chapitre ou Groupe)
+function getDeckTint(item, type) {
+    // 1. Récupérer les stats
     let k;
-    if (item.cards) {
-        // C'est un chapitre
-        k = item.stats.gradeCounts || getLive(item);
-    } else {
-        // C'est un groupe, on doit reconstruire les stats via la globale getSub()
-        k = buildGrpStats(getSub(), item).counts;
+    if (type === 'chapter') k = item.stats.gradeCounts || getLive(item);
+    else k = buildGrpStats(getSub(), item).counts;
+
+    const totalGraded = k.echec + k.difficile + k.bien + k.facile;
+    
+    // -- COULEUR DE BASE (Moyenne des notes) --
+    // Rouge (Fail) : 239, 68, 68
+    // Bleu (Bien)  : 59, 130, 246
+    // Vert (Easy)  : 34, 197, 94
+    
+    let r = 0, g = 0, b = 0, a = 0;
+
+    if (totalGraded > 0) {
+        const wRed = (k.echec + k.difficile) / totalGraded;
+        const wBlue = k.bien / totalGraded;
+        const wGreen = k.facile / totalGraded;
+
+        r = (239 * wRed) + (59 * wBlue) + (34 * wGreen);
+        g = (68 * wRed) + (130 * wBlue) + (197 * wGreen);
+        b = (68 * wRed) + (246 * wBlue) + (94 * wGreen);
+        a = 0.25; // Opacité de base pour la couleur du deck
     }
 
-    const total = (k.unseen + k.echec + k.difficile + k.bien + k.facile) || 1;
-    // Nouvelle définition des "Mauvaises" : inclut les Non Vues
-    const bad = k.unseen + k.echec + k.difficile;
-    
-    // Calcul du temps restant
-    const now = new Date(); now.setHours(0,0,0,0);
-    const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
-    const diffTime = ddl - now;
-    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    // -- COUCHE URGENCE (Date limite) --
+    if (item.deadline) {
+        const now = new Date(); now.setHours(0,0,0,0);
+        const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
+        const diff = (ddl - now) / 864e5; // Jours restants
 
-    // --- LOGIQUE ROUGE (Urgence) ---
-    if (bad > 0) {
-        // Si plus de 7 jours, pas de rouge
-        if (days > 7) return '';
+        // Calcul de l'intensité du rouge (0 = pas d'urgence, 1 = urgence max)
+        let urgency = 0;
         
-        // Calcul de l'intensité (0 à 7 jours)
-        // 7 jours = 0, 0 jour = 1
-        let ratio = 1 - (days / 7);
+        if (diff <= 0) urgency = 1;      // Aujourd'hui ou retard (bien que retard soit supprimé au chargement)
+        else if (diff <= 7) urgency = 1 - (diff / 7); // Dégradé sur 7 jours
         
-        // Bornes (si en retard, on reste à max)
-        if (days < 0) ratio = 1; 
-        if (ratio < 0) ratio = 0;
-
-        // Opacité max de 0.5 pour rester lisible
-        const opacity = 0.5 * ratio;
-        
-        if (opacity <= 0.01) return '';
-        return `rgba(239, 68, 68, ${opacity})`;
-    } 
-    
-    // --- LOGIQUE VERTE (Maîtrise) ---
-    else {
-        // Plus de mauvaises cartes, on passe au vert.
-        // L'intensité dépend de la proportion de "Facile" vs "Bien".
-        // Tout "Bien" = Vert léger (0.15)
-        // Tout "Facile" = Vert plus fort (0.4)
-        
-        const easyRatio = k.facile / total;
-        // Base 0.15 + Bonus jusqu'à 0.25 selon le ratio de Facile
-        const opacity = 0.15 + (easyRatio * 0.25);
-        
-        return `rgba(34, 197, 94, ${opacity})`;
+        if (urgency > 0) {
+            // Cible Rouge Urgence
+            const tR = 239, tG = 68, tB = 68;
+            
+            if (totalGraded === 0) {
+                // Si tout est "Non vu", on part du transparent vers le rouge
+                r = tR; g = tG; b = tB;
+                a = 0.5 * urgency; // Max opacité 0.5
+            } else {
+                // Si on a une couleur de base, on l'écrase progressivement
+                r = r * (1 - urgency) + tR * urgency;
+                g = g * (1 - urgency) + tG * urgency;
+                b = b * (1 - urgency) + tB * urgency;
+                
+                // L'opacité augmente aussi pour devenir plus "solide"
+                a = 0.25 + (0.25 * urgency); 
+            }
+        }
     }
+
+    if (a <= 0.01) return '';
+    return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
+}
+
+
+// Nettoie les dates dépassées
+function checkExpiredDates(list) {
+    const now = new Date(); 
+    now.setHours(0,0,0,0); // On compare à minuit aujourd'hui
+    let changed = false;
+    
+    list.forEach(item => {
+        if (item.deadline) {
+            const ddl = new Date(item.deadline);
+            ddl.setHours(0,0,0,0);
+            // Si la date limite est strictement avant aujourd'hui, on l'enlève
+            if (ddl < now) {
+                item.deadline = null;
+                changed = true;
+            }
+        }
+    });
+    return changed;
 }
 
 function getDailyGoalCalc(ch) {
@@ -540,9 +565,16 @@ function goDeck(push=true){
   setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); 
   setBot({actions:!1, revision:!1}); hideRevAct();
 
+  // 1. NETTOYAGE DES DATES
+  // On vérifie les groupes et les chapitres pour voir si des dates sont dépassées
+  let needsSave = false;
+  if (checkExpiredDates(ensGrps(s))) needsSave = true;
+  if (checkExpiredDates(s.chapters)) needsSave = true;
+  if (needsSave) saveData();
+
   const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
   
-  // TRI 1: DEADLINE (Plus urgent en premier), TRI 2: LAST USED (Plus récent en premier)
+  // Tri : Date Limite d'abord, puis Dernière Utilisation
   const sorter = (a, b) => {
       if (a.deadline && !b.deadline) return -1;
       if (!a.deadline && b.deadline) return 1;
@@ -554,11 +586,19 @@ function goDeck(push=true){
   };
 
   grps.sort(sorter);
-  
-  // Filter out chapters in groups and Sort remaining chapters
   const visibleChs = chs.filter(c=>!inG.has(c.id)).sort(sorter);
 
-  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0; const tint = getUrgency(g); return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?`background-color:${tint}`:''}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0; const tint = getUrgency(c); return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?`background-color:${tint}`:''}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
+  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0; 
+  
+  // Utilisation de la nouvelle fonction de teinte
+  const tint = getDeckTint(g, 'group'); 
+  
+  return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0; 
+  
+  // Utilisation de la nouvelle fonction de teinte
+  const tint = getDeckTint(c, 'chapter'); 
+  
+  return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
   
   $('#impB').onclick=()=>$('#impI').click(); 
   $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); alert('Import terminé !'); goDeck(!1); } catch(x) { console.error(x); } finally { e.target.value=''; } }; 
