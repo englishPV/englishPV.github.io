@@ -361,29 +361,125 @@ const Media = {
 const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}`}); return p } })();
 
 async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
+
 async function impApkg(f){
   try {
-    const b=await f.arrayBuffer(), z=await JSZip.loadAsync(b); let mm={}; const me=z.file(/^media(\.json)?$/i)[0];
+    // 1. Décompression du ZIP (APKG)
+    const b=await f.arrayBuffer(), z=await JSZip.loadAsync(b); 
+    let mm={}; 
+    
+    // 2. Gestion des médias (images/sons)
+    // Le fichier 'media' est un JSON qui mappe "1" -> "image.jpg"
+    const me=z.file(/^media(\.json)?$/i)[0];
     if(me) try{mm=JSON.parse(await me.async('string'))}catch{}
+    
     const iId=`apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`, mnk={};
-    for(const [ns,rn] of Object.entries(mm)){ const e=z.file(new RegExp(`^${ns}$`))[0]; if(!e)continue; const k=`${iId}/${rn||ns}`; await Media.save(k,await e.async('blob'),{name:rn||ns}); mnk[rn]=k; mnk[ns]=k }
-    const col=z.file(/collection\.anki2(1|\.db)?/i)[0]; if(!col) throw new Error("No Collection");
-    const db=new(await ensureSQL()).Database(new Uint8Array(await col.async('uint8array'))); let dk={};
-    try{const r=db.exec('select decks from col limit 1');if(r[0]?.values[0])dk=JSON.parse(r[0].values[0][0]||'{}')}catch{}
-    let rows; try{rows=db.exec('select cards.id,cards.nid,cards.did,cards.ord,notes.flds from cards join notes on notes.id=cards.nid')}catch{throw new Error("DB Error")}
-    if(!rows[0])return;
-    const byD=new Map(), cols=rows[0].columns, vals=rows[0].values;
-    for(const r of vals){ const row=Object.fromEntries(cols.map((c,i)=>[c,r[i]])), dn=(dk[row.did]?.name||`Deck ${row.did}`).replace(/::/g,' › '), fl=(row.flds||'').split('\x1f'), ca=byD.get(dn)||[]; ca.push({id:String(row.id),front:Media.rwHTML(fl[0]||'',mnk),back:Media.rwHTML(fl[1]||'',mnk)}); byD.set(dn,ca) }
-    db.close();
-    const chs=[]; for(const [n,arr] of byD){
-      const cds=arr.map(r=>({id:`${slugify(n)}-${r.id}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
-      chs.push({id:'chap-'+slugify(n),title:n,description:`${getEmoji(n)||'📦'} ${n}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
-      filters:{grades:GRADE_FILTERS()},
-      stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0})
+    
+    // On extrait et sauvegarde chaque image dans IndexedDB
+    for(const [ns,rn] of Object.entries(mm)){ 
+        const e=z.file(new RegExp(`^${ns}$`))[0]; 
+        if(!e)continue; 
+        const k=`${iId}/${rn||ns}`; 
+        await Media.save(k,await e.async('blob'),{name:rn||ns}); 
+        mnk[rn]=k; mnk[ns]=k 
     }
-    const sj={id:`import-${slugify(f.name)}`,title:f.name.replace(/\.[^.]+$/,''),chapters:chs,imported:!0}; data.subjects.push(sj); data.app.currentSubjectId=sj.id; saveData()
-  } catch(e) { alert("Import APKG Err: "+e.message) }
+
+    // 3. Ouverture de la base de données SQLite (collection.anki2)
+    const col=z.file(/collection\.anki2(1|\.db)?/i)[0]; 
+    if(!col) throw new Error("Fichier collection.anki2 manquant (Ce n'est pas un APKG valide)");
+    
+    const db=new(await ensureSQL()).Database(new Uint8Array(await col.async('uint8array'))); 
+    
+    // Récupération des noms des paquets (Decks)
+    let dk={};
+    try{
+        const r=db.exec('select decks from col limit 1');
+        if(r[0]?.values[0]) dk=JSON.parse(r[0].values[0][0]||'{}');
+    }catch(e){ console.warn("Impossible de lire les noms des decks", e); }
+
+    // 4. Requête pour récupérer les cartes et les notes
+    // On récupère aussi 'ord' qui indique si c'est une carte normale (0) ou inversée (1, etc.)
+    let rows; 
+    try{
+        rows=db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid');
+    }catch{throw new Error("Erreur de lecture DB Anki")}
+    
+    if(!rows[0])return;
+    
+    const byD=new Map(), cols=rows[0].columns, vals=rows[0].values;
+    
+    for(const r of vals){ 
+        const row=Object.fromEntries(cols.map((c,i)=>[c,r[i]]));
+        
+        // Nom du deck
+        const dn=(dk[row.did]?.name||`Deck ${row.did}`).replace(/::/g,' › ');
+        
+        // Les champs sont séparés par le caractère \x1f
+        const fl=(row.flds||'').split('\x1f');
+        
+        // --- AMÉLIORATION ICI --- 
+        // Logique simple pour gérer Recto/Verso basique
+        let frontVal = fl[0] || 'Vide';
+        let backVal = fl[1] || '';
+
+        // Si c'est une carte générée par un modèle inversé (souvent ord = 1)
+        // et qu'on a assez de champs, on inverse question/réponse
+        if (row.ord == 1 && fl.length >= 2) {
+            frontVal = fl[1];
+            backVal = fl[0];
+        } 
+        // Si plus de 2 champs (ex: Audio, Exemple), on ajoute le reste au verso
+        if (fl.length > 2) {
+             backVal += '<br><br>' + fl.slice(2).join('<br>');
+        }
+        // ------------------------
+
+        const ca=byD.get(dn)||[]; 
+        ca.push({
+            id:String(row.id),
+            front:Media.rwHTML(frontVal,mnk), // Réécriture des liens images
+            back:Media.rwHTML(backVal,mnk)
+        }); 
+        byD.set(dn,ca);
+    }
+    
+    db.close();
+
+    // 5. Création de la structure pour votre site
+    const chs=[]; 
+    for(const [n,arr] of byD){
+      const cds=arr.map(r=>({
+          id:`${slugify(n)}-${r.id}`,
+          front:r.front, back:r.back,
+          grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0
+      }));
+      
+      chs.push({
+          id:'chap-'+slugify(n),
+          title:n,
+          description:`${getEmoji(n)||'📦'} ${n}`,
+          settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},
+          filters:{grades:GRADE_FILTERS()},
+          stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},
+          cards:cds,
+          imported:!0
+      });
+    }
+    
+    const sj={id:`import-${slugify(f.name)}`,title:f.name.replace(/\.[^.]+$/,''),chapters:chs,imported:!0}; 
+    data.subjects.push(sj); 
+    data.app.currentSubjectId=sj.id; 
+    saveData();
+    alert("Import terminé avec succès !");
+    goDeck(!1); // Rafraîchir l'affichage
+
+  } catch(e) { 
+    console.error(e);
+    alert("Erreur Import APKG: "+e.message); 
+  }
 }
+
+
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
 async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(o)) impSimpSub(f.name.replace(/\.[^.]+$/,''),o); else if(o.cards) impSimpSub(o.subject||f.name,o.cards) }
 async function impSimpSub(n,l){
