@@ -47,6 +47,7 @@ const C_EMOJIS = {
   [REL]: '🛐',   // Religion
   [POL]: '🏛️',   // Politique
 [WP]: '⚔️',
+   [SLM]: '❤️',
   // --- Social & Économie ---
   [CI]:  '🧳',   // Immigration
   [CF]:  '♀️',    // Status of Women
@@ -1512,7 +1513,112 @@ const RAW_EN = String.raw`
 1428|un amputé|an amputee|${WP}
 1429|être estropié, mutilé pour la vie|be maimed for life|${WP}
 1430|névrose post-traumatique|Post Traumatic Stress Disorder, PTSD|${WP}
-
+1431|avoir des rapports (sexuels) avec qn|to have sex, sexual intercourse, sexual relations with sb|${SLM}
+1432|un partenaire sexuel|a sex partner|${SLM}
+1433|le désir|desire|${SLM}
+1434|le désir sexuel|lust|${SLM}
+1435|l’érotisme|eroticism|${SLM}
+1436|être excité sexuellement|to be sexually aroused|${SLM}
+1437|caresser|to fondle, to caress|${SLM}
+1438|les préliminaires amoureux|foreplay|${SLM}
+1439|un orgasme|an orgasm|${SLM}
+1440|jouir|to come|${SLM}
+1441|la sodomie|anal sex, sodomy|${SLM}
+1442|rapports bucco-génitaux|oral sex|${SLM}
+1443|chaste|chaste|${SLM}
+1444|un(e) vierge|a virgin|${SLM}
+1445|l’amour platonique|platonic love|${SLM}
+1446|être frustré sexuellement|to be sex-starved|${SLM}
+1447|les organes génitaux|genitals|${SLM}
+1448|le sperme|sperm, semen|${SLM}
+1449|le nombre de spermatozoïdes|sperm count|${SLM}
+1450|une maladie sexuellement transmissible (MST), une maladie vénérienne|a sexually-transmitted disease (STD), a venereal disease (VD)|${SLM}
+1451|le SIDA (le syndrome d’immunodéficience acquise)|AIDS (acquired immune deficiency syndrome)|${SLM}
+1452|la blennorragie|gonorrhea|${SLM}
+1453|un préservatif|a condom|${SLM}
+1454|des rapports protégés / non protégés|safe sex, protected sex / unprotected sex|${SLM}
+1455|l’industrie du sexe|the sex industry|${SLM}
+1456|une maison close, un bordel|a brothel|${SLM}
+1457|un travailleur sexuel|a sex worker|${SLM}
+1458|le tourisme sexuel|sex tourism|${SLM}
+1459|une prostituée|a prostitute, a hustler|${SLM}
+1460|un prostitué|a rent boy (GB)|${SLM}
+1461|un proxénète, un souteneur, un maquereau|a procurer, a pimp|${SLM}
+1462|un gigolo|a gigolo, a toy boy (GB)|${SLM}
+1463|la pornographie|pornography|${SLM}
+1464|une revue porno|a porn magazine, a skin magazine (US)|${SLM}
+1465|un film porno|a porn film, a blue movie|${SLM}
+1466|le harcèlement sexuel|sexual harassment|${SLM}
+1467|être harcelé sexuellement par qn|to be sexually harassed by sb|${SLM}
+1468|un objet sexuel|a sex object|${SLM}
+1469|violer|to rape|${SLM}
+1470|un violeur|a rapist|${SLM}
+1471|violence conjugale, familiale|domestic violence|${SLM}
+1472|les sévices sexuels, abus sexuel|sexual abuse|${SLM}
+1473|faire subir des abus sexuels à qn|to abuse sb sexually|${SLM}
+1474|être violenté, agressé sexuellement|to be sexually assaulted|${SLM}
+1475|un pédophile|a paedophile (GB), a pedophile (US)|${SLM}
+1476|la pédophilie|paedophilia (GB), pedophilia (US)|${SLM}
+1477|un réseau pédophile|a paedophile ring|${SLM}
+1478|se livrer à des attouchements sur un enfant|to interfere with a child|${SLM}
+1479|auteur de sévices sexuels sur enfant|a child molester|${SLM}
+1480|les sévices sexuels infligés à des enfants|child abuse|${SLM}
+1481|un auteur de sévices|an abuser|${SLM}
+1482|l’inceste|incest|${SLM}
+1483|une relation incestueuse|an incestuous relationship|${SLM}
+1484|un pervers (sexuel), une pervertie sexuelle|a pervert|${SLM}
+1485|avoir l’esprit mal tourné|to have a dirty mind|${SLM}
+1486|être obsédé|to have a one-track mind, to be sex-mad|${SLM}
+1487|un obsédé sexuel|a sex maniac, a sexaholic|${SLM}
+1488|une nymphomane|a nymphomaniac|${SLM}
+1489|un délinquant sexuel|a sex offender|${SLM}
+1490|la castration chimique|chemical castration|${SLM}
+1491|séduisant|attractive|${SLM}
+1492|une bombe sexuelle|a sex goddess|${SLM}
+1493|être attiré par qn|to be attracted to sb|${SLM}
+1494|le coup de foudre|love at first sight|${SLM}
+1495|faire la cour à qn|to woo, to court sb|${SLM}
+1496|flirter avec qn|to flirt with sb|${SLM}
+1497|draguer qn|to try and pick up sb, to chat sb up|${SLM}
+1498|faire des avances à qn|to make a pass at sb|${SLM}
+1499|faire de l’œil à qn|to make eyes at sb|${SLM}
+1500|faire du pied à qn|to play footsie with sb|${SLM}
+1501|tomber amoureux de qn|to fall in love with sb, to fall for sb|${SLM}
+1502|avoir le béguin pour qn|have a crush on sb|${SLM}
+1503|s’enticher de qn|to become infatuated, besotted with sb|${SLM}
+1504|vivre un grand amour|to be deeply in love|${SLM}
+1505|avoir une aventure avec qn|to have an affair with sb|${SLM}
+1506|une idylle|a romance|${SLM}
+1507|une liaison sans lendemain|a one-night stand|${SLM}
+1508|coucher avec qn|to sleep with sb, to go to bed with sb|${SLM}
+1509|coucher avec n’importe qui|to sleep around|${SLM}
+1510|changer souvent de partenaire|to be promiscuous|${SLM}
+1511|un petit ami / une petite amie|a boyfriend / a girlfriend|${SLM}
+1512|un rendez-vous avec un amoureux OU un(e) petit(e) ami(e)|a date|${SLM}
+1513|sortir avec qn|to date sb|${SLM}
+1514|un site de rencontres|a dating site|${SLM}
+1515|le mariage|marriage|${SLM}
+1516|un mariage forcé / arrangé|a forced / arranged marriage|${SLM}
+1517|un mariage blanc|a sham marriage, a marriage of convenience|${SLM}
+1518|se marier avec qn|to marry sb, to get married to sb|${SLM}
+1519|(cérémonie du) mariage|a wedding|${SLM}
+1520|demander qn en mariage|to propose to sb|${SLM}
+1521|avoir qn dans sa vie|to be in a relationship|${SLM}
+1522|sortir OU vivre avec qn depuis longtemps|to be in a long-term relationship with sb|${SLM}
+1523|se mettre en ménage avec qn|to move in with sb, to set up house with sb|${SLM}
+1524|un compagnon OU une compagne|a (live-in) partner|${SLM}
+1525|vivre en concubinage|to live together|${SLM}
+1526|la fidélité (concept)|fidelity|${SLM}
+1527|les relations sexuelles hors mariage|extramarital sex|${SLM}
+1528|être infidèle à qn|to cheat on sb, to be unfaithful to sb|${SLM}
+1529|la fidélité (fait d'être fidèle)|faithfulness|${SLM}
+1530|l’adultère|adultery|${SLM}
+1531|un coureur de jupons|a womanizer, a philanderer|${SLM}
+1532|cesser d’aimer qn|to fall out of love|${SLM}
+1533|rompre avec qn|to split up with sb, break up with sb|${SLM}
+1534|se séparer de qn|to separate from sb|${SLM}
+1535|divorcer de qn|to get divorced from sb, to divorce sb|${SLM}
+`;
 
 
 
