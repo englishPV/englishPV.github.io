@@ -4,7 +4,7 @@ const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verb
 
 // Constantes ajoutées pour couvrir les variables de la Map Emoji et la fin du texte brut
 const EDU="Education", ECO="Economy", SPO="Sports", GUN="Gun Control", REL="Religion", ENV="Environment", TEC="Technology", MED="Media";
-const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace"; 
+const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace", SLM="Sex Love Marriage";
 
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
 const PHY_MAP = {
