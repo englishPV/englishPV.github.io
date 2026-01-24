@@ -36,9 +36,8 @@ const PHY_MAP = {
 };
 
 // Fusion des Emojis
-const C_EMOJIS = {
-  // --- Politique & Société ---
-  [CD]:  '🗳️',   // Democracy
+const C_EMOJIS: Record<string, string> = {
+  [CD]:  '🗳️', 
   [CIT]: '🌐',   // International Relations
   [IF]:  '🗽',   // Individual Freedom
   [CR]:  '🚔',   // Crime
