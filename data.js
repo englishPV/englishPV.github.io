@@ -1618,7 +1618,7 @@ const RAW_EN = String.raw`
 1533|rompre avec qn|to split up with sb, break up with sb|${SLM}
 1534|se séparer de qn|to separate from sb|${SLM}
 1535|divorcer de qn|to get divorced from sb, to divorce sb|${SLM}
-`;
+
 
 
 
