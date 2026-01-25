@@ -36,7 +36,7 @@ const PHY_MAP = {
 };
 
 // Fusion des Emojis
-const C_EMOJIS: Record<string, string> = {
+const C_EMOJIS = {
   [CD]:  '🗳️', 
   [CIT]: '🌐',   // International Relations
   [IF]:  '🗽',   // Individual Freedom
