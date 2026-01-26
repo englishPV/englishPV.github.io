@@ -725,17 +725,36 @@ function renRev(){
 function goRecap(push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh(State.review.multiChaps[0]); setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
-  $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Objectif</div><div class="val">${c.settings.dailyGoal}</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}/${c.settings.dailyGoal}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
+  
+  // --- MODIFICATION: Suppression de la stat "Objectif" ---
+  $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
+  
   $('#contBtn').onclick=()=>startRev(c.id,!1)
 }
 function startRev(cid,push=true){
-  if(!cid)return; const c=getCh(cid); if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push); const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); if(!pool.length){alert('Aucune carte.');return}
+  if(!cid)return; const c=getCh(cid); 
+  if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push);
+  
+  // --- MODIFICATION START ---
+  // Si une date limite existe, on met à jour la taille de session dynamiquement
+  if(c.deadline) {
+      const calc = getDailyGoalCalc(c);
+      // On applique le calcul. Si le calcul donne 0 (tout est fini), on laisse 1 pour la forme ou on met 0.
+      // Ici on s'assure qu'on a au moins 1 carte si le calcul le demande.
+      if(calc) c.settings.sessionSize = calc.val; 
+  }
+  // --- MODIFICATION END ---
+
+  const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); 
+  if(!pool.length){alert('Aucune carte.');return}
   
   // UPDATE LAST USED
   c.lastUsed = Date.now();
   saveData();
 
-  const q=bldQ(c,pool,c.settings.sessionSize); State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
+  const q=bldQ(c,pool,c.settings.sessionSize); 
+  State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; 
+  goReview(push)
 }
 function startRevMulti(ids,vid,flt,push=true){
   const all=ids.map(_real).filter(Boolean), pool=[]; all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen'])pool.push({chapId:ch.id,card:c})})); if(!pool.length){alert('Aucune carte.');return}
@@ -810,7 +829,20 @@ function togFilt(c,k){
 
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:`${c.title} • Paramètres`}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
-  v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div><div class="settings-section"><div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div></div><div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
+  
+  // --- MODIFICATION: Logique pour cacher la section Session si date limite ---
+  const hideSessionSettings = c.deadline ? 'display:none!important' : '';
+  const sessionMsg = c.deadline ? `<div class="settings-section"><div class="section-title">Session</div><div class="muted" style="font-size:13px">La taille de la session et l'objectif sont gérés automatiquement par la date limite (${c.deadline}).</div></div>` : '';
+
+  v.innerHTML=`<div class="settings-page scroll-y" style="flex:1"><div class="settings-hero">Paramètres</div><div class="settings-section"><div class="section-title">Chapitre</div><input id="chTI" class="input" value="${c.title}"><input id="chEI" class="input mt6" placeholder="Emoji" maxlength="4" value="${c.emoji||''}"><button class="btn mt6" id="svId">Enregistrer</button></div><div class="settings-section"><div class="section-title">Apparence</div><button class="btn" id="tgTh">Thème: <span id="thL">${data.app.theme}</span></button><div class="swatches mt6" id="swts">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div><div class="settings-section"><div class="section-title">Langues</div><button class="btn" id="tgL">${c.settings.langSwap?'EN → FR':'FR → EN'}</button></div><div class="settings-section"><div class="section-title">Typo</div><div class="card" id="tyP"><div class="term">Recto</div><div class="definition mt6">Verso</div></div><div class="wheel" id="wT"><div class="name">Recto</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wD"><div class="name">Verso</div><div class="wheel-value"></div></div></div>
+  
+  ${sessionMsg}
+  <div class="settings-section" style="${hideSessionSettings}">
+      <div class="section-title">Session</div><div class="wheel" id="wS"><div class="name">Taille</div><div class="wheel-value"></div></div><div class="wheel mt6" id="wG"><div class="name">Objectif</div><div class="wheel-value"></div></div>
+  </div>
+  
+  <div class="settings-section"><button class="btn" id="expB">Exporter</button><button class="btn" id="impB2">Importer</button><input type="file" id="impF" class="hidden"></div><div class="settings-section"><button class="btn" id="rstC">Reset Chapitre</button><button class="btn btn--solid btn--red" id="rstA">Reset App</button></div></div>`;
+  
   $('#svId').onclick=()=>{const t=$('#chTI').value.trim(),e=$('#chEI').value.trim();if(c.virtual&&c._groupId){const g=findGrp(getSub(),c._groupId);if(g){g.title=t;g.emoji=e;c.title=t;c.emoji=e;updChDesc(c)}}else{if(t)c.title=t;c.emoji=e;updChDesc(c)}saveData();goChapter(c.id,!1)}; $('#tgTh').onclick=()=>{data.app.theme=data.app.theme==='light'?'dark':'light';saveData();applyTh();$('#thL').textContent=data.app.theme}; $$('.swatch').forEach(b=>b.onclick=()=>{P.accent=b.dataset.accent;saveData();applyUI();$$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b))}); $('#tgL').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;saveData();$('#tgL').textContent=c.settings.langSwap?'EN → FR':'FR → EN'}; bindW($('#wT'),{get:()=>P.fsTerm,set:v=>P.fsTerm=v,min:12,max:60}); bindW($('#wD'),{get:()=>P.fsDef,set:v=>P.fsDef=v,min:14,max:72}); bindW($('#wS'),{get:()=>c.settings.sessionSize,set:v=>c.settings.sessionSize=v,min:5,max:200,step:5}); bindW($('#wG'),{get:()=>c.settings.dailyGoal,set:v=>c.settings.dailyGoal=v,min:5,max:500,step:5}); $('#expB').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()}; $('#impB2').onclick=()=>$('#impF').click(); $('#impF').onchange=async e=>{if(confirm("Écraser tout ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}}; 
   $('#rstC').onclick=()=>{if(confirm('Reset ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:GRADE_INIT(),totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}}; 
   $('#rstA').onclick=async()=>{if(confirm('Tout effacer ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}}; 
