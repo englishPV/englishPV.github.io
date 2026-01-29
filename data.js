@@ -1649,7 +1649,22 @@ const RAW_EN = String.raw`
 1562|se mettre en ménage avec qn|to set up house with sb|${SSM}
 1563|une famille homoparentale|same-sex parents, LGBT parents|${SSM}
 1564|l’homoparentalité|same-sex parenting|${SSM}
-1565|légaliser / interdire le mariage
+1565|légaliser / interdire le mariage homosexuel|to legalize / ban gay marriage|${SSM}
+1566|avoir des opinions progressistes|to have liberal views|${SSM}
+1567|une question controversée, un problème sensible|a hot-button issue|${SSM}
+1568|un problème controversé|a controversial, contentious issue|${SSM}
+1569|être contre le mariage homosexuel|to oppose gay marriage, to be opposed to gay marriage|${SSM}
+1570|les opposants au mariage homosexuel|opponents, critics of gay marriage|${SSM}
+1571|être pour le mariage homosexuel / favorable au mariage homosexuel|to support gay marriage|${SSM}
+1572|les partisans du mariage homosexuel|advocates, supporters, proponents of gay marriage|${SSM}
+1573|les valeurs conservatrices|conservative values|${SSM}
+1574|un préjugé|a prejudice, a bias|${SSM}
+1575|avoir des préjugés contre qch|be prejudiced, biased against sth|${SSM}
+1576|traditionaliste|traditionalist|${SSM}
+1577|un homophobe|a homophobe|${SSM}
+1578|l’homophobie|homophobia|${SSM}
+1579|des remarques homophobes|homophobic remarks|${SSM}
+1580|être inflexible au sujet du mariage gay|to take a tough line on gay marriage|${SSM}
 
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
