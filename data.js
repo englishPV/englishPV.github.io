@@ -5,6 +5,8 @@ const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verb
 // Constantes ajoutées pour couvrir les variables de la Map Emoji et la fin du texte brut
 const EDU="Education", ECO="Economy", SPO="Sports", GUN="Gun Control", REL="Religion", ENV="Environment", TEC="Technology", MED="Media";
 const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace", SLM="Sex Love Marriage";
+// NOUVELLE CONSTANTE
+const SSM="Same Sex Marriage";
 
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
 const PHY_MAP = {
@@ -47,6 +49,8 @@ const C_EMOJIS = {
   [POL]: '🏛️',   // Politique
   [WP]:  '⚔️',
   [SLM]: '❤️',
+  [SSM]: '🏳️‍🌈',  // Same Sex Marriage (Nouvel Emoji)
+
   // --- Social & Économie ---
   [CI]:  '🧳',   // Immigration
   [CF]:  '♀️',    // Status of Women
@@ -72,12 +76,12 @@ const C_EMOJIS = {
 };
 
 // On rajoute ensuite tes chapitres de physique à cet objet
-Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji)
+Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 
 /* --- RAW DATA CONTENT --- */
 
-// Note : J'utilise String.raw ici aussi par sécurité, bien que moins critique pour l'anglais
+// Note : J'utilise String.raw ici aussi par sécurité
 const RAW_EN = String.raw`
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
@@ -1616,53 +1620,36 @@ const RAW_EN = String.raw`
 1532|cesser d’aimer qn|to fall out of love|${SLM}
 1533|rompre avec qn|to split up with sb, break up with sb|${SLM}
 1534|se séparer de qn|to separate from sb|${SLM}
-1535|divorcer de qn|to get divorced from sb, to divorce sb|${SLM}
-1536|homosexuel|homosexual|${SLM}
-1537|l’homosexualité|homosexuality|${SLM}
-1538|l’orientation sexuelle|sexual orientation|${SLM}
-1539|la majorité sexuelle|the age of consent|${SLM}
-1540|la communauté gay|the gay community|${SLM}
-1541|une lesbienne|a lesbian|${SLM}
-1542|le mouvement des lesbiennes et des gays|the lesbian and gay movement|${SLM}
-1543|bisexuel|bisexual|${SLM}
-1544|un(e) transsexuel(le)|a transexual|${SLM}
-1545|un travesti|a transvestite|${SLM}
-1546|transgenre, transsexuel|transgender|${SLM}
-1547|se déclarer ouvertement homosexuel|to come out (of the closet)|${SLM}
-1548|révéler l’homosexualité de qn (sans son consentement)|to out sb|${SLM}
-1549|les droits des homosexuels|gay rights|${SLM}
-1550|favorable aux homosexuels|gay-friendly|${SLM}
-1551|un hôtel où les homosexuels sont bienvenus|a gay-friendly hotel|${SLM}
-1552|se marier avec qn, épouser qn|to marry sb|${SLM}
-1553|être marié / se marier avec qn|to be / get married to sb|${SLM}
-1554|convoler, se passer la bague au doigt|to tie the knot, to get hitched|${SLM}
-1555|le mariage (institution)|marriage|${SLM}
-1556|un mariage (cérémonie)|a wedding|${SLM}
-1557|un PACS, une union civile|a civil partnership, a civil union, a domestic partnership|${SLM}
-1558|un couple gay|a gay couple|${SLM}
-1559|un compagnon OU une compagne|a partner|${SLM}
-1560|un(e) petit(e) amie(e) avec qui l’on vit|a live-in boyfriend / girlfriend|${SLM}
-1561|s’installer avec qn|to move in with sb|${SLM}
-1562|se mettre en ménage avec qn|to set up house with sb|${SLM}
-1563|une famille homoparentale|same-sex parents, LGBT parents|${SLM}
-1564|l’homoparentalité|same-sex parenting|${SLM}
-1565|légaliser / interdire le mariage homosexuel|to legalize / ban gay marriage|${SLM}
-1566|avoir des opinions progressistes|to have liberal views|${SLM}
-1567|une question controversée, un problème sensible|a hot-button issue|${SLM}
-1568|un problème controversé|a controversial, contentious issue|${SLM}
-1569|être contre le mariage homosexuel|to oppose gay marriage, to be opposed to gay marriage|${SLM}
-1570|les opposants au mariage homosexuel|opponents, critics of gay marriage|${SLM}
-1571|être pour le mariage homosexuel|to support gay marriage|${SLM}
-1572|les partisans du mariage homosexuel|advocates, supporters, proponents of gay marriage|${SLM}
-1573|les valeurs conservatrices|conservative values|${SLM}
-1574|un préjugé|a prejudice, a bias|${SLM}
-1575|avoir des préjugés contre qch|be prejudiced, biased against sth|${SLM}
-1576|traditionaliste|traditionalist|${SLM}
-1577|un homophobe|a homophobe|${SLM}
-1578|l’homophobie|homophobia|${SLM}
-1579|des remarques homophobes|homophobic remarks|${SLM}
-1580|être inflexible au sujet du mariage gay|to take a tough line on gay marriage|${SLM}`;
-
+1536|homosexuel|homosexual|${SSM}
+1537|l’homosexualité|homosexuality|${SSM}
+1538|l’orientation sexuelle|sexual orientation|${SSM}
+1539|la majorité sexuelle|the age of consent|${SSM}
+1540|la communauté gay|the gay community|${SSM}
+1541|une lesbienne|a lesbian|${SSM}
+1542|le mouvement des lesbiennes et des gays|the lesbian and gay movement|${SSM}
+1543|bisexuel|bisexual|${SSM}
+1544|un(e) transsexuel(le)|a transexual|${SSM}
+1545|un travesti|a transvestite|${SSM}
+1546|transgenre, transsexuel|transgender|${SSM}
+1547|se déclarer ouvertement homosexuel|to come out (of the closet)|${SSM}
+1548|révéler l’homosexualité de qn (sans son consentement)|to out sb|${SSM}
+1549|les droits des homosexuels|gay rights|${SSM}
+1550|favorable aux homosexuels|gay-friendly|${SSM}
+1551|un hôtel où les homosexuels sont bienvenus|a gay-friendly hotel|${SSM}
+1552|se marier avec qn, épouser qn|to marry sb|${SSM}
+1553|être marié / se marier avec qn|to be / get married to sb|${SSM}
+1554|convoler, se passer la bague au doigt|to tie the knot, to get hitched|${SSM}
+1555|le mariage (institution)|marriage|${SSM}
+1556|un mariage (cérémonie)|a wedding|${SSM}
+1557|un PACS, une union civile|a civil partnership, a civil union, a domestic partnership|${SSM}
+1558|un couple gay|a gay couple|${SSM}
+1559|un compagnon OU une compagne|a partner|${SSM}
+1560|un(e) petit(e) amie(e) avec qui l’on vit|a live-in boyfriend / girlfriend|${SSM}
+1561|s’installer avec qn|to move in with sb|${SSM}
+1562|se mettre en ménage avec qn|to set up house with sb|${SSM}
+1563|une famille homoparentale|same-sex parents, LGBT parents|${SSM}
+1564|l’homoparentalité|same-sex parenting|${SSM}
+1565|légaliser / interdire le mariage
 
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
