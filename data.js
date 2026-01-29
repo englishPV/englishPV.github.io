@@ -72,7 +72,7 @@ const C_EMOJIS = {
 };
 
 // On rajoute ensuite tes chapitres de physique à cet objet
-Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji)
+Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 
 /* --- RAW DATA CONTENT --- */
