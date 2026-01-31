@@ -1800,6 +1800,7 @@ const RAW_EN = String.raw`
 
 // C'EST ICI QUE LA CORRECTION EST IMPORTANTE : Ajout de String.raw`...`
 const RAW_PHY = String.raw`
+
 ==================================================
 DECK : EM1
 ==================================================
@@ -2958,17 +2959,14 @@ Q: (Shems) Qu'est-ce qu'un referentiel galiléen?
 R: Un référentiel galiléen est un référentiel dans lequel le principe d'inertie est vérifiée, à savoir que tout objet isolé ou pseudiisolé est soit immobile soit en mouvement rectiligne uniforme dans ce référentiel .
 --------------------
 Q: V.Iulian 
-Tout référentiel {{c1::en translation rectiligne et uniforme par}} rapport à un référentiel galiléen est galiléen
-R: 
---------------------
+Tout référentiel [...] rapport à un référentiel galiléen est galiléen
+R: en translation rectiligne et uniforme par--------------------
 Q: V.Iulian
-Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′{{c1::n’est pas galiléen}}
-R: 
---------------------
+Si la translation de R' par rapport a R galiléen n’est pas rectiligne ou pas uniforme, R′[...]
+R: n’est pas galiléen--------------------
 Q: V.Iulian 
-Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen {{c1::n’est jamais galiléen.}}
-R: 
---------------------
+Un référentiel en rotation autour d’un axe fixe d’un référentiel galiléen [...]
+R: n’est jamais galiléen.--------------------
 Q: (MAG)
 >>> [IMAGE_ID: paste-9cd3560a5f9a5c4100721b04ab4c28ceaaaf93e5.jpg] <<<
 R: >>> [IMAGE_ID: paste-5a57528bd9551b29f65139e8d4887065d643d4ac.jpg] <<<
@@ -3574,6 +3572,7 @@ R: Lorsque l'on diminue l'épaisseur de la lame d'air, on diminue le rayon des a
 On fait rentrer les anneaux. On voit de moins en moins d'anneaux.
 Le cas limite est appelé contact optique. On observe alors une seule couleur unie sur tout l'écran appelée teinte plate.
 --------------------
+
 
 
 
