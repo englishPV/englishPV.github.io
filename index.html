@@ -222,12 +222,6 @@
     
     img { opacity: 1 !important; transition: none; }
     /* --- MODE ZEN / IMMERSION --- */
-.zen-mode { --bg: #000000 !important; --surface: #000000 !important; --card: #000000 !important; --text: #e6ecff; }
-.zen-mode .topbar, .zen-mode .revision-bar, .zen-mode .bottom-actions, .zen-mode .progress-bar { display: none !important; }
-.zen-mode .review-card { border: none !important; background: transparent !important; }
-.zen-mode .review-top { opacity: 0.3; margin-top: 20px; font-size: 11px; justify-content: center; gap: 15px; }
-.zen-mode #undoBtn { display: none; } /* On cache le undo pour épurer */
-.zen-exit-btn { position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 50%; color: #fff; border: none; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; backdrop-filter: blur(4px); }
 </style>
 </head>
 <body>
@@ -910,33 +904,15 @@ function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const fT=ppLat(f), bT=ppLat(b), progress=((r.index)/tot)*100;
-  
-  // Gestion du Mode Zen
-  const isZen = data.app.prefs.focusMode; // On utilise la pref "Focus" comme "Zen"
-  const app = $('#app');
-  if(isZen) app.classList.add('zen-mode'); else app.classList.remove('zen-mode');
-
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
   
-  // TTS & Nettoyage texte
-  const currentTextRaw = !r.flipped ? (ff?card.front:card.back) : (ff?card.back:card.front);
-  const cleanSpeak = currentTextRaw.replace(/<[^>]*>/g, '').replace(/\[.*?\]/g, '');
-
   v.innerHTML=`<div class="review-wrap">
-    ${!isZen ? `<div class="progress-bar" style="width:${progress}%"></div>` : ''}
-    
-    <!-- Bouton Exit Zen (visible seulement si Zen actif) -->
-    ${isZen ? `<button id="exitZen" class="zen-exit-btn">✕</button>` : ''}
-
+    <div class="progress-bar" style="width:${progress}%"></div>
     <div class="review-top">
-      <div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi':chap.title}</div>
+      <div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div>
       <div>${idx} / ${tot}</div>
     </div>
-
     <div class="review-card">
-        <!-- Bouton TTS -->
-        <button id="ttsBtn" style="position:absolute; top:10px; right:${isZen?'auto':'10px'}; left:${isZen?'10px':'auto'}; background:rgba(255,255,255,0.1); border:none; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:18px; z-index:10; display:flex; align-items:center; justify-content:center;">🔊</button>
-        
         <div class="review-scroller">
             ${!r.flipped ? 
                 `<div class="term" data-face="${ff?'front':'back'}">${fT}</div>` : 
@@ -946,29 +922,18 @@ function renRev(){
     </div>
   </div>`;
   
-  // Setup et Bindings
+  // Correction Latex & Bindings
   const scroller = v.querySelector('.review-scroller');
   const finishSetup = () => { 
       Media.resolve(v); 
       initGest(); 
       bindSwipeNav(); 
-      
-      $('#ttsBtn').onclick = (e) => { e.stopPropagation(); speakText(cleanSpeak); };
-      
-      // Binding pour quitter le mode Zen temporairement
-      if(isZen && $('#exitZen')) {
-          $('#exitZen').onclick = () => {
-              data.app.prefs.focusMode = false;
-              renRev(); // Recharge l'interface normale
-              saveData();
-          };
-      }
   };
 
   if(scroller) tsLat(scroller).then(finishSetup);
   else finishSetup();
 
-  if(r.history.length && $('#undoBtn')) $('#undoBtn').onclick = undoRev; 
+  if(r.history.length) $('#undoBtn').onclick = undoRev; 
   
   let lastTap = 0;
   $('.review-scroller').addEventListener('click', e => {
@@ -979,9 +944,6 @@ function renRev(){
   });
 
   const bar=$('#reviewActionsBar');
-  // En mode Zen, on affiche quand même la barre d'action mais on peut la styliser différemment si besoin
-  // Ici elle reste en bas (le CSS du zen-mode ne cache pas .review-actions-bar, juste topbar/bottom/revision)
-  
   if(!r.flipped){
       bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
       $('#flipBtn').onclick=()=>{haptic('light');r.flipped=!0;renRev()}
