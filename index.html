@@ -328,12 +328,29 @@ function bindPullRefresh(container, onRefresh) {
 function bindSwipeNav() {
   const wrap = $('.review-wrap'); if(!wrap) return;
   let startX = 0, startY = 0, deltaX = 0;
-  wrap.addEventListener('touchstart', e => { if(e.touches.length!==1)return; startX=e.touches[0].clientX; startY=e.touches[0].clientY; deltaX=0 }, {passive:!0});
-  wrap.addEventListener('touchmove', e => { if(e.touches.length!==1)return; deltaX=e.touches[0].clientX-startX; if(Math.abs(e.touches[0].clientY-startY)>Math.abs(deltaX)) deltaX=0 }, {passive:!0});
+  wrap.addEventListener('touchstart', e => { 
+    if(e.touches.length !== 1) return; 
+    startX = e.touches[0].clientX; 
+    startY = e.touches[0].clientY; 
+    deltaX = 0; 
+  }, {passive:!0});
+  
+  wrap.addEventListener('touchmove', e => { 
+    if(e.touches.length !== 1) return; 
+    deltaX = e.touches[0].clientX - startX; 
+    // On annule si le mouvement est trop vertical
+    if(Math.abs(e.touches[0].clientY - startY) > Math.abs(deltaX)) deltaX = 0; 
+  }, {passive:!0});
+  
   wrap.addEventListener('touchend', () => {
     const r = State.review; if(!r || Math.abs(deltaX) < 80) return;
-    if(deltaX > 0 && r.history.length > 0) { haptic('medium'); undoRev(); }
-    else if(deltaX < 0 && r.flipped) { haptic('light'); toast('Difficile (Swipe)', 'info', 1000); subG('difficile'); }
+    
+    // On ne garde que le Swipe vers la droite pour annuler (Undo)
+    if(deltaX > 0 && r.history.length > 0) { 
+      haptic('medium'); 
+      undoRev(); 
+    }
+    // Le bloc de notation (deltaX < 0) a été supprimé ici
   });
 }
 
