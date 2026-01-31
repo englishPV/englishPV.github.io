@@ -238,7 +238,7 @@
 <script>
 
 /* --- CORE APP LOGIC --- */
-const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2025-10-18-28';
+const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2026-01-31-00';
 
 const GRADES = ['unseen','echec','difficile','bien','facile'];
 const GRADE_INIT = () => ({unseen:0,echec:0,difficile:0,bien:0,facile:0});
@@ -1135,7 +1135,7 @@ function openSet(cid,push=true){
       <div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div>
     </div>
 
-    <div class="settings-footer">Flashcards v${APP_VER}</div>
+    <div class="settings-footer">Flashcards v${APP_VER} \n JB. C</div>
   </div>`;
 
   // --- 1. Rendu LaTeX ---
