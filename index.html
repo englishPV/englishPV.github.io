@@ -13,7 +13,7 @@
       --border: #232a48;
       --fs-term: 20px; --fs-def: 24px; --radius-md: 14px;
       
-      /* Buttons */
+      /* Buttons - Factorisation des styles */
       --btn-neutral-bg: rgba(255,255,255,.06); --btn-neutral-fg: #e6ecff; --btn-neutral-bd: #232a48; --btn-neutral-bg-h: rgba(255,255,255,.10);
       --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 22%,transparent); --btn-soft-primary-bg-h: color-mix(in srgb,var(--primary) 34%,transparent);
       --btn-soft-primary-fg: #dbe4ff; --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 55%,transparent);
@@ -39,7 +39,7 @@
     :root[data-theme="light"] .legend-item { color: #0f172a!important; border-color: #e2e8f0!important; background: 0 0!important; }
     :root[data-theme="light"] .revision-bar, :root[data-theme="light"] .review-actions-bar { background: rgba(241,245,249,.9)!important; border-top: 1px solid #e2e8f0!important; }
     :root[data-theme="light"] .btn--ghost { --btn-bg-h: rgba(0,0,0,.06); }
-    :root[data-theme="light"] .img-counter, :root[data-theme="light"] .img-close { background: rgba(255,255,255,.9); color: #0f172a; }
+    /* Suppression code mort (.img-counter, .img-close inutiles ici ou doublons) */
 
     /* --- RESET & LAYOUT --- */
     * { box-sizing: border-box; }
@@ -85,19 +85,9 @@
     .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; position: relative; z-index: 2; }
     .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #dbe4ff; cursor: pointer; user-select: none; transition: opacity .15s; position: relative; z-index: 2; }
     .legend-item.inactive { opacity: .45; filter: grayscale(20%); }
-    /* Style pour la coche de sélection */
-.legend-item .check-icon { 
-  display: inline-flex; align-items: center; justify-content: center; 
-  width: 18px; height: 18px; margin-right: 6px; border-radius: 4px; 
-  border: 2px solid var(--border); color: transparent; font-size: 12px; font-weight: 900; 
-  transition: 0.2s;
-}
-.legend-item:not(.inactive) .check-icon { 
-  background: var(--primary); border-color: var(--primary); color: #fff; 
-}
-.legend-item.inactive .check-icon {
-  background: transparent;
-}
+    .legend-item .check-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-right: 6px; border-radius: 4px; border: 2px solid var(--border); color: transparent; font-size: 12px; font-weight: 900; transition: 0.2s; }
+    .legend-item:not(.inactive) .check-icon { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .legend-item.inactive .check-icon { background: transparent; }
     .dot { width: 10px; height: 10px; border-radius: 50%; } .dot.gray { background: #9ca3af; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); } .dot.green { background: var(--green); }
     .chart-wrap { display: flex; align-items: center; justify-content: center; height: 200px; position: relative; z-index: 1; } 
     canvas#gradeChart { width: 180px; height: 180px; pointer-events: auto; }
@@ -110,7 +100,6 @@
     .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
     .review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; transition: background-color 0.4s ease; }
     
-    /* Background tints for grading */
     .review-card.tint-facile { background-color: rgba(34, 197, 94, 0.15)!important; }
     .review-card.tint-bien { background-color: rgba(59, 130, 246, 0.15)!important; }
     .review-card.tint-difficile { background-color: rgba(245, 158, 11, 0.15)!important; }
@@ -120,10 +109,10 @@
     .review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
     .term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
-    /* --- Aperçu Typo --- */
-.preview-box { background: var(--card); border: 2px dashed var(--border); border-radius: 14px; margin: 10px 14px; padding: 20px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; gap: 15px; }
-.preview-recto { font-size: var(--fs-term); font-weight: 600; color: var(--text); }
-.preview-verso { font-size: var(--fs-def); font-weight: 900; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px; }
+    
+    .preview-box { background: var(--card); border: 2px dashed var(--border); border-radius: 14px; margin: 10px 14px; padding: 20px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; gap: 15px; }
+    .preview-recto { font-size: var(--fs-term); font-weight: 600; color: var(--text); }
+    .preview-verso { font-size: var(--fs-def); font-weight: 900; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px; }
 
     /* MathJax & Img */
     mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100% !important; display: inline-block !important; padding: 4px 0; white-space: normal !important; vertical-align: middle; }
@@ -160,23 +149,16 @@
     .img-lightbox { position: fixed; inset: 0; display: none; background: 0 0; z-index: 10000; } .img-lightbox.open { display: block; }
     .img-stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; cursor: grab; } .img-canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
     
-    
-    
-    /* --- Nouveaux contrôles Settings --- */
-.s-control { display: flex; align-items: center; gap: 15px; padding: 0 14px 15px; /* Removed background and border-radius to blend */ }
+    .s-control { display: flex; align-items: center; gap: 15px; padding: 0 14px 15px; }
+    .s-slider-container { flex: 1; display: flex; align-items: center; height: 40px; position: relative; }
+    .s-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border); border-radius: 3px; outline: none; cursor: grab; }
+    .s-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.3); margin-top: 0; position: relative; z-index: 2; }
 
-/* Styles Slider CORRIGÉS */
-.s-slider-container { flex: 1; display: flex; align-items: center; height: 40px; position: relative; }
-.s-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border); border-radius: 3px; outline: none; cursor: grab; }
-.s-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.3); margin-top: 0; /* Alignement */ position: relative; z-index: 2; }
-
-/* Styles Stepper (- / +) */
-.s-stepper { display: flex; align-items: center; gap: 10px; background: var(--border); border-radius: 8px; padding: 4px; margin-left: auto; }
-.step-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: var(--surface); color: var(--text); font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.step-btn:active { transform: scale(0.9); background: var(--primary); color: #fff; }
-.step-val { min-width: 30px; text-align: center; font-weight: 900; font-size: 15px; }
+    .s-stepper { display: flex; align-items: center; gap: 10px; background: var(--border); border-radius: 8px; padding: 4px; margin-left: auto; }
+    .step-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: var(--surface); color: var(--text); font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .step-btn:active { transform: scale(0.9); background: var(--primary); color: #fff; }
+    .step-val { min-width: 30px; text-align: center; font-weight: 900; font-size: 15px; }
     
-    /* --- SETTINGS iOS STYLE --- */
     .settings-page { padding: 0 12px; }
     .settings-hero { font-size: 28px; font-weight: 900; padding: 16px 4px 12px; }
     .settings-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
@@ -187,8 +169,7 @@
     .settings-row .s-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; color: #fff; }
     .s-icon.blue { background: #3b82f6; } .s-icon.green { background: #22c55e; } .s-icon.red { background: #ef4444; }
     .s-icon.dynamic { background: var(--primary) !important; transition: background 0.3s ease; }
-/* On garde l'icône rouge pour la zone dangereuse */
-.s-icon.danger { background: var(--red) !important; }.s-icon.purple { background: #8b5cf6; } .s-icon.orange { background: #f59e0b; } .s-icon.gray { background: #6b7280; }
+    .s-icon.danger { background: var(--red) !important; }.s-icon.purple { background: #8b5cf6; } .s-icon.orange { background: #f59e0b; } .s-icon.gray { background: #6b7280; }
     .s-icon.teal { background: #14b8a6; } .s-icon.pink { background: #ec4899; }
     .settings-row .s-label { flex: 1; min-width: 0; }
     .settings-row .s-title { font-weight: 600; font-size: 15px; }
@@ -221,7 +202,6 @@
     .focus-mode .topbar:hover, .focus-mode .review-top:hover { opacity: 1; }
     
     img { opacity: 1 !important; transition: none; }
-    /* --- MODE ZEN / IMMERSION --- */
 </style>
 </head>
 <body>
@@ -246,7 +226,7 @@
 
 <script src="data.js"></script>
 
-<!-- AJOUTEZ CETTE LIGNE ICI : -->
+<!-- MathJax loaded async -->
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 <script>
@@ -268,24 +248,24 @@ const getDayStart = () => { const d = new Date(); d.setHours(0,0,0,0); return d.
 const avg = a => !a?.length ? 0 : a.reduce((x,y)=>x+y,0)/a.length;
 const deepClone = o => JSON.parse(JSON.stringify(o));
 const isSucc = g => g==='facile'||g==='bien';
-const ppLat = s => s ? s.replace(/\[\/?latex\]/gi,'').replace(/\\newline\s*/g,'<br/>') : s;
+// ppLat removed/merged
 const mathCache = new Set();
 const clearMathCache = () => mathCache.clear();
+
+// Optimisation: check regex avant d'appeler MathJax
+const needsMath = s => /[$]|\\[(\[]|\\frac|\\sqrt|\\text/.test(s);
 const tsLat = e => { 
-  if(!W.MathJax?.typesetPromise) return Promise.resolve();
+  if(!W.MathJax?.typesetPromise || (e && !needsMath(e.innerHTML))) return Promise.resolve();
   const id = e?.id || (e?.dataset?.id) || null;
   if(id && mathCache.has(id)) return Promise.resolve();
   if(id) mathCache.add(id);
   return W.MathJax.typesetPromise(e?[e]:null).catch(()=>{});
 };
-const getEmoji = t => C_EMOJIS[t]||'';
+const getEmoji = t => (typeof C_EMOJIS !== 'undefined' ? C_EMOJIS[t] : '') || '';
 const extractId = c => String(c).match(/-(\d+)$/)?.[1]||null;
 const getSides = (c,ch) => ch?.settings?.langSwap ? {f:c.back,b:c.front} : {f:c.front,b:c.back};
 const fmtDur = ms => { const s=M.round(ms/1000); return`${M.floor(s/60)}:${String(s%60).padStart(2,'0')}` };
 function fmtDayFR(k){ const [Y,M,D]=k.split('-').map(Number), d=new Date(Y,M-1,D); return`${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]} ${String(D).padStart(2,'0')} ${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][M-1]} ${Y}` }
-
-/* --- NEW HELPERS (Perf & UX) --- */
-
 
 /* --- UI/UX HELPERS --- */
 function toast(msg, type = 'info', duration = 2500) {
@@ -330,32 +310,24 @@ function bindSwipeNav() {
   let startX = 0, startY = 0, deltaX = 0;
   wrap.addEventListener('touchstart', e => { 
     if(e.touches.length !== 1) return; 
-    startX = e.touches[0].clientX; 
-    startY = e.touches[0].clientY; 
-    deltaX = 0; 
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY; deltaX = 0; 
   }, {passive:!0});
-  
   wrap.addEventListener('touchmove', e => { 
     if(e.touches.length !== 1) return; 
     deltaX = e.touches[0].clientX - startX; 
-    // On annule si le mouvement est trop vertical
     if(Math.abs(e.touches[0].clientY - startY) > Math.abs(deltaX)) deltaX = 0; 
   }, {passive:!0});
-  
   wrap.addEventListener('touchend', () => {
     const r = State.review; if(!r || Math.abs(deltaX) < 80) return;
-    
-    // On ne garde que le Swipe vers la droite pour annuler (Undo)
-    if(deltaX > 0 && r.history.length > 0) { 
-      haptic('medium'); 
-      undoRev(); 
-    }
-    // Le bloc de notation (deltaX < 0) a été supprimé ici
+    if(deltaX > 0 && r.history.length > 0) { haptic('medium'); undoRev(); }
   });
 }
 
-let saveTimeout = null;
-const debouncedSave = () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveData, 2000); };
+// Optimized Debounce
+const debouncedSave = (() => {
+  let t; const c = W.cancelIdleCallback || clearTimeout, r = W.requestIdleCallback || (cb=>setTimeout(cb,2000));
+  return () => { c(t); t = r(saveData); };
+})();
 
 
 W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
@@ -363,43 +335,23 @@ W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'
 function formatText(text) {
     if (!text) return '';
     let formatted = text.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (match, filename) => {
-        const cleanName = filename.trim();
-        return `<img src="images/${cleanName}" alt="Schéma" loading="lazy">`;
+        return `<img src="images/${filename.trim()}" alt="Schéma" loading="lazy">`;
     });
-    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, function(match, content) {
-        if (content.includes(' ')) return content;
-        return match;
-    });
-    formatted = formatted.replace(/\n/g, '<br>');
-    formatted = formatted.replace(/\[latex\]/g, '').replace(/\[\/latex\]/g, '');
-    formatted = formatted.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
+    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
+    formatted = formatted.replace(/\n|\\newline/g, '<br>').replace(/\[latex\]|\[\/latex\]/g, '').replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
     return formatted;
 }
 
 const parsePhysicsData = (rawData) => {
     if (!rawData) return [];
-    const decks = rawData.split(/={10,}\s*DECK\s*:\s*/);
-    const result = [];
-    let idCounter = 0;
+    const decks = rawData.split(/={10,}\s*DECK\s*:\s*/), result = []; let idCounter = 0;
     decks.forEach(deckBlock => {
         if (!deckBlock.trim()) return;
-        const lines = deckBlock.split('\n');
-        const deckCode = lines[0].trim();
-        const deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) ? PHY_MAP[deckCode].title : deckCode;
-        const content = deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim();
-        const cards = content.split(/-{10,}/);
-        cards.forEach(rawCard => {
+        const lines = deckBlock.split('\n'), deckCode = lines[0].trim(), deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) ? PHY_MAP[deckCode].title : deckCode;
+        deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim().split(/-{10,}/).forEach(rawCard => {
             if (!rawCard.trim()) return;
-            const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/);
-            const rMatch = rawCard.match(/R:\s*([\s\S]*)/);
-            if (qMatch && rMatch) {
-                result.push({
-                    id: 'phy-' + (idCounter++),
-                    front: formatText(qMatch[1].trim()),
-                    back: formatText(rMatch[1].trim()),
-                    chapter: deckName
-                });
-            }
+            const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/), rMatch = rawCard.match(/R:\s*([\s\S]*)/);
+            if (qMatch && rMatch) result.push({ id: 'phy-' + (idCounter++), front: formatText(qMatch[1].trim()), back: formatText(rMatch[1].trim()), chapter: deckName });
         });
     });
     return result;
@@ -446,45 +398,35 @@ const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`h
 
 async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
 
+// Lazy load JSZip
 async function impApkg(f){
   try {
+    if(!window.JSZip) {
+      await new Promise((res, rej) => { const s=D.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; s.onload=res; s.onerror=rej; D.head.appendChild(s); });
+    }
     const b = await f.arrayBuffer();
-    let z;
-    try { z = await JSZip.loadAsync(b); } catch(e) { throw new Error("Ce fichier n'est pas un ZIP/APKG valide."); }
-    let mm = {}; 
-    const me = z.file(/^media(\.json)?$/i)[0];
+    let z; try { z = await JSZip.loadAsync(b); } catch(e) { throw new Error("Ce fichier n'est pas un ZIP/APKG valide."); }
+    let mm = {}; const me = z.file(/^media(\.json)?$/i)[0];
     if(me) { try { mm = JSON.parse(await me.async('string')); } catch(e) {} }
     const iId = `apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
     const mnk = {};
-    for(const [ns,rn] of Object.entries(mm)){ 
-        const e = z.file(new RegExp(`^${ns}$`))[0]; 
-        if(!e) continue; 
-        const k = `${iId}/${rn||ns}`; 
-        await Media.save(k, await e.async('blob'), {name:rn||ns}); 
-        mnk[rn] = k; mnk[ns] = k; 
-    }
-    let col = z.file("collection.anki2");
-    if (!col) col = z.file(/collection\.anki2(1|\.db)?/i)[0];
-    if(!col) throw new Error("Fichier de données introuvable dans l'archive.");
+    for(const [ns,rn] of Object.entries(mm)){ const e = z.file(new RegExp(`^${ns}$`))[0]; if(!e) continue; const k = `${iId}/${rn||ns}`; await Media.save(k, await e.async('blob'), {name:rn||ns}); mnk[rn] = k; mnk[ns] = k; }
+    let col = z.file("collection.anki2") || z.file(/collection\.anki2(1|\.db)?/i)[0];
+    if(!col) throw new Error("Fichier de données introuvable.");
     const dbData = new Uint8Array(await col.async('uint8array'));
     const header = String.fromCharCode.apply(null, dbData.subarray(0, 50));
-    if (header.includes("Please update") || header.includes("Anki version")) { alert("Fichier non supporté (Nouveau format Anki). Veuillez exporter avec 'Support anciennes versions'."); return; }
     if (!header.startsWith("SQLite")) { alert("Format inconnu."); return; }
     const SQL = await ensureSQL();
-    let db;
-    try { db = new SQL.Database(dbData); } catch(sqlErr) { throw new Error("Base de données corrompue."); }
-    let dk = {};
-    try { const r = db.exec('select decks from col limit 1'); if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}'); } catch(e) {}
-    let rows;
-    try { rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid'); } catch(e) { db.close(); throw new Error("Erreur DB."); }
+    let db; try { db = new SQL.Database(dbData); } catch(sqlErr) { throw new Error("Base de données corrompue."); }
+    let dk = {}; try { const r = db.exec('select decks from col limit 1'); if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}'); } catch(e) {}
+    let rows; try { rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid'); } catch(e) { db.close(); throw new Error("Erreur DB."); }
     if(!rows || !rows[0]) { db.close(); throw new Error("Paquet vide."); }
     const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
     for(const r of vals){ 
         const row = Object.fromEntries(cols.map((c,i) => [c,r[i]]));
         const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › ');
         const fl = (row.flds||'').split('\x1f');
-        let frontVal = fl[0] || 'Vide';
-        let backVal = fl[1] || '';
+        let frontVal = fl[0] || 'Vide'; let backVal = fl[1] || '';
         if (row.ord == 1 && fl.length >= 2) { frontVal = fl[1]; backVal = fl[0]; } 
         if (fl.length > 2) { backVal += '<br><br>' + fl.slice(2).join('<br>'); }
         const ca = byD.get(dn) || []; 
@@ -499,7 +441,7 @@ async function impApkg(f){
     }
     const sj = { id: `import-${slugify(f.name)}`, title: f.name.replace(/\.[^.]+$/,''), chapters: chs, imported: !0 }; 
     data.subjects.push(sj); data.app.currentSubjectId = sj.id; saveData();
-  } catch(e) { console.error(e); alert("Erreur import : " + e.message); }
+  } catch(e) { alert("Erreur import : " + e.message); }
 }
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
@@ -548,7 +490,6 @@ const getSub = () => data.subjects.find(x=>x.id===data.app.currentSubjectId)||da
 const setSub = id => { if(data.subjects.find(s=>s.id===id)){data.app.currentSubjectId=id;saveData()} };
 const getChs = () => getSub()?.chapters||[];
 const updChDesc = c => { 
-  // Priorité à l'émoji personnalisé, sinon émoji automatique par nom, sinon rien
   const e = c.emoji || getEmoji(c.title) || ''; 
   c.description = (e ? e + ' ' : '') + c.title; 
 };
@@ -584,21 +525,13 @@ function remGrp(s,gid,ids){ const g=findGrp(s,gid); if(g)g.chapIds=g.chapIds.fil
 function delGrp(s,gid){ s.groups=ensGrps(s).filter(g=>g.id!==gid) }
 
 const Nav = {
-  stack: [],
-  scrollPos: 0,
-  push(){ 
-    // Sauvegarder la position de scroll actuelle
-    const list = $('#dL');
-    this.scrollPos = list ? list.scrollTop : 0;
-    this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos})) 
-  },
+  stack: [], scrollPos: 0,
+  push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos})) },
   back(){ 
-    if(!this.stack.length)return; 
-    const p=this.stack.pop(); 
+    if(!this.stack.length)return; const p=this.stack.pop(); 
     if(!this.stack.length||(!p.chapterId?.startsWith('group-')))State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
-    this.scrollPos = p.scrollPos || 0;
-    render(!1) 
+    this.scrollPos = p.scrollPos || 0; render(!1) 
   },
   clear(){ this.stack=[]; this.scrollPos=0 }
 };
@@ -610,123 +543,48 @@ const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id);
 
 /* --- DEADLINE & LOGIC --- */
 function getDeckTint(item, type) {
-    // 1. Récupérer les stats
-    let k;
-    if (type === 'chapter') k = item.stats.gradeCounts || getLive(item);
-    else k = buildGrpStats(getSub(), item).counts;
-
+    let k; if (type === 'chapter') k = item.stats.gradeCounts || getLive(item); else k = buildGrpStats(getSub(), item).counts;
     const totalGraded = k.echec + k.difficile + k.bien + k.facile;
-    
-    // -- COULEUR DE BASE (Moyenne des notes) --
-    // Rouge (Fail) : 239, 68, 68
-    // Bleu (Bien)  : 59, 130, 246
-    // Vert (Easy)  : 34, 197, 94
-    
     let r = 0, g = 0, b = 0, a = 0;
-
     if (totalGraded > 0) {
-        const wRed = (k.echec + k.difficile) / totalGraded;
-        const wBlue = k.bien / totalGraded;
-        const wGreen = k.facile / totalGraded;
-
+        const wRed = (k.echec + k.difficile) / totalGraded, wBlue = k.bien / totalGraded, wGreen = k.facile / totalGraded;
         r = (239 * wRed) + (59 * wBlue) + (34 * wGreen);
         g = (68 * wRed) + (130 * wBlue) + (197 * wGreen);
         b = (68 * wRed) + (246 * wBlue) + (94 * wGreen);
-        a = 0.25; // Opacité de base pour la couleur du deck
+        a = 0.25;
     }
-
-    // -- COUCHE URGENCE (Date limite) --
     if (item.deadline) {
-        const now = new Date(); now.setHours(0,0,0,0);
-        const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
-        const diff = (ddl - now) / 864e5; // Jours restants
-
-        // Calcul de l'intensité du rouge (0 = pas d'urgence, 1 = urgence max)
-        let urgency = 0;
-        
-        if (diff <= 0) urgency = 1;      // Aujourd'hui ou retard (bien que retard soit supprimé au chargement)
-        else if (diff <= 7) urgency = 1 - (diff / 7); // Dégradé sur 7 jours
-        
+        const now = new Date(); now.setHours(0,0,0,0); const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
+        const diff = (ddl - now) / 864e5; let urgency = 0;
+        if (diff <= 0) urgency = 1; else if (diff <= 7) urgency = 1 - (diff / 7);
         if (urgency > 0) {
-            // Cible Rouge Urgence
             const tR = 239, tG = 68, tB = 68;
-            
-            if (totalGraded === 0) {
-                // Si tout est "Non vu", on part du transparent vers le rouge
-                r = tR; g = tG; b = tB;
-                a = 0.5 * urgency; // Max opacité 0.5
-            } else {
-                // Si on a une couleur de base, on l'écrase progressivement
-                r = r * (1 - urgency) + tR * urgency;
-                g = g * (1 - urgency) + tG * urgency;
-                b = b * (1 - urgency) + tB * urgency;
-                
-                // L'opacité augmente aussi pour devenir plus "solide"
-                a = 0.25 + (0.25 * urgency); 
-            }
+            if (totalGraded === 0) { r = tR; g = tG; b = tB; a = 0.5 * urgency; } else { r = r * (1 - urgency) + tR * urgency; g = g * (1 - urgency) + tG * urgency; b = b * (1 - urgency) + tB * urgency; a = 0.25 + (0.25 * urgency); }
         }
     }
-
     if (a <= 0.01) return '';
     return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
 }
 
-
-// Nettoie les dates dépassées
 function checkExpiredDates(list) {
-    const now = new Date(); 
-    now.setHours(0,0,0,0); // On compare à minuit aujourd'hui
-    let changed = false;
-    
-    list.forEach(item => {
-        if (item.deadline) {
-            const ddl = new Date(item.deadline);
-            ddl.setHours(0,0,0,0);
-            // Si la date limite est strictement avant aujourd'hui, on l'enlève
-            if (ddl < now) {
-                item.deadline = null;
-                changed = true;
-            }
-        }
-    });
+    const now = new Date(); now.setHours(0,0,0,0); let changed = false;
+    list.forEach(item => { if (item.deadline) { const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0); if (ddl < now) { item.deadline = null; changed = true; } } });
     return changed;
 }
 
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
-    
-    const now = new Date(); now.setHours(0,0,0,0);
-    const ddl = new Date(ch.deadline); ddl.setHours(0,0,0,0);
-    const diffTime = ddl - now;
-    // Nombre de jours inclusifs (si c'est pour demain, days=1)
-    let days = Math.ceil(diffTime / 864e5);
-    
-    // Si c'est aujourd'hui ou en retard, on considère qu'il reste "1 jour de travail" (aujourd'hui)
-    if (days <= 0) days = 1;
-
+    const now = new Date(); now.setHours(0,0,0,0); const ddl = new Date(ch.deadline); ddl.setHours(0,0,0,0);
+    let days = Math.ceil((ddl - now) / 864e5); if (days <= 0) days = 1;
     const k = ch.stats.gradeCounts || getLive(ch);
-    
-    // Pool 1 : Non vues + Echec + Difficile
-    let pool = k.unseen + k.echec + k.difficile;
-    let label = "cartes (Mauvaises)";
-    
-    // Pool 2 : Si tout est vu et correct, on perfectionne les "Bien"
-    if (pool === 0) {
-        pool = k.bien;
-        label = "cartes (Bien)";
-        
-        // Si vraiment tout est facile
-        if (pool === 0) return { val: 0, text: "Objectif atteint !", pool: 0 };
-    }
-    
-    // Calcul par jour
-    const daily = Math.ceil(pool / days);
-    
-    return { val: daily, text: `${label} / jour`, pool: pool };
+    let pool = k.unseen + k.echec + k.difficile, label = "cartes (Mauvaises)";
+    if (pool === 0) { pool = k.bien; label = "cartes (Bien)"; if (pool === 0) return { val: 0, text: "Objectif atteint !", pool: 0 }; }
+    return { val: Math.ceil(pool / days), text: `${label} / jour`, pool: pool };
 }
-/* --- NAVIGATION & UI --- */
 
+/* --- NAVIGATION & UI --- */
 const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), revBar=$('#revisionBar'), startBtn=$('#startReviewBtn');
+const chipHtml = k => `<span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span>`;
 
 function renSubMenu(){
   let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
@@ -752,67 +610,84 @@ const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 function goDeck(push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache();
-  if(push) Nav.push(); 
-  State.view='deck'; State.chapterId=null; 
-  const s=getSub(); 
-  setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); 
-  setBot({actions:!1, revision:!1}); hideRevAct();
-
-  let needsSave = false;
-  if (checkExpiredDates(ensGrps(s))) needsSave = true;
-  if (checkExpiredDates(s.chapters)) needsSave = true;
-  if (needsSave) debouncedSave();
+  if(push) Nav.push(); State.view='deck'; State.chapterId=null; 
+  const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); setBot({actions:!1, revision:!1}); hideRevAct();
+  let needsSave = false; if (checkExpiredDates(ensGrps(s))) needsSave = true; if (checkExpiredDates(s.chapters)) needsSave = true; if (needsSave) debouncedSave();
 
   const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
-  const sorter = (a, b) => {
-      if (a.deadline && !b.deadline) return -1;
-      if (!a.deadline && b.deadline) return 1;
-      if (a.deadline && b.deadline) { const diff = new Date(a.deadline) - new Date(b.deadline); if (diff !== 0) return diff; }
-      return (b.lastUsed || 0) - (a.lastUsed || 0);
-  };
+  const sorter = (a, b) => { if (a.deadline && !b.deadline) return -1; if (!a.deadline && b.deadline) return 1; if (a.deadline && b.deadline) { const diff = new Date(a.deadline) - new Date(b.deadline); if (diff !== 0) return diff; } return (b.lastUsed || 0) - (a.lastUsed || 0); };
+  grps.sort(sorter); const visibleChs = chs.filter(c=>!inG.has(c.id)).sort(sorter);
 
-  grps.sort(sorter);
-  const visibleChs = chs.filter(c=>!inG.has(c.id)).sort(sorter);
-
-  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0; const tint = getDeckTint(g, 'group'); return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${c.echec}</span><span class="chip">🟨 ${c.difficile}</span><span class="chip">🟦 ${c.bien}</span><span class="chip">🟩 ${c.facile}</span><span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0; const tint = getDeckTint(c, 'chapter'); return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span><span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
+  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0; const tint = getDeckTint(g, 'group'); return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}"><div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${g.title?((g.emoji?g.emoji+' ':'')+g.title):`📁 Fichier (${grpEmojis(s,g)})`}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span>${chipHtml(c)}<span class="folder-badge">• ${g.chapIds.length} chap.</span></div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0; const tint = getDeckTint(c, 'chapter'); return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?`background-color:${tint};transition:background-color 0.3s`:''}">${c.imported?`<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="${c.id}">Supprimer</button></div>`:''}<div class="slide"><div style="min-width:0;flex:1"><div class="title-line" style="font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px">${c.description||c.title}</div><div class="mt6" style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip-pie" style="--progress:${pct}%"></span>${chipHtml(k)}</div></div><div class="muted" style="font-size:18px;padding-left:8px">›</div></div></div>`}).join('')}</div></div></div>`;
   
   $('#impB').onclick=()=>$('#impI').click(); 
-  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { console.error(x); toast('Erreur import', 'error'); } finally { e.target.value=''; } }; 
-  
+  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } }; 
   if(!push && Nav.scrollPos > 0) { setTimeout(() => { const list = $('#dL'); if(list) list.scrollTop = Nav.scrollPos; }, 50); }
   const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
   bindDeck();
 }
-function bindDeck(){
-  const l=$('#dL'); if(!l)return; const sub=getSub(); l.onclick=e=>{if(e.target.matches('.delCh')){e.stopPropagation();if(delImpCh(e.target.dataset.cid))goDeck(!1)}};
-  $$('.deck-item').forEach(el=>{
-    const t=el.dataset.type, id=el.dataset.id; let sx=0, sy=0, dx=0, dy=0, st='idle', tm, g, raf, sd=0;
-    const auto=()=>{if(sd!==0)l.scrollTop+=6*sd;if(st==='dragging')raf=requestAnimationFrame(auto)};
-    const mG=(x,y)=>{if(g)g.style.transform=`translate(${x-75}px,${y-75}px) scale(1.02)`};
-    
-    // Modification: Swipe plus strict et gestion pointer capture
-    const d=e=>{
-        if(e.target.closest('button'))return;
-        sx=e.clientX;sy=e.clientY;dx=dy=0;st='pressed';
-        clearTimeout(tm);
-        // NE PAS capturer le pointer sur Android pour permettre le scroll natif
-        if(!/android/i.test(navigator.userAgent)) el.setPointerCapture?.(e.pointerId);
 
-        if(t==='chapter')tm=setTimeout(()=>{st='dragging';el.classList.add('dragging-origin');D.body.classList.add('dragging-active');l.classList.add('scroll-lock');openSubMenu();g=el.cloneNode(!0);g.className='drag-ghost';g.style.width=el.offsetWidth+'px';D.body.appendChild(g);mG(sx,sy);raf=requestAnimationFrame(auto)},500);else if(t==='group')tm=setTimeout(()=>{st='idle';if(confirm("Décomposer ?"))delGrp(sub,id);saveData();goDeck(!1)},700)
-    };
-    
-    const m=e=>{if(st==='idle'||st==='swiping')return;dx=e.clientX-sx;dy=e.clientY-sy;if(st==='pressed'&&M.abs(dx)>10){clearTimeout(tm);if(dx<0&&el.querySelector('.right-action')){st='swiping';el.classList.add('reveal-delete');e.preventDefault()}}else if(st==='dragging'){e.preventDefault();mG(e.clientX,e.clientY);const r=l.getBoundingClientRect();sd=e.clientY<r.top+r.height*.2?-1:(e.clientY>r.bottom-r.height*.2?1:0);$$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item,.subject-item');if(tg&&tg!==el)tg.classList.add('drop-target')}};
-    
-    const u=e=>{
-        clearTimeout(tm);
-        if(st==='dragging'){const sEl=D.elementFromPoint(e.clientX,e.clientY)?.closest('.subject-item');if(sEl){const to=sEl.dataset.id;if(to&&to!==sub.id&&moveCh(sub.id,id,to))setSub(to)}else{const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item');if(tg&&tg!==el)hDrop(sub,{type:t,id},{type:tg.dataset.type,id:tg.dataset.id})}goDeck(!1)}
-        // Modification: Seuil plus strict pour le click (hypot < 8 et dy < 6)
-        else if(st==='pressed' && M.hypot(dx,dy)<8 && M.abs(dy)<6){if(t==='group')openGrp(sub,id);else goChapter(id)}
-        
-        cancelAnimationFrame(raf);st='idle';if(g)g.remove();g=null;el.classList.remove('dragging-origin');D.body.classList.remove('dragging-active');l.classList.remove('scroll-lock');$$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));closeSubMenu()
-    };
-    el.addEventListener('pointerdown',d); el.addEventListener('pointermove',m); el.addEventListener('pointerup',u); el.addEventListener('pointercancel',u); el.oncontextmenu=e=>e.preventDefault()
-  }); l.onscroll=()=>{$$('.reveal-delete').forEach(n=>n.classList.remove('reveal-delete'))}
+// Optimized Event Delegation for Deck List
+function bindDeck(){
+  const l=$('#dL'); if(!l)return; const sub=getSub();
+  l.onclick=e=>{if(e.target.matches('.delCh')){e.stopPropagation();if(delImpCh(e.target.dataset.cid))goDeck(!1)}};
+
+  let sx=0, sy=0, dx=0, dy=0, st='idle', tm, g, raf, sd=0, el=null, t=null, id=null;
+  const auto=()=>{if(sd!==0)l.scrollTop+=6*sd;if(st==='dragging')raf=requestAnimationFrame(auto)};
+  const mG=(x,y)=>{if(g)g.style.transform=`translate(${x-75}px,${y-75}px) scale(1.02)`};
+
+  const onDown = e => {
+      if(e.target.closest('button')) return;
+      el = e.target.closest('.deck-item'); if(!el) return;
+      t = el.dataset.type; id = el.dataset.id;
+      sx=e.clientX; sy=e.clientY; dx=dy=0; st='pressed'; clearTimeout(tm);
+      if(!/android/i.test(navigator.userAgent)) el.setPointerCapture?.(e.pointerId);
+
+      if(t==='chapter') tm=setTimeout(()=>{
+          st='dragging'; el.classList.add('dragging-origin'); D.body.classList.add('dragging-active'); l.classList.add('scroll-lock'); openSubMenu();
+          g=el.cloneNode(!0); g.className='drag-ghost'; g.style.width=el.offsetWidth+'px'; D.body.appendChild(g); mG(sx,sy); raf=requestAnimationFrame(auto)
+      }, 500);
+      else if(t==='group') tm=setTimeout(()=>{ st='idle'; if(confirm("Décomposer ?")) { delGrp(sub,id); saveData(); goDeck(!1); } }, 700);
+      
+      l.addEventListener('pointermove', onMove); l.addEventListener('pointerup', onUp); l.addEventListener('pointercancel', onUp);
+  };
+
+  const onMove = e => {
+      if(st==='idle'||st==='swiping') return;
+      dx=e.clientX-sx; dy=e.clientY-sy;
+      if(st==='pressed'&&M.abs(dx)>10){
+          clearTimeout(tm);
+          if(dx<0&&el.querySelector('.right-action')){ st='swiping'; el.classList.add('reveal-delete'); e.preventDefault(); }
+      } else if(st==='dragging'){
+          e.preventDefault(); mG(e.clientX,e.clientY); const r=l.getBoundingClientRect();
+          sd = e.clientY<r.top+r.height*.2 ? -1 : (e.clientY>r.bottom-r.height*.2 ? 1 : 0);
+          $$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));
+          const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item,.subject-item');
+          if(tg&&tg!==el) tg.classList.add('drop-target');
+      }
+  };
+
+  const onUp = e => {
+      clearTimeout(tm);
+      l.removeEventListener('pointermove', onMove); l.removeEventListener('pointerup', onUp); l.removeEventListener('pointercancel', onUp);
+
+      if(st==='dragging'){
+          const sEl=D.elementFromPoint(e.clientX,e.clientY)?.closest('.subject-item');
+          if(sEl){ const to=sEl.dataset.id; if(to&&to!==sub.id&&moveCh(sub.id,id,to)) setSub(to); }
+          else{ const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item'); if(tg&&tg!==el) hDrop(sub,{type:t,id},{type:tg.dataset.type,id:tg.dataset.id}); }
+          goDeck(!1);
+      } else if(st==='pressed' && M.hypot(dx,dy)<8 && M.abs(dy)<6){
+          if(t==='group') openGrp(sub,id); else goChapter(id);
+      }
+      cancelAnimationFrame(raf); st='idle'; if(g) g.remove(); g=null;
+      if(el) el.classList.remove('dragging-origin'); 
+      D.body.classList.remove('dragging-active'); l.classList.remove('scroll-lock');
+      $$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target')); closeSubMenu();
+      el = null;
+  };
+  
+  l.addEventListener('pointerdown', onDown);
+  l.onscroll=()=>{$$('.reveal-delete').forEach(n=>n.classList.remove('reveal-delete'))}
 }
 function hDrop(s,src,dst){
   if(src.type!=='chapter')return; const sG=findGrpCh(s,src.id);
@@ -823,58 +698,27 @@ function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buil
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
-  
   const dailyCalc = getDailyGoalCalc(c);
-  
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${GRADES.map(x=>{
-  const act = sel[x]; // Est-ce que ce grade est sélectionné ?
-  const color = x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green')));
-  const label = x.charAt(0).toUpperCase() + x.slice(1);
-  
-  return `<div class="legend-item ${act?'':'inactive'}" data-key="${x}">
-    <span class="check-icon">${act?'✓':''}</span>
-    <span class="dot ${color}"></span> 
-    <span style="flex:1">${label}</span>
-    <b class="count">${k[x]}</b>
-  </div>`
-}).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">🔥 Streak</div><div class="value">${getStreak(c)} j</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div>
-  
-  <div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span>
-        <input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}">
-    </div>
-    ${dailyCalc ? `<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size || dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>` : ''}
-  </div>
-
-  <div class="bar7-wrap mt8"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
-  
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="kpi"><div class="k"><div class="label">Non vues</div><div class="value">${k.unseen}</div></div><div class="k"><div class="label">Total</div><div class="value">${c.cards.length}</div></div></div><div class="chart-wrap"><canvas id="gradeChart" width="180" height="180"></canvas></div><div class="legend" id="legend">${GRADES.map(x=>{const act = sel[x], color = x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green'))), label = x.charAt(0).toUpperCase() + x.slice(1); return `<div class="legend-item ${act?'':'inactive'}" data-key="${x}"><span class="check-icon">${act?'✓':''}</span><span class="dot ${color}"></span><span style="flex:1">${label}</span><b class="count">${k[x]}</b></div>`}).join('')}</div><div class="kpi mt8"><div class="k"><div class="label">Auj.</div><div class="value">${getTod(c)}</div></div><div class="k"><div class="label">🔥 Streak</div><div class="value">${getStreak(c)} j</div></div></div><div class="kpi mt8"><div class="k"><div class="label">Réussite</div><div class="value">${getSucc(c)}%</div></div><div class="k"><div class="label">Moy. 7j</div><div class="value">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc ? `<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size || dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>` : ''}</div><div class="bar7-wrap mt8"><div class="label" style="color:var(--primary)">Activité 7j</div><canvas id="bar7" width="220" height="60"></canvas><div class="bar7-labels" id="bar7Labels"></div></div></div>`;
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); drawBars('bar7',getLastN(c,7)); $('#bar7').onclick=e=>opDayBar(e,'bar7',c.id); $('#bar7Labels').innerHTML=getLbls(7).map((j,i)=>`<div onclick="goDaily('${c.id}','${dayKeyIdx(7,i)}')">${j.substring(0,3)}</div>`).join('');
-  
-  $('#deadlineInput').onchange = (e) => {
-      const val = e.target.value;
-      if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.deadline = val; } else { c.deadline = val; }
-      debouncedSave(); goChapter(c.id, false); 
-  };
+  $('#deadlineInput').onchange = (e) => { const val = e.target.value; if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.deadline = val; } else { c.deadline = val; } debouncedSave(); goChapter(c.id, false); };
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
 /* --- RECHERCHE --- */
 async function goCards(cid,push=true){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); 
-  State.view='cards'; State.chapterId=cid; 
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
   const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
   v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
   const render = async (q='') => {
-    const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const cleanQ = norm(q);
+    const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
     let filtered = [];
     if (!cleanQ) { filtered = pool; } else {
         const scored = pool.map(x => {
             const {f,b} = getSides(x,c); const tf = norm(f); const tb = norm(b);
-            const fStart = tf.startsWith(cleanQ); const bStart = tb.startsWith(cleanQ); const fIn = tf.includes(cleanQ); const bIn = tb.includes(cleanQ);
+            const fStart = tf.startsWith(cleanQ), bStart = tb.startsWith(cleanQ), fIn = tf.includes(cleanQ), bIn = tb.includes(cleanQ);
             if (!fIn && !bIn) return null;
             let score = 2; let len = 100000; 
             if (fStart || bStart) { score = 1; len = Math.min(fStart ? tf.length : 100000, bStart ? tb.length : 100000); } else { score = 2; len = Math.min(fIn ? tf.length : 100000, bIn ? tb.length : 100000); }
@@ -883,19 +727,13 @@ async function goCards(cid,push=true){
         scored.sort((a, b) => { if (a.score !== b.score) return a.score - b.score; return a.len - b.len; });
         filtered = scored.map(s => s.card);
     }
-    const grid = $('#gridCont');
-    grid.innerHTML = '';
-    
-    // CORRECTION : Création via DOM pour éviter l'imbrication si balises non fermées
-    if(filtered.length === 0) {
-       grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`;
-    } else {
+    const grid = $('#gridCont'); grid.innerHTML = '';
+    if(filtered.length === 0) { grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`; } 
+    else {
        filtered.forEach(x => {
-          const {f,b} = getSides(x,c);
-          const el = D.createElement('div');
-          el.className = `card-block grade-${x.grade||'unseen'}`;
-          el.dataset.id = x.id;
-          el.innerHTML = `<div class="term">${ppLat(f)}</div><div class="definition">${ppLat(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
+          const {f,b} = getSides(x,c), el = D.createElement('div');
+          el.className = `card-block grade-${x.grade||'unseen'}`; el.dataset.id = x.id;
+          el.innerHTML = `<div class="term">${formatText(f)}</div><div class="definition">${formatText(b)}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
           grid.appendChild(el);
        });
     }
@@ -910,7 +748,7 @@ async function goDaily(cid,k,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='daily'; State.chapterId=cid; State.dailyKey=k; const c=getCh(cid), sub=getSub(); setTop({title:`Activité • ${fmtDayFR(k)}`}); setBot({actions:!1,revision:!1});
   const log=c.virtual?(findGrp(sub,c._groupId)?getLogGrp(sub,findGrp(sub,c._groupId),k):[]):(c.stats.dailyLog[k]||[]), v=$('#view'); if(!log.length){v.innerHTML=`<div class="card"><div class="section-title">Activité ${fmtDayFR(k)}</div><div class="muted">Aucune donnée.</div></div>`;return}
   log.sort((a,b)=>a.ts-b.ts); const byC=new Map(); for(const e of log){const cur=byC.get(e.cardId)||{f:e.prev,l:e.next,ts:e.ts,lts:e.ts,_c:e._chapId};if(e.ts>cur.lts){cur.l=e.next;cur.lts=e.ts}byC.set(e.cardId,cur)}
-  const rows=[...byC].map(([id,i])=>{const ch=c.virtual?_real(i._c):c,card=ch.cards.find(x=>x.id===id);return card?{t:ppLat(getSides(card,ch).f),d:ppLat(getSides(card,ch).b),b:i.f,a:i.l}:null}).filter(Boolean);
+  const rows=[...byC].map(([id,i])=>{const ch=c.virtual?_real(i._c):c,card=ch.cards.find(x=>x.id===id);return card?{t:formatText(getSides(card,ch).f),d:formatText(getSides(card,ch).b),b:i.f,a:i.l}:null}).filter(Boolean);
   v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Activité ${fmtDayFR(k)}</div><div id="dayL" class="scroll-y" style="flex:1"><div class="list">${rows.map(r=>`<div class="grid2"><div class="card-block grade-${r.b}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div><div class="card-block grade-${r.a}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div></div>`).join('')}</div></div></div>`;
   await Media.resolve(v); await tsLat(v); $('#dayL').onclick=e=>{const b=e.target.closest('.card-block');if(b)b.classList.toggle('flipped')}
 }
@@ -920,36 +758,18 @@ function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push
 
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
-  const fT=ppLat(f), bT=ppLat(b), progress=((r.index)/tot)*100;
+  const fT=formatText(f), bT=formatText(b), progress=((r.index)/tot)*100;
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
   
   v.innerHTML=`<div class="review-wrap">
     <div class="progress-bar" style="width:${progress}%"></div>
-    <div class="review-top">
-      <div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div>
-      <div>${idx} / ${tot}</div>
-    </div>
-    <div class="review-card">
-        <div class="review-scroller">
-            ${!r.flipped ? 
-                `<div class="term" data-face="${ff?'front':'back'}">${fT}</div>` : 
-                `<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`
-            }
-        </div>
-    </div>
+    <div class="review-top"><div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div>
+    <div class="review-card"><div class="review-scroller">${!r.flipped ? `<div class="term" data-face="${ff?'front':'back'}">${fT}</div>` : `<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div>
   </div>`;
   
-  // Correction Latex & Bindings
   const scroller = v.querySelector('.review-scroller');
-  const finishSetup = () => { 
-      Media.resolve(v); 
-      initGest(); 
-      bindSwipeNav(); 
-  };
-
-  if(scroller) tsLat(scroller).then(finishSetup);
-  else finishSetup();
-
+  const finishSetup = () => { Media.resolve(v); initGest(); bindSwipeNav(); };
+  if(scroller) tsLat(scroller).then(finishSetup); else finishSetup();
   if(r.history.length) $('#undoBtn').onclick = undoRev; 
   
   let lastTap = 0;
@@ -970,40 +790,23 @@ function renRev(){
   }
 }
 
-
-
 function goRecap(push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh(State.review.multiChaps[0]); setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
-  
-  // --- MODIFICATION: Suppression de la stat "Objectif" ---
   $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
-  
   $('#contBtn').onclick=()=>startRev(c.id,!1)
 }
 function startRev(cid,push=true){
   if(!cid)return; const c=getCh(cid); 
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push);
-  
-  // --- MODIFICATION START (Daily Goal Locking) ---
   if(c.deadline) {
       const dayStart = getDayStart();
-      // Recalculer seulement si pas de cache ou cache périmé
-      if(!c._goalCache || c._goalCache.day !== dayStart) {
-          const calc = getDailyGoalCalc(c);
-          c._goalCache = { day: dayStart, size: calc?.val || 10, pool: calc?.pool || 0 };
-      }
+      if(!c._goalCache || c._goalCache.day !== dayStart) { const calc = getDailyGoalCalc(c); c._goalCache = { day: dayStart, size: calc?.val || 10, pool: calc?.pool || 0 }; }
       c.settings.sessionSize = c._goalCache.size;
   }
-  // --- MODIFICATION END ---
-
   const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); 
   if(!pool.length){alert('Aucune carte.');return}
-  
-  // UPDATE LAST USED
-  c.lastUsed = Date.now();
-  saveData();
-
+  c.lastUsed = Date.now(); saveData();
   const q=bldQ(c,pool,c.settings.sessionSize); 
   State.review={chapterId:cid,queue:q.map(x=>x.id),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; 
   goReview(push)
@@ -1011,14 +814,7 @@ function startRev(cid,push=true){
 function startRevMulti(ids,vid,flt,push=true){
   const all=ids.map(_real).filter(Boolean), pool=[]; all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen'])pool.push({chapId:ch.id,card:c})})); if(!pool.length){alert('Aucune carte.');return}
   const scored=pool.map(i=>{const g=i.card.grade||'unseen',base={unseen:6,echec:5,difficile:3.5,bien:2,facile:1}[g]||1,due=(i.card.dueAt&&i.card.dueAt>0)?(Date.now()-i.card.dueAt>0?(1+M.min(3,(Date.now()-i.card.dueAt)/864e5)):0.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(0.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w), sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
-  
-  // UPDATE LAST USED FOR GROUP
-  if(vid.startsWith('group-')){
-     const sub = getSub();
-     const g = findGrp(sub, vid.replace('group-',''));
-     if(g) { g.lastUsed = Date.now(); saveData(); }
-  }
-
+  if(vid.startsWith('group-')){ const sub = getSub(); const g = findGrp(sub, vid.replace('group-','')); if(g) { g.lastUsed = Date.now(); saveData(); } }
   State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],start:Date.now(),end:null,cardStart:Date.now()}; goReview(push)
 }
 
@@ -1027,10 +823,7 @@ function bldQ(c,pool,sz){
   const nc=[], lc=[], dr=[], ot=[];
   pool.forEach(x=>{
       const g=x.grade||'unseen';
-      if(g==='unseen') nc.push(x);
-      else if(g==='echec'||g==='difficile') lc.push(x);
-      else if(x.dueAt<=Date.now()) dr.push(x);
-      else ot.push(x);
+      if(g==='unseen') nc.push(x); else if(g==='echec'||g==='difficile') lc.push(x); else if(x.dueAt<=Date.now()) dr.push(x); else ot.push(x);
   });
   return [...sh(lc),...sh(dr),...sh(nc),...sh(ot)].slice(0,sz)
 }
@@ -1047,24 +840,9 @@ function undoRev(){
   
 function subG(nxt){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
-  
-  // CORRECTION : Flash Couleur de fond au lieu de l'image (Teinte douce)
   haptic(nxt === 'facile' ? 'success' : nxt === 'echec' ? 'error' : 'light'); 
-  
   const cardEl = $('.review-card');
-  if(cardEl) {
-    // Retire toutes les anciennes teintes
-    cardEl.classList.remove('tint-facile', 'tint-bien', 'tint-difficile', 'tint-echec');
-    // Force le reflow pour relancer l'animation si besoin (astuce)
-    void cardEl.offsetWidth;
-    // Ajoute la nouvelle teinte
-    cardEl.classList.add(`tint-${nxt}`);
-    
-    // Retire la teinte après un court délai
-    setTimeout(() => {
-        cardEl.classList.remove(`tint-${nxt}`);
-    }, 400);
-  }
+  if(cardEl) { cardEl.classList.remove('tint-facile', 'tint-bien', 'tint-difficile', 'tint-echec'); void cardEl.offsetWidth; cardEl.classList.add(`tint-${nxt}`); setTimeout(() => cardEl.classList.remove(`tint-${nxt}`), 400); }
 
   r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length });
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
@@ -1098,7 +876,6 @@ function togFilt(c,k){
   else { s[k]=!s[k]; if(!s[k]&&actCnt===1) s[k]=!0; }
 }
 const getPreviewTxt = () => {
-    // On cherche dans les chapitres de Physique
     const phy = data.subjects.find(s => s.title.toLowerCase().includes('physique')) || data.subjects[0];
     const allCards = phy.chapters.flatMap(ch => ch.cards).filter(c => !c.front.includes('<img') && !c.back.includes('<img'));
     if (!allCards.length) return { f: "La constante de Planck", b: "h = 6,626 x 10⁻³⁴ J.s" };
@@ -1107,221 +884,52 @@ const getPreviewTxt = () => {
 };
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
-  const isDark = data.app.theme==='dark';
-  const hasDeadline = !!c.deadline;
-  const prev = getPreviewTxt();
+  const isDark = data.app.theme==='dark'; const prev = getPreviewTxt();
   
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1">
     <div class="settings-hero">Paramètres</div>
+    <div class="settings-section"><div class="section-title">Chapitre</div><div class="settings-row" id="rowTitle"><div class="s-icon dynamic">✏️</div><div class="s-label"><div class="s-title">Nom du chapitre</div><div class="s-sub">${c.title}</div></div><div class="s-chevron">›</div></div><div class="settings-row" id="rowEmoji"><div class="s-icon dynamic">😊</div><div class="s-label"><div class="s-title">Emoji</div></div><div class="s-value">${c.emoji || getEmoji(c.title) || 'Aucun'}</div><div class="s-chevron">›</div></div><div class="settings-row" id="rowLang"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Ordre des langues</div><div class="s-sub">${c.settings.langSwap?'Verso → Recto':'Recto → Verso'}</div></div><div class="s-chevron">›</div></div></div>
+    <div class="settings-section"><div class="section-title">Apparence</div><div class="settings-row" id="rowTheme"><div class="s-icon dynamic">🌓</div><div class="s-label"><div class="s-title">Mode sombre</div></div><div class="s-toggle ${isDark?'on':''}"></div></div><div class="settings-row" id="rowFocus"><div class="s-icon dynamic">🎯</div><div class="s-label"><div class="s-title">Mode Immersion (Zen)</div><div class="s-sub">Interface invisible en révision</div></div><div class="s-toggle ${P.focusMode?'on':''}"></div></div><div class="settings-row" style="cursor:default"><div class="s-icon dynamic">🎨</div><div class="s-label"><div class="s-title">Couleur</div></div><div class="swatches">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div></div>
+    <div class="settings-section"><div class="section-title">Typographie (Aperçu direct)</div><div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">Aa</div><div class="s-label"><div class="s-title">Taille Recto</div></div><div class="s-value" id="valT">${P.fsTerm}px</div></div><div class="s-control"><button class="step-btn" id="subT">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldT" min="12" max="60" value="${P.fsTerm}"></div><button class="step-btn" id="addT">+</button></div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">Aa</div><div class="s-label"><div class="s-title">Taille Verso</div></div><div class="s-value" id="valD">${P.fsDef}px</div></div><div class="s-control"><button class="step-btn" id="subD">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldD" min="14" max="72" value="${P.fsDef}"></div><button class="step-btn" id="addD">+</button></div></div>
+    <div class="settings-section"><div class="section-title">Session</div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">📚</div><div class="s-label"><div class="s-title">Taille session</div><div class="s-sub">Nombre de cartes par révision</div></div><div class="s-value" id="valS">${c.settings.sessionSize}</div></div><div class="s-control"><button class="step-btn" id="subS">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldS" min="1" max="200" value="${c.settings.sessionSize}"></div><button class="step-btn" id="addS">+</button></div></div>
+    <div class="settings-section"><div class="section-title">Données</div><div class="settings-row" id="rowExp"><div class="s-icon dynamic">📤</div><div class="s-label"><div class="s-title">Exporter</div><div class="s-sub">Sauvegarder toutes les données</div></div><div class="s-chevron">›</div></div><div class="settings-row" id="rowImp"><div class="s-icon dynamic">📥</div><div class="s-label"><div class="s-title">Importer</div><div class="s-sub">Restaurer une sauvegarde</div></div><div class="s-chevron">›</div></div><input type="file" id="impF" class="hidden"></div>
+    <div class="settings-section"><div class="section-title">Zone dangereuse</div><div class="settings-row" id="rowRstC"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Réinitialiser ce chapitre</div><div class="s-sub">Remettre toutes les cartes à "Non vu"</div></div></div><div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div></div>
+    <div class="settings-footer">Flashcards v${APP_VER}<br><span style="opacity: 0.7; font-size: 0.9em;">JB. C</span></div></div>`;
 
-    <div class="settings-section">
-      <div class="section-title">Chapitre</div>
-      <div class="settings-row" id="rowTitle"><div class="s-icon dynamic">✏️</div><div class="s-label"><div class="s-title">Nom du chapitre</div><div class="s-sub">${c.title}</div></div><div class="s-chevron">›</div></div>
-      <div class="settings-row" id="rowEmoji"><div class="s-icon dynamic">😊</div><div class="s-label"><div class="s-title">Emoji</div></div><div class="s-value">${c.emoji || getEmoji(c.title) || 'Aucun'}</div><div class="s-chevron">›</div></div>
-      <div class="settings-row" id="rowLang"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Ordre des langues</div><div class="s-sub">${c.settings.langSwap?'Verso → Recto':'Recto → Verso'}</div></div><div class="s-chevron">›</div></div>
-    </div>
-
-    <div class="settings-section">
-      <div class="section-title">Apparence</div>
-      <div class="settings-row" id="rowTheme"><div class="s-icon dynamic">🌓</div><div class="s-label"><div class="s-title">Mode sombre</div></div><div class="s-toggle ${isDark?'on':''}"></div></div>
-      <div class="settings-row" id="rowFocus"><div class="s-icon dynamic">🎯</div><div class="s-label"><div class="s-title">Mode Immersion (Zen)</div>
-<div class="s-sub">Interface invisible en révision</div><div class="s-sub">Masque l'interface en révision</div></div><div class="s-toggle ${P.focusMode?'on':''}"></div></div>
-      <div class="settings-row" style="cursor:default">
-        <div class="s-icon dynamic">🎨</div>
-        <div class="s-label"><div class="s-title">Couleur</div></div>
-        <div class="swatches">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="section-title">Typographie (Aperçu direct)</div>
-      <div class="preview-box">
-        <div class="preview-recto" id="preT"></div>
-        <div class="preview-verso" id="preD"></div>
-      </div>
-      
-      <!-- TAILLE RECTO -->
-      <div class="settings-row" style="cursor:default; border-bottom:none;">
-        <div class="s-icon dynamic">Aa</div>
-        <div class="s-label"><div class="s-title">Taille Recto</div></div>
-        <div class="s-value" id="valT">${P.fsTerm}px</div>
-      </div>
-      <div class="s-control">
-         <button class="step-btn" id="subT">-</button>
-         <div class="s-slider-container" style="margin:0 10px; flex:1">
-            <input type="range" class="s-slider" id="sldT" min="12" max="60" value="${P.fsTerm}">
-         </div>
-         <button class="step-btn" id="addT">+</button>
-      </div>
-
-      <!-- TAILLE VERSO -->
-      <div class="settings-row" style="cursor:default; border-bottom:none;">
-        <div class="s-icon dynamic">Aa</div>
-        <div class="s-label"><div class="s-title">Taille Verso</div></div>
-        <div class="s-value" id="valD">${P.fsDef}px</div>
-      </div>
-      <div class="s-control">
-         <button class="step-btn" id="subD">-</button>
-         <div class="s-slider-container" style="margin:0 10px; flex:1">
-            <input type="range" class="s-slider" id="sldD" min="14" max="72" value="${P.fsDef}">
-         </div>
-         <button class="step-btn" id="addD">+</button>
-      </div>
-    </div>
-
-    <!-- SESSION (Slider + Boutons 1 par 1) -->
-    <div class="settings-section">
-      <div class="section-title">Session</div>
-      <div class="settings-row" style="cursor:default; border-bottom:none;">
-        <div class="s-icon dynamic">📚</div>
-        <div class="s-label"><div class="s-title">Taille session</div><div class="s-sub">Nombre de cartes par révision</div></div>
-        <div class="s-value" id="valS">${c.settings.sessionSize}</div>
-      </div>
-      <div class="s-control">
-         <button class="step-btn" id="subS">-</button>
-         <div class="s-slider-container" style="margin:0 10px; flex:1">
-            <input type="range" class="s-slider" id="sldS" min="1" max="200" value="${c.settings.sessionSize}">
-         </div>
-         <button class="step-btn" id="addS">+</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="section-title">Données</div>
-      <div class="settings-row" id="rowExp"><div class="s-icon dynamic">📤</div><div class="s-label"><div class="s-title">Exporter</div><div class="s-sub">Sauvegarder toutes les données</div></div><div class="s-chevron">›</div></div>
-      <div class="settings-row" id="rowImp"><div class="s-icon dynamic">📥</div><div class="s-label"><div class="s-title">Importer</div><div class="s-sub">Restaurer une sauvegarde</div></div><div class="s-chevron">›</div></div>
-      <input type="file" id="impF" class="hidden">
-    </div>
-
-    <div class="settings-section">
-      <div class="section-title">Zone dangereuse</div>
-      <div class="settings-row" id="rowRstC"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Réinitialiser ce chapitre</div><div class="s-sub">Remettre toutes les cartes à "Non vu"</div></div></div>
-      <div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div>
-    </div>
-
-    <div class="settings-footer">
-      Flashcards v${APP_VER}<br>
-      <span style="opacity: 0.7; font-size: 0.9em;">JB. C</span>
-    </div>
-  </div>`;
-
-  // --- 1. Rendu LaTeX ---
   const preBox = v.querySelector('.preview-box');
-  $('#preT').innerHTML = ppLat(prev.f);
-  $('#preD').innerHTML = ppLat(prev.b);
-  Media.resolve(preBox);
-  tsLat(preBox);
-
-  // --- 2. Helper Générique pour Slider + Boutons ---
-  // Permet de gérer la typo ET la session avec la même logique
+  $('#preT').innerHTML = formatText(prev.f); $('#preD').innerHTML = formatText(prev.b); Media.resolve(preBox); tsLat(preBox);
   const setupControl = (sldId, subId, addId, valId, obj, prop, suffix = '', cssVar = null, fontPrev = null) => {
       const sld = $(sldId), sub = $(subId), add = $(addId), val = $(valId), pre = fontPrev ? $(fontPrev) : null;
-      
       const update = (v) => {
-          v = parseInt(v);
-          const min = parseInt(sld.min), max = parseInt(sld.max);
-          if(v < min) v = min; 
-          if(v > max) v = max;
-          
-          obj[prop] = v;
-          sld.value = v;
-          val.textContent = v + suffix;
-          
-          if(cssVar) D.documentElement.style.setProperty(cssVar, v + 'px');
-          if(pre) pre.style.fontSize = v + 'px';
+          v = parseInt(v); const min = parseInt(sld.min), max = parseInt(sld.max); if(v < min) v = min; if(v > max) v = max;
+          obj[prop] = v; sld.value = v; val.textContent = v + suffix;
+          if(cssVar) D.documentElement.style.setProperty(cssVar, v + 'px'); if(pre) pre.style.fontSize = v + 'px';
       };
-
-      sld.oninput = () => update(sld.value);
-      sld.onchange = () => { debouncedSave(); haptic('light'); };
-
+      sld.oninput = () => update(sld.value); sld.onchange = () => { debouncedSave(); haptic('light'); };
       sub.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) - 1); debouncedSave(); haptic('light'); };
       add.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) + 1); debouncedSave(); haptic('light'); };
   };
 
-  // --- 3. Initialisation des contrôles ---
-  
-  // Font Recto
   setupControl('#sldT', '#subT', '#addT', '#valT', P, 'fsTerm', 'px', '--fs-term', '#preT');
-  // Font Verso
   setupControl('#sldD', '#subD', '#addD', '#valD', P, 'fsDef', 'px', '--fs-def', '#preD');
-  // Session Size
   setupControl('#sldS', '#subS', '#addS', '#valS', c.settings, 'sessionSize', '');
 
-  // --- 4. Bindings Classiques ---
-  
-  $('#rowTitle').onclick=()=>{
-    const t=prompt('Nouveau titre:', c.title);
-    if(t && t.trim()){
-      const newTitle = t.trim();
-      if(c.virtual && c._groupId){
-        const g = findGrp(getSub(), c._groupId);
-        if(g) g.title = newTitle;
-        c.title = newTitle;
-      } else {
-        const real = _real(c.id);
-        if(real) real.title = newTitle;
-        c.title = newTitle;
-      }
-      updChDesc(c);
-      debouncedSave();
-      openSet(cid, !1);
-    }
-  };
-
-  $('#rowEmoji').onclick=()=>{
-    const emojiActuel = c.emoji || getEmoji(c.title) || '';
-    const e = prompt('Emoji (laissez vide pour l\'émoji par défaut) :', emojiActuel);
-    if (e !== null) {
-      const newEmoji = e.trim();
-      if (c.virtual && c._groupId) {
-        const g = findGrp(getSub(), c._groupId);
-        if (g) g.emoji = newEmoji;
-        c.emoji = newEmoji;
-      } else {
-        const real = _real(c.id);
-        if (real) real.emoji = newEmoji;
-        c.emoji = newEmoji;
-      }
-      updChDesc(c);
-      debouncedSave();
-      openSet(cid, !1);
-    }
-  };
-
+  $('#rowTitle').onclick=()=>{ const t=prompt('Nouveau titre:', c.title); if(t && t.trim()){ const newTitle = t.trim(); if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.title = newTitle; c.title = newTitle; } else { const real = _real(c.id); if(real) real.title = newTitle; c.title = newTitle; } updChDesc(c); debouncedSave(); openSet(cid, !1); } };
+  $('#rowEmoji').onclick=()=>{ const emojiActuel = c.emoji || getEmoji(c.title) || ''; const e = prompt('Emoji (laissez vide pour l\'émoji par défaut) :', emojiActuel); if (e !== null) { const newEmoji = e.trim(); if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.emoji = newEmoji; c.emoji = newEmoji; } else { const real = _real(c.id); if (real) real.emoji = newEmoji; c.emoji = newEmoji; } updChDesc(c); debouncedSave(); openSet(cid, !1); } };
   $('#rowLang').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;debouncedSave();openSet(cid,!1)};
   $('#rowTheme').onclick=()=>{data.app.theme=isDark?'light':'dark';debouncedSave();applyTh();openSet(cid,!1)};
   $('#rowFocus').onclick=()=>{P.focusMode=!P.focusMode;debouncedSave();openSet(cid,!1)};
-  
-  $$('.swatch').forEach(b=>b.onclick=e=>{
-    e.stopPropagation();
-    P.accent=b.dataset.accent;
-    debouncedSave();
-    applyUI();
-    $$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b));
-    $$('.s-icon.dynamic').forEach(icon => { icon.style.background = `var(--primary)`; });
-    haptic('light');
-  });
-  
+  $$('.swatch').forEach(b=>b.onclick=e=>{ e.stopPropagation(); P.accent=b.dataset.accent; debouncedSave(); applyUI(); $$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b)); $$('.s-icon.dynamic').forEach(icon => { icon.style.background = `var(--primary)`; }); haptic('light'); });
   $('#rowExp').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()};
   $('#rowImp').onclick=()=>$('#impF').click();
   $('#impF').onchange=async e=>{if(confirm("Écraser toutes les données ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}};
-  
   $('#rowRstC').onclick=()=>{if(confirm('Réinitialiser ce chapitre ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:GRADE_INIT(),totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}};
   $('#rowRstA').onclick=async()=>{if(confirm('⚠️ Supprimer TOUTES les données ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}};
 }
 
-// Fonction générique pour les steppers
-function setupStepper(subBtn, addBtn, valDisplay, obj, prop, min, max, step) {
-    $(subBtn).onclick = (e) => { e.stopPropagation(); let v = obj[prop]; v -= step; if(v < min) v = min; obj[prop] = v; $(valDisplay).textContent = v; debouncedSave(); haptic('light'); };
-    $(addBtn).onclick = (e) => { e.stopPropagation(); let v = obj[prop]; v += step; if(v > max) v = max; obj[prop] = v; $(valDisplay).textContent = v; debouncedSave(); haptic('light'); };
-}
-
-function bindW(el,{get,set,min,max,step=1}){ const val=el.querySelector('.wheel-value'), ren=()=>val.textContent=get(), com=()=>{saveData();applyUI()}; ren(); let sy=null, sv=null; const pd=e=>{e.preventDefault();e.stopPropagation()}; el.onpointerdown=e=>{sy=e.clientY;sv=get();el.setPointerCapture?.(e.pointerId);pd(e)}; el.onpointermove=e=>{if(sy==null)return;set(sv+M.round((sy-e.clientY)/6)*step);ren();applyUI();pd(e)}; el.onpointerup=()=>{if(sy!=null)com();sy=null}; el.onwheel=e=>{e.preventDefault();set(get()+(e.deltaY>0?-step:step));ren();com()} }
 function initGest(){ const s=$('.review-scroller'); if(s)$$('img',s).forEach(i=>i.onclick=e=>{e.preventDefault();openLB(i,s)}); bindSz() }
-
 function bindSz() {
-    const elements = $$('.review-card .term, .review-card .definition');
-    const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
+    const elements = $$('.review-card .term, .review-card .definition'); const getDist = (t) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
     elements.forEach(el => {
         let startDist = 0; let startVal = 0; const isTerm = el.classList.contains('term');
         el.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { if (e.cancelable) e.preventDefault(); startDist = getDist(e.touches); startVal = isTerm ? data.app.prefs.fsTerm : data.app.prefs.fsDef; } }, { passive: false });
@@ -1336,14 +944,12 @@ function reconcile(){ const c=buildCanon(), o=data.subjects||[]; data.subjects=c
 function upgrade(){ if(!data.app)data.app={theme:'dark'}; data.app.prefs={fsTerm:22,fsDef:24,accent:'indigo',radius:14,...(data.app.prefs||{})}; data.subjects.forEach(s=>{valGrps(s);s.emoji=s.emoji||'';s.chapters.forEach(c=>{c.emoji=c.emoji||'';updChDesc(c);c.stats.dailyLog=c.stats.dailyLog||{};syncG(c)})}) }
 function init(){ 
   Media.open(); 
-  setInterval(saveData, 30000); // Backup toutes les 30s
-  data=loadData(); 
-  if(data.app?.version!==APP_VER){reconcile();data.app.version=APP_VER;saveData()} 
+  setInterval(saveData, 30000); 
+  data=loadData(); if(data.app?.version!==APP_VER){reconcile();data.app.version=APP_VER;saveData()} 
   pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1) 
 }
 
 init();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </body>
 </html>
