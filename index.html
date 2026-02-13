@@ -105,8 +105,7 @@
     .review-card.tint-difficile { background-color: rgba(245, 158, 11, 0.15)!important; }
     .review-card.tint-echec { background-color: rgba(239, 68, 68, 0.15)!important; }
 
-    .review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: none; }
-    .review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
+    .review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: text; }.review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
     .term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; } 
     .definition { font-size: var(--fs-def)!important; font-weight: 900; }
     
@@ -308,19 +307,105 @@ function bindPullRefresh(container, onRefresh) {
 
 function bindSwipeNav() {
   const wrap = $('.review-wrap'); if(!wrap) return;
+  const card = wrap.querySelector('.review-card'); if(!card) return;
+  const scroller = wrap.querySelector('.review-scroller');
+
   let startX = 0, startY = 0, deltaX = 0;
-  wrap.addEventListener('touchstart', e => { 
-    if(e.touches.length !== 1) return; 
-    startX = e.touches[0].clientX; startY = e.touches[0].clientY; deltaX = 0; 
-  }, {passive:!0});
-  wrap.addEventListener('touchmove', e => { 
-    if(e.touches.length !== 1) return; 
-    deltaX = e.touches[0].clientX - startX; 
-    if(Math.abs(e.touches[0].clientY - startY) > Math.abs(deltaX)) deltaX = 0; 
-  }, {passive:!0});
+  let mode = 'idle'; // 'idle','undecided','swiping','scrolling','selecting','animating'
+
+  const hasSelection = () => {
+    const sel = window.getSelection();
+    return sel && sel.toString().length > 0;
+  };
+
+  wrap.addEventListener('touchstart', e => {
+    if(e.touches.length !== 1 || mode === 'animating') return;
+
+    // Si du texte est déjà sélectionné → on bloque le swipe
+    if(hasSelection()) { mode = 'selecting'; return; }
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    deltaX = 0;
+    mode = 'undecided';
+    card.style.transition = 'none';
+  }, {passive: true});
+
+  wrap.addEventListener('touchmove', e => {
+    if(e.touches.length !== 1) return;
+    if(mode !== 'undecided' && mode !== 'swiping') return;
+
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+
+    if(mode === 'undecided') {
+      // Si du texte a été sélectionné pendant le toucher → mode sélection
+      if(hasSelection()) { mode = 'selecting'; return; }
+
+      // Mouvement vertical dominant → scroll normal, pas de swipe
+      if(Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) {
+        mode = 'scrolling';
+        return;
+      }
+      // Mouvement horizontal suffisant → c'est un swipe
+      if(Math.abs(dx) > 12) {
+        mode = 'swiping';
+        // On empêche la sélection de texte pendant le swipe
+        window.getSelection()?.removeAllRanges();
+        if(scroller) {
+          scroller.style.userSelect = 'none';
+          scroller.style.webkitUserSelect = 'none';
+        }
+      }
+    }
+
+    if(mode !== 'swiping') return;
+
+    deltaX = dx;
+    const r = State.review;
+    const canGoBack = r && r.history && r.history.length > 0;
+
+    // Swipe droite suit le doigt (si possible), sinon résistance
+    // Swipe gauche = résistance seulement (pas d'action)
+    let tx = deltaX > 0
+      ? (canGoBack ? deltaX : deltaX * 0.15)
+      : deltaX * 0.15;
+
+    card.style.transform = `translateX(${tx}px) rotate(${tx * 0.015}deg)`;
+    card.style.opacity = String(Math.max(0.5, 1 - Math.abs(tx) / 500));
+  }, {passive: true});
+
   wrap.addEventListener('touchend', () => {
-    const r = State.review; if(!r || Math.abs(deltaX) < 80) return;
-    if(deltaX > 0 && r.history.length > 0) { haptic('medium'); undoRev(); }
+    // Restaurer la sélection de texte
+    if(scroller) {
+      scroller.style.userSelect = '';
+      scroller.style.webkitUserSelect = '';
+    }
+
+    if(mode === 'swiping') {
+      const r = State.review;
+      const canGoBack = r && r.history && r.history.length > 0;
+
+      if(deltaX > 80 && canGoBack) {
+        // La carte s'envole vers la droite (comme Reigns)
+        mode = 'animating';
+        card.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
+        card.style.transform = `translateX(${window.innerWidth + 100}px) rotate(12deg)`;
+        card.style.opacity = '0';
+        setTimeout(() => { haptic('medium'); undoRev(); }, 200);
+      } else {
+        // Snap-back élastique vers la position initiale
+        card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out';
+        card.style.transform = '';
+        card.style.opacity = '';
+        setTimeout(() => { card.style.transition = ''; }, 350);
+        mode = 'idle';
+      }
+    } else {
+      mode = 'idle';
+    }
+
+    deltaX = 0;
   });
 }
 
@@ -833,10 +918,11 @@ function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.
 
 function undoRev(){
   const r = State.review; if(!r.history.length) return;
-  const snap = r.history.pop(); r.index = snap.idx; 
-  const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState; 
+  const snap = r.history.pop(); r.index = snap.idx;
+  const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState;
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
-  r.flipped = true; saveData(); renRev();
+  r.flipped = false;  // ← CORRIGÉ : la carte apparaît côté recto
+  saveData(); renRev();
 }
   
 function subG(nxt){
