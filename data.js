@@ -9,7 +9,11 @@ const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace", SL
 const SSM="Same Sex Marriage";
 
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
+/* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
 const PHY_MAP = {
+  // --- Électrocinétique ---
+  "EL1": { title: "Electrocinetique Sup", emoji: "🔌" },
+
   // --- Mécanique ---
   "M1": { title: "M1 - Cinématique du point", emoji: "🚀" },
   "M2": { title: "M2 - Dynamique & Énergétique", emoji: "🎢" },
@@ -22,7 +26,12 @@ const PHY_MAP = {
   "O3": { title: "O3 - Interférences (Young)", emoji: "🌈" },
   "O4": { title: "O4 - Michelson", emoji: "🔬" },
 
-  // --- Électromagnétisme (Ordre Logique) ---
+  // --- Thermodynamique ---
+  "THS": { title: "Thermo Sup", emoji: "🔥" },
+  "T1": { title: "T1", emoji: "🌡️" },
+  "T2": { title: "T2", emoji: "⚙️" },
+
+  // --- Électromagnétisme ---
   "EM1": { title: "EM1 - Symétries & Invariances", emoji: "📐" },
   "EM2": { title: "EM2 - Champ & Potentiel", emoji: "⚡" },
   "EM 3, 4 et 5": { title: "EM3/4/5 - Théorème de Gauss", emoji: "∫" },
@@ -34,7 +43,14 @@ const PHY_MAP = {
   "EM12": { title: "EM12 - Énergétique & Poynting", emoji: "🔋" },
   "EM13": { title: "EM13 - Propagation (Conducteurs)", emoji: "🔌" },
   "EM14": { title: "EM14 - Plasmas", emoji: "☀️" },
-  "EM15": { title: "EM15 - Rayonnement Dipolaire", emoji: "📡" }
+  "EM15": { title: "EM15 - Rayonnement Dipolaire", emoji: "📡" },
+
+  // --- Physique Moderne & Chimie ---
+  "MQ1": { title: "MQ MPI", emoji: "🧩" },
+  "CH1": { title: "Reaction Acide Base", emoji: "🧪" },
+  
+  // --- Divers ---
+  "TD1": { title: "TD 02/03", emoji: "📝" }
 };
 
 // Fusion des Emojis
@@ -3572,6 +3588,960 @@ R: Lorsque l'on diminue l'épaisseur de la lame d'air, on diminue le rayon des a
 On fait rentrer les anneaux. On voit de moins en moins d'anneaux.
 Le cas limite est appelé contact optique. On observe alors une seule couleur unie sur tout l'écran appelée teinte plate.
 --------------------
+==================================================
+DECK : Electrocinetique Sup
+==================================================
+
+Q: <span style="color: rgb(0, 255, 0);">Enzo M. : Rappeler la loi des noeuds (ou 1ère loi de KIRCHHOFF)
+R: La somme des intensités entrantes au niveau d'un noeuds est la même que la somme des intensités sortantes.
+>>> [IMAGE_ID: paste-a875116a7e9cde9cfbf5e0ccac0068dba8cc26e8.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(ALI) Donner les impédances complexes d'une résistance, d'un condensateur et d'une bobine
+R: [latex]
+\begin{itemize}
+\item Pour une résistance : $\underline{Z_R} = R$
+\item Pour un condensateur : $\underline{Z_C} = \frac{1}{jC\omega}$
+\item Pour une bobine: $\underline{Z_L} = jL\omega$
+\end{itemize}
+[/latex]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Thomas S) Donner le temps caractéristique d'un circuit RC série.
+R: \(\tau\) = RC
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Thomas S) Quelles sont les 5 étapes de résolution d'une équation différentielle ?
+R: - Résolution de l'équation homogène
+- Trouver la solution particulière
+- Exprimer la solution générale
+- Utilisation des conditions initiales (si eq. diff. de t) ou conditions les conditions aux limites (si éq. diff. d'une coordonnée de l'espace)
+- Exprimer la solution
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Thomas S) Exprimer le temps caractéristique d'un circuit RL série
+R: \(\tau\) = L / R
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Thomas S) Donner la méthode générale pour faire un bilan d'énergie dans un circuit électrique
+R: On multiplie la loi des mailles par i.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Thomas S) Donner 3 méthodes graphiques pour déterminer \(\tau\)
+R: - Tracer la tangente en 0, l'intersection entre la tangente et l'asymptote se fait en t= \(\tau\)
+- On multiplie le max (resp. la tension initiale) par 0.63 (resp. par 0.37). Cette valeur est atteinte en \(\tau\)
+- Le temps de réponse à 5% est égal à 3 \(\tau\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Thomas B. : 
+>>> [IMAGE_ID: Resistance_serie.jpg] <<<
+Que vaut R<sub>eq</sub> dans cette situation ?
+R: R<sub>eq</sub> = R<sub>1</sub> + R<sub>2</sub>
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Thomas B. :
+>>> [IMAGE_ID: Resistance_derivation.jpg] <<<
+Quelle relation est vérifiée par R<sub>eq</sub> ?
+R: 1/R<sub>eq</sub> = 1/R<sub>1</sub> + 1/R<sub>2</sub>
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Thomas B. :
+>>> [IMAGE_ID: Pont_diviseur_tension.jpg] <<<
+Donner la relation vérifiée par U<sub>1</sub>.
+R: >>> [IMAGE_ID: Reponse.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Yannick) En régime stationnaire, que deviennent le condensateur et la bobine ?
+R: Condensateur : interrupteur ouvert
+Bobine : fil
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Yannick) Que peut on dire au sujet de la tension aux bornes d'un condensateur et de l'intensité du courant à travers une bobine ?
+R: Ces deux gandeurs sont continues.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Yannick) Dans un circuit du premier ordre, quel est la durée du régime transitoire ?
+R: 5𝜏 (système à environ 1% de son régime permanent)
+3𝜏 (Le système à environ 5% de son régime permanent)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Yannick) Donner l'expression de l'énergie stockée pour un condensateur et pour une bobine
+R: Condensateur : 1/2 Cu²
+Bobine : 1/2 Li²
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Polynôme caractéristique de l'équation différentielle linéaire d'ordre 2 d'un oscillateur amorti?
+R: \[r^2+\frac{\omega_0}{Q}r+\omega_0^2=0\]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Ylan.M) 
+Etablir l'équation différentielle d'un circuit LC série en fonction de la tension aux bornes du condensateur et donner l'expression de la pulsation propre.
+>>> [IMAGE_ID: circuit_lc.png] <<<
+R: <div style="text-align: center;">
+\[\begin{align*}
+\quad & E = U_L + U_C \quad \text{(loi des mailles)}\\
+\quad & E = L\frac{di(t)}{dt} + U_C(t)\quad \text{(loi de comportement de la bobine)}  \\
+ \quad & \frac{E}{LC} = \frac{d^2U_C(t)}{dt^2} + \frac{U_C}{LC} \quad \text{(loi de comportement du condensateur)} \\ 
+\quad & {\omega_0^2 E} = \frac{d^2U_C(t)}{dt^2} +{\omega_0^2 U_C}
+\end{align*}\]
+\[\text{avec } \omega_0 = \frac{1}{\sqrt{LC}}  \]<div style="text-align: center;">
+<div style="text-align: center;">\[\text{On a également la période propre } T_0=\frac{2\pi}{\omega_0}  \]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) Définition d'un signal périodique
+R: Un signal s est périodique s'il existe une période T tel que, pour tout instant t, s(t + T) = s(t)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG) Définition de la valeur moyenne d'un signal périodique
+R: La valeur moyenne d'un signal s(t) de période T est définie par :
+>>> [IMAGE_ID: paste-56aebc31db44e9d93c215d00112bf878c4a56ce5.jpg] <<<
+avec t0 une valeur arbitraire de t.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-743958c0904d925a12665b574b91a2cc9b47492c.jpg] <<<
+R: >>> [IMAGE_ID: paste-20774f5297ef4a9db5493c39c01414d95b01ab1a.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-4614d20ae09b3d2e954a251b660db8e509ef7fc0.jpg] <<<
+R: >>> [IMAGE_ID: paste-a9fade0521a66e2190b0f3bd077583d74186cd96.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG) 
+>>> [IMAGE_ID: paste-a1b33d92be280d5327038721267a3ce75b498c39.jpg] <<<
+R: >>> [IMAGE_ID: paste-a5de9621785538ff1a8bd34e0b9c8c5e12065ae5.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Adrien) Etablir l'équation differentielle verifié par la tension aux bornes d'un condensateur pour un circuit RC série.
+R: On obtient :
+\(\frac{dUc}{dt} + \frac{1}{\tau} Uc = \frac {E}{\tau}\)
+Avec:
+-\(\tau = RC\)
+-\(Uc\) la tension aux bornes du condensateur
+-\(E \) la tension aux bornes du generateur (\(E=0\) si il n'y a pas de generateur)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Ylan)
+\[\text{Etablir l'équation différentielle d'un circuit RLC série en fonction de } U_C(t) \text{ et donner l'expression de la pulsation propre }\omega_0 \text{ et du facteur de qualité Q}\]<div style="text-align: center;">
+>>> [IMAGE_ID: circuit_rlc.png] <<<
+R: <div style="text-align: center;">Pour un circuit RLC série, on a :<div style="text-align: center;">
+\[\begin{align*}
+E &= U_R + U_L + U_C \quad  \\
+E &= Ri(t) + L\frac{di(t)}{dt} + U_C\text{ (loi de comportement de la résistance et de la bobine)} \\
+E &= RC\frac{dU_C(t)}{dt} + LC\frac{d^2U_C(t)}{dt^2} + U_C\text{ (loi de comportement du condensateur)} \\
+\frac{E}{LC} &= \frac{d^2U_C(t)}{dt^2} + \frac{R}{L}\frac{dU_C(t)}{dt} + \frac{U_C}{LC} \\
+{\omega_0^2 E } &= \frac{d^2U_C(t)}{dt^2} + \frac{\omega_0}{Q}\frac{dU_C(t)}{dt} + {\omega_0^2 U_C}
+\end{align*}\]\[\text{avec } \omega_0 = \frac{1}{\sqrt{LC}} \text{ et } Q=\frac{1}{R}\sqrt{\frac{L}{C}}\]\[\text{On a également la période propre } T_0=\frac{2\pi}{\omega_0}  \]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Adrien) Etablir l'equation differentielle vérifiée par l'intensité du courant traversant une bobine dans un circuit RL série.
+R: On obtient :
+\(\frac{di}{dt} + \frac{i}{\tau} = \frac{E}{L}\)
+Avec:
+-\(\tau = \frac{L}{R}\)
+-\(i\) l'intensité du courant traversant la bobine
+-\(E\) la tension aux bornes du générateur (\(E = 0\) si il n'y a pas de generateur)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Victor /
+Rappler les racines du polynôme caractéristique pour un oscillateur amorti dans un circuit RLC pour un facteur de qualité \(Q <\) \(1 \over 2\)
+R: Le polynômes admet 2 racines réeles \(r_\pm\) : 
+\(r_\pm  = - {\omega_0 \over 2Q} \pm {\omega_0 \over 2Q} {\sqrt{1-4Q^2}}\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Victor /
+Rappler les racines du polynôme caractéristique pour un oscillateur amorti dans un circuit RLC pour un facteur de qualité \(Q = {1 \over 2}\)
+R: Le polynôme admet une racine double \(r \) :
+\(r = -{\omega_0 \over 2Q} = -\omega_0 \)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Victor /
+Rappler les racines du polynôme caractéristique pour un oscillateur amorti dans un circuit RLC pour un facteur de qualité \(Q > {1 \over 2}\)
+R: Le polynôme admet deux racines complexes \(r _ \pm\) :
+\(r_\pm = -\mu \pm j\Omega = - {\omega_0 \over 2Q} \pm j\omega_0 \sqrt{1-{1\over 4Q^2}}\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Fabien) Montrer que dans un circuit RC série, l'énergie  Eg fournie par le générateur lors de la charge complète du condensateur est égale à [$]\Delta Eg = C*E^2[/$]
+R: >>> [IMAGE_ID: IMG_3659.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG) 
+>>> [IMAGE_ID: paste-5c580b54ddcbcda3567244ebc5af86fe324dfefb.jpg] <<<
+R: >>> [IMAGE_ID: paste-54e6f7af394dbf01d43255f48b46884890c3c498.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-7daead3eabe97baa10a9badbd45a8ba413b1056a.jpg] <<<
+R: >>> [IMAGE_ID: paste-d39adeb88745a3553b98945ae6b81101a138c7b5.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Que signifient régime transitoire et régime permanent?
+R: Le régime permanent désigne l'état du circuit dans lequel toutes les grandeurs (tensions, courants, ...) ont la même forme que celle imposée par le générateur (parfois absent alors les grandeurs sont constantes).
+Le régime transitoire est l'état du circuit entre deux régimes permanents.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-c7506d0c9ea7ea333e9711a7220077602ceada38.jpg] <<<
+R: >>> [IMAGE_ID: paste-01b9b3b01a7c056184bedec16e2186431a05c7c7.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-6ffb549f053d20b3edf276c81961358393584927.jpg] <<<
+R: >>> [IMAGE_ID: paste-83a1d539943ae0259a6ab113e94371972fd973e5.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-8da3d9322669ec0fea282482a257199d5f0a7822.jpg] <<<
+R: >>> [IMAGE_ID: paste-5012b3a89fead189350f6b727c41fe47add60629.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-d810e793d4ca64fb16b3eb4a4c03eaa8b9cda1c6.jpg] <<<
+R: >>> [IMAGE_ID: paste-633360169cefe5a7ec5f43411c4802cd209a3045.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG) 
+>>> [IMAGE_ID: paste-93aefadadfcbbd4ba98185e6adc003b9ce323085.jpg] <<<
+R: Le gain en dB augmente de 20 dB
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-1f762087a245a059c1607e01a888a3be883519aa.jpg] <<<
+R: >>> [IMAGE_ID: paste-28369efd4e03afaf7f085f3e1cd2503d5eef290d.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(MAG) 
+>>> [IMAGE_ID: paste-9365e88f44c99dcded4f17ec25c9f94af0e9e6ec.jpg] <<<
+R: >>> [IMAGE_ID: paste-fbb7ee4524ac441a40d4738f748679dcd47a11cd.jpg] <<<
+--------------------
+Q: >>> [IMAGE_ID: Circuit.jpg] <<<
+<span style="color: rgb(0, 255, 0);">(Lenny) Le condensateur est initialement chargé, de tension E.
+qu'elle est l'expression de u(t) pour t > 0 (avec τ = RC)
+R: u(t) = E*e^(-t/τ)
+On a u(t = 0) = E et le condensateur se décharge dans la résistance.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Vlas.I
+Le gain en dB est défini par:
+R: >>> [IMAGE_ID: img7718006153195699032.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Lenny) La tension u vérifie l'équation différentielle suivante :
+>>> [IMAGE_ID: équation.jpg] <<<
+Qu'elle est la solution en régime permanent ?
+R: >>> [IMAGE_ID: solution.jpg] <<<
+En régime permanent on a u = cste. Donc du/dt = 0 puis on isole u.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Vincent M.) A quelle condition sur l'amplitude du signal découvre-t-on la résonance?
+R: Lorsque l'amplitude du signal passe un maximum pour une certaine pulsation, nommée pulsation de résonance.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Victor /
+Réaliser un bilan d'énergie sur le circuit RLC 
+>>> [IMAGE_ID: Circuit RLC-63531ab1913debd4b8c81857268740d95d937fdd.png] <<<
+et expliquer chaque terme.
+R: La loi de mailles donne :
+\(e = u_R + u_L + u_c \)
+On multiplie la loi des mailles par l'intensité du courant : 
+\(ei = u_Ri + u_Li + u_c i\)
+\(=>P_g = P_j +  {dE_L\over dt} + {dE_c\over dt} \)
+\(=> P_g = P_j +  {d \over dt}(E_L+E_c)\)
+avec \(P_g\) : puissance fournie par le générateur
+       \(P_j \)  : puissance dissipée par effet Joule 
+         \(E_L\) : énergie emmaganisée par la bobine
+         \(E_c\) : énergie stockée par le condensateur
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Balthazar) 
+Solution homogène d'une équation différentielle dde la forme: 
+[latex]\scriptsize $\frac{\text{d}x}{\text{d}t} + \frac{x}{\tau} = 0$ [/latex] ?
+R: [latex]\scriptsize $x_h(t) = Ae^{-t/\tau}$. [/latex]
+avec [latex]\scriptsize $A \in \mathbb{R}$. [/latex] :
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Manuel BT.) Donner l'impédance équivalente [latex]$\underline{Z_{\text{éq}}}$[/latex] dans ce circuit 
+>>> [IMAGE_ID: IMG_0C8AE9F25B52-1.jpeg] <<<
+R: [latex]$\underline{Z_{\text{éq}}} = R + \frac{R - RLC\omega^2}{1+jRC\omega - LC\omega^2}$[/latex]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Balthazar) Solution particulière d'une équation différentielle de la forme: 
+[latex]\scriptsize $\frac{\text{d}x}{\text{d}t} + \frac{x}{\tau} = \frac{X_1}{\tau}$, [/latex]
+R: On pose, pour [latex]\scriptsize $B \in \mathbb{R}$ [/latex], la solution constante : 
+[latex]\scriptsize $x_p(t) = B$.[/latex]
+On obtient alors en injectant dans l'équation :
+[latex]\scriptsize $0 + \frac{B}{\tau} = \frac{X_1}{\tau}$. [/latex]
+Ainsi 
+[latex]\scriptsize $x_p(t) = B = X_1$.[/latex]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Manuel BT.) Dans un circuit RLC série en régime sinusoïdal forcé, le courant le parcourant est d'amplitude complexe :
+[latex]
+$\underline{I_{m}} = \frac{I_{0}}{1+jQ\left( \frac{\omega}{\omega_{0}} - \frac{\omega_{0}}{\omega}\right)}$ 
+[/latex]
+Donner alors l'équivalent de son amplitude réelle [latex]$|\underline{I_{m}}|$[/latex] en BF et en HF et la fréquence [latex]$\omega$[/latex] où [latex]$|\underline{I_{m}}|$[/latex] est au maximum.
+R: [latex]\begin{itemize}
+\item En BF : $|\underline{I_{m}}| \underset{\text{BF}}{\longrightarrow} 0$
+\item En HF : $|\underline{I_{m}}| \underset{\text{HF}}{\longrightarrow} 0$
+\item Amplitude max : $|\underline{I_{m}}| = I_{0}$ (lorsque $\omega = \omega_{0}$)
+\end{itemize}
+[/latex]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Océane A.) En quoi la bobine est-elle équivalente en basses fréquences? en hautes fréquences?
+R: • BF  → un fil
+• HF → un interrupteur ouvert
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Océane A.) Donner l'expression de l'amplitude complexe de u(t) avec :
+[latex]$u(t) = U_{0} \cos \left(\omega t + \frac{\pi}{4}\right)$[/latex]
+R: [latex]$\underline{U_{0}} = U_{0}e^{j\frac{\pi}{4}} = \frac{U_{0}}{\sqrt{2}}(1+j)$[/latex]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(Océane A.) En quoi le condensateur est-il équivalent en basses fréquences? en hautes fréquences?
+R: • En BF → un interrupteur ouvert
+• En HF → un fil
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Océane A.) En régime sinusoïdal forcé à la pulsation [latex]$\omega$[/latex], à quoi les opérations de dérivation et d'intégration sont-elles équivalentes?
+R: [latex]\begin{itemize}
+\item Dériver $\Longleftrightarrow \times j\omega$
+\item Intégrer $\Longleftrightarrow \times \frac{1}{j\omega}$
+\end{itemize}[/latex]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Daouda C.) Donner la relation entre le facteur de qualité ([latex]$Q$[/latex]), la pulsation de résonance ([latex]$\omega_{0}$[/latex]) et la bande passante à -3dB ([latex]$\Delta\omega$[/latex]) d'un filtre passe bande d'ordre 2. Comment varie la largeur de la bande passante selon le facteur de qualité ([latex]$Q$[/latex]) ?
+R: [latex]$Q = \frac{\omega_{0}}{\Delta\omega}$[/latex]
+ Plus Q est grand, plus le pic de résonance est étroit i.e. plus la largeur de la bande passante est faible i.e. plus [latex]$\Delta\omega$[/latex] est faible.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Quelle est la forme d'une équation différentielle d'un oscillateur harmonique ? (cas d'un circuit LC pour la pulsation propre)
+R: \(\frac{d^{2}\alpha }{dt^{2}}+ \omega_{0}^{2}\alpha = cste\) avec \(\omega_{0} = \frac{1}{\sqrt{LC}}\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Quelle est la forme de la solution homogène d'un OH ?
+R: \(s_{h}(t) = A*\cos{(\omega_{0}t)} + B*\sin{(\omega_{0}t)}=C*\cos{(\omega_0 t + \Phi)}=D*\sin{(\omega_0 t + \Phi')}\) 
+avec A et B ou C et \(\Phi\) ou encore D et \(\Phi'\) à determier grâce aux C.I. .
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Quelle est la relation entre la periode propre et la pulsation propre des oscillations de l'OH ?
+R: \(T_0 = \frac{2\pi}{\omega_{0}}\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Quel est le circuit étudié en tant que modèle de l'OH ?
+R: Circuit LC série
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Dans un circuit LC sans source, l'énergie est elle conservée ?
+R: Oui, on a \(P_{C} + P_{L} = 0\)
+Donc \(dE/dt=0\) soit \(E=cste\)
+avec :
+\(P_{C}\) la puissance reçue par le condensateur
+\(P_{L}\) la puissance stockée par la bobine.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Mohammed S.) Comment peut-on exprimer l'amplitude complexe de la tension aux bornes d'un condensateur dans un circuit RLC ?
+R: [latex]$\underline{U_c} = \frac {E_0}{1-\frac{\omega^2}{\omega_0^2}+ j \times \frac{\omega}{\omega_0 \times Q }}$[/latex]
+<div style="text-align: center;">[$]Q = \frac{1}{R} \sqrt{\frac{L}{C}}[/$]
+<div style="text-align: center;">[$]\omega_0 = \frac{1}{\sqrt{LC}} [/$]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Determiner la fonction transfert d un filtre passe bas d ordre 1 dans un circuit RC :
+R: Avec un pont diviseur de tension on obtient :
+\(\underline{H} (j\omega)=\frac{\underline{u_s}}{\underline{u_e}}=\frac{1}{1+jRC\omega}\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Determiner la fonction transfert d'un filtre passe haut d ordre 1 dans un circuit RC.
+R: Avec un pont diviseur de tension on a :
+\(\underline{H} (j\omega)=\frac{\underline{u_s}}{\underline{u_e}}=\frac{jRC\omega}{1+jRC\omega}\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Leo S./Cyril J. : Exprimez la charge q d'un condensateur en fonction de sa capacité C et de la tension à ses bornes U
+R: \[q = C \cdot U\]
+\(q\) en coulomb (C)
+\(C\), la charge du condensateur en Farat (F)
+\(U\) en Volt (V)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Mohammed S.) Quelle est l'expression de l'amplitude complexe associé à l'intensité du courant dans le circuit RLC série en RSF ?
+R: [$]\underline{I} = \frac{I_0}{1+jQ(\frac{\omega}{\omega_0}-\frac{\omega_0}{\omega})}[/$]
+avec 
+<div style="text-align: center;">[$]I_0 = \frac{e}{R}[/$]
+<div style="text-align: center;">[$]Q = \frac{1}{R} \sqrt{\frac{L}{C}}[/$]
+<div style="text-align: center;">[$]\omega_0 = \frac{1}{\sqrt{LC}} [/$]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Mohammed S.) Que peut-on dire de la résonance en intensité dans le circuit RLC série
+R: <div style="text-align: left;">[$]\underline{I} = \frac{I_0}{1+jQ(\frac{\omega}{\omega_0}-\frac{\omega_0}{\omega})}[/$]<div style="text-align: left;">donc [$]|\underline{I}|[/$] est maximal, quand le dénominateur est minimal.
+<div style="text-align: left;">ie lorsque [$]\omega = \omega_0[/$] et donc il y'a toujours résonance lorsque [$]\omega = \omega_0[/$] quelque soit la valeur de Q.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Mohammed S.) Quel est le lien entre la bande passante et le facteur de qualité ?
+C'est quoi la bande passante à -3dB?
+R: <div style="text-align: center;">[$]Q = \frac{\omega_0}{\Delta\omega}=\frac{f_0}{\Delta f}[/$]<div style="text-align: center;">
+>>> [IMAGE_ID: bande_passante.jpg] <<<
+<div style="text-align: left;">La bande passant à - 3dB est la plage de fréquence sur laquelle  [$]Amplitude\geqslant \frac{Amplitude_{max}}{\sqrt{2}}=\frac{Amplitude (\omega=\omega_0)}{\sqrt{2}}[/$]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Soit \(Q < \frac{1}{2}\) ou \(\Delta > 0\), donner la forme de la solution de l'équation différentielle homogène dans ce cas.
+R: Pour \(Q < \frac{1}{2}\), on a alors \(\alpha_h(t)= Ae^{r_+t}+Be^{r_-t}\) avec \(A \) et \(B\) deux constantes à déterminer avec les CI et \(r_{\pm}\) les racines du polynôme caractéristique. Ce système est en régime apériodique.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Soit \(Q = \frac{1}{2}\) ou \(\Delta = 0\), donner la forme de la solution de l'équation différentielle homogène dans ce cas.
+R: Pour \(Q = \frac{1}{2}\), on a alors \(\alpha_h(t) = (At + B)e^{r_0t}\) avec A et B deux constantes à déterminer avec les CI et \(r_0\) la racine double du polynôme caractéristique. Ce système est en régime critique.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Soit \(Q> \frac{1}{2}\) ou \(\Delta<0\), donner la forme de la solution de l'équation différentielle homogène dans ce cas.
+R: Pour \(Q> \frac{1}{2}\), on a alors \(\alpha_h(t) = e^{-\mu t} (Acos(\Omega t) + B sin(\Omega t)=Ce^{-\mu t} cos(\Omega t+\Phi)=De^{-\mu t} sin(\Omega t+\Phi')\)avec A et B ou C et \(\Phi\) ou encore D et \(\Phi'\) à determier grâce aux C.I. , et avec \(-\mu \pm j \Omega\) les racines du polynôme caractéristique. Ce système est en régime pseudo-périodique.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Alexis R. : Qu'est-ce qu'un conducteur ohmique ?
+R: Il s'agit d'un conducteur qui vérifie la loi d'Ohm :\[U = R \cdot I\]Les résistances sont des conducteurs ohmiques.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Alexis R. : Quelle est l'influence de la convention choisie sur un dipôle.
+R: La convention choisie (générateur ou récepteur) n'influence pas les résultats. Les changements apportés par un changement de convention s'annulent toujours.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">Alexis R. : Quelle est la formule mettant en relation la puissance et l'énergie ? Quelle est la formule de la puissance pour un circuit électrique
+R: Puissance et énergie : \[P = \frac {d\varepsilon} {dt}\]Puissance dans un circuit électrique : \[P = U \cdot I\]L'interprétation dépend de la convention choisie.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">Alexis R. : Donnez la définition de la tension.
+R: La tension entre deux points du circuit est définie comme la différence de potentiel entre ces deux points. 
+NB : Le potentiel électrique est défini à une constante additive près.
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-8b53223b85c32cebddf51d33474919cb08cb5f51.jpg] <<<
+R: >>> [IMAGE_ID: paste-512e14081d84d08894df5446eb66a7dcf352acbf.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG)
+>>> [IMAGE_ID: paste-01da042bbe0dde84885ab703c5c7e5c3d02a88f4.jpg] <<<
+R: >>> [IMAGE_ID: paste-7a794527c9322c97ab32307d02da3b2d26c52a31.jpg] <<<
+--------------------
+Q: (MAG)
+>>> [IMAGE_ID: paste-c8470044d81547260799d88c9a7ed866d58ef226.jpg] <<<
+R: >>> [IMAGE_ID: paste-3039a51ec61bcc1d4c2d34d296376f287a4d0f8d.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(MAG)
+>>> [IMAGE_ID: paste-37de55c62dd770061713d705b70e5962561d2145.jpg] <<<
+R: >>> [IMAGE_ID: paste-aa07df7df60e8b1ef18471915ce6f54b1d742344.jpg] <<<
+--------------------
+
+
+==================================================
+DECK : MQ MPI
+==================================================
+
+Q: Qu’est-ce qu’une barrière de potentiel ?
+R: C'est une marche de potentiel d’extension limitée.
+>>> [IMAGE_ID: paste-c2bd4b96488b55df53548509aa1162b53e0ba5f4.jpg] <<<
+--------------------
+Q: Qu’est-ce que l’effet tunnel ? Citer des applications
+R: Dans le cas de l'étude d'une barrière de potentiel : Si la décroissance de la fonction d’onde dans la barrière de potentiel est suffisamment lente, on peut s’attendre à ce que la probabilité de présence soit non nulle de l’autre côté de la barrière (une particule quantique a donc la possibilité de traverser la barrière de potentiel) : c’est l’effet tunnel.
+Applications : microscope à effet tunnel, radioactivité alpha
+>>> [IMAGE_ID: paste-4a85ca8e92e755c5fcbea42714506c4c37d0a7e9.jpg] <<<
+--------------------
+Q: Quel est l’influence de la largeur et de la hauteur de la barrière de potentiel sur l’effet tunnel ?
+R: La probabilité de transmission diminue très rapidement lorsque:
+- la largeur de la barrière augmente,
+- la hauteur de la barrière vue par la particule soit \(V_0-E\) augmente
+--------------------
+Q: Comment se comporte une particule quantique lorsqu'elle rencontre la marche de potentiel ?
+R: Pour E>V0 :
+>>> [IMAGE_ID: paste-238eaf4ac206714e0288ba0a46d07211430b993d.jpg] <<<
+Dans la zone I, la fonction d’onde est la superposition d’une OPPM incidente et d’une OPPM réfléchie.
+Dans la zone II, il s'agit d'une OPPM transmise. Contrairement à la particule classique, la particule quantique a une probabilité non nulle de se réfléchir sur la marche, et cette probabilité est d'autant plus importante que l'énergie de E est proche de V0.
+Pour 0<E<V0 :
+>>> [IMAGE_ID: paste-2bbc4d9da7acd5186a02712131f447d2e993dfe0.jpg] <<<
+Dans la zone I, la fonction d’onde est la superposition d’une OPPM incidente et d’une OPPM
+réfléchie.
+Pour E<V0, dans la zone II, il s’agit d’une onde évanescente, et la densité de
+probabilité de présence dans la zone II n’est donc pas rigoureusement nulle au-delà de la marche. Cela signifie que la mesure de la position de la particule peut conduire à une valeur positive de son abscisse, contrairement aux prévisions classiques.
+--------------------
+Q: Quelles sont les conditions de continuité de la fonction d’onde ?
+R: >>> [IMAGE_ID: paste-503d75a14b6c2d0987b9d12926bcc2d01e1db8da.jpg] <<<
+--------------------
+Q: Comment établir les solutions de l’équation de Schrödinger indépendante du temps dans le cas d’une particule
+incidente sur une marche de potentiel ? Exploiter les conditions de continuité de la fonction d’onde.
+R: Déja le potentiel est constant égale à [latex]$V_0$[/latex], l’équation de Schrödinger devient [latex]$ \frac{d^{2}\varphi}{dx^2}  + \frac{2m(E-V_0)}{\bar{h}^2} \varphi(x) = 0 $[/latex]
+Dans la cas oû [latex]$E>V_0$[/latex] 
+dans la région 1 
+la solution de l’équation de Schrödinger est de la forme 
+[latex]$\varphi_1(x) = A_1\exp(ik_1 x) + B_1\exp(-ik_1 x)$[/latex] avec  [latex]$ k_1 = \frac{\sqrt{2mE}}{\bar{h}} $[/latex]
+dans la région 2
+[latex]$\varphi_2 (x) = A_2\exp(ik_2 x) + B_2\exp(-ik_2 x)$[/latex] avec  [latex]$ k_2 = \frac{\sqrt{2m(E-V_0)}}{\bar{h}} $[/latex]
+puis on sait que [latex]$\psi(x) = f(t)\varphi(x)$[/latex] avec \(f(t)=exp(-i \frac{E}{\hslash} t)=exp(-i\omega t)\)
+donc
+ [latex]$\psi_1 (x) = A_1\exp(-i(wt-k_1 x) + B_1\exp(-i(wt+k_1 x)$[/latex] 
+ [latex]$\psi_2 (x) = A_2\exp(-i(wt-k_1 x)  $[/latex] 
+Remarque : le terme [latex]$B_2\exp(-i(wt+k_1 x) $[/latex] est impossible car c'est une onde qui se propage selon [latex]$-u_x$[/latex] alors qu'il n'existe aucune source qui peut être à l'origine de cette onde ni aucun obstacle de potentiel.
+Maintenant on va exploiter les condition de continuité de la fonction d'onde 
+[latex]$\varphi_1 (x=0) = \varphi_2(x=0) \rightarrow A_1+B_1=A_2$[/latex]
+[latex]$\varphi_1' (x=0) = \varphi_2'(x=0) \rightarrow A_1-B_1=\frac{k_2}{k_1}A_2$[/latex]
+on trouve alors 
+[latex]$A_2= \frac{2k_1}{k_1+k_2}A_1$[/latex]
+[latex]$B_1= \frac{k_1-k_2}{k_1+k_2}A_1$[/latex]
+on choisit [latex]$A_1=1$[/latex] et on retrouve 
+>>> [IMAGE_ID: paste-e01397cac5a386e78f0e6b82d32827ed48f4a333.jpg] <<<
+Dans le cas oû [latex]$E<V_0$[/latex]
+la solution de l’équation de Schrödinger est de la forme:
+dans la zone 1 x<0
+[latex]$\varphi_1(x) = A_1\exp(ik_1 x) + B_1\exp(-ik_1 x)$[/latex] avec  [latex]$ k_1 = \frac{\sqrt{2mE}}{\bar{h}} $[/latex]
+dans la zone 2 x>0
+[latex]$\varphi_2 (x) = B_2\exp(-qx)$[/latex] avec  [latex]$ q = \frac{\sqrt{2m(V_0-E)}}{\bar{h}} $[/latex] 
+Rem: Pas de terme en [latex]$ B_1\exp(qx)$[/latex] qui diverge quand \(x \rightarrow +\infty \)
+par analogie avec ce qu'on a trouvé dans le cas [latex]$E>V_0$[/latex]  (en remplaçant donc \(ik_2\) par \(-q\) soit \(k_2\) par \(iq\)),on retrouve  
+>>> [IMAGE_ID: paste-e9426f4c38c2a8f19999e41c811cffd47d29ef9f.jpg] <<<
+--------------------
+Q: Que peut-on dire de l’énergie de la particule confinée? Que vaut son énergie lorsqu’elle est dans son état fondamental ?
+R: >>> [IMAGE_ID: paste-4f63251a51c64707992844072d2e4e1ac1823f1f.jpg] <<<
+--------------------
+Q: Les solutions de l’équation de Schrödinger dans le cas d’états stationnaires d’une particule de masse \(m\) dans un puits de potentiel infini de largeur \(a\)?
+R: >>> [IMAGE_ID: paste-a1fb0088b24b8e2d826cf21403e2df150910cbcc.jpg] <<<
+--------------------
+Q: Ordre de grandeur de l'énergie de confinement ?
+R: [$]E_{min} \approx \frac{\hbar ^2}{2ma^2} [/$]
+--------------------
+Q: Montrer, en prenant l’exemple simple du cours, qu’une superposition de deux états stationnaires (caractérisé par les fonctions d’onde d’énergie respectivement Er et Es) engendre une évolution au cours du temps de l’état de la particule.
+R: [$]\psi(x,t) = \lambda_1 e^{-i\frac{E_r}{\hbar}t}\varphi_r(x) + \lambda_2 e^{-i\frac{E_s}{\hbar}t}\varphi_s(x)[/$]
+La densité de probabilité de présence associée cet état de la particule s’écrit :
+[$]|\psi(x,t)|^2 = |\lambda_1 \lambda_2| (|\varphi_r(x)|^2 + |\varphi_s(x)|^2 + 2\varphi_r(x)\varphi_s(x)\cos(\frac{E_s - E_r}{\hbar}t))[/$]
+On remarque que la densité de probabilité de présence dépend explicitement du temps : l’état de la particule n’est donc pas stationnaire, il évolue au cours du temps.
+--------------------
+
+
+==================================================
+DECK : Reaction Acide Base
+==================================================
+
+Q: Qu'est-ce qu'un acide fort?
+R: Un acide fort est un acide qui réagit totalement avec l'eau suivant la réaction d'équation:
+\(AH+ H_2O_{(l)} \rightarrow A^{-} + H_3O^{+}_{(aq)}\)
+Un acide fort dans l'eau se convertit totalement en \(H_3O^{+}\).
+--------------------
+Q: Qu'est-ce que la constante d'acidité (
+\(K_A\)) d'un couple acide/base (noté \(AH/A^ {-}\)). Son expression?
+R: C'est la constante d'équilibre de la réaction de l'acide du couple avec l'eau d'équation:
+\(AH+H_2O_{(l)} \rightarrow A^{-} + H_3O^ {+}_{(aq)}\)
+Son expression est \(K_A=\frac{[A^{-}]_{éq}[H_3O^{+}]_{éq}}{[AH]_{éq} C°}\)
+--------------------
+Q: Qu'est-ce qu'un acide?
+Qu'est-ce qu'une base?
+R: Un acide est une entité chimique pouvant céder un proton \(H^{+}\). On le note \(AH\).
+Une base est une entité chimique pouvant capter un proton \(H^{+}\). On la note \(A^{-}\).
+--------------------
+Q: Donner les couples de l'eau et leur \(pK_A\).
+R: L'eau est la base dans le couple \(H_3O^{+}/H_2O\) de \(pK_A=0\).
+L'eau est l'acide dans le couple \(H_2O/HO^{-}\) de \(pK_A=14\).
+--------------------
+Q: Qu'est-ce que le produit ionique de l'eau? Quelle est sa valeur? son expression?
+R: C'est la constante d'équilibre de la réaction d'autoprotolyse de l'eau d'éq:
+\(2H_2O_{(l)}=H_30^{+}_{(aq)} +HO^{-}_{(aq)}\)
+Il est noté \(K_e=\frac{[H_3O^{+}]_{éq}[HO^{-}]_{éq}}{C°^2}=10^{-14}\) à \(25°C\).
+--------------------
+Q: Quelle est la définition du pH d'une solution?
+R: \(pH=-log\frac{[H_3O^{+}]}{C°}\)
+--------------------
+Q: Comment calculer \([H_30^{+}]\) et 
+\([H0^{-}]\) quand on connait le pH de la solution?
+R: \([H_30^{+}]=10^{-pH}\) et \([H0^{-}]=10^{pH-14}\)
+--------------------
+Q: Comment calculer un \(K_A\) quand on connait \(pK_A\)et inversement?
+R: \(pK_A=-log K_A\) et \(K_A=10^{-pK_A}\)
+--------------------
+Q: Donner la relation qui lie le pH d'une solution avec le \(pK_A\) d'un couple \(AH/A^{-}\) qui y est présent.
+R: \(pH=pK_A+log\frac{[A^-]_{éq} }{[AH]_{éq}}\)
+--------------------
+Q: Quelle est la forme du couple qui domine lorsque \(pH>pK_A\)? \(pH<pK_A\)? \(pH=pK_A\)?
+R: Lorsque \(pH<pK_A\): C'est la forme acide qui domine: \([AH]>[A^-]\)
+Lorsque  \(pH>pK_A\): C'est la forme basique qui domine: \([AH]<[A^-]\)
+Lorsque  \(pH=pK_A\): Aucune des deux formes ne domine: \([AH]=[A^-]\)
+--------------------
+Q: On mélange dans l'eau, les deux membres du couple \(CH_3COOH/CH_3COO^{-}\) de \(pK_A=4,8\) ainsi que les deux membres du couple \(NH_4^{+}/NH_3\) de \(pK_A=9,2\).
+Quelles réactions peuvent se produire? Que valent leurs constantes d'équilibre? Quelle est celle qui se fera dans les plus grandes proportions (qui aura le plus grand avancement à l'équilibre)?
+R: \(NH_{3(aq)} + CH_3COOH_{(aq)}\rightarrow CH_3COO^{-}_{(aq)}+NH_{4(aq)}^{+}\) ;  \(K°=10^{9,2-4,8}=10^{4,4}\) réaction que l'on peut considérer comme totale (qui aura le plus grand avancement à l'équilibre).
+\( CH_3COO^{-}_{(aq)}+NH_{4(aq)}^{+} \rightarrow NH_{3(aq)} + CH_3COOH_{(aq)}\) ;  \(K°=10^{4,8-9,2}=10^{-4,4}\)réaction qui ne se fait presque pas
+\(H_20_{(l)}+CH_3COO^{-}_{(aq)} \rightarrow CH_3COOH_{(aq)}+HO^{-}_{(aq)}\) ; \(K°=10^{4,8-14}=10^{-9,2}\) réaction qui se fait encore moins.
+\(2H_2O_{(l)} \rightarrow H_3O^{+}_{(aq)}+HO^{-}_{(aq)}\); \(K°=10^{-14}\) réaction qui se fait encore moins.
+--------------------
+
+
+==================================================
+DECK : T1
+==================================================
+
+Q: <span style="color: rgb(255, 170, 0);">(E.M) Quels sont les 3 modes de transferts d'énergie thermique ?
+R: La conduction (aussi appelée diffusion thermique), la convection et le rayonnement.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(E.M) Qu'est ce que la conduction thermique ?
+R: C'est un transport d'énergie thermique à travers un milieu matériel (solide ou fluide) sans déplacement macroscopique de matière.
+La conduction thermique est présente partout où il y a de la matière dont la température n'est pas uniforme.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.M) Définition de la puissance thermique/flux thermique \(\phi\) et son unité ?
+R: >>> [IMAGE_ID: paste-25188068b698be55467f25e4252bcf0a0fa3a135.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.M) Dans quelle direction se font les transferts thermiques ?
+R: Des zones chaudes vers les zones froides.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.M) Donner la loi de Fourier.
+R: >>> [IMAGE_ID: paste-6bb5e882e6c73155c5dff2e491dde6d1ea5a27f1.jpg] <<<
+avec 
+. \(\vec j_{th}\) le vecteur densité de flux thermique/de courant thermique
+. λ est la conductivité thermique, c'est une grandeur positive caractéristique du matériau dans lequel a lieu le transfert thermique. Unité : W. m<sup>-1</sup>.K<sup>-1</sup>.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(E.M.) Quelle est l'expression, en fonction de j<sub>th</sub>,<sub> </sub>du transfert thermique δQ à travers une surface S, dans le sens indiqué par \(\vec {dS}\), pendant dt ?
+R: >>> [IMAGE_ID: paste-62e583638ff04222da7b2bf3553df5515750e080.jpg] <<<
+avec j<sub>th</sub> en W.m<sup>-2</sup>
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.M) Donner l'expression du flux thermique \(\phi \) à travers une surface S en fonction du vecteur densité de flux thermique \(\vec {j_{th}}(M, t)\) ?
+R: On a :  \(\phi = \int\int _{M\in S} \vec j_{th}.\overrightarrow dS\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.M) Dans quels cas la loi de fourier n'est-elle pas valable ?
+R: - lorsque le gradient de température \(\overrightarrow{grad} \space T\) varie trop rapidement dans le temps par rapport au temps d'établissement du flux thermique
+- lorsque le gradient de température \(\overrightarrow{grad} \space T\) est trop grand
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(E.M) Donner l'unité de la conductivité λ et son ordre de grandeur pour :
+- un métal bon conducteur (Ag, Cu)
+- du verre
+- l'air
+R: Unité : W.m<sup>-1</sup>.K<sup>-1
+</sup>- acier : 50 W.m<sup>-1</sup>.K<sup>-1</sup>
+- du verre : 1 W.m<sup>-1</sup>.K<sup>-1</sup>
+- l'air : 0.03 W.m<sup>-1</sup>.K<sup>-1
+</sup>- eau liquide (P et T usuelles): 0,6 W.m<sup>-1</sup>.K<sup>-1</sup>
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(S.D.) Analogie entre Conduction thermique et électrique
+R: >>> [IMAGE_ID: paste-95bd659b9be99e7c9c5963100bb46f59593aa905.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(S.D.)
+>>> [IMAGE_ID: paste-014ad9b052028d394823d5ae894648df45012490.jpg] <<<
+R: 1. Il s'agit bien d'une association en série car le flux thermique est le même à travers chacun des matériaux.
+>>> [IMAGE_ID: ex1.jpeg] <<<
+2. Vitrage simple : \(R_{th_{SV}}=\frac{3e}{\lambda_v S}\)
+Vitrage double : \(R_{th_{DV}}=R_{th_1}+R_{th_2}+R_{th_3} = \frac{e}{\lambda_v S} + \frac{e}{\lambda_a S} + \frac{e}{\lambda_v S} = \frac{e}{S}\big(\frac{2}{\lambda_v}+\frac{1}{\lambda_a}\big)\)
+On fait le rapport avec les données de l'énoncé : \(\frac{R_{th_{DV}}}{R_{th_ {SV}}} = 11,7\)
+3. Les pertes thermiques en hiver sont en fait les flux thermiques allant de l'intérieur vers l'exterieur.
+On rappelle : \(T_{int} - T_{ext} = R_{th}\phi_{int \rightarrow ext}\)
+D'où : \(\phi_{SV} = \frac{T_{int} - T_{ext}}{R_{th_{SV}}}\) et \(\phi_{DV} = \frac{T_{int} - T_{ext}}{R_{th_{DV}}}\)
+On fait le rapport : \(\frac{\phi_{DV}}{\phi_{SV}} = \frac{R_{th_{SV}}}{R_{th_{DV}}} = \frac{1}{11,7}\)
+On a donc \(\phi_{SV} = 11,7\phi_{DV}\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">[Z.S] Conduction thermique dans une barre - problème unidimensionnel en coordonnées cartésiennes
+>>> [IMAGE_ID: paste-5bc4bdf6dd1615bfe2f6fdfb42b08d6fffb77cb2.jpg] <<<
+Etablir une relation différentielle entre la température et le vecteur densité de flux thermique. Puis l'équation de la diffusion thermique.
+R: Réponse: \(µ c \frac{\partial T}{\partial t}+\frac{\partial j_{th}}{\partial x}=0\) et \(\frac{\partial^2 T}{\partial  x^2}- \frac{1}{D}\frac{\partial T}{\partial t}=0\)
+Démonstation:
+Choix du système étudié: Portion de barre: cylindre de section S et de largeur dx
+Expression de dH: \(dH=C dT=cµS \ dx (T(x,t+dt)-T(x,t)=cµS \ dx\ \frac{\partial T}{\partial t}\)
+Expression de \(\delta Q\) (transfert thermique algébriquement reçu par le système pendant dt):
+\(\delta Q=\delta Q_1 + \delta Q_2\)
+avec \(\delta Q_1\): le transfert thermique qui entre dans le système par la face situé en \(x\) pendant dt
+\(\delta Q_2\): le transfert thermique qui entre dans le système par la face situé en \(x+dx\) pendant dt
+En notant \(\phi (x,t)\) le flux thermique dans le sens \(+\overrightarrow{u_x}\) : \(\delta Q_1=\phi (x,t) dt\) et \(\delta Q_2=- \phi (x+dx,t) dt\)
+Donc \(\delta Q=\phi (x,t) dt-\phi (x=dx,t) dt=- \frac {\partial \phi}{\partial x} dx \ dt\)
+1er principe (évolution isobare): \(dH=\delta Q\) donne \(c \ µ \ S \ dx \ \frac{\partial T}{\partial t} dt=- \frac {\partial \phi}{\partial x} dx \ dt\) soit \(c \ µ \ S \frac{\partial T}{\partial t}+ \frac {\partial \phi}{\partial x} =0\)
+Or \(\phi (x,t)=\iint _S \overrightarrow{j_{th}} .\overrightarrow{dS}=j_{th} S\) Donc \(c \ µ \frac{\partial T}{\partial t}+ \frac {\partial j_{th}}{\partial x} =0\)
+Deplus \(j_{th} S= -\lambda S \frac{\partial T}{\partial x}\)donc \(c \ µ \ S \frac{\partial T}{\partial t}-\lambda S \frac {\partial ^2 T}{\partial ^2 x} =0\)Soit \(\frac {\partial ^2 T}{\partial ^2 x}- \frac{cµ}{\lambda} \frac {\partial T}{\partial t}=0\) ou \(\frac {\partial ^2 T}{\partial ^2 x}- \frac{1}{D} \frac {\partial T}{\partial t}=0\) avec D le coefficient de diffusion thermique de la barre.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">[Z.S] Que peut-on dire du flux thermique en régime stationnaire?
+R: En régime stationnaire et en l’absence de source, le flux thermique entrant est égal au flux thermique sortant de n’importe quel système.
+On dit qu’il y a conservation du flux thermique ou que le flux thermique est conservatif.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">[Z.S] Conduction thermique dans une barre - problème unidimensionnel en coordonnées cartésiennes
+>>> [IMAGE_ID: paste-5bc4bdf6dd1615bfe2f6fdfb42b08d6fffb77cb2.jpg] <<<
+Déterminer l'expression de la température T(x) de la barre en régime stationnaire en fonction de T<sub>1</sub> , T<sub>2</sub> , x , et L.
+R: Méthode 1:
+Simplifier l'équation de la diffusion thermique dans le cas d'un régime stationnaire. 
+\(\frac{\partial^2 T}{\partial  x^2}- \frac{1}{D}\frac{\partial T}{\partial t}=0\) devient \(\frac{\partial^2 T}{\partial  x^2}=0\) en régime stationnaire
+Intégrer deux fois l'équation obtenue.
+\(T=Ax+B\)
+Déterminer les constantes d'intégration à l'aide des conditions aux limites.
+Les conditions aux limites: \(T(x=0)=T_1\) et \(T(x=L)=T_2\)
+Donc \(A=\frac{T_2 -T_1}{L}\)et \(B=T_1\)
+Soit \(T=\frac{T_2 -T_1}{L} x+T_1\)
+Méthode 2:
+Utiliser le fait qu'en régime stationnaire le flux thermique se conserve:
+\(\Phi=cste\)
+Exprimer \(\phi\) en fonction de \(j_{th}\) puis en fonction de T à l'aide de la loi de Fourier.
+\(\phi = -\lambda \frac{ dT}{dx} S\) dans le sens \(T_1\) vers \(T_2\) (i.e. suivant \(+\overrightarrow{u_x}\))
+Donc \(\frac{dT}{dx}=A=cste\)
+Intégrer une fois l'équation obtenue et déterminer les constantes d'intégration à l'aide des conditions aux limites.
+idem méthode 1
+A retenir : Dans un milieu homogène, en régime stationnaire T(x) suit une loi affine.
+--------------------
+Q: Donner la relation différentielle entre la température et le vecteur densité de flux thermique, puis l'équation de la diffusion thermique. 
+Dans le cas le plus général (3D) avec terme de source.
+R: Avec terme de source (\(P_v\): la puissance thermique volumique dela source)
+\(µ c \frac{\partial T}{\partial t}+div \overrightarrow{ j_{th}}=P_v\)
+\(\Delta {T}- \frac{1}{D}\frac{\partial T}{\partial t}=- \frac{P_v}{\lambda}\)
+--------------------
+Q: Définir la résistance thermique
+R: En régime stationnaire, on définit la résistance thermique \(R_{th}=\frac{T_1-T_2}{\Phi_{1 \rightarrow 2}}\)
+--------------------
+
+
+==================================================
+DECK : T2
+==================================================
+
+Q: (Y.Z) Qu'est ce qu'un corps noir ?
+R: Un corps noir est un corps qui absorbe intégralement tout le rayonnement qu’il reçoit (quelle que soit sa fréquence (longueur d’onde)).
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(Y.Z) 
+>>> [IMAGE_ID: paste-f6b9f90f8cf02c41f23d6ea12614cdd2e115cc05.jpg] <<<
+R: C'est le flux surfacique émis par un corps noir à la température T
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(F.H) Quelle est l’expression de la puissance totale rayonnée par le soleil \(P_s\) en fonction de σ, \(T_s\) et \(R_S\) ? (Loi de Stefan : \(\varphi(t) = \sigma T^4\))
+R: On a : \(P_s = \sigma T_s^44\pi R_s^2 \) avec \(Rs \) le rayon du soleil
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(FH) Déterminer la température à la surface du soleil Ts sachant que le maximum du spectre qu’il émet se situe à \(\lambda_m =  500nm\).
+Loi de Wien : \(\lambda_mT= 2898 \mu m.K\)
+R: Donc \(T_s = \dfrac{2898}{\lambda_m}\) avec \(\lambda =0,500 \ µm\)
+AN : \(T_s = 5796 K\)
+--------------------
+
+
+==================================================
+DECK : TD 02/03
+==================================================
+
+Q: <span style="color: rgb(255, 170, 0);">(T.B) Dans le cas du montage avec lentilles, déterminer l'expression de la différence de marche en un point M quelconque de l'écran ?
+>>> [IMAGE_ID: Montage_lentille_schema.jpg] <<<
+R: \(\delta(M)=(SS_2)-(SS_1)+(S_2 M) - (S_1 M)\)
+\(S_1\) et \(S_2 \) sont sur la même surface d'onde donc \((SS_2)=(SS_1)\)
+Donc: \(\delta(M)=(S_2 M) - (S_1 M)\)
+D'après le principe du retour inverse de la lumière + le théorème de Malus: \((HM)=(S_1 M)\)
+Donc: \(\delta(M)=(S_2 M) - (S_1 M)=(S_2 H)+(HM)-(S_1 M)=(S_2 H)=n_{air}\ S_2 H=n_{air} \ a \ sin(\theta)\)En se plaçant dans les condion de Gauss (\(\theta\) petit): \(tan(\theta)\approx sin(\theta)\approx \frac{x}{f'_2}\)
+Bilan: \(\delta(M)\approx n_{air} \frac {ax}{f'_2}\)
+--------------------
+Q: >>> [IMAGE_ID: IMG_20231216_160858.jpg] <<<
+<span style="color: rgb(0, 255, 0);">(T.B) Comment varie l'interfrange lorsque l'on translate S comme sur le schéma ?
+Et la figure d'interférences ?
+R: L'interfrange ne varie pas, mais la figure d'interférences est translatée :
+- vers le haut si la source est décalée vers le bas
+- vers le bas si la source est décalée vers le haut
+--------------------
+Q: >>> [IMAGE_ID: Source centree schema.jpg] <<<
+<span style="color: rgb(255, 170, 0);">(T.B) Quelle est l'expression de la différence de marche dans la configuration basique des trous d'Young ? Méthode (en bref) pour l'obtenir ?
+R: ẟ(M) = n<sub>air</sub>×ax / D
+Méthode:
+- Définir la diff de marche:\(\delta(M)=(S_2 M)-(S_1 M)=n_{air} (S_2 M-S_1 M)\)
+- Exprimer les distances \(S_2 M\) et \(S_1 M\) en exprimant les corrdonnes de chaque points / les coordonnées des vecteurs / la norme des vecteurs)
+- Effctier une DL grâce à l'hypothèse D>>a,x,y pour obtenir \(S_2 M-S_1 M \approx \frac{ax}{D}\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.B) Dans le cas suivant faire le tracé de deux rayon lumineux qui arrivent en un point M quelconque et qui interfèrent
+>>> [IMAGE_ID: 20231218_210637-5143f6bde5b28f4dffc961d9364abd84289e1911.jpg] <<<
+R: >>> [IMAGE_ID: 20231218_211228.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(E.B) Dans ce cas là tracer deux rayon lumineux issus de S<sub>0</sub> qui interfèrent en M
+^
+>>> [IMAGE_ID: 20231218_212428.jpg] <<<
+R: >>> [IMAGE_ID: 20231218_212438.jpg] <<<
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(A.H.) 
+>>> [IMAGE_ID: paste-d760f1bd44dd9b39b34e74b94e06f1e00ad3f4ed.jpg] <<<
+[latex]\footnotesize{On se place dans le cas où $\delta$ ne dépend pas de $\lambda$. \newline
+\footnotesize{Si la lampe émettait un rayonnement monochromatique de longueur d'onde $\lambda$, quelle serait, en fonction de la différence de marche $\delta$, l'expression de l'intensité résultante ?}\newline
+Dans le cas du spectre bichromatique (à deux raies), exprimer l'intensité reçue en fonction de $\lambda_1$, $\lambda_2$, $I_0$ et $\delta$.
+\scriptsize{Avec $I_0$ l'intensité reçue si une seule des deux ondes parvient sur le détecteur, $I_0$ est une valeur commune aux deux ondes.}}[/latex]
+R: Cas monochromatique:\(I = 2I_0[1 + cos(\frac{2\pi}{\lambda}\delta)]\)
+Cas bichromatique:\(I = I_1 + I_2 = 2I_0[1+cos(\frac{2\pi}{\lambda_1}\delta)] + 2I_0[1+cos(\frac{2\pi}{\lambda_2}\delta)]\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(A.H.)
+>>> [IMAGE_ID: paste-9c0a6a8a3cf09546fb3fac93eb68f4d3aa3dcf01.jpg] <<<
+[latex]
+\footnotesize{On consdère que les deux longueurs du doublet sont très proches et on définit : 
+\begin{itemize}
+\item{$\lambda_0$ la valeur moyenne de $\lambda_1$ et $\lambda_2$}
+\item{$\Delta\lambda$ la largeur du doublet, différence entre $\lambda_2$ et $\lambda_1$ ($\lambda_2 > \lambda_1$)}
+\end{itemize}
+Mettre l'expression de $I(\delta)$ sous la forme :}
+\begin{center}
+\normalsize{$I(\delta) = I'[1+v(\delta)cos(\frac{2\pi\delta}{\lambda_0})]$}
+\end{center}
+\footnotesize{où $v(\delta)$ est la fonction de visibilité que l'on exprimera en fonction de $\Delta\lambda$.}
+\\\\
+\footnotesize{On admettra que : $I = I_1 + I_2 = 2I_0[1+cos(\frac{2\pi}{\lambda_1}\delta)] + 2I_0[1+cos(\frac{2\pi}{\lambda_2}\delta)]$}
+[/latex]
+R: [latex]
+\footnotesize{On a : $\lambda_0 = \frac{\lambda_1 + \lambda_2}{2}$ et $\Delta\lambda = \lambda_2 - \lambda_1$ ($\lambda_2 > \lambda_1$).
+De plus, $\lambda_1$ et $\lambda_2$ sont proches, on approxime $\lambda_1\lambda_2 \simeq \lambda_0^2$. On a alors :}
+\begin{align}
+I(\delta) & = 2I_0[1+cos(\frac{2\pi}{\lambda_1}\delta)] + 2I_0[1+cos(\frac{2\pi}{\lambda_2}\delta)] \\
+& = 2I_0[2 + cos(\frac{2\pi}{\lambda_1}\delta) + cos(\frac{2\pi}{\lambda_2}\delta)] \\
+& = 2I_0[2 + 2cos(\frac{2\pi\delta}{2}(\frac{1}{\lambda_1}+\frac{1}{\lambda_2}))cos(\frac{2\pi\delta}{2}(\frac{1}{\lambda_1}-\frac{1}{\lambda_2}))] \\
+& \simeq 4I_0[1 + cos(\frac{2\pi\delta}{2}(\frac{\lambda_1 + \lambda_2}{\lambda_0^2}))cos(\frac{2\pi\delta}{2}(\frac{\Delta\lambda}{\lambda_0^2}))] \\
+& = 4I_0[1 + cos(\frac{2\pi}{\lambda_0}\delta)cos(\frac{\pi\Delta\lambda}{\lambda_0^2}\delta) \\
+I(\delta) & = I'[1 + v(\delta)cos(\frac{2\pi}{\lambda_0}\delta)]
+\end{align}
+avec $I' = 4I_0$ et $v(\delta) = cos(\frac{\pi\Delta\lambda}{\lambda_0^2}\delta)$.
+[/latex]
+--------------------
+
+
+==================================================
+DECK : Thermo Sup
+==================================================
+
+Q: <span style="color: rgb(0, 255, 0);">(C.J.) Gaz Parfait Monoatomique : C<span style="font-size:x-small">v = ? C<span style="font-size:x-small">p = ?
+R: GPM : \(C_v = \frac{3}{2}nR\)
+\(C_p = \frac{5}{2} nR\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(C.J.) Gaz Parfait Diatomique : C<span style="font-size:x-small">v = ? C<span style="font-size:x-small">p = ?
+R: GPD : \(C_v = \frac 5 2 nR\)
+\(C_p = \frac 7 2 nR\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(C.E.) Un système thermodynamique est fermé si
+R: il n'échange pas de matière avec l'extérieur (mais peut échanger énergie)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(C.E.) Un système thermoynamique est isolé si
+R: Il n'échange ni matière ni énergie avec l'extérieur
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(C.E.) Un système thermodynamique est ouvert si
+R: Il échange matière avec le milieu extérieur
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(C.E) Le quotient de 2 grandeurs extensives donne
+R: Une grandeur intensive (ex : masse volumique)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(TS)Donner la formule du premier principe (dans le cas où il n'y a pas de variations d'énergie cinétique et pas de variation d'énergie potentielle macroscopique) :
+R: \(\Delta U = W + Q\)
+Avec W: travail algébriquement reçu par le système
+Q: transfert thermique algébriquement reçu par le système
+Condition d'application: système fermé
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(TS)Citer la première loi de Joule et en déduire une égalité :
+R: L'énergie interne d'un gaz parfait ne dépend que de sa température. On a alors :
+\[\Delta U =  \text{C}_\text{v}\Delta T\]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(TS)Donner l'expression de l'enthalpie :
+R: <div style="text-align: justify;"> \(H = U + PV \)<div style="text-align: left;">H et U en J<div style="text-align: left;">P en Pa<div style="text-align: left;">V en m^3
+--------------------
+Q: (TS) Donner l'expression du premier principe sur l'enthalpie. Quelles sont les conditions de validité?
+R: <div style="text-align: left;">
+<div style="text-align: left;">\[\Delta H =  \text{W}_\text{u} + Q\]<div style="text-align: left;">Avec \(W_u\) le travail autre que celui des forces ext de pression.<span style="color: black; font-family: Arial; font-size: 20px; display: inline !important; float: none;">
+<div style="text-align: left;">Conditions de validité:<div style="text-align: left;">Evolution isobare (Le travail des forces de pression devient -<span style="white-space: pre-wrap;">Δ(PV) lorsque la transformation est isobare)<div style="text-align: left;">ou monobare avec équilibre mécanique à l'état initial et à l'état final: Pi = Pf = Pext.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(T.B.) Qu'est-ce qu'une grandeur intensive? extensive? Donner des exemples.
+R: Intensive si sa valeur ne dépend pas de la taille du système (expl: T, P)
+Extensive si sa valeur dépend de la taille du système (expl: V, n)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(A.S) Que dit la première loi de Joule ?
+R: L'énergie interne d'un Gaz Parfait ne dépend que de sa température.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(A.R. et T.B.) Comment s'exprime la variation d'énergie interne d'une PCII ?
+R: [$]\Delta U=C \Delta T[/$]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(T.B.) Que vaut la force de pression lorsque la pression est constante et s'exerce sur une surface S plane ?
+R: >>> [IMAGE_ID: Pression.jpg] <<<
+avec \(\vec{n}\) (comme \(\vec{F}\)) dirigé du fluide vers la surface.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(BR/LPB) Comment s'écrit le travail élémentaire et le travail des forces extérieures de pression?
+R: Travail élémentaire: \(\delta W = -P_\text{ext}dV\\\)
+Travail lorsque V varie de \(V_i\) à \(V_f\): \(W = -\int_{V_i}^{V_f} P_\text{ext}dV\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(BR/LPB)Pour les capacités thermiques d'une PCII, on a :
+R: \(C_P\approx C_V\) noté \(C\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(BR/LPB)On définit le coefficient isentropique \(\gamma\) comme le rapport :
+R: \(\gamma = \frac{C_\text{p}}{C_\text{v}} = \frac{C_\text{p, m}}{C_\text{v, m}} = \frac{c_\text{p}}{c_\text{v}} \)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(BR/LPB)Citer la deuxième loi de Joule :
+R: L'enthalpie d'un GP ne dépend que de la température \(T\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Enoncer le deuxième principe
+R: <div style="text-align: justify;">Pour un système fermé qui subit une transformation entre un état 1 et un état 2, la variation d'entropie <span style="text-align: left;"> <span style="text-align: left;"> \({\Delta}S=S_2-S_1\)<span style="text-align: left;"> s'exprime: \({\Delta}S=S_{creee}+S_{ech}\)<div style="text-align: justify;"><span style="color: black; font-family: Arial; font-size: 20px; text-align: justify; display: inline !important; float: none;"><span style="text-align: left;">
+<div style="text-align: justify;">où \(S_{créée}\) est <span style="text-align: left;">l'entropie créée au sein du système, <span style="text-align: left;"> <div style="text-align: left;">\(S_{éch}\) est l'entropie échangée, reçu de l'extérieur par le système.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Comment calculer l'entropie échangée?
+R: Si au cours d'une transformation , le système reçoit des transferts thermiques \(Q_i\) de différents thermostats de températures \(T_{ext,i}\), on a:\[S_{ech}=\sum_i \frac{Q_i}{T_{ext,i}}\]où \(T_{ext,i}\) est la température du <span style="color: rgb(255, 0, 0);">thermostat: elle est a priori <span style="color: rgb(0, 0, 0);">différente de cellle du système.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Quelle est la caractérisique d'une fonction d'état?
+R: Les variations d'une fonciton d'état ne dépendent pas du chemin suivi, seulement des états initiaux et finaux des transformations.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(BR/LPB)Sur ce diagramme de Clapeyron, le travail algébriquement reçu par le système est : 
+>>> [IMAGE_ID: Capture d’écran 2023-09-09 155229.png] <<<
+R: \(W = \mathcal{A}>0\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(A.P) Inégalité de Clausius ?
+R: Pour un cycle ditherme:
+>>> [IMAGE_ID: Screenshot_20230910_115252_DuckDuckGo.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Citer les conditions d'application de la loi de Laplace, citer la loi puis l'établir à l'aide de l'entropie d'un gaz parfait :\[S(P,V) = \frac{nR}{{\gamma}-1}ln(\frac{P}{P_0})+\frac{nR{\gamma}}{{\gamma}-1}ln(\frac{V}{V_0})) + S_0\]
+R: Un gaz parfait qui subit une transformation isentropique (notée isoS et aussi nommée adiabatique réversible) suit la loi de Laplace :
+\[ PV^{\gamma} = \text{cste} \]
+Pour l'établir, on sait que la transformation entre l'état 1 \((P_1,V_1,T_1)\) et l'état 2 \((P_2,V_2,T_2)\) est adiabatique réversible. On a donc :
+\[ \Delta S = S_2 - S_1 = 0 \]
+On a que l'entropie est constante, donc :
+\[ \Delta S = \frac{nR}{\gamma -1} \ln\left(\frac{P_2}{P_1}\right) + \frac{nR\gamma}{\gamma -1} \ln\left(\frac{V_2}{V_1}\right) \]
+\[ = \frac{nR}{\gamma -1} \ln\left(\frac{P_2}{P_1}\left(\frac{V_2}{V_1}\right)^{\gamma}\right) = 0 \]
+Donc,
+\[ P_1 V_1^{\gamma} = P_2 V_2^{\gamma} \]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Citer la loi de Laplace et l'exprimer en fonction de P et T et en fonction de T et V
+R: La loi de Laplace en fonction de P et V s'exprime :
+\[PV^{\gamma} = \text{cste}\]<span style="white-space: pre-wrap;">
+o<span style="white-space: pre-wrap;">ù \[ {\gamma}=c_p/c_v \]
+En fonction de \(P\) et \(T\): 
+\[P\left(\frac{nRT}{P}\right)^{\gamma} = \text{cste}\]
+donc on obtient:
+\[P^{1-\gamma}T^{\gamma} = \frac{\text{cste}}{(nR)^{\gamma}} = \text{cste}'\]
+Pour \(T\) et \(V\):
+\[TV^{\gamma - 1} = \frac{\text{cste}}{nR} = \text{cste}''\]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(E.B.) Faire un schéma de la détente de Joule - Gay-Lussac
+Exprimer T<sub>f</sub> et V<sub>f </sub>(température et volume finale) en fontcion de T<sub>0</sub> et V<sub>0</sub> (température et volume Initial).
+Donner l'entropie créée.
+Qu'en deduire sur la transformation?
+Donnée: \(\Delta S_{GP}=C_v ln (T_f/T_i) +nR ln (V_f/V_i)\)
+R: >>> [IMAGE_ID: paste-869b85dbe1c56a1cd010e47ed61ca635c720c15c.jpg] <<<
+Syst: Tout le gaz+ le vide (système fermé)
+1er pp: \(\Delta U=W+Q\) 
+évolution adiabatique: Q=0
+G.P.: \(\Delta U=\Delta U _{GP} + \Delta U_{vide} =C_V \Delta T\) car \(\Delta U_{vide}=0\)
+Or W=0 car V=cste
+Donc 1er pp: \(C_V\  \Delta T=0\) soit \(\Delta T=0\)
+Bilan: \(V_f = 2V_0\) ; \(T_f = T_0\)
+2nd pp: \(\Delta S=S_{créée}+S_{éch}\)
+\(\Delta S=\Delta S_{GP} +\Delta S_{vide}=\Delta S_{GP}=nR\ ln(2)\)
+\(S_{ech}=0\) car Q=0
+Donc \(Scréée = ΔS_{GP} = nRln(2)>0\) La transformation est irréversible
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Comment différencier une adiabatique réversible et une isotherme dans un diagramme de Clapeyron ?
+R: En un point M du diagramme, l'adiabatique réversible est plus raide qu'une isothèrme.
+>>> [IMAGE_ID: Screenshot_20230910_142255_Samsung_Notes.jpg] <<<
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(O.M) Efficacité et efficacité maximum d'une pompe à chaleur utilisée comme chauffage/
+R: [$] e = \frac{-Q_c}{W} [/$]
+et  [$] e \le \frac{T_c}{T_c-T_f} [/$]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(O.M) Efficacité et efficacité maximal d'un frigo
+R: [$] e = \frac{Q_f}{W} [/$]
+et  [$] e \le \frac{T_f}{T_c-T_f} [/$]
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Comment appelle-t-on une transformation dont la variation d'entropie est nulle ?
+R: On dit qu'elle est isentropique.
+--------------------
+Q: (FH)Déf isochore, isobare, monobare, isotherme, monotherme, reversible
+R: isochore : volume syst constant
+isobare : pression syst constante + \(P=P_{ext}\)
+monobare pression ext constante
+isotherme : temp syst constante +\(P=P_{ext}\)
+monotherme : temp ext constante 
+reversible : perturbation lente, et à tout moment on a temp et pression du système égales à la temp et pression de l'ext (\(P=P_{ext}\) et \(T=T_{ext}\))
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(FH)Travail pour une transfo isochore :
+R: W = 0
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(FH)Travail pour une transfo monobare :
+R: [$]W = -Pext  \Delta V[/$]
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(FH)Def adiabatique :
+R: systeme n'échange aucun transfert thermique avec le milieu extérieur.
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(ADC)La capacité thermique massique c de l'eau est (avec les unités) :
+R: 4,18 J.g<sup>-1</sup>.K<sup>-1</sup>
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(FH)Variation d'enthalpie d'un GP ou d'une phase condensée incompressible et indilatable.
+R: Gaz parfait: \(\Delta H=C_p\ \Delta T\)
+Phase condensé incompressible indilatable: \(\Delta H=C\ \Delta T\)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">INC
+>>> [IMAGE_ID: Capture d’écran 2023-09-10 170551.png] <<<
+Indiquer la signification des différents éléments et échanges.
+R: (1) système étudié: fluide frigorigène
+(2) Système mécanique ou électrique
+(3) Source chaude à Tc
+(4) Source froide à Tf
+(A) Travail W algébriquement reçu par le système
+(B) Transfert thermique Qc algébriquement reçu par le système
+(C) Transfert thermique Qf algébriquement reçu par le système
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(A.R) On considère une <span style="color: rgb(255, 0, 0);">masse m d'eau de <span style="color: rgb(255, 0, 0);">capacité th. massique c<sub>m</sub>, initialement à la température<span style="color: rgb(255, 0, 0);"> T<sub>i</sub> = 20°C, dans un calorimètre dont on néglige la valeur en eau. 
+On plonge une résistance <span style="color: rgb(255, 0, 0);">R = 5 <span style="background-color: rgb(255, 255, 255);"><span style="color: rgb(255, 0, 0);">Ω<span style="color: rgb(32, 33, 34);"> (de capacité th. négligeable) parcourue par un courant d'intensité <span style="color: rgb(255, 0, 0);">I = 1 A pendant <span style="color: rgb(255, 0, 0);">τ <span style="color: rgb(255, 0, 0);">= 1 minute dans l'eau.
+Calculer la température finale <span style="color: rgb(255, 0, 0);">T<sub>f</sub> de l'eau. La transformation est-elle réversible ? 
+Donnée:\(\Delta S_{PCII}=C\  ln (T_f/T_i)\)
+R: 1)  Système : { eau + résistance }
+On applique le 1<sup>er</sup> principe sur l'enthalpie :
+ΔH = W<sub>u</sub> = W<sub>élec
+</sub>Or ΔH = m c<sub>m </sub>(T<sub>f</sub> - T<sub>i</sub>) donc mc<sub>m</sub>(T<sub>f</sub> - T<sub>i</sub>) = RI<sup>2</sup><span style="color: rgb(0, 0, 0);">τ
+<span style="color: rgb(255, 0, 0);">T<sub>f</sub> = T<sub>i</sub> + RI<sup>2</sup>τ / mc<sub>m</sub>
+2) Toujours pour le système { eau + résistance }
+S<sub>e</sub> = 0 car la transformation est adiabatique
+ΔS = ΔS<sub><span style="font-size: 16.6667px;">eau</sub> + ΔS<sub>résistance</sub> (additivité de l'enthalpie). Or ΔS<sub>résistance</sub> = 0
+ΔS = m c<sub>m</sub> * ln(T<sub>f</sub> / T<sub>i</sub>) > 0 car T<sub>f</sub> > T<sub>i
+</sub>On applique le 2<sup><span style="font-size: 16.6667px;">ème</sup> principe :
+ΔS<sub>c </sub>= ΔS > 0 donc la transformation est irréversible !
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(L.L) Au cours d'une transformation adiabatique la température est-elle constante ?
+R: Non pas forcément car on peut chauffer un système en lui apportant du travail sans sans lui apporter de transfert thermique . (Un gaz quelconque qui est comprimé chauffe)
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(L.L)L'enthalpie de vaporisation est positive ou négative ? De même pour celle de solidification ?
+R: Changement d'état isobare: [$]\Delta H=Q[/$]
+La vaporisation consomme de l'énergie donc [$]Q>0[/$]  et donc l'enthalpie de vaporisation: [$]\Delta H>0[/$].
+Pour la solidification c'est l'inverse.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(INC) Définition de la capacité thermique à volume constant \(C_v\)
+R: Si U ne dépend que de T: \(C_v= \frac {dU} {dT}\)
+\(C_v\) en \(J \cdot K^{-1}\)
+\(dU\) en \(J\)
+\(dT\) en \(K\)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC) Rappeler les propriétés de l'entropie créee.
+R: L'entropie créee est toujours positive ou nulle. On a aussi
+S<sub>créee</sub> > 0  pour une transformation irréversible. 
+S<sub>créee </sub>= 0  pour une transformation réversible.
+--------------------
+Q: <span style="color: rgb(255, 170, 0);">(YZ) A l'aide de la relation de Mayer, établir et exprimer les capacités thermiques molaires à volume constant Cv,m et à pression constante Cp,m d'un gaz parfait en fonction du coefficient isentropique γ et de la constante des gaz parfaits R
+R: <div style="text-align: justify;">Cp,m =Cv,m +R<div style="text-align: justify;">γ=Cp,m / Cv,m <div style="text-align: justify;">Donc γ=1+R/Cv,m <div style="text-align: justify;">Soit Cv,m = R/(γ-1) et Cp,m = γCv,m = γR/(γ-1)
+--------------------
+Q: <span style="color: rgb(0, 255, 0);">(INC)<span style="color: rgb(0, 0, 0);"> Application : calcul d'entropie créee
+Un morceau de fer m = 2kg à la température T<sub>i</sub> = 880 K est jeté dans un lac à T<sub>0</sub> = 5°C. On donne c<sub>fer</sub> = 400 J Kg<sup>-1</sup> K<sup>-1</sup> et entropie massqiue c : s(T) = c ln(T/T<sub>0</sub>) + s<sub>0</sub>
+Exprimer l'entropie créee.
+R: On applique le 2nd principe : \(ΔS = Scrée + Séch\)
+d'où \(Scrée = ΔS - Séch\)
+De plus \(ΔS = m(s(T₀) - s(Ti))= m\ c \ ln\frac{T₀}{Ti}\)
+D'autre part : \(Séch = Q/T₀\)
+Avec Q qui s'obtient avec le premier principe :
+  \(ΔH = Wu + Q\) avec \(Wu = 0\)
+  \(Q = m\ c\ (T₀ - Ti)\)
+Finalement :
+  \(Scréee = m\ c\ ln(T₀/Ti) - m\ c\ (1-(Ti/T₀))\)
+--------------------
+
+
 
 
 
