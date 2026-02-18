@@ -94,6 +94,12 @@ const C_EMOJIS = {
 // On rajoute ensuite tes chapitres de physique à cet objet
 Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
+/* --- MAPPING MATHS --- */
+const MATH_MAP = {
+  "CH1": { title: "Ch.1 — Suites, fonctions réelles", emoji: "📊" },
+};
+Object.values(MATH_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
+
 
 /* --- RAW DATA CONTENT --- */
 
@@ -4547,3 +4553,6 @@ Finalement :
 
 
 `.trim();
+
+
+
