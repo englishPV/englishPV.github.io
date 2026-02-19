@@ -1688,7 +1688,6 @@ const RAW_EN = String.raw`
 1578|l’homophobie|homophobia|${SSM}
 1579|des remarques homophobes|homophobic remarks|${SSM}
 1580|être inflexible au sujet du mariage gay|to take a tough line on gay marriage|${SSM}
-1581|y a-t-il de la vie sur Mars ?|is there life on Mars?|${SPA}
 1582|l’univers|the universe|${SPA}
 1583|le système solaire|the solar system|${SPA}
 1584|une galaxie|a galaxy|${SPA}
