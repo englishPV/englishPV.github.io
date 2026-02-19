@@ -5,10 +5,11 @@ const HI="HEALTH ISSUES", IF="INDIVIDUAL FREEDOM", IDR="ILLEGAL DRUGS", VI="Verb
 // Constantes ajoutées pour couvrir les variables de la Map Emoji et la fin du texte brut
 const EDU="Education", ECO="Economy", SPO="Sports", GUN="Gun Control", REL="Religion", ENV="Environment", TEC="Technology", MED="Media";
 const THA="Thanksgiving", BUS="Business", POL="Politique" , WP="War & Peace", SLM="Sex Love Marriage";
-// NOUVELLE CONSTANTE
 const SSM="Same Sex Marriage";
 
-/* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
+// NOUVELLE CONSTANTE : SPACE
+const SPA="Space";
+
 /* --- MAPPING PHYSIQUE (ORDRE ET NOMS) --- */
 const PHY_MAP = {
   // --- Électrocinétique ---
@@ -65,7 +66,8 @@ const C_EMOJIS = {
   [POL]: '🏛️',   // Politique
   [WP]:  '⚔️',
   [SLM]: '❤️',
-  [SSM]: '🏳️‍🌈',  // Same Sex Marriage (Nouvel Emoji)
+  [SSM]: '🏳️‍🌈',  // Same Sex Marriage
+  [SPA]: '🌌',   // Space (Nouvel Emoji)
 
   // --- Social & Économie ---
   [CI]:  '🧳',   // Immigration
@@ -91,7 +93,7 @@ const C_EMOJIS = {
   [VI]:  '📝'    // Verbes Irréguliers
 };
 
-// On rajoute ensuite tes chapitres de physique à cet objet
+// Ajout des chapitres de physique à l'objet emojis
 Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 /* --- MAPPING MATHS --- */
@@ -103,7 +105,6 @@ Object.values(MATH_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 /* --- RAW DATA CONTENT --- */
 
-// Note : J'utilise String.raw ici aussi par sécurité
 const RAW_EN = String.raw`
 0|monarchie|monarchy|${CD}
 1|monarque de droit divin|a monarch by divine right|${CD}
@@ -1687,7 +1688,95 @@ const RAW_EN = String.raw`
 1578|l’homophobie|homophobia|${SSM}
 1579|des remarques homophobes|homophobic remarks|${SSM}
 1580|être inflexible au sujet du mariage gay|to take a tough line on gay marriage|${SSM}
-
+1581|y a-t-il de la vie sur Mars ?|is there life on Mars?|${SPA}
+1582|l’univers|the universe|${SPA}
+1583|le système solaire|the solar system|${SPA}
+1584|une galaxie|a galaxy|${SPA}
+1585|l’espace|outer space|${SPA}
+1586|une année-lumière|a light year|${SPA}
+1587|une planète|a planet|${SPA}
+1588|une comète|a comet|${SPA}
+1589|un astéroïde|an asteroid|${SPA}
+1590|un trou noir|a black hole|${SPA}
+1591|un météorite|a meteorite|${SPA}
+1592|un monolithe|a monolith|${SPA}
+1593|un mégalithe|a megalith|${SPA}
+1594|l’astronomie|astronomy|${SPA}
+1595|un astronome|an astronomer|${SPA}
+1596|un fana de l’espace|a space buff|${SPA}
+1597|la NASA|NASA|${SPA}
+1598|l’Agence spatiale européenne|the ESA (European Space Agency)|${SPA}
+1599|la conquête de l’espace|the conquest of space|${SPA}
+1600|l’ère spatiale|the space age|${SPA}
+1601|la course dans l’espace|the space race|${SPA}
+1602|un vol dans l’espace|a space flight|${SPA}
+1603|l’astronautique|astronautics|${SPA}
+1604|l’avionique|avionics|${SPA}
+1605|l’espace aérien|airspace|${SPA}
+1606|l’industrie aérospatiale|the aerospace industry|${SPA}
+1607|une mission sur Mars|a mission to Mars|${SPA}
+1608|explorer|to explore|${SPA}
+1609|un explorateur|an explorer|${SPA}
+1610|un vol habité|a manned flight|${SPA}
+1611|un vol inhabité|a unmanned flight|${SPA}
+1612|une combinaison spatiale|a space suit|${SPA}
+1613|un casque d’astronaute|a space helmet|${SPA}
+1614|un équipage|a crew|${SPA}
+1615|un astronaute|an astronaut|${SPA}
+1616|un cosmonaute|a cosmonaut|${SPA}
+1617|un taïkonaute|a taïkonaut|${SPA}
+1618|voyageur de l'espace|spaceman / spacewoman / space traveller|${SPA}
+1619|astronaute stagiaire|space cadet|${SPA}
+1620|une fusée|a rocket|${SPA}
+1621|une rétrofusée|a retrorocket|${SPA}
+1622|un téléscope|a telescope|${SPA}
+1623|une sonde|a probe|${SPA}
+1624|un vaisseau spatial|a spaceship / a rocket ship / spacecraft|${SPA}
+1625|le carburant|fuel|${SPA}
+1626|une navette|a shuttle|${SPA}
+1627|une station spatiale|a space station|${SPA}
+1628|un véhicule spatial|a lander|${SPA}
+1629|un véhicule lunaire|a lunar rover|${SPA}
+1630|lancer|to launch|${SPA}
+1631|être mis à feu|to blast off|${SPA}
+1632|un lanceur de satellites|a satellite launcher|${SPA}
+1633|une rampe de lancement, pas de tir|a launch pad|${SPA}
+1634|le compte à rebours|the countdown|${SPA}
+1635|l’envol|lift-off|${SPA}
+1636|un moteur|an engine|${SPA}
+1637|propulseur de fusée, moteur-fusée|a rocket engine|${SPA}
+1638|propulser|to propel|${SPA}
+1639|le combustible pour fusée, le propergol|propellant|${SPA}
+1640|kérosène (de fusée)|rocket fuel|${SPA}
+1641|une fusée de lancement|a launch vehicle / a booster / a booster rocket|${SPA}
+1642|une fusée interplanétaire|a space rocket|${SPA}
+1643|une fusée à étages|a multi-stage rocket|${SPA}
+1644|un sas|an airlock|${SPA}
+1645|ce n’est pas sorcier !|it’s not rocket science!|${SPA}
+1646|un missile|a missile|${SPA}
+1647|un satellite de télécommunications|a communications satellite|${SPA}
+1648|un satellite météorologique|a weather satellite|${SPA}
+1649|un satellite espion|a surveillance satellite|${SPA}
+1650|télécommandé|remote-controlled|${SPA}
+1651|être en orbite / se mettre en orbite|to be in orbit / go into orbit|${SPA}
+1652|mettre, placer un satellite en orbite|to put a satellite in(to) orbit|${SPA}
+1653|atterrir|to land / to touch down|${SPA}
+1654|atterrissage / amerissage / alunissage|touchdown|${SPA}
+1655|alunir|to land on the moon|${SPA}
+1656|amerrir|to splash down|${SPA}
+1657|amerissage|splashdown|${SPA}
+1658|l’apesanteur|weightlessness / zero gravity|${SPA}
+1659|la micro-gravité|microgravity|${SPA}
+1660|le tourisme dans l’espace|space tourism|${SPA}
+1661|recherches aérospatiales|space research / rocket research|${SPA}
+1662|un laboratoire spatial|a space lab|${SPA}
+1663|la spatiologie|space science|${SPA}
+1664|une retombée|a spin-off|${SPA}
+1665|le GPS|satnav / global positioning system / GPS|${SPA}
+1666|une soucoupe volante|a flying saucer|${SPA}
+1667|un OVNI|an unidentified flying object / a UFO|${SPA}
+1668|un extra-terrestre|an alien / an alien being|${SPA}
+1669|un martien|a Martian|${SPA}
 
 8000|supporter/porter/naître|bear / bore / borne/born|${VI}
 8001|battre|beat / beat / beaten|${VI}
