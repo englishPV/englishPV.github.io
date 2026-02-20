@@ -521,7 +521,7 @@ const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.l
 const dataEN = parseRaw(RAW_EN);
 const dataPHY = parsePhysicsData(RAW_PHY);
 
-const dataMATH = parseMathData(RAW_MATH);
+let dataMATH = [];
 
 const Media = {
   db: null, cache: new Map(),
@@ -1151,11 +1151,19 @@ function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
 function reconcile(){ const c=buildCanon(), o=data.subjects||[]; data.subjects=c.map(x=>{const old=o.find(z=>z.title===x.title)||{},chs=x.chapters.map(nc=>{const oc=(old.chapters||[]).find(z=>z.title===nc.title);return oc?{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=oc.cards.find(z=>extractId(z.id)===extractId(cd.id));return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}:nc});return{...x,chapters:chs,groups:old.groups||[]}}); o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id }
 function upgrade(){ if(!data.app)data.app={theme:'dark'}; data.app.prefs={fsTerm:22,fsDef:24,accent:'indigo',radius:14,...(data.app.prefs||{})}; data.subjects.forEach(s=>{valGrps(s);s.emoji=s.emoji||'';s.chapters.forEach(c=>{c.emoji=c.emoji||'';updChDesc(c);c.stats.dailyLog=c.stats.dailyLog||{};syncG(c)})}) }
-function init(){ 
-  Media.open(); 
-  setInterval(saveData, 30000); 
-  data=loadData(); if(data.app?.version!==APP_VER){reconcile();data.app.version=APP_VER;saveData()} 
-  pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1) 
+async function init(){
+  Media.open();
+  setInterval(saveData, 30000);
+
+  // ── Charger le markdown maths ──
+  try {
+    const r = await fetch('math.md');
+    if(r.ok) dataMATH = parseMathData(await r.text());
+  } catch(e){ console.warn('math.md non trouvé, fallback vide'); }
+
+  data = loadData();
+  if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; saveData(); }
+  pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
 }
 
 init();
