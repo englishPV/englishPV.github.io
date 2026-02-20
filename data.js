@@ -4643,4 +4643,7 @@ Finalement :
 `.trim();
 
 
+const RAW_MATH = String.raw`
+
+
 
