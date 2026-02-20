@@ -9047,7 +9047,7 @@ const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.l
 
 const dataEN = parseRaw(RAW_EN);
 const dataPHY = parsePhysicsData(RAW_PHY);
-const RAW_MATH = document.getElementById('rawMath')?.textContent || '';
+
 const dataMATH = parseMathData(RAW_MATH);
 
 const Media = {
