@@ -1,4 +1,5 @@
-<!DOCTYPE html> 
+
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
@@ -6,7 +7,6 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Physique Flashcards</title>
   <style>
-    /* --- VARIABLES & THEME --- */
     /* --- VARIABLES & THEME --- */
 :root {
   --bg: #0b1020; --surface: #12172b; --card: #161c33; --text: #e6ecff; --muted: #8aa0d3;
@@ -22,7 +22,7 @@
   --btn-soft-green-bg: rgba(34,197,94,.18); --btn-soft-green-bg-h: rgba(34,197,94,.28); --btn-soft-green-fg: #bbf7d0; --btn-soft-green-bd: rgba(34,197,94,.45);
   --btn-solid-primary-bg: var(--primary); --btn-solid-primary-bg-h: var(--primary-600); --btn-solid-primary-fg: #fff; --btn-solid-primary-bd: var(--primary-600);
 }
-:root[data-theme="light"] {
+[data-theme="light"] {
   --bg: linear-gradient(180deg,#f8fafc 0%,#eef2f7 100%); --surface: #fff; --card: #fff; --text: #0f172a; --muted: #475569;
   --primary: #3b82f6; --primary-600: #2563eb; --border: #cbd5e1;
   --btn-neutral-bg: #f1f5f9; --btn-neutral-fg: #0f172a; --btn-neutral-bd: #cbd5e1; --btn-neutral-bg-h: #e2e8f0;
@@ -33,11 +33,11 @@
   --btn-soft-blue-bg: #dbeafe; --btn-soft-blue-bg-h: #bfdbfe; --btn-soft-blue-fg: #1e3a8a; --btn-soft-blue-bd: #93c5fd;
   --btn-soft-green-bg: #dcfce7; --btn-soft-green-bg-h: #bbf7d0; --btn-soft-green-fg: #14532d; --btn-soft-green-bd: #86efac;
 }
-:root[data-theme="light"] .definition, :root[data-theme="light"] .card-item .back { color: var(--text)!important; opacity: 1!important; }
-:root[data-theme="light"] .muted { color: #475569!important; }
-:root[data-theme="light"] .legend-item { color: #0f172a!important; border-color: #e2e8f0!important; background: 0 0!important; }
-:root[data-theme="light"] .revision-bar, :root[data-theme="light"] .review-actions-bar { background: rgba(241,245,249,.9)!important; border-top: 1px solid #e2e8f0!important; }
-:root[data-theme="light"] .btn--ghost { --btn-bg-h: rgba(0,0,0,.06); }
+[data-theme="light"] :is(.definition,.card-item .back){color:var(--text)!important;opacity:1!important}
+[data-theme="light"] .muted{color:#475569!important}
+[data-theme="light"] .legend-item{color:#0f172a!important;border-color:#e2e8f0!important;background:0 0!important}
+[data-theme="light"] :is(.revision-bar,.review-actions-bar){background:rgba(241,245,249,.9)!important;border-top:1px solid #e2e8f0!important}
+[data-theme="light"] .btn--ghost{--btn-bg-h:rgba(0,0,0,.06)}
 
 /* --- RESET & LAYOUT --- */
 * { box-sizing: border-box; }
@@ -55,25 +55,55 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-san
 .spacer { flex: 1; }
 
 main#view { min-height: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden; padding: 8px; gap: 10px; }
-.hidden { display: none!important; } .muted { color: var(--muted); } .center { text-align: center; } .mt6 { margin-top: 6px; } .mt8 { margin-top: 8px; }
+.hidden { display: none!important; }
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.mt6 { margin-top: 6px; }
+.mt8 { margin-top: 8px; }
 .scroll-y { overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; } .scroll-lock { overflow: hidden; touch-action: none!important; }
 .list, .flexcol { display: flex; flex-direction: column; gap: 8px; min-height: 0; } .stack { display: flex; flex-direction: column; gap: 6px; }
-.row, .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .grid2 { gap: 10px; } .row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
 .input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; outline: none; appearance: none; }
 .input:focus { border-color: var(--primary); }
 
-.card, .deck-item, .review-card, .legend-item, .kpi .k, .stat, .chip { background: 0 0; border: 0; border-radius: var(--radius-md); pointer-events: auto; }
+.card,.deck-item,.review-card,.legend-item,.kpi .k,.stat,.chip{background:0 0;border:0;border-radius:var(--radius-md)}
 
 /* Deck & Lists */
-.deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer; user-select: none; position: relative; overflow: hidden; touch-action: pan-y; transition: background-color 0.3s ease; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); }
+.deck-item { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; cursor: pointer; user-select: none; position: relative; overflow: hidden; touch-action: pan-y; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); pointer-events: auto; }
 .deck-item:last-child { border-bottom: none; }
 .deck-item .slide { display: flex; align-items: center; gap: 10px; padding: 12px 0; transition: transform .18s ease; will-change: transform; width: 100%; position: relative; z-index: 2; }
 .deck-item .right-action { position: absolute; top: 0; right: 0; height: 100%; width: 92px; display: flex; align-items: center; justify-content: center; z-index: 1; }
 .deck-item.reveal-delete .slide { transform: translateX(-92px); }
 .deck-item.drop-target { outline: 2px dashed var(--primary); outline-offset: -2px; border-radius: var(--radius-md); background: color-mix(in srgb,var(--primary) 8%,transparent); }
+.deck-item.drop-target-above::before { content:''; position:absolute; top:-2px; left:10px; right:10px; height:3px; background:var(--primary); border-radius:2px; z-index:10; }
+.deck-item.drop-target-below::after { content:''; position:absolute; bottom:-2px; left:10px; right:10px; height:3px; background:var(--primary); border-radius:2px; z-index:10; }
+.deck-item.drop-target-inside { background: color-mix(in srgb,var(--primary) 15%,transparent); outline: 2px solid var(--primary); }
 .deck-item.dragging-origin { opacity: .3; }
-.drag-ghost { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; transform: translate(-9999px,-9999px) scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,.35); background: rgba(0,0,0,.08); border-radius: var(--radius-md); }
+.drag-ghost { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; transform: translate(-9999px,-9999px) scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,.35); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 16px; font-weight: 700; font-size: 14px; color: var(--text); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .folder-badge { font-weight: bold; color: var(--primary); margin-left: 6px; font-size: 12px; }
+
+/* Selection mode checkbox */
+.sel-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; margin-right: 8px; }
+.sel-checkbox.checked { background: var(--primary); border-color: var(--primary); }
+.sel-checkbox.checked::after { content: '✓'; color: #fff; font-size: 14px; font-weight: bold; }
+
+/* Red X button for removing from folder */
+.remove-x { width: 26px; height: 26px; border-radius: 50%; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: var(--red); font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.remove-x:hover { background: rgba(239,68,68,0.3); }
+
+/* Confirm FAB */
+.fab-confirm { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #fff; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(34,197,94,0.4); z-index: 100; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, opacity 0.2s; }
+.fab-confirm:active { transform: scale(0.9); }
+.fab-cancel { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--red); color: #fff; border: none; font-size: 20px; cursor: pointer; box-shadow: 0 4px 16px rgba(239,68,68,0.4); z-index: 100; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+.fab-cancel:active { transform: scale(0.9); }
+
+/* Indented folder children */
+.deck-item.folder-child { padding-left: 28px; }
+.deck-item.folder-child-depth-2 { padding-left: 48px; }
+.deck-item.folder-child-depth-3 { padding-left: 68px; }
 
 /* Deck emoji avatar */
 .deck-emoji { width: 42px; height: 42px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 15%, transparent); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
@@ -107,27 +137,23 @@ canvas#gradeChart { width: 140px; height: 140px; pointer-events: auto; }
 .section-title { font-weight: 900; font-size: 14px; color: var(--primary); letter-spacing: .3px; margin: 0 0 6px; }
 
 /* KPI */
-.kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .kpi .k { padding: 0; } .k .label, .stat .label { color: var(--muted); font-size: 12px; } .k .value, .val { font-weight: 900; font-size: 17px; margin-top: 2px; }
-.chip { display: inline-flex; align-items: center; gap: 8px; padding: 0; color: var(--muted); font-size: 12px; }
+.kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .kpi .k { padding: 0; pointer-events: auto; } .k .label, .stat .label { color: var(--muted); font-size: 12px; } .k .value, .val { font-weight: 900; font-size: 17px; margin-top: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 0; color: var(--muted); font-size: 12px; pointer-events: auto; }
 .chip-pie { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(var(--primary) var(--progress,0%),var(--border) var(--progress,0%)); vertical-align: middle; display: inline-block; }
 
 /* Legend compact */
 .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 8px; background: color-mix(in srgb, var(--border) 30%, transparent); cursor: pointer; user-select: none; transition: opacity .15s; position: relative; z-index: 2; }
+.legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 8px; background: color-mix(in srgb, var(--border) 30%, transparent); cursor: pointer; user-select: none; transition: opacity .15s; position: relative; z-index: 2; pointer-events: auto; }
 .legend-item.inactive { opacity: .45; filter: grayscale(20%); }
-.legend-item .check-icon { display: none; }
 .dot { width: 10px; height: 10px; border-radius: 50%; } .dot.gray { background: #9ca3af; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); } .dot.green { background: var(--green); }
 
-main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
+main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; pointer-events: auto; }
 
 /* Review */
 .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
-.review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; transition: background-color 0.4s ease; }
-.review-card.tint-facile { background-color: rgba(34, 197, 94, 0.15)!important; }
-.review-card.tint-bien { background-color: rgba(59, 130, 246, 0.15)!important; }
-.review-card.tint-difficile { background-color: rgba(245, 158, 11, 0.15)!important; }
-.review-card.tint-echec { background-color: rgba(239, 68, 68, 0.15)!important; }
+.review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; transition: background-color 0.4s ease; pointer-events: auto; }
+
 .review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: text; }
 .review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
 .term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; }
@@ -138,16 +164,16 @@ main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-hei
 .preview-verso { font-size: var(--fs-def); font-weight: 900; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px; }
 
 /* MathJax & Img */
-mjx-container { overflow-x: hidden; overflow-y: hidden; max-width: 100% !important; display: inline-block !important; padding: 4px 0; white-space: normal !important; vertical-align: middle; }
+mjx-container { overflow: hidden; max-width: 100% !important; display: inline-block !important; padding: 4px 0; white-space: normal !important; vertical-align: middle; }
 mjx-mtext { white-space: normal !important; display: inline !important; }
 mjx-math { white-space: normal !important; max-width: 100%; }
 .img-placeholder { display: block; background: rgba(255,255,255,0.05); color: #8aa0d3; padding: 15px; border: 2px dashed rgba(255,255,255,0.1); border-radius: 8px; margin: 15px auto; font-style: italic; font-size: 0.85rem; text-align: center; }
-img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-radius: 8px; background: var(--border); user-select: none; object-fit: contain; opacity: 1 !important; transition: none; }
+img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-radius: 8px; background: var(--border); user-select: none; object-fit: contain; opacity: 1 !important; }
 
 .bottom-actions, .revision-bar, .review-actions-bar { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
 .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 4; backdrop-filter: blur(8px) saturate(140%); }
 
-.btn, .navbtn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 10px 12px; font-weight: 900; cursor: pointer; transition: .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; }
+.btn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 10px 12px; font-weight: 900; cursor: pointer; transition: .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; }
 .btn:hover { background: var(--btn-bg-h,var(--btn-bg,var(--btn-neutral-bg-h))); } .btn:disabled { opacity: .6; cursor: not-allowed; }
 .btn--primary { --btn-bg: var(--btn-soft-primary-bg); --btn-bg-h: var(--btn-soft-primary-bg-h); --btn-fg: var(--btn-soft-primary-fg); --btn-bd: var(--btn-soft-primary-bd); }
 .btn--red { --btn-bg: var(--btn-soft-red-bg); --btn-bg-h: var(--btn-soft-red-bg-h); --btn-fg: var(--btn-soft-red-fg); --btn-bd: var(--btn-soft-red-bd); }
@@ -166,8 +192,6 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 
 .subject-menu { position: absolute; top: 52px; left: 10px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-md); min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,.35); padding: 6px; z-index: 1000; display: none; }
 .subject-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; cursor: pointer; } .subject-item:hover { background: rgba(255,255,255,.06); } .subject-item .name { font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .subject-item .meta { font-size: 12px; color: var(--muted); } .subject-item .subject-actions { margin-left: auto; display: flex; gap: 6px; }
-.wheel { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(255,255,255,.04); touch-action: none; user-select: none; cursor: ns-resize; }
-.wheel .name, .wheel .wheel-value { font-weight: 800; font-size: 13px; } .wheel .hint { color: var(--muted); font-size: 12px; } .wheel .wheel-value { margin-left: auto; font-weight: 900; }
 .swatches { display: flex; gap: 8px; flex-wrap: wrap; } .swatch { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border); background: var(--sw,#6366f1); cursor: pointer; position: relative; } .swatch.is-active::after { content: ''; position: absolute; inset: -3px; border: 2px solid var(--primary); border-radius: 10px; }
 .img-lightbox { position: fixed; inset: 0; display: none; background: 0 0; z-index: 10000; } .img-lightbox.open { display: block; }
 .img-stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; cursor: grab; } .img-canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
@@ -175,11 +199,9 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 .s-control { display: flex; align-items: center; gap: 15px; padding: 0 14px 15px; }
 .s-slider-container { flex: 1; display: flex; align-items: center; height: 40px; position: relative; }
 .s-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border); border-radius: 3px; outline: none; cursor: grab; }
-.s-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.3); margin-top: 0; position: relative; z-index: 2; }
-.s-stepper { display: flex; align-items: center; gap: 10px; background: var(--border); border-radius: 8px; padding: 4px; margin-left: auto; }
+.s-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.3); margin-top: 0; position: relative; z-index: 2; }
 .step-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: var(--surface); color: var(--text); font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .step-btn:active { transform: scale(0.9); background: var(--primary); color: #fff; }
-.step-val { min-width: 30px; text-align: center; font-weight: 900; font-size: 15px; }
 
 .settings-page { padding: 0 12px; }
 .settings-hero { font-size: 28px; font-weight: 900; padding: 16px 4px 12px; }
@@ -189,10 +211,8 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 .settings-row:last-child { border-bottom: none; }
 .settings-row:active { background: rgba(255,255,255,0.04); }
 .settings-row .s-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; color: #fff; }
-.s-icon.blue { background: #3b82f6; } .s-icon.green { background: #22c55e; } .s-icon.red { background: #ef4444; }
 .s-icon.dynamic { background: var(--primary) !important; transition: background 0.3s ease; }
-.s-icon.danger { background: var(--red) !important; } .s-icon.purple { background: #8b5cf6; } .s-icon.orange { background: #f59e0b; } .s-icon.gray { background: #6b7280; }
-.s-icon.teal { background: #14b8a6; } .s-icon.pink { background: #ec4899; }
+.s-icon.danger { background: var(--red) !important; }
 .settings-row .s-label { flex: 1; min-width: 0; }
 .settings-row .s-title { font-weight: 600; font-size: 15px; }
 .settings-row .s-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
@@ -211,14 +231,8 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 
 .progress-bar { position: absolute; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--green)); border-radius: 0 3px 3px 0; transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 5; }
 
-@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-main#view > * { animation: fadeSlideIn 0.25s ease-out; }
-
-.card-block, .deck-item { transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, background-color 0.3s; }
-.card-block:active, .deck-item:active { transform: scale(0.98); }
-
-.skeleton { background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; }
-@keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.card-block,.deck-item{transition:transform .2s,border-color .2s,box-shadow .2s,background-color .3s}
+.card-block:active,.deck-item:active{transform:scale(.98)}
 
 .focus-mode .topbar, .focus-mode .review-top { opacity: 0.3; transition: opacity 0.3s; }
 .focus-mode .topbar:hover, .focus-mode .review-top:hover { opacity: 1; }
@@ -248,75 +262,66 @@ main#view > * { animation: fadeSlideIn 0.25s ease-out; }
     </div>
   </div>
 
-<!-- APRÈS (corrigé) : -->
-<script type="text/plain" id="rawMath">
-</script>
-
 <script src="data.js"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 <script>
-
 /* --- CORE APP LOGIC --- */
-
-
-
-
-
-/* --- CORE APP LOGIC --- */
-const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2026-05-20-math-v4';
+const D = document, W = window, LS = localStorage, M = Math, KEY = 'flashcards9x16_data', APP_VER = '2026-06-22-math-v4';
 
 const GRADES = ['unseen','echec','difficile','bien','facile'];
-const GRADE_INIT = () => ({unseen:0,echec:0,difficile:0,bien:0,facile:0});
-const GRADE_FILTERS = () => ({unseen:!0,echec:!0,difficile:!0,bien:!0,facile:!0});
+const GRADE_INIT = () => Object.fromEntries(GRADES.map(g=>[g,0]));
+const GRADE_FILTERS = () => Object.fromEntries(GRADES.map(g=>[g,!0]));
+const GC={unseen:'gray',echec:'red',difficile:'amber',bien:'blue',facile:'green'};
+const GB={echec:'btn--red',difficile:'btn--amber',bien:'btn--blue',facile:'btn--green'};
+const mkCard=(id,f,b,ms=null)=>({id,front:f,back:b,mathSimple:ms,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0});
+const mkStats=n=>({gradeCounts:{...GRADE_INIT(),unseen:n},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}});
+const mkSettings=()=>({sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1});
+const mkChapter=(id,title,cards,imp)=>({id,title,description:(getEmoji(title)?getEmoji(title)+' ':'')+title,settings:mkSettings(),filters:{grades:GRADE_FILTERS()},stats:mkStats(cards.length),cards,imported:!!imp});
+const sRow=(id,icon,title,sub,right,click)=>`<div class="settings-row" ${id?'id="'+id+'"':''}${click?' style="cursor:pointer"':''}><div class="s-icon dynamic">${icon}</div><div class="s-label"><div class="s-title">${title}</div>${sub?'<div class="s-sub">'+sub+'</div>':''}</div>${right||''}</div>`;
+const sToggle=on=>`<div class="s-toggle ${on?'on':''}"></div>`;
+const sChev=`<div class="s-chevron">›</div>`;
+const sVal=v=>`<div class="s-value">${v}</div>`;
 
 const $ = (s,p=D) => p.querySelector(s), $$ = (s,p=D) => [...p.querySelectorAll(s)];
 const clamp = (n,mn,mx) => n<mn?mn:n>mx?mx:n;
 
 const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-const todayKey = () => dateKey(new Date());
-const getDayStart = () => { const d = new Date(); d.setHours(0,0,0,0); return d.getTime() };
-const avg = a => !a?.length ? 0 : a.reduce((x,y)=>x+y,0)/a.length;
-const deepClone = o => JSON.parse(JSON.stringify(o));
-const isSucc = g => g==='facile'||g==='bien';
-// ppLat removed/merged
-const mathCache = new Set();
-const clearMathCache = () => mathCache.clear();
+const dateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,todayKey=()=>dateKey(new Date()),getDayStart=()=>new Date().setHours(0,0,0,0),avg=a=>a?.length?a.reduce((x,y)=>x+y,0)/a.length:0,deepClone=o=>JSON.parse(JSON.stringify(o)),isSucc=g=>g==='facile'||g==='bien';
 
-// Optimisation: check regex avant d'appeler MathJax
+let mathCache = new Set();
+const clearMathCache = () => { mathCache = new Set(); };
+
 const needsMath = s => /[$]|\\[(\[]|\\frac|\\sqrt|\\text/.test(s);
 const tsLat = e => { 
   if(!W.MathJax?.typesetPromise || (e && !needsMath(e.innerHTML))) return Promise.resolve();
-  const id = e?.id || (e?.dataset?.id) || null;
-  if(id && mathCache.has(id)) return Promise.resolve();
-  if(id) mathCache.add(id);
+  const id = e?.id || e?.dataset?.id;
+  if(id) { if(mathCache.has(id)) return Promise.resolve(); mathCache.add(id); }
   return W.MathJax.typesetPromise(e?[e]:null).catch(()=>{});
 };
 const getEmoji = t => (typeof C_EMOJIS !== 'undefined' ? C_EMOJIS[t] : '') || '';
-const isMathSubject = () => { const s=getSub(); return s && s.title.toLowerCase()==='maths'; };
-const isMathChapter = () => isMathSubject();
-function getMathSimple(card) {
-    if (card.mathSimple) return card.mathSimple;
-    return null;
-}
+const isMathChapter = () => { const s=getSub(); return s?.title.toLowerCase()==='maths'; };
+const getMathSimple = card => card.mathSimple || null;
+
+const md2html = s => s
+    .replace(/\*\*([^*]+?:)\*\*/g, '<span class="math-label">$1</span>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/g, '<em>$1</em>')
+    .replace(/^\s*[\*\-]\s{2,}/gm, '• ')
+    .replace(/\n/g, '<br>');
 
 const parseMathData = (raw) => {
     if (!raw) return [];
     const result = []; let idCounter = 0;
-    // Découper par chapitres : # CHAPITRE N — Titre
     const chapSplit = raw.split(/^#\s+CHAPITRE\s+(\d+)\s*[—–-]\s*(.+)$/gm);
-    // chapSplit: [preamble, num1, title1, content1, num2, title2, content2, ...]
     for (let i = 1; i + 2 < chapSplit.length; i += 3) {
         const chNum = chapSplit[i].trim();
         const chKey = 'CH' + chNum;
-        const chTitle = (typeof MATH_MAP !== 'undefined' && MATH_MAP[chKey]) ? MATH_MAP[chKey].title : chapSplit[i+1].trim();
+        const chTitle = typeof MATH_MAP !== 'undefined' && MATH_MAP[chKey] ? MATH_MAP[chKey].title : chapSplit[i+1].trim();
         const content = chapSplit[i+2];
-        // Découper par flashcards : ## FLASHCARD N — Titre
         const cardSplit = content.split(/^##\s+FLASHCARD\s+\d+\s*[—–-]\s*.+$/gm);
         for (let j = 1; j < cardSplit.length; j++) {
             const block = cardSplit[j];
-            // Extraire RECTO, VERSO, L'ŒIL DE L'X
             const rectoMatch = block.match(/###\s+RECTO\s*\n([\s\S]*?)(?=###\s+VERSO|$)/);
             const versoMatch = block.match(/###\s+VERSO\s*\n([\s\S]*?)(?=###\s+L[''']ŒIL|---\s*$|$)/);
             const oeilMatch = block.match(/###\s+L[''']ŒIL DE L[''']X\s*\n([\s\S]*?)(?=---\s*$|$)/);
@@ -324,16 +329,6 @@ const parseMathData = (raw) => {
             let front = rectoMatch[1].trim();
             let back = (versoMatch ? versoMatch[1].trim() : '');
             if (oeilMatch) back += '\n\n---\n\n**🔍 L\'Œil de l\'X :**\n\n' + oeilMatch[1].trim();
-            // Convertir Markdown basique en HTML
-            const md2html = (s) => {
-    let h = s;
-    h = h.replace(/\*\*([^*]+?:)\*\*/g, '<span class="math-label">$1</span>');
-    h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    h = h.replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/g, '<em>$1</em>');
-    h = h.replace(/^\s*[\*\-]\s{2,}/gm, '• ');
-    h = h.replace(/\n/g, '<br>');
-    return h;
-};
             let mathSimple = null;
             const hypoM = back.match(/\*\*Hypothèses complètes\s*:\*\*\s*([\s\S]*?)(?=\*\*Énoncé formel|$)/);
             const enonceM = back.match(/\*\*Énoncé formel\s*:\*\*\s*([\s\S]*?)(?=\*\*Démonstration|\*\*Subtilités|\*\*Extensions|\*\*Pièges|\*\*🔍|###|$)/);
@@ -355,27 +350,23 @@ const parseMathData = (raw) => {
 };
 const extractId = c => String(c).match(/-(\d+)$/)?.[1]||null;
 const getSides = (c,ch) => ch?.settings?.langSwap ? {f:c.back,b:c.front} : {f:c.front,b:c.back};
-const fmtDur = ms => { const s=M.round(ms/1000); return`${M.floor(s/60)}:${String(s%60).padStart(2,'0')}` };
-function fmtDayFR(k){ const [Y,M,D]=k.split('-').map(Number), d=new Date(Y,M-1,D); return`${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]} ${String(D).padStart(2,'0')} ${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][M-1]} ${Y}` }
+const fmtDur=ms=>{const s=M.round(ms/1e3);return`${s/60|0}:${String(s%60).padStart(2,'0')}`},fmtDayFR=k=>{const[Y,Mo,Dy]=k.split('-').map(Number),d=new Date(Y,Mo-1,Dy);return`${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]} ${String(Dy).padStart(2,'0')} ${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][Mo-1]} ${Y}`};
 
 /* --- UI/UX HELPERS --- */
-function toast(msg, type = 'info', duration = 2500) {
-  let el = $('#toast'); if(!el) { el = D.createElement('div'); el.id = 'toast'; D.body.appendChild(el); }
+function toast(msg, type='info', dur=2500) {
+  let el = $('#toast') || Object.assign(D.createElement('div'), {id:'toast'});
+  if(!el.parentNode) D.body.appendChild(el);
   el.textContent = msg; el.className = `toast ${type}`;
-  requestAnimationFrame(() => { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), duration); });
+  requestAnimationFrame(() => { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), dur); });
 }
 
-const haptic = (style = 'light') => {
-  if(!navigator.vibrate) return;
-  const patterns = { light: 10, medium: 20, heavy: 30, success: [10, 50, 10], error: [30, 50, 30] };
-  navigator.vibrate(patterns[style] || 10);
-};
+const haptic = (s='light') => navigator.vibrate?.({light:10,medium:20,heavy:30,success:[10,50,10],error:[30,50,30]}[s]||10);
 
 function getStreak(c) {
   let streak = 0; const today = new Date();
   for(let i = 0; i < 365; i++) {
     const d = new Date(today); d.setDate(today.getDate() - i);
-    if((c.stats.dailyReviews[dateKey(d)] || 0) > 0) streak++; else if(i > 0) break;
+    if(c.stats.dailyReviews[dateKey(d)] > 0) streak++; else if(i) break;
   }
   return streak;
 }
@@ -396,25 +387,19 @@ function bindPullRefresh(container, onRefresh) {
   });
 }
 
+const hasSelection = () => window.getSelection()?.toString().length > 0;
+
 function bindSwipeNav() {
   const wrap = $('.review-wrap'); if(!wrap) return;
   const card = wrap.querySelector('.review-card'); if(!card) return;
   const scroller = wrap.querySelector('.review-scroller');
 
   let startX = 0, startY = 0, deltaX = 0;
-  let mode = 'idle'; // 'idle','undecided','swiping','scrolling','selecting','animating'
-
-  const hasSelection = () => {
-    const sel = window.getSelection();
-    return sel && sel.toString().length > 0;
-  };
+  let mode = 'idle';
 
   wrap.addEventListener('touchstart', e => {
     if(e.touches.length !== 1 || mode === 'animating') return;
-
-    // Si du texte est déjà sélectionné → on bloque le swipe
     if(hasSelection()) { mode = 'selecting'; return; }
-
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     deltaX = 0;
@@ -425,112 +410,73 @@ function bindSwipeNav() {
   wrap.addEventListener('touchmove', e => {
     if(e.touches.length !== 1) return;
     if(mode !== 'undecided' && mode !== 'swiping') return;
-
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
-
     if(mode === 'undecided') {
-      // Si du texte a été sélectionné pendant le toucher → mode sélection
       if(hasSelection()) { mode = 'selecting'; return; }
-
-      // Mouvement vertical dominant → scroll normal, pas de swipe
-      if(Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) {
-        mode = 'scrolling';
-        return;
-      }
-      // Mouvement horizontal suffisant → c'est un swipe
+      if(Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { mode = 'scrolling'; return; }
       if(Math.abs(dx) > 12) {
         mode = 'swiping';
-        // On empêche la sélection de texte pendant le swipe
         window.getSelection()?.removeAllRanges();
-        if(scroller) {
-          scroller.style.userSelect = 'none';
-          scroller.style.webkitUserSelect = 'none';
-        }
+        if(scroller) { scroller.style.userSelect = 'none'; scroller.style.webkitUserSelect = 'none'; }
       }
     }
-
     if(mode !== 'swiping') return;
-
     deltaX = dx;
     const r = State.review;
     const canGoBack = r && r.history && r.history.length > 0;
-
-    // Swipe droite suit le doigt (si possible), sinon résistance
-    // Swipe gauche = résistance seulement (pas d'action)
-    let tx = deltaX > 0
-      ? (canGoBack ? deltaX : deltaX * 0.15)
-      : deltaX * 0.15;
-
+    let tx = deltaX > 0 ? (canGoBack ? deltaX : deltaX * 0.15) : deltaX * 0.15;
     card.style.transform = `translateX(${tx}px) rotate(${tx * 0.015}deg)`;
     card.style.opacity = String(Math.max(0.5, 1 - Math.abs(tx) / 500));
   }, {passive: true});
 
   wrap.addEventListener('touchend', () => {
-    // Restaurer la sélection de texte
-    if(scroller) {
-      scroller.style.userSelect = '';
-      scroller.style.webkitUserSelect = '';
-    }
-
+    if(scroller) { scroller.style.userSelect = ''; scroller.style.webkitUserSelect = ''; }
     if(mode === 'swiping') {
       const r = State.review;
       const canGoBack = r && r.history && r.history.length > 0;
-
       if(deltaX > 80 && canGoBack) {
-        // La carte s'envole vers la droite (comme Reigns)
         mode = 'animating';
         card.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
         card.style.transform = `translateX(${window.innerWidth + 100}px) rotate(12deg)`;
         card.style.opacity = '0';
         setTimeout(() => { haptic('medium'); undoRev(); }, 200);
       } else {
-        // Snap-back élastique vers la position initiale
         card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out';
         card.style.transform = '';
         card.style.opacity = '';
         setTimeout(() => { card.style.transition = ''; }, 350);
         mode = 'idle';
       }
-    } else {
-      mode = 'idle';
-    }
-
+    } else { mode = 'idle'; }
     deltaX = 0;
   });
 }
 
-// Optimized Debounce
 const debouncedSave = (() => {
   let t; const c = W.cancelIdleCallback || clearTimeout, r = W.requestIdleCallback || (cb=>setTimeout(cb,2000));
   return () => { c(t); t = r(saveData); };
 })();
 
-
 W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
 
-function formatText(text) {
-    if (!text) return '';
-    let formatted = text.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (match, filename) => {
-        return `<img src="images/${filename.trim()}" alt="Schéma" loading="lazy">`;
-    });
-    formatted = formatted.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
-    formatted = formatted.replace(/\n|\\newline/g, '<br>').replace(/\[latex\]|\[\/latex\]/g, '').replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
-    return formatted;
-}
+const formatText = t => t ? t
+    .replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (_,f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`)
+    .replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m,c) => c.includes(' ') ? c : m)
+    .replace(/\n|\\newline/g, '<br>').replace(/\[latex\]|\[\/latex\]/g, '').replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)') : '';
 
 const parsePhysicsData = (rawData) => {
     if (!rawData) return [];
     const decks = rawData.split(/={10,}\s*DECK\s*:\s*/), result = []; let idCounter = 0;
-    decks.forEach(deckBlock => {
-        if (!deckBlock.trim()) return;
-        const lines = deckBlock.split('\n'), deckCode = lines[0].trim(), deckName = (typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode]) ? PHY_MAP[deckCode].title : deckCode;
-        deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim().split(/-{10,}/).forEach(rawCard => {
-            if (!rawCard.trim()) return;
+    for(const deckBlock of decks) {
+        if (!deckBlock.trim()) continue;
+        const lines = deckBlock.split('\n'), deckCode = lines[0].trim(), deckName = typeof PHY_MAP !== 'undefined' && PHY_MAP[deckCode] ? PHY_MAP[deckCode].title : deckCode;
+        for(const rawCard of deckBlock.substring(deckCode.length).replace(/^=+/gm, '').trim().split(/-{10,}/)) {
+            if (!rawCard.trim()) continue;
             const qMatch = rawCard.match(/Q:\s*([\s\S]*?)(?=R:)/), rMatch = rawCard.match(/R:\s*([\s\S]*)/);
             if (qMatch && rMatch) result.push({ id: 'phy-' + (idCounter++), front: formatText(qMatch[1].trim()), back: formatText(rMatch[1].trim()), chapter: deckName });
-        });
-    });
+        }
+    }
     return result;
 };
 
@@ -558,8 +504,8 @@ function setLBScale(ns,f=!1){ const os=LB.s, s=clamp(ns,LB.mnS,LB.mxS); if(!f&&M
 /* --- DATA LOADING --- */
 const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
 
-const dataEN = parseRaw(RAW_EN);
-const dataPHY = parsePhysicsData(RAW_PHY);
+const dataEN = (typeof RAW_EN !== 'undefined') ? parseRaw(RAW_EN) : [];
+const dataPHY = (typeof RAW_PHY !== 'undefined') ? parsePhysicsData(RAW_PHY) : [];
 
 let dataMATH = [];
 
@@ -577,121 +523,33 @@ const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`h
 
 async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
 
-// Lazy load JSZip
 async function impApkg(f){
   try {
     if(!window.JSZip) {
-      await new Promise((res, rej) => { 
-        const s=D.createElement('script'); 
-        s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; 
-        s.onload=res; 
-        s.onerror=()=>rej(new Error("Impossible de charger la bibliothèque JSZip.")); 
-        D.head.appendChild(s); 
-      });
+      await new Promise((res, rej) => { const s=D.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; s.onload=res; s.onerror=()=>rej(new Error("JSZip load failed")); D.head.appendChild(s); });
     }
     const b = await f.arrayBuffer();
-    let z; 
-    try { z = await JSZip.loadAsync(b); } 
-    catch(e) { throw new Error("Ce fichier n'est pas un ZIP/APKG valide."); }
-    
-    let mm = {}; 
-    const me = z.file(/^media(\.json)?$/i)[0];
-    if(me) { 
-      try { mm = JSON.parse(await me.async('string')); } 
-      catch(e) { console.warn("Fichier media.json invalide, ignoré."); } 
-    }
-    
+    let z; try { z = await JSZip.loadAsync(b); } catch(e) { throw new Error("Not a valid ZIP/APKG."); }
+    let mm = {}; const me = z.file(/^media(\.json)?$/i)[0];
+    if(me) { try { mm = JSON.parse(await me.async('string')); } catch(e) {} }
     const iId = `apkg-${slugify(f.name.replace(/\.[^.]+$/,''))}-${Date.now()}`;
     const mnk = {};
-    for(const [ns,rn] of Object.entries(mm)){ 
-      const e = z.file(new RegExp(`^${ns}$`))[0]; 
-      if(!e) continue; 
-      const k = `${iId}/${rn||ns}`; 
-      await Media.save(k, await e.async('blob'), {name:rn||ns}); 
-      mnk[rn] = k; 
-      mnk[ns] = k; 
-    }
-    
+    for(const [ns,rn] of Object.entries(mm)){ const e = z.file(new RegExp(`^${ns}$`))[0]; if(!e) continue; const k = `${iId}/${rn||ns}`; await Media.save(k, await e.async('blob'), {name:rn||ns}); mnk[rn] = k; mnk[ns] = k; }
     let col = z.file("collection.anki2") || z.file(/collection\.anki2(1|\.db)?/i)[0];
-    if(!col) throw new Error("Fichier de données Anki introuvable.");
-    
+    if(!col) throw new Error("Anki data not found.");
     const dbData = new Uint8Array(await col.async('uint8array'));
-    const header = String.fromCharCode.apply(null, dbData.subarray(0, 50));
-    if (!header.startsWith("SQLite")) { throw new Error("Format de base de données inconnu."); }
-    
     const SQL = await ensureSQL();
-    let db; 
-    try { db = new SQL.Database(dbData); } 
-    catch(sqlErr) { throw new Error("Base de données corrompue."); }
-    
-    let dk = {}; 
-    try { 
-      const r = db.exec('select decks from col limit 1'); 
-      if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}'); 
-    } catch(e) { console.warn("Impossible de charger les decks Anki, utilisation des IDs."); }
-    
-    let rows; 
-    try { rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid'); } 
-    catch(e) { db.close(); throw new Error("Erreur lors de la lecture des cartes."); }
-    
-    if(!rows || !rows[0]) { db.close(); throw new Error("Paquet Anki vide."); }
-    
+    let db; try { db = new SQL.Database(dbData); } catch(sqlErr) { throw new Error("DB corrupted."); }
+    let dk = {}; try { const r = db.exec('select decks from col limit 1'); if(r[0]?.values[0]) dk = JSON.parse(r[0].values[0][0]||'{}'); } catch(e) {}
+    let rows; try { rows = db.exec('select cards.id, cards.nid, cards.did, cards.ord, notes.flds from cards join notes on notes.id=cards.nid'); } catch(e) { db.close(); throw new Error("Read error."); }
+    if(!rows || !rows[0]) { db.close(); throw new Error("Empty Anki deck."); }
     const byD = new Map(), cols = rows[0].columns, vals = rows[0].values;
-    for(const r of vals){ 
-        const row = Object.fromEntries(cols.map((c,i) => [c,r[i]]));
-        const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › ');
-        const fl = (row.flds||'').split('\x1f');
-        let frontVal = fl[0] || 'Vide'; 
-        let backVal = fl[1] || '';
-        if (row.ord == 1 && fl.length >= 2) { frontVal = fl[1]; backVal = fl[0]; } 
-        if (fl.length > 2) { backVal += '<br><br>' + fl.slice(2).join('<br>'); }
-        const ca = byD.get(dn) || []; 
-        ca.push({ id: String(row.id), front: Media.rwHTML(frontVal, mnk), back: Media.rwHTML(backVal, mnk) }); 
-        byD.set(dn, ca);
-    }
-    
+    for(const r of vals){ const row = Object.fromEntries(cols.map((c,i) => [c,r[i]])); const dn = (dk[row.did]?.name || `Deck ${row.did}`).replace(/::/g,' › '); const fl = (row.flds||'').split('\x1f'); let frontVal = fl[0] || 'Vide'; let backVal = fl[1] || ''; if (row.ord == 1 && fl.length >= 2) { frontVal = fl[1]; backVal = fl[0]; } if (fl.length > 2) { backVal += '<br><br>' + fl.slice(2).join('<br>'); } const ca = byD.get(dn) || []; ca.push({ id: String(row.id), front: Media.rwHTML(frontVal, mnk), back: Media.rwHTML(backVal, mnk) }); byD.set(dn, ca); }
     db.close();
-    
-    const chs = []; 
-    for(const [n,arr] of byD){
-      const cds = arr.map(r => ({ 
-        id: `${slugify(n)}-${r.id}`, 
-        front: r.front, 
-        back: r.back, 
-        grade: 'unseen', 
-        timesReviewed:0, 
-        lastReviewed:0, 
-        lastMs:0, 
-        avgMs:0, 
-        perfEma:.5, 
-        ef:2.5, 
-        intervalDays:0, 
-        dueAt:0, 
-        streak:0, 
-        successes:0, 
-        failures:0 
-      }));
-      chs.push({ 
-        id: 'chap-'+slugify(n), 
-        title: n, 
-        description: `${getEmoji(n)||'📦'} ${n}`, 
-        settings: {sessionSize:10, dailyGoal:10, reviewOrder:'front-first', langSwap:!1}, 
-        filters: {grades:GRADE_FILTERS()}, 
-        stats: {gradeCounts:{...GRADE_INIT(), unseen:cds.length}, totalReviews:0, dailyReviews:{}, dailyChanges:{}, dailyDurMs:{}, dailyDurCount:{}, dailyLog:{}}, 
-        cards: cds, 
-        imported: !0 
-      });
-    }
-    
-    const sj = { id: `import-${slugify(f.name)}`, title: f.name.replace(/\.[^.]+$/,''), chapters: chs, imported: !0 }; 
-    data.subjects.push(sj); 
-    data.app.currentSubjectId = sj.id; 
-    saveData();
+    const chs = []; for(const [n,arr] of byD){ const cds=arr.map(r=>mkCard(`${slugify(n)}-${r.id}`,r.front,r.back)); chs.push(mkChapter('chap-'+slugify(n),n,cds,!0)); }
+    const sj = { id: `import-${slugify(f.name)}`, title: f.name.replace(/\.[^.]+$/,''), chapters: chs, imported: !0 }; data.subjects.push(sj); data.app.currentSubjectId = sj.id; saveData();
     toast('Import Anki réussi !', 'success');
-  } catch(e) { 
-    alert("Erreur import Anki : " + e.message); 
-    console.error(e);
-  }
+  } catch(e) { alert("Erreur import Anki : " + e.message); console.error(e); }
 }
 
 async function impDelim(f){ const t=await f.text(), sep=t.includes('\t')?'\t':(t.includes(';')?';':','), l=t.split(/\r?\n/).filter(Boolean); let h=l[0].split(sep).map(s=>s.trim().toLowerCase()), st=0; if(!h.includes('front')) h=['front','back','chapter']; else st=1; const recs=[]; for(let i=st;i<l.length;i++){ const c=l[i].split(sep), r=Object.fromEntries(h.map((x,j)=>[x,c[j]||''])); recs.push({front:r.front||c[0]||'',back:r.back||c[1]||'',chapter:r.chapter||'Général'}) } await impSimpSub(f.name.replace(/\.[^.]+$/,''),recs) }
@@ -699,34 +557,26 @@ async function impJSON(f){ const o=JSON.parse(await f.text()); if(Array.isArray(
 async function impSimpSub(n,l){
   const by={}; l.forEach(x=>{ const c=(x.chapter||'Général').trim()||'Général'; (by[c]=by[c]||[]).push({front:Media.rwHTML(String(x.front||''),{}),back:Media.rwHTML(String(x.back||''),{})}) });
   const chs=Object.entries(by).map(([cn,arr])=>{
-    const cds=arr.map((r,i)=>({id:`${slugify(cn)}-${i}-${Date.now()}`,front:r.front,back:r.back,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0}));
-    return{id:'chap-'+slugify(cn),title:cn,description:`📦 ${cn}`,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:{grades:GRADE_FILTERS()},stats:{gradeCounts:{...GRADE_INIT(), unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}},cards:cds,imported:!0}
+    const cds=arr.map((r,i)=>mkCard(`${slugify(cn)}-${i}-${Date.now()}`,r.front,r.back));
+    return mkChapter('chap-'+slugify(cn),cn,cds,!0)
   });
   const s={id:`import-${slugify(n)}-${Date.now()}`,title:n,chapters:chs,imported:!0}; data.subjects.push(s); data.app.currentSubjectId=s.id; saveData(); goDeck(!1)
 }
 
 let data;
-const ChartHit={}, Bar7Hit={};
+const ChartHit={};
 function buildChs(l){ 
-  const by={}; 
-  l.forEach(r=>{ const n=r.chapter||'Sans catégorie'; (by[n]=by[n]||[]).push(r) }); 
-  let sortedKeys = Object.keys(by);
-    const orderMap = {};
-  if(typeof PHY_MAP !== 'undefined') Object.values(PHY_MAP).forEach((v, i) => orderMap[v.title] = i);
-  if(typeof MATH_MAP !== 'undefined') Object.values(MATH_MAP).forEach((v, i) => orderMap[v.title] = i);
-  sortedKeys.sort((a, b) => {
-      const idxA = orderMap[a] !== undefined ? orderMap[a] : 999;
-      const idxB = orderMap[b] !== undefined ? orderMap[b] : 999;
-      return idxA - idxB;
-  });
+  const by={}; l.forEach(r=>{ const n=r.chapter||'Sans catégorie'; (by[n]=by[n]||[]).push(r) }); 
+  const orderMap = {};
+  [typeof PHY_MAP!=='undefined'&&PHY_MAP, typeof MATH_MAP!=='undefined'&&MATH_MAP].filter(Boolean).forEach(m => Object.values(m).forEach((v,i) => orderMap[v.title] = i));
+  const sortedKeys = Object.keys(by);
+  sortedKeys.sort((a, b) => { const idxA = orderMap[a] !== undefined ? orderMap[a] : 999; const idxB = orderMap[b] !== undefined ? orderMap[b] : 999; return idxA - idxB; });
   return {
       chapters: sortedKeys.map(n=>{ 
-          const cds=by[n].map(r=>({ id:`${slugify(n)}-${r.id}`, front:r.front, back:r.back, mathSimple:r.mathSimple||null, grade:'unseen', timesReviewed:0, lastReviewed:0, lastMs:0, avgMs:0, perfEma:.5, ef:2.5, intervalDays:0, dueAt:0, streak:0, successes:0, failures:0 }));
-          return {
-              id:'chap-'+slugify(n), title:n, description: getEmoji(n) ? `${getEmoji(n)} ${n}` : n, settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1}, filters:{grades:GRADE_FILTERS()}, stats:{gradeCounts:{...GRADE_INIT(),unseen:cds.length},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}}, cards:cds
-          } 
+          const cds=by[n].map(r=>mkCard(`${slugify(n)}-${r.id}`,r.front,r.back,r.mathSimple||null));
+          return mkChapter('chap-'+slugify(n),n,cds)
       }), 
-      app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',showEmoji:!0,radius:14}}
+      app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}
   };
 }
 const buildSub=(t,l) => ({id:slugify(t),title:t,chapters:buildChs(l).chapters,groups:[]});
@@ -737,6 +587,8 @@ const buildMathSub = () => {
         s.groups = [{
             id: 'g-math-all',
             chapIds: s.chapters.map(c => c.id),
+            childGroupIds: [],
+            parentGroupId: null,
             createdAt: Date.now(),
             title: 'Résumé de Cours',
             emoji: '📖',
@@ -747,57 +599,110 @@ const buildMathSub = () => {
 };
 const buildCanon = () => [buildSub('Physique',dataPHY), buildMathSub(), buildSub('Anglais',dataEN)];
 
-
-function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo'}}} }
+function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} }
 function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
 
-function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); data.subjects.forEach(s=>s.chapters.forEach(ch=>{ ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog'].forEach(x=>{const m=ch.stats[x]||{};Object.keys(m).forEach(d=>{if(d<k)delete m[d]})}); if(ch.stats.dailyLog)Object.values(ch.stats.dailyLog).forEach(a=>{if(a.length>200)a.splice(0,a.length-200)}) })) }
+function pruneStats(){ const c=new Date(); c.setDate(c.getDate()-180); const k=dateKey(c); for(const s of data.subjects) for(const ch of s.chapters){ for(const x of ['dailyReviews','dailyDurMs','dailyDurCount','dailyChanges','dailyLog']){ const m=ch.stats[x]; if(m) for(const d in m) if(d<k) delete m[d]; } if(ch.stats.dailyLog) for(const a of Object.values(ch.stats.dailyLog)) if(a.length>200) a.splice(0,a.length-200); } }
 const getSub = () => data.subjects.find(x=>x.id===data.app.currentSubjectId)||data.subjects[0];
 const setSub = id => { if(data.subjects.find(s=>s.id===id)){data.app.currentSubjectId=id;saveData()} };
 const getChs = () => getSub()?.chapters||[];
-const updChDesc = c => { 
-  const e = c.emoji || getEmoji(c.title) || ''; 
-  c.description = (e ? e + ' ' : '') + c.title; 
-};
+const updChDesc = c => { const e = c.emoji || getEmoji(c.title) || ''; c.description = (e ? e + ' ' : '') + c.title; };
 function uniqId(s,b){ const ids=new Set((s.chapters||[]).map(c=>c.id)); if(!ids.has(b))return b; let i=2,d=b; while(ids.has(d))d=b+'-'+i++; return d }
-function moveCh(fid,cid,tid){ if(fid===tid)return!1; const f=data.subjects.find(s=>s.id===fid), t=data.subjects.find(s=>s.id===tid); if(!f||!t)return!1; const i=f.chapters.findIndex(c=>c.id===cid); if(i<0)return!1; const ch=f.chapters[i]; ensGrps(f).forEach(g=>g.chapIds=g.chapIds.filter(id=>id!==cid)); valGrps(f); f.chapters.splice(i,1); ch.id=uniqId(t,ch.id); (t.chapters=t.chapters||[]).push(ch); valGrps(t); if(f.chapters.length===0){data.subjects=data.subjects.filter(s=>s.id!==f.id);if(data.app.currentSubjectId===f.id)data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 }
+function moveCh(fi,ci,ti){if(fi===ti)return!1;const f=data.subjects.find(s=>s.id===fi),t=data.subjects.find(s=>s.id===ti);if(!f||!t)return!1;const i=f.chapters.findIndex(c=>c.id===ci);if(i<0)return!1;const ch=f.chapters[i];ensGrps(f).forEach(g=>g.chapIds=g.chapIds.filter(id=>id!==ci));valGrps(f);f.chapters.splice(i,1);ch.id=uniqId(t,ch.id);(t.chapters=t.chapters||[]).push(ch);valGrps(t);if(!f.chapters.length){data.subjects=data.subjects.filter(s=>s.id!==f.id);if(data.app.currentSubjectId===fi)data.app.currentSubjectId=data.subjects[0]?.id}saveData();return!0}
 function renSub(id,t,e){ const s=data.subjects.find(x=>x.id===id); if(!s)return!1; if(t)s.title=t.trim(); s.emoji=(e||'').trim(); saveData(); return!0 }
-const ensGrps = s => { if(!Array.isArray(s.groups))s.groups=[]; return s.groups };
-const findGrp = (s,id) => ensGrps(s).find(g=>g.id===id);
-const findGrpCh = (s,cid) => ensGrps(s).find(g=>g.chapIds.includes(cid));
-const grpEmojis = (s,g) => { const z=new Set(); g.chapIds.forEach(id=>{const c=s.chapters.find(x=>x.id===id),e=c?(c.emoji||getEmoji(c.title)||''):'';if(e)z.add(e)}); return[...z].join(', ') };
-const valGrps = s => { const all=new Set(s.chapters.map(c=>c.id)); s.groups=ensGrps(s).map(g=>({...g,chapIds:g.chapIds.filter(x=>all.has(x))})).filter(g=>g.chapIds.length>=2) };
+const ensGrps=s=>{if(!Array.isArray(s.groups))s.groups=[];return s.groups},findGrp=(s,id)=>ensGrps(s).find(g=>g.id===id),findGrpCh=(s,cid)=>ensGrps(s).find(g=>g.chapIds.includes(cid)),findGrpOfGrp=(s,gid)=>ensGrps(s).find(g=>(g.childGroupIds||[]).includes(gid)),grpEmojis=(s,g)=>{const z=new Set();g.chapIds.forEach(id=>{const c=s.chapters.find(x=>x.id===id),e=c?(c.emoji||getEmoji(c.title)||''):'';if(e)z.add(e)});return[...z].join(', ')};
+const valGrps=s=>{const a=new Set(s.chapters.map(c=>c.id)),gi=new Set(ensGrps(s).map(g=>g.id));s.groups=ensGrps(s).map(g=>({...g,chapIds:(g.chapIds||[]).filter(x=>a.has(x)),childGroupIds:(g.childGroupIds||[]).filter(c=>gi.has(c)),parentGroupId:g.parentGroupId||null})).filter(g=>g.chapIds.length>=1||(g.childGroupIds||[]).length>=1)};
+function getAllChapIdsRecursive(s,gid){const g=findGrp(s,gid);if(!g)return[];let ids=[...g.chapIds];for(const c of(g.childGroupIds||[]))ids.push(...getAllChapIdsRecursive(s,c));return[...new Set(ids)]}
 
-function buildGrpStats(s,g){
-  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), c=GRADE_INIT();
-  chs.forEach(ch=>{ const k=getLive(ch); for(let x in c)c[x]+=k[x] });
-  const st={totalReviews:chs.reduce((a,b)=>a+(b.stats.totalReviews||0),0),dailyReviews:{},dailyDurMs:{},dailyDurCount:{},dailyChanges:{}}, base=new Date();
-  for(let i=0;i<60;i++){
-    const d=new Date(base); d.setDate(base.getDate()-i); const k=dateKey(d);
-    st.dailyReviews[k]=chs.reduce((a,b)=>a+(b.stats.dailyReviews[k]||0),0); st.dailyDurMs[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurMs[k]||0),0);
-    st.dailyDurCount[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurCount[k]||0),0);
-    st.dailyChanges[k]=chs.reduce((acc,ch)=>{const v=ch.stats.dailyChanges[k];if(v){acc.changed+=v.changed||0;acc.total+=v.total||0}return acc},{changed:0,total:0})
-  }
-  return {counts:c, stats:st}
-}
+function buildGrpStats(s,g){const ids=getAllChapIdsRecursive(s,g.id),chs=ids.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean),c=GRADE_INIT();chs.forEach(ch=>{const k=getLive(ch);for(let x in c)c[x]+=k[x]});const st={totalReviews:chs.reduce((a,b)=>a+(b.stats.totalReviews||0),0),dailyReviews:{},dailyDurMs:{},dailyDurCount:{},dailyChanges:{}},b=new Date();for(let i=0;i<60;i++){const d=new Date(b);d.setDate(b.getDate()-i);const k=dateKey(d);st.dailyReviews[k]=chs.reduce((a,b)=>a+(b.stats.dailyReviews[k]||0),0);st.dailyDurMs[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurMs[k]||0),0);st.dailyDurCount[k]=chs.reduce((a,b)=>a+(b.stats.dailyDurCount[k]||0),0);st.dailyChanges[k]=chs.reduce((a,ch)=>{const v=ch.stats.dailyChanges[k];if(v){a.changed+=v.changed||0;a.total+=v.total||0}return a},{changed:0,total:0})}return{counts:c,stats:st}}
 function buildVirt(s,g){
-  const chs=g.chapIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
+  const allIds = getAllChapIdsRecursive(s, g.id);
+  const chs=allIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
   chs.forEach(ch=>ch.cards.forEach(c=>cards.push({...c,id:`virt-${ch.id}-${c.id}`,_origin:{chapId:ch.id,cardId:c.id}})));
-  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:g.chapIds.slice(),settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:buildGrpStats(s,g).counts,...buildGrpStats(s,g).stats},cards,deadline:g.deadline,lastUsed:g.lastUsed}
+  const gs = buildGrpStats(s,g);
+  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:allIds,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:gs.counts,...gs.stats},cards,deadline:g.deadline,lastUsed:g.lastUsed}
 }
-function addGrp(s,ids){ const u=[...new Set(ids)].filter(Boolean); if(u.length<2)return; ensGrps(s).push({id:'g'+Date.now().toString(36),chapIds:u,createdAt:Date.now(),title:'',emoji:'',lastUsed:Date.now()}) }
-function toGrp(s,gid,cid){ const g=findGrp(s,gid); if(g&&!g.chapIds.includes(cid))g.chapIds.push(cid) }
-function remGrp(s,gid,ids){ const g=findGrp(s,gid); if(g)g.chapIds=g.chapIds.filter(x=>!ids.includes(x)) }
-function delGrp(s,gid){ s.groups=ensGrps(s).filter(g=>g.id!==gid) }
+function addGrp(s,ids,p=null){const u=[...new Set(ids)].filter(Boolean);if(u.length<2)return null;const gid='g'+Date.now().toString(36);ensGrps(s).push({id:gid,chapIds:u,childGroupIds:[],parentGroupId:p||null,createdAt:Date.now(),title:'',emoji:'',lastUsed:Date.now()});if(p){const pg=findGrp(s,p);if(pg){if(!pg.childGroupIds)pg.childGroupIds=[];pg.childGroupIds.push(gid);pg.chapIds=pg.chapIds.filter(id=>!u.includes(id))}}return gid}
+function toGrp(s,g,c){const x=findGrp(s,g);if(x&&!x.chapIds.includes(c))x.chapIds.push(c)}
+function remFromGrp(s,g,c){const x=findGrp(s,g);if(x)x.chapIds=x.chapIds.filter(i=>i!==c)}
+function delGrp(s,gid){const g=findGrp(s,gid);if(!g)return;const p=g.parentGroupId?findGrp(s,g.parentGroupId):null;if(p){g.chapIds.forEach(c=>{if(!p.chapIds.includes(c))p.chapIds.push(c)});(g.childGroupIds||[]).forEach(cg=>{const x=findGrp(s,cg);if(x){x.parentGroupId=g.parentGroupId;if(!p.childGroupIds)p.childGroupIds=[];p.childGroupIds.push(cg)}});p.childGroupIds=(p.childGroupIds||[]).filter(x=>x!==gid)}else(g.childGroupIds||[]).forEach(cg=>{const x=findGrp(s,cg);if(x)x.parentGroupId=null});s.groups=ensGrps(s).filter(x=>x.id!==gid)}
+function removeChildGrpFromParent(s,pid,cid){const p=findGrp(s,pid);if(!p)return;p.childGroupIds=(p.childGroupIds||[]).filter(x=>x!==cid);const c=findGrp(s,cid);if(c){c.chapIds.forEach(id=>{if(!p.chapIds.includes(id))p.chapIds.push(id)});c.parentGroupId=null}}
+
+let selectionMode = false;
+let selectedIds = new Set(); 
+let expandedFolders = new Set(); 
+let selectionContext = null; 
+
+function enterSelectionMode(initialId) {
+  selectionMode = true;
+  selectedIds = new Set();
+  if(initialId) selectedIds.add(initialId);
+  removeFABs();
+  goDeck(false);
+}
+
+function exitSelectionMode() {
+  selectionMode = false;
+  selectedIds.clear();
+  removeFABs();
+  goDeck(false);
+}
+
+function removeFABs() {
+  $$('.fab-confirm, .fab-cancel').forEach(el => el.remove());
+}
+
+function renderFABs() {
+  removeFABs();
+  if(!selectionMode) return;
+  
+  const fabConfirm = D.createElement('button');
+  fabConfirm.className = 'fab-confirm';
+  fabConfirm.innerHTML = '✓';
+  fabConfirm.title = 'Créer un dossier';
+  fabConfirm.onclick = () => {
+    const ids = [...selectedIds];
+    if(ids.length < 2) { toast('Sélectionnez au moins 2 éléments', 'error'); return; }
+    const sub = getSub();
+    let parentGid = null;
+    for(const eid of expandedFolders) {
+      const g = findGrp(sub, eid);
+      if(g) {
+        const allInFolder = ids.every(id => g.chapIds.includes(id));
+        if(allInFolder) { parentGid = eid; break; }
+      }
+    }
+    const newGid = addGrp(sub, ids, parentGid);
+    if(newGid) {
+      const title = prompt('Nom du dossier:', '');
+      if(title) { const ng = findGrp(sub, newGid); if(ng) ng.title = title.trim(); }
+      valGrps(sub); saveData();
+      toast('Dossier créé !', 'success');
+    }
+    exitSelectionMode();
+  };
+  D.body.appendChild(fabConfirm);
+  
+  const fabCancel = D.createElement('button');
+  fabCancel.className = 'fab-cancel';
+  fabCancel.innerHTML = '✕';
+  fabCancel.title = 'Annuler';
+  fabCancel.onclick = () => exitSelectionMode();
+  D.body.appendChild(fabCancel);
+}
 
 const Nav = {
   stack: [], scrollPos: 0,
-  push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos})) },
+  push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
   back(){ 
-    if(!this.stack.length)return; const p=this.stack.pop(); 
-    if(!this.stack.length||(!p.chapterId?.startsWith('group-')))State.virtualChapter=null; 
+    if(!this.stack.length) return false; 
+    const p=this.stack.pop(); 
+    State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
-    this.scrollPos = p.scrollPos || 0; render(!1) 
+    expandedFolders = new Set(p.expandedFolders || []);
+    this.scrollPos = p.scrollPos || 0; 
+    render(!1);
+    return true;
   },
   clear(){ this.stack=[]; this.scrollPos=0 }
 };
@@ -814,19 +719,13 @@ function getDeckTint(item, type) {
     let r = 0, g = 0, b = 0, a = 0;
     if (totalGraded > 0) {
         const wRed = (k.echec + k.difficile) / totalGraded, wBlue = k.bien / totalGraded, wGreen = k.facile / totalGraded;
-        r = (239 * wRed) + (59 * wBlue) + (34 * wGreen);
-        g = (68 * wRed) + (130 * wBlue) + (197 * wGreen);
-        b = (68 * wRed) + (246 * wBlue) + (94 * wGreen);
-        a = 0.25;
+        r = (239 * wRed) + (59 * wBlue) + (34 * wGreen); g = (68 * wRed) + (130 * wBlue) + (197 * wGreen); b = (68 * wRed) + (246 * wBlue) + (94 * wGreen); a = 0.25;
     }
     if (item.deadline) {
         const now = new Date(); now.setHours(0,0,0,0); const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
         const diff = (ddl - now) / 864e5; let urgency = 0;
         if (diff <= 0) urgency = 1; else if (diff <= 7) urgency = 1 - (diff / 7);
-        if (urgency > 0) {
-            const tR = 239, tG = 68, tB = 68;
-            if (totalGraded === 0) { r = tR; g = tG; b = tB; a = 0.5 * urgency; } else { r = r * (1 - urgency) + tR * urgency; g = g * (1 - urgency) + tG * urgency; b = b * (1 - urgency) + tB * urgency; a = 0.25 + (0.25 * urgency); }
-        }
+        if (urgency > 0) { const tR = 239, tG = 68, tB = 68; if (totalGraded === 0) { r = tR; g = tG; b = tB; a = 0.5 * urgency; } else { r = r * (1 - urgency) + tR * urgency; g = g * (1 - urgency) + tG * urgency; b = b * (1 - urgency) + tB * urgency; a = 0.25 + (0.25 * urgency); } }
     }
     if (a <= 0.01) return '';
     return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
@@ -850,7 +749,6 @@ function getDailyGoalCalc(ch) {
 
 /* --- NAVIGATION & UI --- */
 const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), revBar=$('#revisionBar'), startBtn=$('#startReviewBtn');
-const chipHtml = k => `<span class="chip">🟥 ${k.echec}</span><span class="chip">🟨 ${k.difficile}</span><span class="chip">🟦 ${k.bien}</span><span class="chip">🟩 ${k.facile}</span>`;
 
 function renSubMenu(){
   let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
@@ -866,8 +764,38 @@ const closeSubMenu = () => { const m=$('#subjectMenu'); if(m)m.style.display='no
 const clsOnOut = e => { if(!$('#subjectMenu')?.contains(e.target)&&e.target!==titleEl)closeSubMenu() };
 
 titleEl.onclick = () => { if(State.view!=='deck')goDeck(!1); else($('#subjectMenu')?.style.display==='block')?closeSubMenu():openSubMenu() };
-backBtn.onclick = () => { if(State.view==='recap'){if(Nav.stack.length)Nav.stack.pop();const t=State.review?.chapterId||State.chapterId;State.review=null;hideRevAct();if(t?.startsWith('group-')){const g=findGrp(getSub(),t.replace('group-',''));if(g){State.virtualChapter=buildVirt(getSub(),g);goChapter(State.virtualChapter.id,!1)}else goDeck(!1)}else if(t)goChapter(t,!1);else goDeck(!1)}else{if(State.view==='review'&&State.review&&!State.review.end&&!confirm('Quitter la révision ?'))return;Nav.back()} };
-$('#cardsBtn').onclick = () => goCards(State.chapterId); $('#settingsBtn').onclick = () => openSet(State.chapterId); startBtn.onclick = () => startRev(State.chapterId);
+
+backBtn.onclick = () => { 
+  if(selectionMode) { exitSelectionMode(); return; }
+  if(State.view==='recap'){
+    if(Nav.stack.length)Nav.stack.pop();
+    const t=State.review?.chapterId||State.chapterId;
+    State.review=null; hideRevAct();
+    if(t?.startsWith('group-')){
+      const g=findGrp(getSub(),t.replace('group-',''));
+      if(g){State.virtualChapter=buildVirt(getSub(),g);goChapter(State.virtualChapter.id,!1)}
+      else goDeck(!1);
+    } else if(t) goChapter(t,!1);
+    else goDeck(!1);
+  } else if(State.view==='review') {
+    if(!State.review?.end && !confirm('Quitter la révision ?')) return;
+    if(Nav.stack.length) Nav.back();
+    else goDeck(!1);
+  } else {
+    if(Nav.stack.length) {
+      Nav.back();
+    } else {
+      if(expandedFolders.size > 0) {
+        expandedFolders.clear();
+        goDeck(false);
+      }
+    }
+  }
+};
+
+$('#cardsBtn').onclick = () => goCards(State.chapterId); 
+$('#settingsBtn').onclick = () => openSet(State.chapterId); 
+startBtn.onclick = () => startRev(State.chapterId);
 
 function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
 function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
@@ -877,114 +805,558 @@ const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 function goDeck(push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache();
   if(push) Nav.push(); State.view='deck'; State.chapterId=null; 
-  const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack:!1}); setBot({actions:!1, revision:!1}); hideRevAct();
+  const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack: selectionMode || expandedFolders.size > 0}); setBot({actions:!1, revision:!1}); hideRevAct();
   let needsSave = false; if (checkExpiredDates(ensGrps(s))) needsSave = true; if (checkExpiredDates(s.chapters)) needsSave = true; if (needsSave) debouncedSave();
 
-  const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]), inG=new Set(grps.flatMap(g=>g.chapIds));
-  const sorter = (a, b) => { if (a.deadline && !b.deadline) return -1; if (!a.deadline && b.deadline) return 1; if (a.deadline && b.deadline) { const diff = new Date(a.deadline) - new Date(b.deadline); if (diff !== 0) return diff; } return (b.lastUsed || 0) - (a.lastUsed || 0); };
-  grps.sort(sorter); const visibleChs = chs.filter(c=>!inG.has(c.id)).sort(sorter);
-
-    v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head"><div class="section-title">Chapitres & Fichiers</div><div class="actions"><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list">${grps.map(g=>{const{counts:c}=buildGrpStats(s,g),tot=Object.values(c).reduce((a,b)=>a+b,0),pct=tot?M.round((tot-c.unseen)*100/tot):0;const tint=getDeckTint(g,'group');const emoji=g.emoji||'📁';const title=g.title||'Fichier ('+grpEmojis(s,g)+')';return`<div class="deck-item" data-type="group" data-id="${g.id}" style="${tint?'background-color:'+tint:''}"><div class="slide"><div class="deck-emoji">${emoji}</div><div class="deck-info"><div class="deck-title">${title}</div><div class="deck-sub"><div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div><span>${pct}%</span><div class="mini-dots"><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--amber)"></div><div class="md" style="background:var(--blue)"></div><div class="md" style="background:var(--green)"></div></div><span>${c.echec}·${c.difficile}·${c.bien}·${c.facile}</span><span class="folder-badge">${g.chapIds.length} chap.</span></div></div><div class="deck-chevron">›</div></div></div>`}).join('')}${visibleChs.map(c=>{const k=getLive(c),tot=c.cards.length,pct=tot?M.round((tot-k.unseen)/tot*100):0;const tint=getDeckTint(c,'chapter');const emoji=c.emoji||getEmoji(c.title)||'📄';return`<div class="deck-item" data-type="chapter" data-id="${c.id}" style="${tint?'background-color:'+tint:''}">${c.imported?'<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}<div class="slide"><div class="deck-emoji">${emoji}</div><div class="deck-info"><div class="deck-title">${c.title}</div><div class="deck-sub"><div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div><span>${pct}%</span><div class="mini-dots"><div class="md" style="background:#9ca3af"></div><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--green)"></div></div><span>${k.unseen}·${k.echec}·${k.facile}</span></div></div><div class="deck-chevron">›</div></div></div>`}).join('')}</div></div></div>`;
+  const v=$('#view'), grps=ensGrps(s), chs=(s.chapters||[]);
+  
+  const items = buildDeckItems(s, null, 0);
+  
+      v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
+      const listEl = $('#deckList');
+  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
   const impBtn = $('#impB');
-const impInput = $('#impI');
-if (impBtn && impInput) {
-    impBtn.onclick = () => impInput.click();
-}
-  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } }; 
+  const impInput = $('#impI');
+  if (impBtn && impInput) { impBtn.onclick = () => impInput.click(); }
+    $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
+  
+  $('#editModeBtn').onclick = () => {
+    if(selectionMode) {
+      exitSelectionMode();
+    } else {
+      selectionMode = true;
+      selectedIds.clear();
+      goDeck(false);
+    }
+  };
   if(!push && Nav.scrollPos > 0) { setTimeout(() => { const list = $('#dL'); if(list) list.scrollTop = Nav.scrollPos; }, 50); }
   const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
-  bindDeck();
+  
+  if(selectionMode) renderFABs();
+  
+  bindDeckNew();
 }
 
-// Optimized Event Delegation for Deck List
-function bindDeck(){
-  const l=$('#dL'); if(!l)return; const sub=getSub();
-  l.onclick=e=>{if(e.target.matches('.delCh')){e.stopPropagation();if(delImpCh(e.target.dataset.cid))goDeck(!1)}};
-
-  let sx=0, sy=0, dx=0, dy=0, st='idle', tm, g, raf, sd=0, el=null, t=null, id=null;
-  const auto=()=>{if(sd!==0)l.scrollTop+=6*sd;if(st==='dragging')raf=requestAnimationFrame(auto)};
-  const mG=(x,y)=>{if(g)g.style.transform=`translate(${x-75}px,${y-75}px) scale(1.02)`};
-
-  const onDown = e => {
-      if(e.target.closest('button')) return;
-      el = e.target.closest('.deck-item'); if(!el) return;
-      t = el.dataset.type; id = el.dataset.id;
-      sx=e.clientX; sy=e.clientY; dx=dy=0; st='pressed'; clearTimeout(tm);
-      if(!/android/i.test(navigator.userAgent)) el.setPointerCapture?.(e.pointerId);
-
-      if(t==='chapter') tm=setTimeout(()=>{
-          st='dragging'; el.classList.add('dragging-origin'); D.body.classList.add('dragging-active'); l.classList.add('scroll-lock'); openSubMenu();
-          g=el.cloneNode(!0); g.className='drag-ghost'; g.style.width=el.offsetWidth+'px'; D.body.appendChild(g); mG(sx,sy); raf=requestAnimationFrame(auto)
-      }, 500);
-      else if(t==='group') tm=setTimeout(()=>{ st='idle'; if(confirm("Décomposer ?")) { delGrp(sub,id); saveData(); goDeck(!1); } }, 700);
-      
-      l.addEventListener('pointermove', onMove); l.addEventListener('pointerup', onUp); l.addEventListener('pointercancel', onUp);
-  };
-
-  const onMove = e => {
-      if(st==='idle'||st==='swiping') return;
-      dx=e.clientX-sx; dy=e.clientY-sy;
-      if(st==='pressed'&&M.abs(dx)>10){
-          clearTimeout(tm);
-          if(dx<0&&el.querySelector('.right-action')){ st='swiping'; el.classList.add('reveal-delete'); e.preventDefault(); }
-      } else if(st==='dragging'){
-          e.preventDefault(); mG(e.clientX,e.clientY); const r=l.getBoundingClientRect();
-          sd = e.clientY<r.top+r.height*.2 ? -1 : (e.clientY>r.bottom-r.height*.2 ? 1 : 0);
-          $$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target'));
-          const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item,.subject-item');
-          if(tg&&tg!==el) tg.classList.add('drop-target');
+function buildDeckItems(s, parentGid, depth) {
+  const grps = ensGrps(s);
+  const items = [];
+  
+  const levelGroups = grps.filter(g => (g.parentGroupId||null) === parentGid);
+  const inGroupAtLevel = new Set();
+  levelGroups.forEach(g => g.chapIds.forEach(id => inGroupAtLevel.add(id)));
+  levelGroups.forEach(g => (g.childGroupIds||[]).forEach(cgid => {
+    getAllChapIdsRecursive(s, cgid).forEach(id => inGroupAtLevel.add(id));
+  }));
+  
+  let levelChapters;
+  if(parentGid === null) {
+    const allInGroups = new Set();
+    grps.forEach(g => {
+      if(!g.parentGroupId) {
+        g.chapIds.forEach(id => allInGroups.add(id));
+        (g.childGroupIds||[]).forEach(cgid => getAllChapIdsRecursive(s, cgid).forEach(id => allInGroups.add(id)));
       }
-  };
-
-  const onUp = e => {
-      clearTimeout(tm);
-      l.removeEventListener('pointermove', onMove); l.removeEventListener('pointerup', onUp); l.removeEventListener('pointercancel', onUp);
-
-      if(st==='dragging'){
-          const sEl=D.elementFromPoint(e.clientX,e.clientY)?.closest('.subject-item');
-          if(sEl){ const to=sEl.dataset.id; if(to&&to!==sub.id&&moveCh(sub.id,id,to)) setSub(to); }
-          else{ const tg=D.elementFromPoint(e.clientX,e.clientY)?.closest('.deck-item'); if(tg&&tg!==el) hDrop(sub,{type:t,id},{type:tg.dataset.type,id:tg.dataset.id}); }
-          goDeck(!1);
-      } else if(st==='pressed' && M.hypot(dx,dy)<8 && M.abs(dy)<6){
-          if(t==='group') openGrp(sub,id); else goChapter(id);
-      }
-      cancelAnimationFrame(raf); st='idle'; if(g) g.remove(); g=null;
-      if(el) el.classList.remove('dragging-origin'); 
-      D.body.classList.remove('dragging-active'); l.classList.remove('scroll-lock');
-      $$('.deck-item,.subject-item').forEach(n=>n.classList.remove('drop-target')); closeSubMenu();
-      el = null;
+    });
+    levelChapters = s.chapters.filter(c => !allInGroups.has(c.id));
+  } else {
+    const parentG = findGrp(s, parentGid);
+    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) : [];
+  }
+  
+  const sorter = (a, b) => { 
+    const aDeadline = a.deadline || (a.type === 'group' ? null : null);
+    const bDeadline = b.deadline || (b.type === 'group' ? null : null);
+    if (aDeadline && !bDeadline) return -1; if (!aDeadline && bDeadline) return 1; 
+    if (aDeadline && bDeadline) { const diff = new Date(aDeadline) - new Date(bDeadline); if (diff !== 0) return diff; }
+    return (b.lastUsed || 0) - (a.lastUsed || 0); 
   };
   
-  l.addEventListener('pointerdown', onDown);
-  l.onscroll=()=>{$$('.reveal-delete').forEach(n=>n.classList.remove('reveal-delete'))}
+  const groupItems = levelGroups.map(g => ({type:'group', group:g, depth}));
+  const chapItems = levelChapters.map(c => ({type:'chapter', chapter:c, depth, parentGid}));
+  
+  groupItems.sort((a,b) => sorter(a.group, b.group));
+  chapItems.sort((a,b) => sorter(a.chapter, b.chapter));
+  
+  for(const gi of groupItems) {
+    items.push(gi);
+    if(expandedFolders.has(gi.group.id)) {
+      const children = buildDeckItems(s, gi.group.id, depth + 1);
+      items.push(...children);
+    }
+  }
+  items.push(...chapItems);
+  
+  return items;
 }
-function hDrop(s,src,dst){
-  if(src.type!=='chapter')return; const sG=findGrpCh(s,src.id);
-  if(dst.type==='chapter'){if(src.id===dst.id)return;const dG=findGrpCh(s,dst.id);if(!sG&&!dG)addGrp(s,[src.id,dst.id]);else if(sG&&!dG)toGrp(s,sG.id,dst.id);else if(!sG&&dG)toGrp(s,dG.id,src.id);else if(sG!==dG){remGrp(s,sG.id,[src.id]);toGrp(s,dG.id,src.id)}}
-  else if(dst.type==='group'){if(sG&&sG.id!==dst.id)remGrp(s,sG.id,[src.id]);toGrp(s,dst.id,src.id)} valGrps(s); saveData()
-}
-function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buildVirt(s,g);goChapter(State.virtualChapter.id)} }
 
+function renderDeckItem(item, s) {
+  const depthClass = item.depth > 0 ? ` folder-child${item.depth >= 2 ? ` folder-child-depth-${Math.min(item.depth, 3)}` : ''}` : '';
+  
+  if(item.type === 'group') {
+    const g = item.group;
+    const {counts:c} = buildGrpStats(s, g);
+    const tot = Object.values(c).reduce((a,b)=>a+b,0);
+    const pct = tot ? M.round((tot-c.unseen)*100/tot) : 0;
+    const tint = getDeckTint(g, 'group');
+    const emoji = g.emoji || '📁';
+    const title = g.title || 'Fichier ('+grpEmojis(s,g)+')';
+    const isExpanded = expandedFolders.has(g.id);
+    const chevron = isExpanded ? '▾' : '›';
+    
+    let rightContent = '';
+    if(selectionMode) {
+      rightContent = `<button class="remove-x" data-action="delete-folder" data-gid="${g.id}" title="Supprimer le dossier">✕</button>`;
+    } else if(isExpanded) {
+      const parentG = findGrpOfGrp(s, g.id);
+      if(parentG) {
+        rightContent = `<button class="remove-x" data-action="remove-subfolder" data-gid="${g.id}" data-parent="${parentG.id}" title="Sortir du dossier" style="margin-right:12px">✕</button>`;
+      }
+    }
+    
+    return `<div class="deck-item${depthClass}" data-type="group" data-id="${g.id}" style="${tint?'background-color:'+tint:''}">
+      <div class="slide">
+        <div class="deck-emoji">${emoji}</div>
+        <div class="deck-info">
+          <div class="deck-title">${title}</div>
+          <div class="deck-sub">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
+            <span>${pct}%</span>
+            <div class="mini-dots"><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--amber)"></div><div class="md" style="background:var(--blue)"></div><div class="md" style="background:var(--green)"></div></div>
+            <span>${c.echec}·${c.difficile}·${c.bien}·${c.facile}</span>
+            <span class="folder-badge">${getAllChapIdsRecursive(s, g.id).length} chap.</span>
+          </div>
+        </div>
+        ${rightContent}
+        <div class="deck-chevron">${chevron}</div>
+      </div>
+    </div>`;
+  } else {
+    const c = item.chapter;
+    const k = getLive(c), tot = c.cards.length, pct = tot ? M.round((tot-k.unseen)/tot*100) : 0;
+    const tint = getDeckTint(c, 'chapter');
+    const emoji = c.emoji || getEmoji(c.title) || '📄';
+    
+    let rightContent = '';
+    if(selectionMode) {
+      const isChecked = selectedIds.has(c.id);
+      rightContent = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
+    } else if(item.parentGid && expandedFolders.has(item.parentGid)) {
+      rightContent = `<button class="remove-x" data-action="remove-from-folder" data-cid="${c.id}" data-gid="${item.parentGid}" title="Sortir du dossier" style="margin-right:12px">✕</button>`;
+    }
+    
+    if(selectionMode) {
+      rightContent = '';
+    }
+    let selectBox = '';
+    if(selectionMode) {
+      const isChecked = selectedIds.has(c.id);
+      selectBox = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
+    }
+    
+    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}" style="${tint?'background-color:'+tint:''}">
+      ${c.imported?'<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
+      <div class="slide">
+        ${selectBox}
+        <div class="deck-emoji">${emoji}</div>
+        <div class="deck-info">
+          <div class="deck-title">${c.title}</div>
+          <div class="deck-sub">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
+            <span>${pct}%</span>
+            <div class="mini-dots"><div class="md" style="background:#9ca3af"></div><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--green)"></div></div>
+            <span>${k.unseen}·${k.echec}·${k.facile}</span>
+          </div>
+        </div>
+        ${rightContent}
+        <div class="deck-chevron">›</div>
+      </div>
+    </div>`;
+  }
+}
+
+function bindDeckNew() {
+  const l = $('#dL'); if(!l) return;
+  const sub = getSub();
+  
+  if(bindDeckNew._globalExit) D.removeEventListener('pointerup', bindDeckNew._globalExit);
+  bindDeckNew._globalExit = (e) => {
+    if(!selectionMode) return;
+       const deckItem = e.target.closest('.deck-item, .fab-confirm, .fab-cancel');
+    if(!deckItem) exitSelectionMode();
+  };
+  D.addEventListener('pointerup', bindDeckNew._globalExit);
+
+  l.onclick = e => {
+    if(e.target.matches('.delCh')) { e.stopPropagation(); if(delImpCh(e.target.dataset.cid)) goDeck(!1); return; }
+    const selBox = e.target.closest('[data-action="toggle-select"]');
+    if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid); goDeck(false); return; }
+    const remBtn = e.target.closest('[data-action="remove-from-folder"]');
+    if(remBtn) { e.stopPropagation(); remFromGrp(sub, remBtn.dataset.gid, remBtn.dataset.cid); valGrps(sub); saveData(); goDeck(false); return; }
+    const delFolderBtn = e.target.closest('[data-action="delete-folder"]');
+    if(delFolderBtn) { e.stopPropagation(); if(confirm('Supprimer ce dossier ?')) { delGrp(sub, delFolderBtn.dataset.gid); valGrps(sub); saveData(); exitSelectionMode(); } return; }
+    const remSubBtn = e.target.closest('[data-action="remove-subfolder"]');
+    if(remSubBtn) { e.stopPropagation(); removeChildGrpFromParent(sub, remSubBtn.dataset.parent, remSubBtn.dataset.gid); valGrps(sub); saveData(); goDeck(false); return; }
+  };
+  
+  let longPressTimer = null;
+  let startX = 0, startY = 0;
+  let pressedEl = null;
+  let didLongPress = false;
+  
+  let dragging = false;
+  let dragData = null; 
+  let dragGhost = null;
+  let dragStarted = false;
+  let currentDropTarget = null;
+  let dropMode = null; 
+  
+  function createGhost(item) {
+    const ghost = D.createElement('div');
+    ghost.className = 'drag-ghost';
+    const titleEl = item.querySelector('.deck-title');
+    const emoji = item.querySelector('.deck-emoji');
+    ghost.textContent = (emoji ? emoji.textContent + ' ' : '') + (titleEl ? titleEl.textContent : 'Item');
+    D.body.appendChild(ghost);
+    return ghost;
+  }
+  
+  function updateGhost(x, y) {
+    if(!dragGhost) return;
+    dragGhost.style.transform = `translate(${x - 30}px, ${y - 20}px) scale(1.02)`;
+  }
+  
+  function removeGhost() {
+    if(dragGhost) { dragGhost.remove(); dragGhost = null; }
+  }
+  
+  function clearDropTargets() {
+    $$('.drop-target, .drop-target-above, .drop-target-below, .drop-target-inside', l).forEach(el => {
+      el.classList.remove('drop-target', 'drop-target-above', 'drop-target-below', 'drop-target-inside');
+    });
+    currentDropTarget = null;
+    dropMode = null;
+  }
+  
+  function getDropInfo(x, y) {
+    const items = $$('.deck-item', l);
+    for(const item of items) {
+      const rect = item.getBoundingClientRect();
+      if(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) continue;
+      
+      const itemType = item.dataset.type;
+      const itemId = item.dataset.id;
+      
+      if(dragData && itemId === dragData.id) continue;
+      
+      const relY = (y - rect.top) / rect.height;
+      
+      if(itemType === 'group') {
+        if(relY < 0.25) return { el: item, type: itemType, id: itemId, mode: 'above' };
+        if(relY > 0.75) return { el: item, type: itemType, id: itemId, mode: 'below' };
+        return { el: item, type: itemType, id: itemId, mode: 'inside' };
+      } else {
+        if(relY < 0.5) return { el: item, type: itemType, id: itemId, mode: 'above' };
+        return { el: item, type: itemType, id: itemId, mode: 'below' };
+      }
+    }
+    return null;
+  }
+  
+  function executeDrop(dragInfo, dropInfo) {
+    if(!dragInfo || !dropInfo) return;
+    
+    const sub = getSub();
+    const srcType = dragInfo.type;
+    const srcId = dragInfo.id;
+    
+    if(dropInfo.mode === 'root') {
+      if(srcType === 'chapter') {
+        const parentG = findGrpCh(sub, srcId);
+        if(parentG) { remFromGrp(sub, parentG.id, srcId); }
+      } else if(srcType === 'group') {
+        const parentG = findGrpOfGrp(sub, srcId);
+        if(parentG) { removeChildGrpFromParent(sub, parentG.id, srcId); }
+      }
+      valGrps(sub); saveData();
+      toast('Déplacé à la racine', 'success');
+      return;
+    }
+    
+    const dstType = dropInfo.type;
+    const dstId = dropInfo.id;
+    
+    if(dropInfo.mode === 'inside' && dstType === 'group') {
+      if(srcType === 'chapter') {
+        const oldG = findGrpCh(sub, srcId);
+        if(oldG && oldG.id !== dstId) remFromGrp(sub, oldG.id, srcId);
+        toGrp(sub, dstId, srcId);
+        toast('Chapitre ajouté au dossier', 'success');
+      } else if(srcType === 'group' && srcId !== dstId) {
+        const srcG = findGrp(sub, srcId);
+        const dstG = findGrp(sub, dstId);
+        if(srcG && dstG) {
+          const dstAllChildren = getAllChapIdsRecursive(sub, srcId);
+          const isCircular = (function checkCirc(gid) {
+            if(gid === srcId) return true;
+            const g = findGrp(sub, gid);
+            if(!g) return false;
+            return (g.childGroupIds||[]).some(cg => checkCirc(cg));
+          })(dstId);
+          
+          if(!isCircular) {
+            const oldParent = findGrpOfGrp(sub, srcId);
+            if(oldParent) {
+              oldParent.childGroupIds = (oldParent.childGroupIds||[]).filter(x => x !== srcId);
+            }
+            srcG.parentGroupId = dstId;
+            if(!dstG.childGroupIds) dstG.childGroupIds = [];
+            if(!dstG.childGroupIds.includes(srcId)) dstG.childGroupIds.push(srcId);
+            toast('Dossier imbriqué', 'success');
+          } else {
+            toast('Impossible : référence circulaire', 'error');
+          }
+        }
+      }
+    } else if(dropInfo.mode === 'above' || dropInfo.mode === 'below') {
+      if(srcType === 'chapter') {
+        let targetParentG = null;
+        if(dstType === 'chapter') {
+          targetParentG = findGrpCh(sub, dstId);
+        } else if(dstType === 'group') {
+          const dstG = findGrp(sub, dstId);
+          targetParentG = dstG ? (dstG.parentGroupId ? findGrp(sub, dstG.parentGroupId) : null) : null;
+        }
+        
+        const oldG = findGrpCh(sub, srcId);
+        if(oldG) remFromGrp(sub, oldG.id, srcId);
+        
+        if(targetParentG) {
+          toGrp(sub, targetParentG.id, srcId);
+          toast('Chapitre déplacé', 'success');
+        } else {
+          toast('Chapitre déplacé à la racine', 'success');
+        }
+      } else if(srcType === 'group') {
+        const srcG = findGrp(sub, srcId);
+        if(!srcG) return;
+        
+        let targetParentGid = null;
+        if(dstType === 'group') {
+          const dstG = findGrp(sub, dstId);
+          targetParentGid = dstG ? dstG.parentGroupId : null;
+        } else if(dstType === 'chapter') {
+          const parentG = findGrpCh(sub, dstId);
+          targetParentGid = parentG ? parentG.id : null;
+        }
+        
+        const oldParent = findGrpOfGrp(sub, srcId);
+        if(oldParent) {
+          oldParent.childGroupIds = (oldParent.childGroupIds||[]).filter(x => x !== srcId);
+        }
+        
+        if(targetParentGid && targetParentGid !== srcId) {
+          const newParent = findGrp(sub, targetParentGid);
+          if(newParent) {
+            srcG.parentGroupId = targetParentGid;
+            if(!newParent.childGroupIds) newParent.childGroupIds = [];
+            if(!newParent.childGroupIds.includes(srcId)) newParent.childGroupIds.push(srcId);
+          } else {
+            srcG.parentGroupId = null;
+          }
+        } else {
+          srcG.parentGroupId = null;
+        }
+        toast('Dossier déplacé', 'success');
+      }
+    }
+    
+    valGrps(sub); saveData();
+  }
+  
+  const onPointerDown = e => {
+    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
+    const item = e.target.closest('.deck-item');
+    if(!item) return;
+    
+    pressedEl = item;
+    startX = e.clientX;
+    startY = e.clientY;
+    didLongPress = false;
+    dragging = false;
+    dragStarted = false;
+    
+    const type = item.dataset.type;
+    const id = item.dataset.id;
+    
+    clearTimeout(longPressTimer);
+    
+    longPressTimer = setTimeout(() => {
+      didLongPress = true;
+      haptic('medium');
+      
+      dragging = true;
+      dragData = { type, id, el: item };
+      item.classList.add('dragging-origin');
+      dragGhost = createGhost(item);
+      updateGhost(startX, startY);
+      
+      l.classList.add('scroll-lock');
+    }, 400);
+  };
+  
+  const onPointerMove = e => {
+    if(!pressedEl) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    
+    if(!dragging && M.hypot(dx, dy) > 15) {
+      clearTimeout(longPressTimer);
+      return;
+    }
+    
+    if(dragging) {
+      e.preventDefault();
+      dragStarted = true;
+      updateGhost(e.clientX, e.clientY);
+      
+      clearDropTargets();
+      const info = getDropInfo(e.clientX, e.clientY);
+      if(info) {
+        if(info.mode === 'root') {
+          info.el.classList.add('drop-target');
+        } else if(info.mode === 'inside') {
+          info.el.classList.add('drop-target-inside');
+        } else if(info.mode === 'above') {
+          info.el.classList.add('drop-target-above');
+        } else if(info.mode === 'below') {
+          info.el.classList.add('drop-target-below');
+        }
+        currentDropTarget = info;
+        dropMode = info.mode;
+      }
+      
+      const lRect = l.getBoundingClientRect();
+      const edgeSize = 40;
+      if(e.clientY < lRect.top + edgeSize) {
+        l.scrollTop -= 8;
+      } else if(e.clientY > lRect.bottom - edgeSize) {
+        l.scrollTop += 8;
+      }
+    }
+  };
+  
+  const onPointerUp = e => {
+    clearTimeout(longPressTimer);
+    
+    if(dragging && dragStarted) {
+      const dropInfo = getDropInfo(e.clientX, e.clientY);
+      if(dropInfo && dragData) {
+        executeDrop(dragData, dropInfo);
+      }
+      
+      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
+      clearDropTargets();
+      removeGhost();
+      l.classList.remove('scroll-lock');
+      dragging = false;
+      dragData = null;
+      dragStarted = false;
+      pressedEl = null;
+      
+      goDeck(false);
+      return;
+    }
+    
+        if(dragging && !dragStarted) {
+      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
+      removeGhost();
+      l.classList.remove('scroll-lock');
+      
+      dragging = false;
+      dragData = null;
+      pressedEl = null;
+      return;
+    }
+    
+    if(!pressedEl || didLongPress) { pressedEl = null; return; }
+    
+    const item = pressedEl;
+    pressedEl = null;
+    
+    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
+    
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if(M.hypot(dx, dy) > 15) return;
+    
+    const type = item.dataset.type;
+    const id = item.dataset.id;
+    
+    if(selectionMode) {
+      if(type === 'chapter') {
+        if(selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        goDeck(false);
+      } else if(type === 'group') {
+        if(expandedFolders.has(id)) expandedFolders.delete(id);
+        else expandedFolders.add(id);
+        goDeck(false);
+      }
+    } else {
+      if(type === 'group') {
+        openGrp(sub, id);
+      } else {
+        goChapter(id);
+      }
+    }
+  };
+  
+  const onPointerCancel = () => {
+    clearTimeout(longPressTimer);
+    if(dragging) {
+      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
+      clearDropTargets();
+      removeGhost();
+      l.classList.remove('scroll-lock');
+    }
+    dragging = false;
+    dragData = null;
+    dragStarted = false;
+    pressedEl = null;
+  };
+  
+  l.addEventListener('pointerdown', onPointerDown);
+  l.addEventListener('pointermove', onPointerMove, {passive: false});
+  l.addEventListener('pointerup', onPointerUp);
+  l.addEventListener('pointercancel', onPointerCancel);
+}
+
+function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buildVirt(s,g);goChapter(State.virtualChapter.id)} }
+D.addEventListener('pointerup', (e) => {
+    if(!selectionMode) return;
+    const deckItem = e.target.closest('.deck-item');
+    const fab = e.target.closest('.fab-confirm, .fab-cancel');
+    if(!deckItem && !fab) {
+      exitSelectionMode();
+    }
+  });
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
   const dailyCalc = getDailyGoalCalc(c);
-    const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>{const act=sel[x],color=x==='unseen'?'gray':(x==='echec'?'red':(x==='difficile'?'amber':(x==='bien'?'blue':'green'))),label=x.charAt(0).toUpperCase()+x.slice(1);return`<div class="legend-item ${act?'':'inactive'}" data-key="${x}"><span class="dot ${color}"></span><span style="flex:1">${label}</span><b class="count">${k[x]}</b></div>`}).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
+  const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
-    botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
-  if(isMathChapter(c)){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;debouncedSave();goChapter(c.id,false)};}
+  botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
+  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;debouncedSave();goChapter(c.id,false)};}
   $('#deadlineInput').onchange = (e) => { const val = e.target.value; if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.deadline = val; } else { c.deadline = val; } debouncedSave(); goChapter(c.id, false); };
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
-/* --- RECHERCHE --- */
 async function goCards(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
   const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
   v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
-  const render = async (q='') => {
+  const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
     let filtered = [];
     if (!cleanQ) { filtered = pool; } else {
@@ -1005,15 +1377,15 @@ async function goCards(cid,push=true){
        filtered.forEach(x => {
           const {f,b} = getSides(x,c), el = D.createElement('div');
           el.className = `card-block grade-${x.grade||'unseen'}`; el.dataset.id = x.id;
-                    const msC=getMathSimple(x), bContent=(!data.app.prefs.mathDetail&&msC)?formatText(msC):formatText(b);
+          const msC=getMathSimple(x), bContent=(!data.app.prefs.mathDetail&&msC)?formatText(msC):formatText(b);
           el.innerHTML = `<div class="term">${formatText(f)}</div><div class="definition">${bContent}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
           grid.appendChild(el);
        });
     }
     await Media.resolve(grid); await tsLat(grid);
   };
-  await render(); 
-  $('#cardSearch').oninput = (e) => render(e.target.value);
+  await renderCards(); 
+  $('#cardSearch').oninput = (e) => renderCards(e.target.value);
   $('#cardsGrid').onclick=e=>{ const b=e.target.closest('.card-block'); if(b){ $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')}); b.classList.toggle('flipped'); } };
 }
 
@@ -1031,7 +1403,7 @@ function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push
 
 function renRev(){
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
-    const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
+  const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
   
   v.innerHTML=`<div class="review-wrap">
@@ -1058,7 +1430,7 @@ function renRev(){
       bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
       $('#flipBtn').onclick=()=>{haptic('light');r.flipped=!0;renRev()}
   } else {
-      bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn btn--${g==='echec'?'red':(g==='difficile'?'amber':(g==='bien'?'blue':'green'))}" id="g_${g}">${g}</button>`).join('')}</div>`;
+      bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn ${GB[g]}" id="g_${g}">${g}</button>`).join('')}</div>`;
       ['echec','difficile','bien','facile'].forEach(g=>$('#g_'+g).onclick=()=>subG(g))
   }
 }
@@ -1069,79 +1441,31 @@ function goRecap(push=true){
   $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
   $('#contBtn').onclick=()=>startRev(c.id,!1,true)
 }
+function continueOrNew(cid,queue,mode,push,isCont,extras={}){
+  if(isCont&&State.review){State.review.queue.push(...queue);State.review.index++;State.review.flipped=!1;State.review.cardStart=Date.now();State.review.end=null}
+  else State.review={chapterId:cid,queue,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),...extras};
+  goReview(push)
+}
 function startRev(cid,push=true,isCont=false){
-  if(!cid)return; const c=getCh(cid); 
-  // Passer isCont à startRevMulti
+  if(!cid)return;const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
-  
-  if(c.deadline) {
-      const dayStart = getDayStart();
-      if(!c._goalCache || c._goalCache.day !== dayStart) { const calc = getDailyGoalCalc(c); c._goalCache = { day: dayStart, size: calc?.val || 10, pool: calc?.pool || 0 }; }
-      c.settings.sessionSize = c._goalCache.size;
-  }
-
-  // Si continuation, on exclut les cartes déjà présentes dans la queue actuelle
-  let pool = c.cards.filter(x=>c.filters.grades[x.grade||'unseen']); 
-  if(isCont && State.review && State.review.queue) {
-      const seenIds = new Set(State.review.queue);
-      pool = pool.filter(x => !seenIds.has(x.id));
-  }
-
-  if(!pool.length){alert('Plus de cartes disponibles dans ce filtre.'); return;}
-  
-  c.lastUsed = Date.now(); saveData();
-  const q = bldQ(c,pool,c.settings.sessionSize); 
-  const newIds = q.map(x=>x.id);
-
-  if(isCont && State.review) {
-      // On ajoute à la session existante
-      State.review.queue.push(...newIds);
-      State.review.index++; // On passe à la première des nouvelles cartes
-      State.review.flipped = false;
-      State.review.cardStart = Date.now();
-      State.review.end = null;
-  } else {
-      // Nouvelle session (comportement d'origine)
-      State.review={chapterId:cid,queue:newIds,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; 
-  }
-  goReview(push);
+  if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}}c.settings.sessionSize=c._goalCache.size}
+  let pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
+  if(isCont&&State.review?.queue){const seen=new Set(State.review.queue);pool=pool.filter(x=>!seen.has(x.id))}
+  if(!pool.length){alert('Plus de cartes disponibles dans ce filtre.');return}
+  c.lastUsed=Date.now();saveData();
+  continueOrNew(cid,bldQ(c,pool,c.settings.sessionSize).map(x=>x.id),null,push,isCont)
 }
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
-  const all=ids.map(_real).filter(Boolean), pool=[]; 
-  
-  // Si continuation, on récupère les IDs déjà présents
-  const seenIds = (isCont && State.review) ? new Set(State.review.queue.map(item => item.cardId)) : new Set();
-
-  all.forEach(ch=>ch.cards.forEach(c=>{
-      if(flt.grades[c.grade||'unseen'] && !seenIds.has(c.id)) {
-          pool.push({chapId:ch.id,card:c});
-      }
-  })); 
-  
+  const all=ids.map(_real).filter(Boolean),pool=[];
+  const seen=isCont&&State.review?new Set(State.review.queue.map(i=>i.cardId)):new Set();
+  all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen']&&!seen.has(c.id))pool.push({chapId:ch.id,card:c})}));
   if(!pool.length){alert('Plus de cartes disponibles.');return}
-
-  const scored=pool.map(i=>{
-      const g=i.card.grade||'unseen',
-      base={unseen:6,echec:5,difficile:3.5,bien:2,facile:1}[g]||1,
-      due=(i.card.dueAt&&i.card.dueAt>0)?(Date.now()-i.card.dueAt>0?(1+M.min(3,(Date.now()-i.card.dueAt)/864e5)):0.85):1.15;
-      return {chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(0.9+M.random()*.2)}
-  }).sort((a,b)=>b.w-a.w);
-
+  const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+  const scored=pool.map(i=>{const g=i.card.grade||'unseen',base=wt[g]||1,due=i.card.dueAt>0?(Date.now()-i.card.dueAt>0?1+M.min(3,(Date.now()-i.card.dueAt)/864e5):.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w);
   const sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
-  const newCards = scored.slice(0,sz);
-
-  if(vid.startsWith('group-')){ const sub = getSub(); const g = findGrp(sub, vid.replace('group-','')); if(g) { g.lastUsed = Date.now(); saveData(); } }
-
-  if(isCont && State.review) {
-      State.review.queue.push(...newCards);
-      State.review.index++;
-      State.review.flipped = false;
-      State.review.cardStart = Date.now();
-      State.review.end = null;
-  } else {
-      State.review={mode:'multi',chapterId:vid,multiChaps:ids.slice(),queue:newCards,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now()}; 
-  }
-  goReview(push);
+  if(vid.startsWith('group-')){const g=findGrp(getSub(),vid.replace('group-',''));if(g){g.lastUsed=Date.now();saveData()}}
+  continueOrNew(vid,scored.slice(0,sz),null,push,isCont,{mode:'multi',multiChaps:ids.slice()})
 }
 
 function bldQ(c,pool,sz){
@@ -1154,22 +1478,20 @@ function bldQ(c,pool,sz){
   return [...sh(lc),...sh(dr),...sh(nc),...sh(ot)].slice(0,sz)
 }
 
-function getCur(){ const r=State.review; if(r.mode==='multi'){const i=r.queue[r.index],ch=_real(i.chapId);return{card:ch.cards.find(x=>x.id===i.cardId),chap:ch}}else{const ch=getCh(r.chapterId);return{card:ch.cards.find(x=>x.id===r.queue[r.index]),chap:ch}} }
+function getCur(){ const r=State.review; if(!r||r.index<0||r.index>=r.queue.length)return{card:null,chap:null}; if(r.mode==='multi'){const i=r.queue[r.index];if(!i)return{card:null,chap:null};const ch=_real(i.chapId);if(!ch)return{card:null,chap:null};return{card:ch.cards.find(x=>x.id===i.cardId)||null,chap:ch}}else{const ch=getCh(r.chapterId);if(!ch)return{card:null,chap:null};return{card:ch.cards.find(x=>x.id===r.queue[r.index])||null,chap:ch}} }
 
 function undoRev(){
   const r = State.review; if(!r.history.length) return;
   const snap = r.history.pop(); r.index = snap.idx;
   const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState;
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
-  r.flipped = false;  // ← CORRIGÉ : la carte apparaît côté recto
+  r.flipped = false; 
   saveData(); renRev();
 }
   
 function subG(nxt){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
   haptic(nxt === 'facile' ? 'success' : nxt === 'echec' ? 'error' : 'light'); 
-  const cardEl = $('.review-card');
-  if(cardEl) { cardEl.classList.remove('tint-facile', 'tint-bien', 'tint-difficile', 'tint-echec'); void cardEl.offsetWidth; cardEl.classList.add(`tint-${nxt}`); setTimeout(() => cardEl.classList.remove(`tint-${nxt}`), 400); }
 
   r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length });
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
@@ -1184,16 +1506,14 @@ function subG(nxt){
 }
 function schNx(c,g,now){
   const q={'facile':5,'bien':4,'difficile':2,'echec':1}[g]||0; let ef=c.ef||2.5; ef=ef+(0.1-(5-q)*(0.08+(5-q)*0.02)); if(ef<1.3)ef=1.3; c.ef=ef;
-  if(q<3){c.intervalDays=(g==='echec')?0.02:0.5;c.streak=(c.streak<=0?c.streak-1:-1)}else{c.intervalDays=(c.intervalDays<1e-6)?1:(c.intervalDays<1.5?6:M.round(c.intervalDays*ef));c.streak=(c.streak>=0?c.streak+1:1)}
+  if(q<3){c.intervalDays=(g==='echec')?0.02:0.5;c.streak=(c.streak<=0?c.streak-1:-1)}else{c.intervalDays=c.intervalDays<.001?1:c.intervalDays<1.5?6:M.round(c.intervalDays*ef);c.streak=(c.streak>=0?c.streak+1:1)}
   c.streak=clamp(c.streak,-8,12); c.dueAt=now+c.intervalDays*864e5
 }
 
-const getLive=c=>{const o=GRADE_INIT();c.cards.forEach(x=>o[x.grade||'unseen']++);return o}, syncG=c=>c.stats.gradeCounts=getLive(c), getTod=c=>c.stats.dailyReviews[todayKey()]||0, getTodCh=c=>c.stats.dailyChanges[todayKey()]||{changed:0,total:0}, cntAv=c=>c.cards.filter(x=>c.filters.grades[x.grade||'unseen']).length;
-const getSucc=c=>{const k=c.stats.gradeCounts,g=k.bien+k.facile,t=g+k.echec+k.difficile;return t?M.round(g/t*100):0}, get7dAvgMs=c=>{const b=new Date();let s=0,cnt=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);const k=dateKey(d);s+=(c.stats.dailyDurMs[k]||0);cnt+=(c.stats.dailyDurCount[k]||0)}return cnt?M.round(s/cnt):0}, get7dAvg=c=>{const b=new Date(),arr=[];for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);arr.push(c.stats.dailyReviews[dateKey(d)]||0)}return M.round(avg(arr))}, getWk=c=>{const b=new Date();let s=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);s+=(c.stats.dailyReviews[dateKey(d)]||0)}return s}, getLastN=(c,n)=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(c.stats.dailyReviews[dateKey(d)]||0)}return a}, getLbls=n=>{const a=[],b=new Date();for(let i=n-1;i>=0;i--){const d=new Date(b);d.setDate(b.getDate()-i);a.push(['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][d.getDay()])}return a}, dayKeyIdx=(n,i)=>{const b=new Date();b.setDate(b.getDate()-((n-1)-i));return dateKey(b)};
+const getLive=c=>{const o=GRADE_INIT();c.cards.forEach(x=>o[x.grade||'unseen']++);return o},syncG=c=>c.stats.gradeCounts=getLive(c),getTod=c=>c.stats.dailyReviews[todayKey()]||0,getTodCh=c=>c.stats.dailyChanges[todayKey()]||{changed:0,total:0},cntAv=c=>c.cards.filter(x=>c.filters.grades[x.grade||'unseen']).length,getSucc=c=>{const k=c.stats.gradeCounts,g=k.bien+k.facile,t=g+k.echec+k.difficile;return t?M.round(g/t*100):0},get7dAvgMs=c=>{const b=new Date();let s=0,n=0;for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);const k=dateKey(d);s+=(c.stats.dailyDurMs[k]||0);n+=(c.stats.dailyDurCount[k]||0)}return n?M.round(s/n):0},get7dAvg=c=>{const b=new Date(),a=[];for(let i=0;i<7;i++){const d=new Date(b);d.setDate(b.getDate()-i);a.push(c.stats.dailyReviews[dateKey(d)]||0)}return M.round(avg(a))},daysAgo=(n,i)=>{const d=new Date();d.setDate(d.getDate()-((n-1)-i));return d},getLastN=(c,n)=>Array.from({length:n},(_,i)=>c.stats.dailyReviews[dateKey(daysAgo(n,i))]||0),getLbls=n=>Array.from({length:n},(_,i)=>['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][daysAgo(n,i).getDay()]),dayKeyIdx=(n,i)=>dateKey(daysAgo(n,i));
 
-function drawBars(cid,v){ const el=D.getElementById(cid); if(!el)return; const ctx=el.getContext('2d'), dpr=W.devicePixelRatio||1, w=el.clientWidth, h=60; el.width=w*dpr; el.height=h*dpr; ctx.scale(dpr,dpr); const max=M.max(1,...v), barW=M.floor((w-36)/7); ctx.fillStyle='#94a3b8'; ctx.fillRect(0,h-14,w,1); let x=0; const bars=[]; v.forEach(n=>{const bh=M.max(3,(n/max)*(h-20));ctx.fillStyle='#6366f1';ctx.fillRect(x,h-14-bh,barW,bh);ctx.fillStyle='#e2e8f0';ctx.fillText(n,x+barW/2-3,h);bars.push({x,w:barW});x+=barW+6}); Bar7Hit[cid]={cssW:w,bars} }
-function opDayBar(e,id,cid){ const h=Bar7Hit[id]; if(!h)return; const x=e.clientX-e.target.getBoundingClientRect().left, i=h.bars.findIndex(b=>x>=b.x&&x<=b.x+b.w); if(i>=0)goDaily(cid,dayKeyIdx(7,i)) }
-function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=140, h=140, cx=70, cy=70, R=64, r=40; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=24;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,52,start,end);ctx.lineWidth=24;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 15px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+4); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
+function drawChart(id,k,sel){ const el=D.getElementById(id); if(!el)return; const ctx=el.getContext('2d'), w=140, h=140, cx=70, cy=70, R=64, r=40; ctx.clearRect(0,0,w,h); const segs=[{k:'unseen',c:'#9ca3af'},{k:'echec',c:'#ef4444'},{k:'difficile',c:'#f59e0b'},{k:'bien',c:'#3b82f6'},{k:'facile',c:'#22c55e'}], tot=segs.reduce((s,x)=>s+(k[x.k]||0),0), arcs=[]; 
+ if(!tot){ctx.beginPath();ctx.arc(cx,cy,R,0,6.28);ctx.lineWidth=24;ctx.strokeStyle='#cbd5e1';ctx.stroke();ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs:[]};return} let start=-1.57; segs.forEach(s=>{const v=k[s.k];if(!v)return;const ang=(v/tot)*6.28,end=start+ang,act=!sel||sel[s.k];ctx.beginPath();ctx.arc(cx,cy,52,start,end);ctx.lineWidth=24;ctx.strokeStyle=s.c;ctx.globalAlpha=act?0.9:0.2;ctx.stroke();ctx.globalAlpha=1;arcs.push({key:s.k,start,end});start=end}); ctx.fillStyle='#0ea5e9'; ctx.font='bold 15px sans-serif'; ctx.textAlign='center'; ctx.fillText(tot,cx,cy+4); ChartHit[id]={cx,cy,innerR:r,outerR:R,arcs} }
 function hChartClk(e,id,ch){ const h=ChartHit[id]; if(!h)return; const r=e.target.getBoundingClientRect(), dx=(e.clientX-r.left)*(180/r.width)-h.cx, dy=(e.clientY-r.top)*(180/r.height)-h.cy, d=M.hypot(dx,dy); if(d<h.innerR||d>h.outerR)return; let a=M.atan2(dy,dx); if(a<-1.57)a+=6.28; const hit=h.arcs.find(s=>a>=s.start&&a<=s.end); if(hit)updFilt(ch,hit.key) }
 
 function togFilt(c,k){ 
@@ -1202,26 +1522,44 @@ function togFilt(c,k){
   else if(actCnt===1&&s[k]){ keys.forEach(x=>s[x]=!0); }
   else { s[k]=!s[k]; if(!s[k]&&actCnt===1) s[k]=!0; }
 }
-const getPreviewTxt = () => {
-    const phy = data.subjects.find(s => s.title.toLowerCase().includes('physique')) || data.subjects[0];
-    const allCards = phy.chapters.flatMap(ch => ch.cards).filter(c => !c.front.includes('<img') && !c.back.includes('<img'));
-    if (!allCards.length) return { f: "La constante de Planck", b: "h = 6,626 x 10⁻³⁴ J.s" };
-    const r = allCards[M.floor(M.random() * allCards.length)];
-    return { f: r.front.replace(/<br>/g, ' '), b: r.back.replace(/<br>/g, ' ') };
-};
+const getPreviewTxt=()=>{const s=data.subjects.find(s=>s.title.toLowerCase().includes('physique'))||data.subjects[0],a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>!c.front.includes('<img')&&!c.back.includes('<img'));if(!a.length)return{f:"La constante de Planck",b:"h = 6,626 x 10⁻³⁴ J.s"};const r=a[M.floor(M.random()*a.length)];return{f:r.front.replace(/<br>/g,' '),b:r.back.replace(/<br>/g,' ')}};
 function openSet(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   const isDark = data.app.theme==='dark'; const prev = getPreviewTxt();
   
+  const sCtrl=(sId,subId,addId,valId,val,sfx='')=>`<div class="s-control"><button class="step-btn" id="${subId}">-</button><div class="s-slider-container" style="margin:0 10px;flex:1"><input type="range" class="s-slider" id="${sId}" min="12" max="72" value="${val}"></div><button class="step-btn" id="${addId}">+</button></div>`;
+  const swatches=['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('');
+  const sect=(t,body)=>`<div class="settings-section"><div class="section-title">${t}</div>${body}</div>`;
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1">
     <div class="settings-hero">Paramètres</div>
-    <div class="settings-section"><div class="section-title">Chapitre</div><div class="settings-row" id="rowTitle"><div class="s-icon dynamic">✏️</div><div class="s-label"><div class="s-title">Nom du chapitre</div><div class="s-sub">${c.title}</div></div><div class="s-chevron">›</div></div><div class="settings-row" id="rowEmoji"><div class="s-icon dynamic">😊</div><div class="s-label"><div class="s-title">Emoji</div></div><div class="s-value">${c.emoji || getEmoji(c.title) || 'Aucun'}</div><div class="s-chevron">›</div></div><div class="settings-row" id="rowLang"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Ordre des langues</div><div class="s-sub">${c.settings.langSwap?'Verso → Recto':'Recto → Verso'}</div></div><div class="s-chevron">›</div></div></div>
-    <div class="settings-section"><div class="section-title">Apparence</div><div class="settings-row" id="rowTheme"><div class="s-icon dynamic">🌓</div><div class="s-label"><div class="s-title">Mode sombre</div></div><div class="s-toggle ${isDark?'on':''}"></div></div><div class="settings-row" id="rowFocus"><div class="s-icon dynamic">🎯</div><div class="s-label"><div class="s-title">Mode Immersion (Zen)</div><div class="s-sub">Interface invisible en révision</div></div><div class="s-toggle ${P.focusMode?'on':''}"></div></div><div class="settings-row" style="cursor:default"><div class="s-icon dynamic">🎨</div><div class="s-label"><div class="s-title">Couleur</div></div><div class="swatches">${['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('')}</div></div></div>
-    <div class="settings-section"><div class="section-title">Typographie (Aperçu direct)</div><div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">Aa</div><div class="s-label"><div class="s-title">Taille Recto</div></div><div class="s-value" id="valT">${P.fsTerm}px</div></div><div class="s-control"><button class="step-btn" id="subT">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldT" min="12" max="60" value="${P.fsTerm}"></div><button class="step-btn" id="addT">+</button></div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">Aa</div><div class="s-label"><div class="s-title">Taille Verso</div></div><div class="s-value" id="valD">${P.fsDef}px</div></div><div class="s-control"><button class="step-btn" id="subD">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldD" min="14" max="72" value="${P.fsDef}"></div><button class="step-btn" id="addD">+</button></div></div>
-    <div class="settings-section"><div class="section-title">Session</div><div class="settings-row" style="cursor:default; border-bottom:none;"><div class="s-icon dynamic">📚</div><div class="s-label"><div class="s-title">Taille session</div><div class="s-sub">Nombre de cartes par révision</div></div><div class="s-value" id="valS">${c.settings.sessionSize}</div></div><div class="s-control"><button class="step-btn" id="subS">-</button><div class="s-slider-container" style="margin:0 10px; flex:1"><input type="range" class="s-slider" id="sldS" min="1" max="200" value="${c.settings.sessionSize}"></div><button class="step-btn" id="addS">+</button></div></div>
-    <div class="settings-section"><div class="section-title">Données</div><div class="settings-row" id="rowExp"><div class="s-icon dynamic">📤</div><div class="s-label"><div class="s-title">Exporter</div><div class="s-sub">Sauvegarder toutes les données</div></div><div class="s-chevron">›</div></div><div class="settings-row" id="rowImp"><div class="s-icon dynamic">📥</div><div class="s-label"><div class="s-title">Importer</div><div class="s-sub">Restaurer une sauvegarde</div></div><div class="s-chevron">›</div></div><input type="file" id="impF" class="hidden"></div>
-    <div class="settings-section"><div class="section-title">Zone dangereuse</div><div class="settings-row" id="rowRstC"><div class="s-icon dynamic">🔄</div><div class="s-label"><div class="s-title">Réinitialiser ce chapitre</div><div class="s-sub">Remettre toutes les cartes à "Non vu"</div></div></div><div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div></div>
-    <div class="settings-footer">Flashcards v${APP_VER}<br><span style="opacity: 0.7; font-size: 0.9em;">JB. C</span></div></div>`;
+    ${sect('Chapitre',
+      sRow('rowTitle','✏️','Nom du chapitre',c.title,sChev,1)+
+      sRow('rowEmoji','😊','Emoji','',sVal(c.emoji||getEmoji(c.title)||'Aucun')+sChev,1)+
+      sRow('rowLang','🔄','Ordre des langues',c.settings.langSwap?'Verso → Recto':'Recto → Verso',sChev,1)
+    )}
+    ${sect('Apparence',
+      sRow('rowTheme','🌓','Mode sombre','',sToggle(isDark),1)+
+      sRow('rowFocus','🎯','Mode Immersion (Zen)','Interface invisible en révision',sToggle(P.focusMode),1)+
+      sRow('','🎨','Couleur','',`<div class="swatches">${swatches}</div>`)
+    )}
+    ${sect('Typographie (Aperçu direct)',
+      `<div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div>`+
+      sRow('','Aa','Taille Recto','',sVal(P.fsTerm+'px').replace('s-value','s-value" id="valT'))+sCtrl('sldT','subT','addT','valT',P.fsTerm)+
+      sRow('','Aa','Taille Verso','',sVal(P.fsDef+'px').replace('s-value','s-value" id="valD'))+sCtrl('sldD','subD','addD','valD',P.fsDef)
+    )}
+    ${sect('Session',
+      sRow('','📚','Taille session','Nombre de cartes par révision',sVal(c.settings.sessionSize).replace('s-value','s-value" id="valS'))+sCtrl('sldS','subS','addS','valS',c.settings.sessionSize)
+    )}
+    ${sect('Données',
+      sRow('rowExp','📤','Exporter','Sauvegarder toutes les données',sChev,1)+
+      sRow('rowImp','📥','Importer','Restaurer une sauvegarde',sChev,1)+
+      '<input type="file" id="impF" class="hidden">'
+    )}
+    ${sect('Zone dangereuse',
+      sRow('rowRstC','🔄','Réinitialiser ce chapitre','Remettre toutes les cartes à "Non vu"','',1)+
+      `<div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div>`
+    )}
+    <div class="settings-footer">Flashcards v${APP_VER}<br><span style="opacity:.7;font-size:.9em">JB. C</span></div></div>`;
 
   const preBox = v.querySelector('.preview-box');
   $('#preT').innerHTML = formatText(prev.f); $('#preD').innerHTML = formatText(prev.b); Media.resolve(preBox); tsLat(preBox);
@@ -1250,7 +1588,7 @@ function openSet(cid,push=true){
   $('#rowExp').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()};
   $('#rowImp').onclick=()=>$('#impF').click();
   $('#impF').onchange=async e=>{if(confirm("Écraser toutes les données ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}};
-  $('#rowRstC').onclick=()=>{if(confirm('Réinitialiser ce chapitre ?')){c.cards.forEach(x=>{x.grade='unseen';x.timesReviewed=0;x.ef=2.5;x.intervalDays=0;x.dueAt=0;x.streak=0});c.stats={gradeCounts:GRADE_INIT(),totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}};saveData();openSet(cid,!1)}};
+  $('#rowRstC').onclick=()=>{if(confirm('Réinitialiser ce chapitre ?')){c.cards.forEach(x=>Object.assign(x,{grade:'unseen',timesReviewed:0,ef:2.5,intervalDays:0,dueAt:0,streak:0}));c.stats=mkStats(c.cards.length);saveData();openSet(cid,!1)}};
   $('#rowRstA').onclick=async()=>{if(confirm('⚠️ Supprimer TOUTES les données ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}};
 }
 
@@ -1267,21 +1605,82 @@ function bindSz() {
 
 function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
-function reconcile(){ const c=buildCanon(), o=data.subjects||[]; data.subjects=c.map(x=>{const old=o.find(z=>z.title===x.title)||{},chs=x.chapters.map(nc=>{const oc=(old.chapters||[]).find(z=>z.title===nc.title);return oc?{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=oc.cards.find(z=>extractId(z.id)===extractId(cd.id));return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}:nc});return{...x,chapters:chs,groups:old.groups||[]}}); o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id }
-function upgrade(){ if(!data.app)data.app={theme:'dark'}; data.app.prefs={fsTerm:22,fsDef:24,accent:'indigo',radius:14,...(data.app.prefs||{})}; if(data.app.prefs.mathDetail===undefined)data.app.prefs.mathDetail=false; data.subjects.forEach(s=>{valGrps(s);s.emoji=s.emoji||'';s.chapters.forEach(c=>{c.emoji=c.emoji||'';updChDesc(c);c.stats.dailyLog=c.stats.dailyLog||{};syncG(c)})}) }
+function reconcile(){ const c=buildCanon(), o=data.subjects||[], oMap=Object.fromEntries(o.map(s=>[s.title,s])); data.subjects=c.map(x=>{const old=oMap[x.title]||{}, ocMap=Object.fromEntries((old.chapters||[]).map(c=>[c.title,c])); const chs=x.chapters.map(nc=>{const oc=ocMap[nc.title]; if(!oc)return nc; const cardMap=Object.fromEntries(oc.cards.map(c=>[extractId(c.id),c])); return{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=cardMap[extractId(cd.id)]; return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}}); return{...x,chapters:chs,groups:old.groups||[]}}); o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id }
+function upgrade(){ 
+  if(!data.app) data.app = {theme:'dark'}; 
+  data.app.prefs = {fsTerm:22, fsDef:24, accent:'indigo', radius:14, ...(data.app.prefs||{})}; 
+  if(data.app.prefs.mathDetail === undefined) data.app.prefs.mathDetail = false; 
+  data.subjects.forEach(s => {
+    ensGrps(s).forEach(g => {
+      if(!g.childGroupIds) g.childGroupIds = [];
+      if(!g.parentGroupId) g.parentGroupId = null;
+      if(!g.chapIds) g.chapIds = [];
+    });
+    valGrps(s); 
+    s.emoji = s.emoji || ''; 
+    s.chapters.forEach(c => {
+      c.emoji = c.emoji || ''; 
+      updChDesc(c); 
+      c.stats.dailyLog = c.stats.dailyLog || {}; 
+      syncG(c);
+    });
+  });
+  ensureMathGrouped();
+}
+
+function ensureMathGrouped(){
+  const mathSub = data.subjects.find(s => s.title.toLowerCase() === 'maths');
+  if(!mathSub || mathSub.chapters.length < 2) return;
+  
+  const isExcluded = c => /travail/i.test(c.title);
+  const courseChaps = mathSub.chapters.filter(c => !isExcluded(c));
+  
+  const grps = ensGrps(mathSub);
+  const existing = grps.find(g => g.id === 'g-math-all');
+  
+  if(existing) {
+    const alreadyIn = new Set();
+    getAllChapIdsRecursive(mathSub, 'g-math-all').forEach(id => alreadyIn.add(id));
+    for(const c of courseChaps) {
+      if(!alreadyIn.has(c.id)) existing.chapIds.push(c.id);
+    }
+    const excludedIds = new Set(mathSub.chapters.filter(isExcluded).map(c => c.id));
+    existing.chapIds = existing.chapIds.filter(id => !excludedIds.has(id));
+  } else {
+    grps.push({
+      id: 'g-math-all',
+      chapIds: courseChaps.map(c => c.id),
+      childGroupIds: [],
+      parentGroupId: null,
+      createdAt: Date.now(),
+      title: 'Résumé de Cours',
+      emoji: '📖',
+      lastUsed: Date.now()
+    });
+  }
+  
+  valGrps(mathSub);
+}
+
 async function init(){
   Media.open();
   setInterval(saveData, 30000);
 
-  // ── Charger le markdown maths ──
   try {
     const r = await fetch('math.md');
     if(r.ok) dataMATH = parseMathData(await r.text());
   } catch(e){ console.warn('math.md non trouvé, fallback vide'); }
 
-  data = loadData();
-  if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; saveData(); }
-  pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+  try {
+    data = loadData();
+    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; saveData(); }
+    pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+  } catch(e) {
+    console.error('Init error, resetting:', e);
+    localStorage.removeItem(KEY);
+    data = loadData();
+    upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+  }
 }
 
 init();
