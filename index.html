@@ -633,19 +633,29 @@ let selectedIds = new Set();
 let expandedFolders = new Set(); 
 let selectionContext = null; 
 
+function goDeckKeepScroll() {
+  const scrollEl = $('#dL');
+  const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
+  goDeck(false);
+  requestAnimationFrame(() => {
+    const newScrollEl = $('#dL');
+    if(newScrollEl) newScrollEl.scrollTop = savedScroll;
+  });
+}
+
 function enterSelectionMode(initialId) {
   selectionMode = true;
   selectedIds = new Set();
   if(initialId) selectedIds.add(initialId);
   removeFABs();
-  goDeck(false);
+  goDeckKeepScroll();
 }
 
 function exitSelectionMode() {
   selectionMode = false;
   selectedIds.clear();
   removeFABs();
-  goDeck(false);
+  goDeckKeepScroll();
 }
 
 function removeFABs() {
@@ -821,14 +831,14 @@ function goDeck(push=true){
     $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
   
   $('#editModeBtn').onclick = () => {
-    if(selectionMode) {
-      exitSelectionMode();
-    } else {
-      selectionMode = true;
-      selectedIds.clear();
-      goDeck(false);
-    }
-  };
+  if(selectionMode) {
+    exitSelectionMode();
+  } else {
+    selectionMode = true;
+    selectedIds.clear();
+    goDeckKeepScroll();
+  }
+};
   if(!push && Nav.scrollPos > 0) { setTimeout(() => { const list = $('#dL'); if(list) list.scrollTop = Nav.scrollPos; }, 50); }
   const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
   
@@ -989,13 +999,14 @@ function bindDeckNew() {
   l.onclick = e => {
     if(e.target.matches('.delCh')) { e.stopPropagation(); if(delImpCh(e.target.dataset.cid)) goDeck(!1); return; }
     const selBox = e.target.closest('[data-action="toggle-select"]');
-    if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid); goDeck(false); return; }
+    if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid);
+goDeckKeepScroll(); return; }
     const remBtn = e.target.closest('[data-action="remove-from-folder"]');
-    if(remBtn) { e.stopPropagation(); remFromGrp(sub, remBtn.dataset.gid, remBtn.dataset.cid); valGrps(sub); saveData(); goDeck(false); return; }
+    if(remBtn) { e.stopPropagation(); remFromGrp(sub, remBtn.dataset.gid, remBtn.dataset.cid); valGrps(sub); saveData(); goDeckKeepScroll(); return; }
     const delFolderBtn = e.target.closest('[data-action="delete-folder"]');
     if(delFolderBtn) { e.stopPropagation(); if(confirm('Supprimer ce dossier ?')) { delGrp(sub, delFolderBtn.dataset.gid); valGrps(sub); saveData(); exitSelectionMode(); } return; }
     const remSubBtn = e.target.closest('[data-action="remove-subfolder"]');
-    if(remSubBtn) { e.stopPropagation(); removeChildGrpFromParent(sub, remSubBtn.dataset.parent, remSubBtn.dataset.gid); valGrps(sub); saveData(); goDeck(false); return; }
+    if(remSubBtn) { e.stopPropagation(); removeChildGrpFromParent(sub, remSubBtn.dataset.parent, remSubBtn.dataset.gid); valGrps(sub); saveData(); goDeckKeepScroll(); return; }
   };
   
   let longPressTimer = null;
@@ -1262,8 +1273,8 @@ function bindDeckNew() {
       dragStarted = false;
       pressedEl = null;
       
-      goDeck(false);
-      return;
+      goDeckKeepScroll();
+return;
     }
     
         if(dragging && !dragStarted) {
@@ -1296,10 +1307,10 @@ function bindDeckNew() {
         else selectedIds.add(id);
         goDeck(false);
       } else if(type === 'group') {
-        if(expandedFolders.has(id)) expandedFolders.delete(id);
-        else expandedFolders.add(id);
-        goDeck(false);
-      }
+  if(expandedFolders.has(id)) expandedFolders.delete(id);
+  else expandedFolders.add(id);
+  goDeckKeepScroll();
+}
     } else {
       if(type === 'group') {
         openGrp(sub, id);
