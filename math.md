@@ -8528,6 +8528,843 @@ $\varphi_{\bar{X}_n}(t) = (\varphi_{X_1}(t/n))^n \to e^{i\mu t}$ (car $\varphi_{
 *   Oublier que la convergence est en probabilité : $\bar{X}_n(\omega) \to \mu$ pour presque tout $\omega$ est la loi forte, plus forte.
 
 ---
-`;
+# CHAPITRE 99 — Travail Février
 
+## FLASHCARD 1 — Identité combinatoire binomiale
+
+### RECTO
+Montrer que $\displaystyle\binom{2n}{n} = \sum_{k=0}^{n} \binom{n}{k}^2$ avec une méthode de dénombrement et en développant $(1+x)^{2n} = (1+x)^n(1+x)^n$.
+
+### VERSO
+**Méthode 1 : Dénombrement**
+
+Soit $E$ un ensemble à $2n$ éléments ($n$ rouges, $n$ noirs). $F$ = parties à $n$ éléments, $F_k$ = parties avec $k$ rouges et $n-k$ noirs.
+
+$$F = \bigsqcup_{k=0}^{n} F_k \implies |F| = \sum_{k=0}^{n} |F_k| \implies \binom{2n}{n} = \sum_{k=0}^{n} \binom{n}{k}\binom{n}{n-k} = \sum_{k=0}^{n} \binom{n}{k}^2$$
+
+**Méthode 2 : Développement**
+
+$$(1+x)^{2n} = \sum_{k=0}^{2n} \binom{2n}{k} x^k$$
+
+$$(1+x)^n(1+x)^n = \left(\sum_{k=0}^{n}\binom{n}{k}x^k\right)\left(\sum_{k=0}^{n}\binom{n}{k}x^k\right) = \sum_{i=0}^{n}\sum_{j=0}^{n}\binom{n}{i}\binom{n}{j}x^{i+j}$$
+
+Termes de degré $n$ :
+
+$$\binom{2n}{n} = \sum_{\substack{i+j=n}}\binom{n}{i}\binom{n}{j} = \sum_{i=0}^{n}\binom{n}{i}\binom{n}{n-i} = \sum_{i=0}^{n}\binom{n}{i}^2$$
+
+---
+
+## FLASHCARD 2 — Définition tribu et probabilité
+
+### RECTO
+Donner la définition d'une tribu et d'une probabilité.
+
+### VERSO
+**Tribu :** Soit $\Omega$ un univers et $\mathcal{A} \subset \mathcal{P}(\Omega)$. $\mathcal{A}$ est une **tribu** ssi :
+
+* $\Omega \in \mathcal{A}$
+* $\forall A \in \mathcal{A},\ \bar{A} \in \mathcal{A}$
+* $\forall (A_n)_n \in \mathcal{A}^{\mathbb{N}},\ \displaystyle\bigcup_{n \in \mathbb{N}} A_n \in \mathcal{A}$
+
+**Probabilité :** $P : \mathcal{A} \to [0,1]$ est une probabilité sur $(\Omega, \mathcal{A})$ ssi :
+
+* $P(\Omega) = 1$
+* $\forall A \in \mathcal{A},\ P(A) \geq 0$
+* $\forall (A_n) \in \mathcal{A}^{\mathbb{N}}$ disjoints : $\displaystyle P\!\left(\bigcup_{n \in \mathbb{N}} A_n\right) = \sum_{n \in \mathbb{N}} P(A_n)$
+
+---
+
+## FLASHCARD 3 — Inégalité de Boole
+
+### RECTO
+Énoncer et démontrer l'inégalité de Boole.
+
+### VERSO
+**Énoncé :** Soit $(\Omega, \mathcal{A}, P)$ un espace probabilisé et $(A_n)_n \in \mathcal{A}^{\mathbb{N}}$.
+
+$$P\!\left(\bigcup_{n \in \mathbb{N}} A_n\right) \leq \sum_{n \in \mathbb{N}} P(A_n)$$
+
+**Preuve :** On pose $B_0 = A_0$ et $\forall n \in \mathbb{N}^*,\ B_n = A_n \setminus (A_{n-1} \cup \cdots \cup A_0) \in \mathcal{A}$.
+
+$B_n \subset A_n$ donc $P(B_n) \leq P(A_n)$ et $\displaystyle\bigcup_{n} B_n \subset \bigcup_{n} A_n$.
+
+Or $\forall n,\ A_n \subset \bigcup_{k=0}^{n} B_k$ donc $\displaystyle\bigcup_n A_n \subset \bigcup_n B_n$ donc $\displaystyle\bigcup_n A_n = \bigcup_n B_n$.
+
+$$P\!\left(\bigcup_n A_n\right) = P\!\left(\bigcup_n B_n\right) = \sum_n P(B_n) \leq \sum_n P(A_n)$$
+
+---
+
+## FLASHCARD 4 — Continuité monotone
+
+### RECTO
+Énoncer la propriété de continuité monotone et son corollaire.
+
+### VERSO
+Soit $(\Omega, \mathcal{A}, P)$ un espace probabilisé.
+
+**Continuité monotone :**
+
+* $(A_n)$ **croissante** $\implies P(A_n) \to P\!\left(\bigcup_n A_n\right)$
+* $(A_n)$ **décroissante** $\implies P(A_n) \to P\!\left(\bigcap_n A_n\right)$
+
+**Corollaire :** Pour $(A_n) \in \mathcal{A}^{\mathbb{N}}$ quelconque :
+
+* $\displaystyle P\!\left(\bigcup_{k=0}^{n} A_k\right) \xrightarrow{n \to +\infty} P\!\left(\bigcup_{n=0}^{\infty} A_n\right)$
+* $\displaystyle P\!\left(\bigcap_{k=0}^{n} A_k\right) \xrightarrow{n \to +\infty} P\!\left(\bigcap_{n=0}^{\infty} A_n\right)$
+
+---
+
+## FLASHCARD 5 — Matrices stochastiques
+
+### RECTO
+Montrer que le produit de deux matrices stochastiques positives est stochastique positive, et que les valeurs propres d'une matrice stochastique sont dans la boule unité.
+
+### VERSO
+**Produit :** $U$ = colonne de $1$. $A$ stochastique positive $\iff AU = U$ et $a_{ij} \geq 0$.
+
+$ABU = A(BU) = AU = U$ et $(AB)_{ij} = \sum_k a_{ik}b_{kj} \geq 0$. Donc $AB$ stochastique positive.
+
+**Valeurs propres :** Soit $\lambda$ valeur propre, $X$ vecteur propre, $i_0$ tel que $|x_{i_0}| = \max|x_i| > 0$.
+
+$$|\lambda||x_{i_0}| = \left|\sum_{i=1}^{n} a_{i_0,i}x_i\right| \leq \sum_{i=1}^{n} |a_{i_0,i}||x_i| \leq |x_{i_0}|\sum_{i=1}^{n} |a_{i_0,i}| = |x_{i_0}|$$
+
+En divisant par $|x_{i_0}| > 0$ : $|\lambda| \leq 1$.
+
+---
+
+## FLASHCARD 6 — Ensemble dénombrable
+
+### RECTO
+Donner la définition d'un ensemble dénombrable et d'un ensemble au plus dénombrable.
+
+### VERSO
+Un ensemble est **dénombrable** s'il est en bijection avec $\mathbb{N}$.
+
+Un ensemble est **au plus dénombrable** s'il est fini ou dénombrable.
+
+---
+
+## FLASHCARD 7 — Produit scalaire sur R[X]
+
+### RECTO
+Montrer que $\displaystyle\langle P, Q\rangle = \int_{-1}^{1} \frac{P(t)Q(t)}{\sqrt{1-t^2}}\,dt$ définit un produit scalaire sur $\mathbb{R}[X]$. Savoir poser $t = \cos u$.
+
+### VERSO
+**Convergence :** $f(t) = \frac{P(t)Q(t)}{\sqrt{1-t^2}}$, cpm sur $]-1,1[$.
+
+En $-1$ : $f(t) = \frac{P(t)Q(t)}{\sqrt{1-t}\sqrt{1+t}} \underset{-1}{=} O\!\left(\frac{1}{\sqrt{1+t}}\right)$ intégrable.
+
+En $1$ : $f(t) \underset{1}{=} O\!\left(\frac{1}{\sqrt{1-t}}\right)$ intégrable. Donc l'intégrale converge.
+
+**Symétrique, bilinéaire :** Immédiat.
+
+**Positive :** $\langle P,P\rangle$ est l'intégrale d'une fonction positive donc $\langle P,P\rangle \geq 0$.
+
+**Définie :** Si $\langle P,P\rangle = 0$ alors $\forall t \in ]-1,1[,\ \frac{P^2(t)}{\sqrt{1-t^2}} = 0$ (fonction positive continue d'intégrale nulle), donc $P^2(t) = 0$ donc $P = 0$ (infinité de racines).
+
+**Changement de variable :** $t = \cos u$, $C^1$ bijection de $[0,\pi]$ dans $[-1,1]$ :
+
+$$\int_{-1}^{1}\frac{P(t)Q(t)}{\sqrt{1-t^2}}\,dt = -\int_{\pi}^{0}\frac{P(\cos u)Q(\cos u)}{|\sin u|}(-\sin u)\,du = \int_0^{\pi} P(\cos u)Q(\cos u)\,du$$
+
+---
+
+## FLASHCARD 8 — Famille orthogonale libre
+
+### RECTO
+Montrer qu'une famille finie de vecteurs non nuls, deux-à-deux orthogonaux d'un espace $E$ préhilbertien est libre.
+
+### VERSO
+Soient $(x_1,\ldots,x_n)$ non nuls deux-à-deux orthogonaux et $(\lambda_1,\ldots,\lambda_n) \in \mathbb{R}^n$ tels que $\sum_{i=1}^{n}\lambda_i x_i = 0$.
+
+Soit $k \in [\![1,n]\!]$ :
+
+$$0 = \langle 0, x_k\rangle = \left\langle\sum_{i=1}^{n}\lambda_i x_i, x_k\right\rangle = \sum_{i=1}^{n}\lambda_i\langle x_i, x_k\rangle = \lambda_k\|x_k\|^2$$
+
+Comme $x_k \neq 0$, $\|x_k\|^2 > 0$ donc $\lambda_k = 0$.
+
+$\forall k,\ \lambda_k = 0$ : la famille est libre.
+
+---
+
+## FLASHCARD 9 — Adjoint d'un endomorphisme
+
+### RECTO
+Donner la définition de l'adjoint de $u \in \mathcal{L}(E)$ et sa matrice dans une b.o.n. de $E$ euclidien.
+
+### VERSO
+L'adjoint de $u$ est l'unique endomorphisme $u^*$ de $E$ tel que :
+
+$$\forall (x,y) \in E^2,\ \langle u(x), y\rangle = \langle x, u^*(y)\rangle$$
+
+Dans une b.o.n. $\mathcal{B}$ de $E$ :
+
+$$\mathrm{Mat}_{\mathcal{B}}(u^*) = \mathrm{Mat}_{\mathcal{B}}(u)^\top$$
+
+---
+
+## FLASHCARD 10 — Projeté orthogonal
+
+### RECTO
+Donner l'expression du projeté orthogonal sur une droite et sur un hyperplan.
+
+### VERSO
+**Droite :** $D = \mathrm{Vect}(u)$ :
+
+$$p_D(x) = \frac{\langle x, u\rangle}{\|u\|^2}\,u$$
+
+**Hyperplan :** $H$ hyperplan, $D = \mathrm{Vect}(u) = H^\perp$ :
+
+$$p_H(x) = x - p_D(x) = x - \frac{\langle x, u\rangle}{\|u\|^2}\,u$$
+
+---
+
+## FLASHCARD 11 — Théorème spectral
+
+### RECTO
+Énoncer le théorème spectral pour les matrices et les endomorphismes (cas réel).
+
+### VERSO
+Pour $E$ **euclidien** (réel) :
+
+* Soit $M$ une matrice **symétrique réelle**. Elle est **orthodiagonalisable** : $\exists P \in O_n(\mathbb{R}),\ M = PDP^\top$.
+
+* Soit $u \in \mathcal{S}(E)$ (endomorphisme symétrique). Alors $\mathrm{Sp}(u) \subset \mathbb{R}$ et $u$ est diagonalisable dans une **b.o.n.** de ses vecteurs propres.
+
+---
+
+## FLASHCARD 12 — Orthodiagonalisation
+
+### RECTO
+Orthodiagonaliser $A = \begin{pmatrix} 2 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 2 \end{pmatrix}$.
+
+### VERSO
+$\chi_A = (\lambda-2)((\lambda-2)^2 - 2) = (X-2)(X-2-\sqrt{2})(X-2+\sqrt{2})$
+
+Espaces propres :
+
+* $E_2 = \mathrm{Vect}(1, 0, -1)$
+* $E_{2+\sqrt{2}} = \mathrm{Vect}(1, \sqrt{2}, 1)$
+* $E_{2-\sqrt{2}} = \mathrm{Vect}(1, -\sqrt{2}, 1)$
+
+Après **orthonormalisation** :
+
+$$P = \begin{pmatrix} \frac{1}{\sqrt{2}} & \frac{1}{2} & \frac{1}{2} \\ 0 & \frac{\sqrt{2}}{2} & -\frac{\sqrt{2}}{2} \\ -\frac{1}{\sqrt{2}} & \frac{1}{2} & \frac{1}{2} \end{pmatrix} \in O_3(\mathbb{R}),\quad D = \begin{pmatrix} 2 & 0 & 0 \\ 0 & 2+\sqrt{2} & 0 \\ 0 & 0 & 2-\sqrt{2} \end{pmatrix}$$
+
+$A = PDP^\top$.
+
+---
+
+## FLASHCARD 13 — Orthogonalité Sn et An
+
+### RECTO
+Montrer que $S_n(\mathbb{R})$ et $A_n(\mathbb{R})$ sont orthogonaux pour le produit scalaire usuel sur $M_n(\mathbb{R})$.
+
+### VERSO
+On utilise $\mathrm{Tr}(AB) = \mathrm{Tr}(BA)$ et $\mathrm{Tr}((AB)^\top) = \mathrm{Tr}(B^\top A^\top)$.
+
+Pour $S \in S_n(\mathbb{R})$ et $A \in A_n(\mathbb{R})$ :
+
+$$\mathrm{Tr}(S^\top A) = \mathrm{Tr}(SA)$$
+
+Mais aussi :
+
+$$\mathrm{Tr}(S^\top A) = \mathrm{Tr}(A^\top S) = \mathrm{Tr}((-A)S) = -\mathrm{Tr}(AS) = -\mathrm{Tr}(SA)$$
+
+Donc $\mathrm{Tr}(SA) = -\mathrm{Tr}(SA) = 0$. Donc $S_n(\mathbb{R}) \perp A_n(\mathbb{R})$.
+
+---
+
+## FLASHCARD 14 — On(R) groupe, det²=1
+
+### RECTO
+Montrer que $O_n(\mathbb{R})$ est un groupe multiplicatif, et que si $A \in O_n(\mathbb{R})$ alors $\det(A)^2 = 1$.
+
+### VERSO
+**Déterminant :** $AA^\top = I_n \implies \det(A)\det(A^\top) = \det(A)^2 = 1$.
+
+**Groupe :** Montrons que $O_n(\mathbb{R})$ est un sous-groupe de $GL_n(\mathbb{R})$.
+
+* $O_n(\mathbb{R}) \subset GL_n(\mathbb{R})$ car $\det(A)^2 = 1 \neq 0$.
+* $I_n \in O_n(\mathbb{R})$ car $I_nI_n^\top = I_n$.
+* $AB \in O_n(\mathbb{R})$ car $(AB)(AB)^\top = A(BB^\top)A^\top = AA^\top = I_n$.
+* $A^{-1} \in O_n(\mathbb{R})$ car $A^{-1}(A^{-1})^\top = A^{-1}(A^\top)^{-1} = (A^\top A)^{-1} = I_n$.
+
+Par caractérisation, c'est un sous-groupe de $GL_n(\mathbb{R})$.
+
+---
+
+## FLASHCARD 15 — Théorème de Riesz
+
+### RECTO
+Énoncer le théorème de représentation de Riesz.
+
+### VERSO
+Soit $(E, \langle\cdot,\cdot\rangle)$ un espace **euclidien** et $\varphi \in \mathcal{L}(E, \mathbb{R})$, alors :
+
+$$\exists!\, a \in E,\ \forall x \in E,\ \varphi(x) = \langle a, x\rangle$$
+
+---
+
+## FLASHCARD 16 — Isométries équivalences
+
+### RECTO
+Donner la définition d'une isométrie et montrer les équivalences : conservation de la norme $\iff$ conservation du produit scalaire $\iff$ $u^* \circ u = \mathrm{Id}$.
+
+### VERSO
+$u \in \mathcal{L}(E)$ est une **isométrie** ssi $\forall x \in E,\ \|u(x)\| = \|x\|$.
+
+**Norme $\implies$ produit scalaire :** $\|x+y\|^2 = \|u(x)+u(y)\|^2$ donne :
+
+$$\|x\|^2 + 2\langle x,y\rangle + \|y\|^2 = \|u(x)\|^2 + 2\langle u(x),u(y)\rangle + \|u(y)\|^2$$
+
+Donc $\langle x,y\rangle = \langle u(x),u(y)\rangle$.
+
+**Produit scalaire $\implies$ norme :** Pour $x = y$ : $\|u(x)\|^2 = \|x\|^2$.
+
+**Produit scalaire $\iff$ $u^*u = \mathrm{Id}$ :**
+
+$$\langle u(x),u(y)\rangle = \langle x,y\rangle \iff \langle u^*u(x),y\rangle = \langle x,y\rangle \iff u^*u(x) = x \iff u^*u = \mathrm{Id}$$
+
+---
+
+## FLASHCARD 17 — SO2(R) commutatif
+
+### RECTO
+Donner la forme des matrices de $SO_2(\mathbb{R})$ et montrer que $SO_2(\mathbb{R})$ est un groupe commutatif.
+
+### VERSO
+$$SO_2(\mathbb{R}) = \left\{\begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix},\ \theta \in \mathbb{R}\right\}$$
+
+**Sous-groupe de $O_2(\mathbb{R})$ :**
+
+* $SO_2(\mathbb{R}) \subset O_2(\mathbb{R})$ avec $\det = 1$.
+* $AB \in SO_2(\mathbb{R})$ car $\det(AB) = 1$.
+* $A^{-1} \in SO_2(\mathbb{R})$ car $\det(A^{-1}) = 1$.
+
+**Commutativité :** $R(\alpha)R(\beta) = R(\alpha+\beta) = R(\beta+\alpha) = R(\beta)R(\alpha)$.
+
+---
+
+## FLASHCARD 18 — Réduction des isométries
+
+### RECTO
+Énoncer le théorème de réduction des isométries.
+
+### VERSO
+Soit $E$ euclidien de dimension $n$ et $u \in O(E)$. Il existe une base $\mathcal{B}$ de $E$ telle que :
+
+$$\mathrm{Mat}_{\mathcal{B}}(u) = \begin{pmatrix} R(\theta_1) & & (0) \\ & \ddots & \\ & & R(\theta_r) \\ & & & I_p \\ (0) & & & & -I_q \end{pmatrix}$$
+
+avec $R(\theta) = \begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}$ et $(r,p,q) \in \mathbb{N}^3$, $(\theta_1,\ldots,\theta_r) \in \mathbb{R}^r$.
+
+---
+
+## FLASHCARD 19 — Matrice symétrique complexe non diagonalisable
+
+### RECTO
+Donner un exemple de matrice symétrique complexe non diagonalisable.
+
+### VERSO
+$$A = \begin{pmatrix} 2 & i \\ i & 0 \end{pmatrix} \in M_2(\mathbb{C})$$
+
+$\chi_A = X^2 - 2X + 1 = (X-1)^2$ et $E_1 = \mathrm{Vect}(1, i)$ de dimension $1$.
+
+$A$ n'est **pas diagonalisable** (sous-espace propre de dimension $1 < 2$), mais est bien **symétrique complexe** ($A^\top = A$).
+
+---
+
+## FLASHCARD 20 — Matrice symétrique positive et forme quadratique
+
+### RECTO
+Soit $A \in S_n(\mathbb{R})$. Montrer : valeurs propres positives $\iff$ $\forall X \in M_{n,1}(\mathbb{R}),\ X^\top AX \geq 0$.
+
+### VERSO
+Par théorème spectral : $A = PDP^\top$ avec $P \in O_n(\mathbb{R})$, $D = \mathrm{Diag}(\lambda_i)$.
+
+**$\implies$** Supposons $\mathrm{Sp}(A) \subset \mathbb{R}_+$. Soit $X \in M_{n,1}(\mathbb{R})$, posons $Y = P^\top X$ :
+
+$$X^\top AX = Y^\top DY = \sum_{i=1}^{n}\lambda_i y_i^2 \geq 0$$
+
+**$\impliedby$** Supposons $\forall X,\ X^\top AX \geq 0$. Pour $\lambda \in \mathrm{Sp}(A)$ et $X$ vecteur propre :
+
+$$X^\top AX = \lambda X^\top X = \lambda\|X\|^2 \geq 0 \implies \lambda \geq 0$$
+
+---
+
+## FLASHCARD 21 — Inégalité de Cauchy-Schwarz
+
+### RECTO
+Énoncer et démontrer l'inégalité de Cauchy-Schwarz. Écrire les cas usuels pour $\mathbb{R}^n$, $M_n(\mathbb{R})$ et $\mathcal{C}^0([a,b])$.
+
+### VERSO
+**Énoncé :** Soit $(E,\langle\cdot,\cdot\rangle)$ préhilbertien réel. $\forall u,v \in E$ : $|\langle u,v\rangle| \leq \|u\|\cdot\|v\|$.
+
+**Preuve :** $P(\lambda) = \langle x+\lambda y, x+\lambda y\rangle = \|x\|^2 + 2\lambda\langle x,y\rangle + \lambda^2\|y\|^2 \geq 0$.
+
+$\Delta = 4(\langle x,y\rangle^2 - \|x\|^2\|y\|^2) \leq 0$ donc $|\langle x,y\rangle| \leq \|x\|\|y\|$.
+
+**Cas usuels :**
+
+$$\left(\sum_{i=1}^{n}x_iy_i\right)^2 \leq \left(\sum x_i^2\right)\left(\sum y_i^2\right)$$
+
+$$\left(\sum_{i,j}[A]_{j,i}[B]_{j,i}\right)^2 \leq \left(\sum [A]_{j,i}^2\right)\left(\sum [B]_{j,i}^2\right)$$
+
+$$\left(\int_a^b f(t)g(t)\,dt\right)^2 \leq \left(\int_a^b f^2\right)\left(\int_a^b g^2\right)$$
+
+---
+
+## FLASHCARD 22 — Caractérisations projections orthogonales
+
+### RECTO
+Donner deux caractérisations des projections orthogonales.
+
+### VERSO
+Soit $E$ euclidien et $p$ un projecteur de $E$. $p$ est orthogonal ssi l'une des deux :
+
+* $\forall x \in E,\ \|p(x)\| \leq \|x\|$
+* $p$ est **autoadjoint** ($p^* = p$)
+
+---
+
+## FLASHCARD 23 — Matrice de projection orthogonale
+
+### RECTO
+Comment reconnaître une matrice de projection et une matrice de projection orthogonale ?
+
+### VERSO
+$P \in M_n(\mathbb{R})$ est matrice d'une **projection** ssi $P^2 = P$.
+
+De surcroît **orthogonale** ssi $P^\top = P$.
+
+---
+
+## FLASHCARD 24 — Inégalité exponentielle par Taylor
+
+### RECTO
+Montrer que $\forall x \geq 0,\ \forall n \in \mathbb{N},\ e^x \geq 1 + x + \cdots + \frac{x^n}{n!}$.
+
+### VERSO
+**Méthode DSE :**
+
+$$e^x = \sum_{k=0}^{\infty}\frac{x^k}{k!} = \sum_{k=0}^{n}\frac{x^k}{k!} + \underbrace{\sum_{k=n+1}^{\infty}\frac{x^k}{k!}}_{\geq 0} \geq \sum_{k=0}^{n}\frac{x^k}{k!}$$
+
+**Méthode Taylor avec reste intégral :** $\exp \in C^{n+1}([0,x],\mathbb{R})$ :
+
+$$e^x = \sum_{k=0}^{n}\frac{x^k}{k!} + \underbrace{\int_0^x \frac{(x-t)^n}{n!}e^t\,dt}_{\geq 0} \geq \sum_{k=0}^{n}\frac{x^k}{k!}$$
+
+---
+
+## FLASHCARD 25 — Fonction convexe sur ses tangentes
+
+### RECTO
+Soit $f \in C^2(I)$ convexe. Montrer qu'elle est au-dessus de ses tangentes avec Taylor intégral.
+
+### VERSO
+Taylor avec reste intégral à l'ordre $2$ sur $I = [a,x]$ :
+
+$$f(x) = f(a) + f'(a)(x-a) + \int_a^x (x-t)f''(t)\,dt$$
+
+$f$ convexe $\implies f'' \geq 0$ donc $\int_a^x (x-t)f''(t)\,dt \geq 0$.
+
+$$\forall x \in I,\ f(x) \geq f(a) + f'(a)(x-a)$$
+
+C'est l'équation de la tangente en $a$.
+
+---
+
+## FLASHCARD 26 — Intégrale de ln
+
+### RECTO
+Justifier l'existence de $\displaystyle\int_0^1 \ln(t)\,dt$ et la calculer.
+
+### VERSO
+$\ln$ est cpm sur $]0,1]$, prolongeable par continuité en $0$ par $0 \cdot \ln 0 = 0$.
+
+Pour $a \in ]0,1]$ :
+
+$$\int_a^1 \ln(t)\,dt = [t\ln t - t]_a^1 = -1 - (a\ln a - a)= a - 1 - a\ln a$$
+
+Par croissances comparées : $a\ln a \xrightarrow{a \to 0} 0$, donc :
+
+$$\int_0^1 \ln(t)\,dt = -1$$
+
+---
+
+## FLASHCARD 27 — Convergence de sin(t)/t
+
+### RECTO
+Justifier la convergence de $\displaystyle\int_0^{+\infty}\frac{\sin t}{t}\,dt$.
+
+### VERSO
+$f : t \mapsto \frac{\sin t}{t}$, cpm sur $\mathbb{R}_+^*$.
+
+**En $0$ :** prolongeable par continuité, $f(0) = 1$.
+
+**En $+\infty$ :** IPP avec $u = -\cos t$, $v = \frac{1}{t}$, $u,v \in C^1([\frac{\pi}{2},+\infty[)$.
+
+$[uv]_{\pi/2}^{+\infty} = 0$ donc $\displaystyle\int_{\pi/2}^{+\infty}\frac{\sin t}{t}\,dt$ est de même nature que $\displaystyle\int_{\pi/2}^{+\infty}\frac{\cos t}{t^2}\,dt$.
+
+$\left|\frac{\cos t}{t^2}\right| \leq \frac{1}{t^2}$ : convergence par comparaison à une intégrale de Riemann.
+
+---
+
+## FLASHCARD 28 — Nature de trois intégrales avec ln
+
+### RECTO
+Déterminer la nature de $\displaystyle\int_2^{+\infty}\frac{\ln t}{t}\,dt$, $\displaystyle\int_2^{+\infty}\frac{\ln t}{t^2}\,dt$, $\displaystyle\int_2^{+\infty}\frac{1}{t\ln t}\,dt$.
+
+### VERSO
+**1.** $\frac{\ln t}{t} \geq \frac{1}{t}$ pour $t \geq e$ : **diverge** par comparaison.
+
+**2.** Par croissances comparées : $\frac{\ln t}{t^2} = o\!\left(\frac{1}{t^{3/2}}\right)$ : **converge** par comparaison.
+
+**3.** $\displaystyle\int_2^{+\infty}\frac{dt}{t\ln t} = [\ln(\ln t)]_2^{+\infty}$ : **diverge**.
+
+---
+
+## FLASHCARD 29 — Relation fonctionnelle Gamma
+
+### RECTO
+Montrer avec une IPP généralisée que $\forall x > 0,\ \Gamma(x+1) = x\,\Gamma(x)$.
+
+### VERSO
+$$\Gamma(x) = \int_0^{+\infty} t^{x-1}e^{-t}\,dt$$
+
+IPP avec $u = t^x$, $u' = xt^{x-1}$, $v = -e^{-t}$, $v' = e^{-t}$, $u,v \in C^1(\mathbb{R}_+^*)$.
+
+$[uv]_0^{+\infty} = [-t^x e^{-t}]_0^{+\infty} = 0$ par croissances comparées.
+
+$$\Gamma(x+1) = \int_0^{+\infty}t^x e^{-t}\,dt = \left[-t^x e^{-t}\right]_0^{+\infty} + \int_0^{+\infty}xt^{x-1}e^{-t}\,dt = x\,\Gamma(x)$$
+
+---
+
+## FLASHCARD 30 — Théorème de convergence dominée
+
+### RECTO
+Énoncer le théorème de convergence dominée.
+
+### VERSO
+Soit $(f_n)_n$ une suite de fonctions cpm sur $I$.
+
+Si $f_n \xrightarrow{\text{CS}} f$ cpm sur $I$ et $\forall n,\ |f_n| \leq \varphi$ avec $\varphi : I \to \mathbb{R}_+$ **intégrable** sur $I$, alors :
+
+$$\int_I f_n \xrightarrow{n \to +\infty} \int_I f$$
+
+---
+
+## FLASHCARD 31 — Intégrale à paramètre F(λ)
+
+### RECTO
+Soit $F(\lambda) = \int_0^{+\infty}f(t)e^{-\lambda t}\,dt$ avec $f$ continue bornée sur $\mathbb{R}$. Montrer que $F$ est définie, continue et $C^1$ sur $\mathbb{R}_+^*$, puis que $\lim_{\lambda \to +\infty}F(\lambda) = 0$.
+
+### VERSO
+On pose $g(\lambda,t) = f(t)e^{-\lambda t}$, $|f| \leq M$.
+
+**Définie :** $|g(\lambda,t)| \leq Me^{-\lambda t}$, intégrable car $\lambda > 0$.
+
+**Continue :** $\forall \alpha > 0,\ \forall \lambda > \alpha$ : $|g(\lambda,t)| \leq Me^{-\alpha t}$ intégrable. Par théorème de continuité sous l'intégrale.
+
+**$C^1$ :** $\frac{\partial g}{\partial\lambda} = -tf(t)e^{-\lambda t}$, $\forall \lambda > \alpha$ : $|\frac{\partial g}{\partial\lambda}| \leq tMe^{-\alpha t} = O(e^{-\alpha t/2})$ intégrable. Par théorème de dérivation sous l'intégrale.
+
+**Limite :** $(\lambda_n) \to +\infty$, $g_n(t) = g(\lambda_n,t) \xrightarrow{\text{CS}} 0$, $|g_n| \leq Me^{-t}$ intégrable. Par TCD : $F(\lambda) \to 0$.
+
+---
+
+## FLASHCARD 32 — Théorème d'échange série-intégrale
+
+### RECTO
+Énoncer le théorème d'échange série-intégrale.
+
+### VERSO
+Soit $(f_n)_n$ une suite de fonctions cpm sur $I$.
+
+Si $\sum f_n$ converge simplement vers une fonction cpm sur $I$ et $\displaystyle\sum_{n \in \mathbb{N}}\int_I |f_n|$ converge, alors :
+
+$$\sum_{n \in \mathbb{N}}\int_I f_n = \int_I \sum_{n \in \mathbb{N}} f_n$$
+
+---
+
+## FLASHCARD 33 — Suite d'intégrales un
+
+### RECTO
+Pour $n \geq 1$, $u_n = \int_0^{+\infty}\frac{dt}{(1+t^2)^n}$. Montrer que $(u_n)$ décroît vers $0$, étudier $\sum u_n$ et $\sum(-1)^n u_n$.
+
+### VERSO
+**Décroissance :** $u_{n+1} - u_n = \int_0^{+\infty}\left(\frac{1}{(1+t^2)^{n+1}} - \frac{1}{(1+t^2)^n}\right)dt \leq 0$.
+
+**Limite :** $f_n(t) = \frac{1}{(1+t^2)^n} \xrightarrow{\text{CS}} 0$, $|f_n| \leq \frac{1}{1+t^2}$ intégrable. Par TCD : $u_n \to 0$.
+
+**$\sum(-1)^n u_n$ :** converge par CSSA.
+
+**$\sum u_n$ :** $u_n \sim \frac{\sqrt{\pi}}{2\sqrt{n}}$ (par formule de Wallis), diverge par comparaison à série de Riemann.
+
+---
+
+## FLASHCARD 34 — Écriture en série de Ip
+
+### RECTO
+Écrire sous forme de série : $I_p = \int_0^{+\infty}\frac{t^p}{e^t - 1}\,dt$ pour $p \geq 2$.
+
+### VERSO
+**Convergence :** En $0$ : $\frac{t^p}{e^t-1} \sim t^{p-1}$, $p > 1$ ok. En $+\infty$ : $o(1/t^2)$ par croissances comparées.
+
+**Développement :**
+
+$$\frac{1}{e^t-1} = e^{-t}\sum_{n=0}^{\infty}e^{-nt} = \sum_{n=0}^{\infty}e^{-(n+1)t}$$
+
+Changement de variable $u = (n+1)t$ :
+
+$$\int_0^{+\infty}t^p e^{-(n+1)t}\,dt = \frac{1}{(n+1)^{p+1}}\int_0^{+\infty}u^p e^{-u}\,du = \frac{p!}{(n+1)^{p+1}}$$
+
+Par **échange série-intégrale** (vérification des hypothèses) :
+
+$$I_p = \sum_{n=0}^{\infty}\frac{p!}{(n+1)^{p+1}} = p!\sum_{k=1}^{\infty}\frac{1}{k^{p+1}}$$
+
+---
+
+## FLASHCARD 35 — Intégrale à paramètre F(x) avec cos
+
+### RECTO
+Soit $F(x) = \int_0^{+\infty}\frac{1-\cos(xt)}{t^2}e^{-t}\,dt$. Montrer que $F$ est définie sur $\mathbb{R}$, $C^2$, calculer $F''(x)$ puis $F(x)$.
+
+### VERSO
+**Domination :** $\frac{1-\cos(xt)}{t^2} = \frac{2\sin^2(xt/2)}{t^2} \leq \frac{x^2}{2}$, donc $|f(x,t)| \leq \frac{A^2}{2}e^{-t}$ sur $[0,A]$.
+
+**Dérivées :** $\frac{\partial f}{\partial x} = \frac{\sin(xt)}{t}e^{-t}$, $\frac{\partial^2 f}{\partial x^2} = \cos(xt)e^{-t}$.
+
+Dominations locales analogues $\implies F \in C^2(\mathbb{R})$.
+
+**Calcul de $F''$ :**
+
+$$F''(x) = \int_0^{+\infty}\cos(xt)e^{-t}\,dt = \mathrm{Re}\!\int_0^{+\infty}e^{(ix-1)t}\,dt = \mathrm{Re}\!\left(\frac{1}{1-ix}\right) = \frac{1}{1+x^2}$$
+
+**Primitives :** $F'(x) = \arctan x + C$. $F$ paire $\implies F'$ impaire $\implies F'(0) = 0 \implies C = 0$.
+
+$$F'(x) = \arctan x$$
+
+IPP sur $\int\arctan$ : $F(x) = x\arctan x - \frac{1}{2}\ln(1+x^2) + \alpha$. $F(0) = 0 \implies \alpha = 0$.
+
+$$\boxed{F(x) = x\arctan x - \frac{1}{2}\ln(1+x^2)}$$
+
+---
+
+## FLASHCARD 36 — Preuve de Riesz et existence de l'adjoint
+
+### RECTO
+Démontrer le théorème de Riesz puis l'existence et l'unicité de l'adjoint.
+
+### VERSO
+**Riesz :** On pose $\psi : a \mapsto (x \mapsto \langle a,x\rangle)$ de $E$ dans $\mathcal{L}(E,\mathbb{R})$.
+
+* **Linéaire :** $\psi(a+\lambda b)(x) = \langle a,x\rangle + \lambda\langle b,x\rangle$.
+* **Injective :** $\psi(a) = 0 \implies \langle a,a\rangle = 0 \implies a = 0$.
+* $\dim\mathcal{L}(E,\mathbb{R}) = \dim E$ donc $\psi$ bijective.
+
+Donc $\forall\varphi \in \mathcal{L}(E,\mathbb{R}),\ \exists!a,\ \varphi(x) = \langle a,x\rangle$.
+
+**Adjoint :** Pour $x$ fixé, $\varphi_x : y \mapsto \langle u(y),x\rangle \in \mathcal{L}(E,\mathbb{R})$.
+
+Par Riesz : $\exists!a_x,\ \varphi_x(y) = \langle a_x,y\rangle$. On pose $u^*(x) = a_x$.
+
+$$\forall(x,y),\ \langle x, u(y)\rangle = \langle u^*(x), y\rangle$$
+
+---
+
+## FLASHCARD 37 — Ker(u*u) = Ker(u) et rg(A⊤A) = rg(A)
+
+### RECTO
+Montrer $\ker(u^* \circ u) = \ker(u)$ puis $\mathrm{rg}(A^\top A) = \mathrm{rg}(A)$.
+
+### VERSO
+$\ker u \subset \ker(u^*u)$ : trivial.
+
+$\ker(u^*u) \subset \ker u$ : Soit $x \in \ker(u^*u)$ :
+
+$$\|u(x)\|^2 = \langle u(x),u(x)\rangle = \langle x, u^*u(x)\rangle = 0 \implies u(x) = 0$$
+
+**Rang :** $\mathrm{Mat}_\mathcal{B}(u^*u) = A^\top A$ donc $\ker(A^\top A) = \ker A$.
+
+Par théorème du rang : $n = \mathrm{rg}(A^\top A) + \dim\ker(A^\top A) = \mathrm{rg}(A) + \dim\ker A$.
+
+Donc $\mathrm{rg}(A^\top A) = \mathrm{rg}(A)$. De même $\mathrm{rg}(AA^\top) = \mathrm{rg}(A)$.
+
+---
+
+## FLASHCARD 38 — Matrice de passage de Schmidt triangulaire
+
+### RECTO
+Montrer que la matrice de passage d'une base à sa b.o.n. de Schmidt est triangulaire supérieure à diagonale strictement positive.
+
+### VERSO
+Soit $\mathcal{B} = (a_1,\ldots,a_n)$ base, $\mathcal{B}' = (e_1,\ldots,e_n)$ orthonormalisée de Schmidt.
+
+$P^{-1}$ de $\mathcal{B}'$ à $\mathcal{B}$ : $(P^{-1})_{i,j} = \langle a_j, e_i\rangle$.
+
+$\forall i,\ a_i \in \mathrm{Vect}(e_1,\ldots,e_i)$ donc $\langle a_j, e_i\rangle = 0$ pour $i > j$.
+
+De plus $\langle a_i, e_i\rangle > 0$ (même demi-espace).
+
+Donc $P^{-1}$ est **triangulaire supérieure à diagonale $> 0$**, et $P$ aussi.
+
+---
+
+## FLASHCARD 39 — On compact, GLn dense, SOn connexe, S+n fermé
+
+### RECTO
+Montrer que $O_n(\mathbb{R})$ est compact, $GL_n(\mathbb{R})$ dense dans $M_n(\mathbb{R})$, $SO_n(\mathbb{R})$ connexe par arcs et $S_n^+(\mathbb{R})$ fermé.
+
+### VERSO
+**$O_n$ borné :** $\|A\| = \sqrt{\mathrm{Tr}(A^\top A)} = \sqrt{n}$.
+
+**$O_n$ fermé :** $A_k \to A$ avec $A_kA_k^\top = I_n$. $A^\top$ continue, donc $AA^\top = I_n$.
+
+**$GL_n$ dense :** $A_p = A - \frac{1}{p}I_n \to A$. $\det(A_p) = (-1)^n\chi_A(\frac{1}{p}) \neq 0$ àpdcr.
+
+**$SO_n$ connexe par arcs :** Par réduction, $A = P\,\mathrm{Diag}(R(\theta_i), I_p)\,P^{-1}$. Le chemin $\varphi(t) = P\,\mathrm{Diag}(R(t\theta_i), I_p)\,P^{-1}$ est continu, $\varphi(0) = I_n$, $\varphi(1) = A$.
+
+**$S_n^+$ fermé :** $A_k \to A$, $X^\top A_k X \geq 0$, par continuité $X^\top AX \geq 0$.
+
+---
+
+## FLASHCARD 40 — Loi du 0/1 de Borel
+
+### RECTO
+Démontrer la loi du $0/1$ de Borel.
+
+### VERSO
+$A = \bigcap_p \bigcup_{n \geq p} A_n$ (événements réalisés infiniment souvent).
+
+**Cas 1 : $\sum P(A_n) < \infty \implies P(A) = 0$.**
+
+$B_p = \bigcup_{n \geq p}A_n$ décroissante. Par continuité monotone : $P(A) = \lim P(B_p)$.
+
+Boole : $P(B_p) \leq \sum_{n \geq p}P(A_n) \to 0$ (reste de série convergente).
+
+**Cas 2 : $\sum P(A_n) = \infty$ et $(A_n)$ mutuellement indépendante $\implies P(A) = 1$.**
+
+$\overline{A} = \bigcup_p C_p$ avec $C_p = \bigcap_{n \geq p}\overline{A_n}$ croissante.
+
+$(A_n)$ indépendants $\implies (\overline{A_n})$ indépendants.
+
+$$P(C_p) = \lim_N P\!\left(\bigcap_{n=p}^{N}\overline{A_n}\right) = \lim_N \prod_{n=p}^{N}(1-P(A_n))$$
+
+$1-x \leq e^{-x}$ donc $\prod(1-P(A_n)) \leq \exp(-\sum P(A_n)) \to 0$.
+
+$P(\overline{A}) = \lim P(C_p) = 0$ donc $P(A) = 1$.
+
+---
+
+## FLASHCARD 41 — R non dénombrable
+
+### RECTO
+Montrer que $\mathbb{R}$ (ou $\{0,1\}^{\mathbb{N}}$) n'est pas dénombrable.
+
+### VERSO
+Supposons $[0,1[$ dénombrable : $\exists\varphi : \mathbb{N} \to [0,1[$ bijective.
+
+Écriture décimale : $\varphi(n) = 0{,}x_0^n x_1^n \ldots$
+
+On construit $y = 0{,}y_0 y_1 \ldots$ avec $y_n \neq x_n^n$ pour tout $n$.
+
+$\forall n,\ \varphi(n) \neq y$ car $y_n \neq x_n^n$. Or $y \in [0,1[$ : $\varphi$ non surjective. **Absurde.**
+
+Puis $\forall a < b$, $\lambda \mapsto \lambda a + (1-\lambda)b$ est bijective de $[0,1[$ dans $]a,b]$ donc $]a,b]$ indénombrable.
+
+Donc $\mathbb{R}$ n'est pas dénombrable.
+
+---
+
+## FLASHCARD 42 — Réunion dénombrable d'ensembles dénombrables
+
+### RECTO
+Montrer qu'une réunion dénombrable d'ensembles dénombrables est dénombrable.
+
+### VERSO
+Soit $(A_i)_{i \in I}$ des ensembles dénombrables non vides ($I$ dénombrable).
+
+$\forall i \in I$, $\exists f_i : \mathbb{N} \to A_i$ bijection (car $A_i$ dénombrable).
+
+On définit $f : I \times \mathbb{N} \to \bigcup_i A_i$ par $f(i,n) = f_i(n)$, **surjective**.
+
+$I \times \mathbb{N}$ est dénombrable (produit cartésien d'ensembles dénombrables).
+
+Donc $\bigcup_i A_i$ est au plus dénombrable. Si infini, il est dénombrable.
+
+---
+
+## FLASHCARD 43 — Codiagonalisation dans une b.o.n.
+
+### RECTO
+Montrer que si $u$ et $v$ commutent et sont autoadjoints, alors ils sont codiagonalisables dans une b.o.n.
+
+### VERSO
+$u \in \mathcal{S}(E) \implies E = \bigoplus E_\lambda$ (espaces propres de $u$).
+
+$uv = vu \implies \forall\lambda \in \mathrm{Sp}(u),\ v(E_\lambda) \subset E_\lambda$.
+
+$v_\lambda = v|_{E_\lambda} \in \mathcal{S}(E_\lambda)$ (restriction d'un autoadjoint).
+
+Par théorème spectral sur $E_\lambda$ : $\exists\mathcal{B}_\lambda$ b.o.n. de $E_\lambda$ de vecteurs propres de $v_\lambda$.
+
+$\mathcal{B} = \bigcup_\lambda \mathcal{B}_\lambda$ est une b.o.n. de $E$, chaque vecteur est vecteur propre de $u$ **et** de $v$.
+
+---
+
+## FLASHCARD 44 — Projection orthogonale par la norme
+
+### RECTO
+Montrer que $p$ projecteur est orthogonal ssi $\forall x \in E,\ \|p(x)\| \leq \|x\|$.
+
+### VERSO
+$p$ projecteur sur $F = \mathrm{Im}(p)$, $G = \ker(p)$, $E = F \oplus G$.
+
+**$\implies$** $p$ orthogonal : $x = p(x) + (x-p(x))$ avec $p(x) \perp (x-p(x))$.
+
+$\|x\|^2 = \|p(x)\|^2 + \|x-p(x)\|^2 \geq \|p(x)\|^2$.
+
+**$\impliedby$** Soit $x \in F$, $y \in G$, $\forall\lambda$ : $p(x+\lambda y) = x$ donc $\|x\| \leq \|x+\lambda y\|$.
+
+$\|x\|^2 \leq \|x\|^2 + 2\lambda\langle x,y\rangle + \lambda^2\|y\|^2$, vrai $\forall\lambda$.
+
+$\Delta = 4\langle x,y\rangle^2 \leq 0$, or $\langle x,y\rangle^2 \geq 0$ donc $\langle x,y\rangle = 0$.
+
+Donc $F \perp G$ : $p$ est orthogonal.
+
+---
+
+## FLASHCARD 45 — Racine carrée d'une matrice S+n
+
+### RECTO
+Montrer que si $A \in S_n^+(\mathbb{R})$, alors $\exists!\, B \in S_n^+(\mathbb{R})$ telle que $A = B^2$.
+
+### VERSO
+**Existence :** Théorème spectral : $A = PDP^\top$, $D = \mathrm{Diag}(\lambda_i)$, $\lambda_i \geq 0$.
+
+$\Delta = \mathrm{Diag}(\sqrt{\lambda_i})$, $B = P\Delta P^\top$. Alors $B^2 = P\Delta^2 P^\top = A$, $B^\top = B$, $\mathrm{Sp}(B) \subset \mathbb{R}_+$.
+
+**Unicité :** Soit $B \in S_n^+$ avec $B^2 = A$.
+
+$AB = B^2B = BB^2 = BA$ : $A$ et $B$ commutent et sont symétriques, donc **codiagonalisables**.
+
+$A = P D P^\top$, $B = P\Delta P^\top$. $B^2 = A \iff \Delta^2 = D \iff \forall i,\ \mu_i^2 = \lambda_i$.
+
+$\mu_i \geq 0$ donc $\mu_i = \sqrt{\lambda_i}$ : $B$ est unique.
+
+---
+
+## FLASHCARD 46 — Matrice de Gram symétrique positive
+
+### RECTO
+Montrer qu'une matrice de Gram est symétrique positive.
+
+### VERSO
+$\mathrm{Gram}(a_1,\ldots,a_n) \in S_n(\mathbb{R})$ par symétrie du produit scalaire : $\langle a_i,a_j\rangle = \langle a_j,a_i\rangle$.
+
+Soit $X = (x_i) \in M_{n,1}(\mathbb{R})$ :
+
+$$X^\top \mathrm{Gram}(a_1,\ldots,a_n)\, X = \sum_{i,j} x_i x_j \langle a_i, a_j\rangle = \left\langle\sum_i x_i a_i,\, \sum_j x_j a_j\right\rangle = \left\|\sum_i x_i a_i\right\|^2 \geq 0$$
+
+Donc une matrice de Gram est **symétrique positive**.
+
+---`;
 
