@@ -99,6 +99,7 @@ Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 /* --- MAPPING MATHS --- */
 const MATH_MAP = {
   "CH1": { title: "Ch.1 — Suites, fonctions réelles", emoji: "📊" },
+  "CH99": { title: "Travail Février", emoji: "📝" },
 };
 Object.values(MATH_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
@@ -4641,4 +4642,3 @@ Finalement :
 
 
 `.trim();
-
