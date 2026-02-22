@@ -26,7 +26,7 @@ const tsLat = e => {
 W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
 
 const getEmoji = t => (typeof C_EMOJIS !== 'undefined' ? C_EMOJIS[t] : '') || '';
-const isMathChapter = () => { const s = getSub(); return s?.title.toLowerCase() === 'maths'; };
+const isMathChapter = () => { const s = getSub(); return /math/i.test(s?.title || ''); };
 const getMathSimple = card => card.mathSimple || null;
 const extractId = c => String(c).match(/-(\d+)$/)?.[1] || null;
 const getSides = (c, ch) => ch?.settings?.langSwap ? {f:c.back, b:c.front} : {f:c.front, b:c.back};
