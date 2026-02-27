@@ -381,12 +381,53 @@ const FireSync = (() => {
     btn.addEventListener('pointercancel', () => clearTimeout(pressTimer));
   }
 
+  async function pullIfNewer() {
+    if (!currentUser) return false;
+    try {
+      const mSnap = await metaRef().once('value');
+      const cloudMeta = mSnap.val() || {};
+      const cloudTime = cloudMeta.lastModified || 0;
+      
+      if (cloudTime === 0) {
+        console.log('[FireSync] No cloud data exists yet');
+        return false;
+      }
+
+      const localTime = getLocalModTime();
+      console.log('[FireSync] pullIfNewer — cloud:', cloudTime, 'local:', localTime);
+
+      if (cloudTime > localTime + 2000) {
+        console.log('[FireSync] Cloud is newer, pulling before reconcile');
+        const snap = await dataRef().once('value');
+        const raw = snap.val();
+        if (!raw) return false;
+        
+        const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (!cloudData.subjects || !cloudData.app) return false;
+
+        // Replace local data BEFORE reconcile runs
+        data = cloudData;
+        saveDataLocal();
+        lastPushTime = cloudTime;
+        console.log('[FireSync] Cloud data loaded successfully');
+        return true;
+      } else {
+        console.log('[FireSync] Local is same or newer, keeping local');
+        return false;
+      }
+    } catch(e) {
+      console.error('[FireSync] pullIfNewer error:', e);
+      return false;
+    }
+  }
+
   return {
     login: showLoginPrompt,
     logout,
     getUser: () => currentUser,
     pushToCloud,
     pullFromCloud,
+    pullIfNewer,
     scheduleAutoSync,
     startListening,
     stopListening,
