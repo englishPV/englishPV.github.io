@@ -1,153 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FlashCards 9x16 - Math/Physique</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-  <style>
-    /* --- CSS GLOBAL & VARIABLES --- */
-    :root {
-      --bg-color: #f0f2f5; --text-color: #333; --card-bg: #fff;
-      --primary: #4f46e5; --accent: #6366f1; --danger: #ef4444; --success: #22c55e; --warning: #f59e0b;
-      --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      --radius: 16px; --shadow: 0 4px 20px rgba(0,0,0,0.08);
-      --h-header: 60px; --h-nav: 70px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e; --shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    }
-    body {
-      background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-main);
-      margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none;
-    }
-    #app { width: 100%; max-width: 500px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; position: relative; background: var(--bg-color); }
-    
-    /* --- NAVIGATION --- */
-    .view { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; display: none; opacity: 0; transition: opacity 0.2s ease; }
-    .view.active { display: block; opacity: 1; }
-    .nav-bar {
-      height: var(--h-nav); background: var(--card-bg); display: flex; justify-content: space-around; align-items: center;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; padding-bottom: env(safe-area-inset-bottom);
-    }
-    .nav-item { flex: 1; text-align: center; color: #999; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-    .nav-item.active { color: var(--primary); font-weight: 600; transform: scale(1.05); }
-    .nav-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
-
-    /* --- COMMON UI --- */
-    h1, h2 { margin: 0 0 15px 0; font-weight: 700; letter-spacing: -0.5px; }
-    .card-list { display: grid; gap: 12px; padding-bottom: 80px; }
-    .folder-card, .deck-card {
-      background: var(--card-bg); padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow);
-      display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.1s active;
-    }
-    .folder-card:active, .deck-card:active { transform: scale(0.98); }
-    .icon-box {
-      width: 45px; height: 45px; border-radius: 12px; background: rgba(79, 70, 229, 0.1); color: var(--primary);
-      display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;
-    }
-    .info-box { flex: 1; overflow: hidden; }
-    .title { font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .subtitle { font-size: 0.85rem; color: #888; margin-top: 3px; }
-    
-    /* --- STUDY MODE --- */
-    #study-container { height: 100%; display: flex; flex-direction: column; }
-    .flashcard-area { flex: 1; position: relative; perspective: 1000px; margin: 20px 0; cursor: pointer; }
-    .flashcard {
-      width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border-radius: 20px; box-shadow: var(--shadow);
-    }
-    .flashcard.flipped { transform: rotateY(180deg); }
-    .front, .back {
-      position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: var(--card-bg); border-radius: 20px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;
-      font-size: 1.4rem; line-height: 1.5; overflow-y: auto;
-    }
-    .back { transform: rotateY(180deg); border: 2px solid var(--primary); }
-    .controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 10px 0; }
-    .btn-grade {
-      padding: 15px 0; border: none; border-radius: 12px; font-weight: 700; color: white; cursor: pointer; font-size: 0.9rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.1s;
-    }
-    .btn-grade:active { transform: scale(0.95); }
-    .btn--red { background: var(--danger); }
-    .btn--amber { background: var(--warning); }
-    .btn--blue { background: var(--primary); }
-    .btn--green { background: var(--success); }
-
-    /* --- MATHJAX FIX --- */
-    mjx-container { font-size: 1.1em !important; outline: none; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Physique Flashcards</title>
+  
+  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css">
 </head>
-<body id="app">
-
-  <!-- VUES DE L'APPLICATION -->
-  <!-- 1. ACCUEIL (Dossiers/Sujets) -->
-  <div id="view-home" class="view active">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h1>Bibliothèque</h1>
-      <div id="user-status" style="font-size:0.8rem; color:var(--primary);">Offline</div>
-    </div>
-    <div id="subject-list" class="card-list"></div>
-  </div>
-
-  <!-- 2. CHAPITRES (Liste des decks) -->
-  <div id="view-chapters" class="view">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-      <div class="icon-box" onclick="App.nav('home')" style="cursor:pointer;">←</div>
-      <h2 id="subject-title" style="margin:0;">Sujet</h2>
-    </div>
-    <div id="chapter-list" class="card-list"></div>
-  </div>
-
-  <!-- 3. ÉTUDE (Flashcard) -->
-  <div id="view-study" class="view">
-    <div id="study-container">
-      <div style="display:flex; justify-content:space-between; color:#888; font-size:0.9rem;">
-        <span id="progress-text">0 / 0</span>
-        <span onclick="App.nav('chapters')" style="cursor:pointer;">Quitter</span>
+<body>
+  <div class="wrapper">
+    <div class="phone" id="app">
+       <header class="topbar">
+        <button class="back" id="backBtn" title="Retour">← Retour</button>
+        <div class="title" id="title">Deck</div>
+        <div class="spacer"></div>
+        <a href="https://schedulepv.web.app/" target="_blank" rel="noopener" class="btn btn--primary btn--tiny" style="flex-shrink:0;text-decoration:none;width:auto;padding:6px 12px;">📅</a>
+      </header>
+      <main id="view"></main>
+      <div class="bottom-actions" id="bottomActions">
+        <button class="action btn" id="cardsBtn">Cartes</button>
+        <button class="action btn" id="settingsBtn">Paramètres</button>
       </div>
-      
-      <div class="flashcard-area" onclick="Study.flip()">
-        <div class="flashcard" id="card-el">
-          <div class="front">
-            <div id="card-front">...</div>
-            <div style="font-size:0.8rem; color:#999; margin-top:20px;">(Toucher pour voir)</div>
-          </div>
-          <div class="back">
-            <div id="card-back">...</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls" id="grade-btns">
-        <button class="btn-grade btn--red" onclick="Study.grade('echec')">Oublié</button>
-        <button class="btn-grade btn--amber" onclick="Study.grade('difficile')">Dur</button>
-        <button class="btn-grade btn--blue" onclick="Study.grade('bien')">Bien</button>
-        <button class="btn-grade btn--green" onclick="Study.grade('facile')">Facile</button>
-      </div>
+      <footer class="revision-bar" id="revisionBar">
+        <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">Révision</button>
+      </footer>
+      <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
     </div>
   </div>
 
-  <!-- BARRE DE NAVIGATION DU BAS -->
-  <nav class="nav-bar">
-    <div class="nav-item active" onclick="App.nav('home')">
-      <span class="nav-icon">📚</span>Matières
-    </div>
-    <div class="nav-item" onclick="alert('Stats bientôt !')">
-      <span class="nav-icon">📊</span>Stats
-    </div>
-    <div class="nav-item" onclick="alert('Paramètres bientôt !')">
-      <span class="nav-icon">⚙️</span>Réglages
-    </div>
-  </nav>
-
-  <!-- DONNÉES STATIQUES -->
   <script src="data.js"></script>
-  <!-- MATHJAX -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- FIREBASE SETUP (AJOUTÉ POUR SYNCHRO) -->
+  <!-- === CONFIGURATION FIREBASE (AJOUTÉ ICI) === -->
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script>
@@ -160,17 +45,13 @@
       messagingSenderId: "285413164654",
       appId: "1:285413164654:web:a0d8d27dfa0009ab45887f"
     };
-    // Initialisation
-    try {
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.database();
-        console.log("Firebase initialisé !");
-    } catch(e) {
-        console.error("Erreur Firebase:", e);
-    }
+    // Initialisation de Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
   </script>
+  <!-- === FIN CONFIGURATION FIREBASE === -->
 
-  <!-- LOGIQUE JS -->
+  <!-- Fichiers logiques découpés -->
   <script src="js/02_utils_formatting_and_helpers.js"></script>
   <script src="js/03_data_storage_and_imports.js"></script>
   <script src="js/04_srs_algorithm_and_stats.js"></script>
