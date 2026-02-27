@@ -875,7 +875,7 @@ function subG(nxt){
   const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
   (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
   r.answers.push({cardId:card.id,prev,next:nxt,ms});
-    if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.scheduleAutoSync();renRev()}else{r.end=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();goRecap(!1)}
+      if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();renRev()}else{r.end=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();goRecap(!1)}
 }
 
 function goRecap(push=true){
@@ -1253,6 +1253,13 @@ async function init(){
   if(typeof FireSync !== 'undefined') {
     FireSync.initSyncButton();
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'hidden') {
+      saveData();
+      if(typeof FireSync!=='undefined' && FireSync.isConnected) FireSync.pushToCloud();
+    }
+  });
 
   try {
     const r = await fetch('math.md');
