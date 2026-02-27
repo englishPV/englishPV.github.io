@@ -225,7 +225,7 @@ const FireSync = (() => {
       if (currentUser && !isSyncing) {
         pushToCloud(true).catch(e => console.warn('[FireSync] Auto-push failed:', e));
       }
-    }, 10000); // 10 seconds
+    }, 3000); // 10 seconds
   }
 
   // --- LOCAL MOD TIME ---
