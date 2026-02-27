@@ -114,60 +114,9 @@ const buildMathSub = () => {
 };
 const buildCanon = () => [buildSub('Physique',dataPHY), buildMathSub(), buildSub('Anglais',dataEN)];
 
-/* --- DATA MANAGEMENT (VERSION SANS CRASH) --- */
-
-// Fonction de synchro SILENCIEUSE
-function initFirebaseSync() {
-    if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
-        const dbRef = db.ref('englishpv_sync_global');
-        
-        dbRef.on('value', (snapshot) => {
-            const cloudData = snapshot.val();
-            if (cloudData) {
-                const currentStr = LS.getItem(KEY);
-                const cloudStr = JSON.stringify(cloudData);
-                
-                // Si différence, on met à jour le stockage local MAIS on ne reload pas pour éviter le crash
-                if (currentStr !== cloudStr) {
-                    console.log("Données cloud reçues. Mise à jour silencieuse.");
-                    LS.setItem(KEY, cloudStr);
-                    // On ne force pas data = cloudData pour ne pas casser l'UI en cours d'utilisation
-                    // L'utilisateur verra les changements au prochain chargement "naturel"
-                }
-            } else {
-                // Cloud vide, on envoie le local
-                saveData();
-            }
-        });
-    }
-}
-
-function loadData(){ 
-    // 1. Chargement local
-    let loaded = null;
-    try{const r=LS.getItem(KEY);if(r) loaded=JSON.parse(r);}catch{} 
-    
-    if(!loaded) { 
-        const s=buildCanon(); 
-        loaded={subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} 
-    }
-    
-    // 2. Lancement synchro sécurisée
-    setTimeout(initFirebaseSync, 2000);
-
-    return loaded;
-}
-
-function saveData(){ 
-    // 1. Local
-    try{LS.setItem(KEY,JSON.stringify(data))}catch{} 
-    
-    // 2. Cloud (Firebase)
-    if(typeof db !== 'undefined') {
-        // Sauvegarde simple
-        db.ref('englishpv_sync_global').set(data).catch(e => console.error("Err Cloud", e));
-    }
-}
+/* --- DATA MANAGEMENT --- */
+function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} }
+function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
 
 const debouncedSave = (() => {
   let t; const c = W.cancelIdleCallback || clearTimeout, r = W.requestIdleCallback || (cb=>setTimeout(cb,2000));
