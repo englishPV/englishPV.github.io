@@ -50,6 +50,16 @@ const FireSync = (() => {
   }
 
   // Listen for auth state
+  auth.getRedirectResult().then(result => {
+    if (result.user) {
+      currentUser = result.user;
+      updateSyncUI();
+      toast('Connecté : ' + currentUser.email, 'success');
+      startListening();
+      smartSync();
+    }
+  }).catch(e => console.warn('Redirect result error:', e));
+
   auth.onAuthStateChanged(user => {
     currentUser = user;
     updateSyncUI();
@@ -248,15 +258,23 @@ const FireSync = (() => {
   }
 
   // --- UI ---
-  function showLoginPrompt() {
-    const email = prompt('Email Firebase :');
-    if (!email) return;
-    const password = prompt('Mot de passe :');
-    if (!password) return;
-    login(email, password).then(() => {
+    function showLoginPrompt() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).then((result) => {
+      currentUser = result.user;
+      updateSyncUI();
+      toast('Connecté : ' + currentUser.email, 'success');
       startListening();
       smartSync();
-    }).catch(() => {});
+    }).catch((e) => {
+      console.error('Google login error:', e);
+      // Fallback: sur mobile si popup bloqué, utiliser redirect
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+        auth.signInWithRedirect(provider);
+      } else {
+        toast('Erreur connexion : ' + e.message, 'error');
+      }
+    });
   }
 
   function updateSyncUI() {
