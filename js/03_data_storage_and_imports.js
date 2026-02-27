@@ -116,7 +116,7 @@ const buildCanon = () => [buildSub('Physique',dataPHY), buildMathSub(), buildSub
 
 /* --- DATA MANAGEMENT --- */
 function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} }
-function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
+function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} if(typeof FireSync!=='undefined')FireSync.scheduleAutoSync(); }
 
 const debouncedSave = (() => {
   let t; const c = W.cancelIdleCallback || clearTimeout, r = W.requestIdleCallback || (cb=>setTimeout(cb,2000));
