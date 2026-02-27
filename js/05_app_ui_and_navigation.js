@@ -1059,15 +1059,10 @@ function ensureMathGrouped(){
 
 async function init(){
   Media.open();
-  setInterval(saveData, 30000);
 
-  // Init Firebase sync button
+  // Init Firebase sync button FIRST but don't auto-sync yet
   if(typeof FireSync !== 'undefined') {
     FireSync.initSyncButton();
-    // Auto-start listening if already logged in
-    setTimeout(() => {
-      if(FireSync.isConnected) FireSync.startListening();
-    }, 2000);
   }
 
   try {
@@ -1077,13 +1072,31 @@ async function init(){
 
   try {
     data = loadData();
-    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; saveData(); }
+
+    // TRY TO PULL FROM CLOUD BEFORE reconcile
+    if(typeof FireSync !== 'undefined' && FireSync.isConnected) {
+      console.log('[Init] Firebase connected, pulling cloud data first...');
+      try {
+        await FireSync.pullIfNewer();
+      } catch(e) {
+        console.warn('[Init] Cloud pull failed, using local:', e);
+      }
+    }
+
+    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; FireSync.saveDataLocal ? FireSync.saveDataLocal() : saveData(); }
     pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+
+    // START periodic save and listening AFTER init complete
+    setInterval(saveData, 30000);
+    if(typeof FireSync !== 'undefined' && FireSync.isConnected) {
+      FireSync.startListening();
+    }
   } catch(e) {
     console.error('Init error, resetting:', e);
     localStorage.removeItem(KEY);
     data = loadData();
     upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+    setInterval(saveData, 30000);
   }
 }
 
