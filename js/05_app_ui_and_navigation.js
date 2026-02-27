@@ -767,9 +767,9 @@ function goChapter(id,push=true){
   const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
   v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
-  botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
-  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
-  $('#deadlineInput').onchange = (e) => { const val = e.target.value; if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.deadline = val; } else { c.deadline = val; } debouncedSave(); goChapter(c.id, false); };
+    const canQCM=c.cards.length>=4;
+  botAct.style.gridTemplateColumns='1fr 1fr 1fr'; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn${canQCM?' btn--primary':''}" id="qcmBtn"${canQCM?'':' disabled'}>QCM</button><button class="action btn" id="settingsBtn">Param.</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#qcmBtn').onclick=()=>startQCM(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
+  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn${canQCM?' btn--primary':''}" id="qcmBtn"${canQCM?'':' disabled'}>QCM</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Param.</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#qcmBtn').onclick=()=>startQCM(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
@@ -825,6 +825,7 @@ function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.fi
 function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; $('#app').classList.toggle('focus-mode', data.app.prefs.focusMode); renRev() }
 
 function renRev(){
+  if(State.review?.isQCM){ renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
@@ -922,7 +923,8 @@ function undoRev(){
   const snap = r.history.pop(); r.index = snap.idx;
   const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState;
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
-  r.flipped = false; 
+  r.flipped = false;
+  if(r.isQCM){ r.qcmOptions = null; r.qcmAnswered = false; }
   saveData(); renRev();
 }
 
@@ -1056,7 +1058,90 @@ function ensureMathGrouped(){
   }
   valGrps(mathSub);
 }
+/* === QCM MODE === */
+function startQCM(cid){
+  if(!cid)return; const c=getCh(cid); if(!c)return;
 
+  if(c.virtual&&c._ids){
+    const all=c._ids.map(_real).filter(Boolean),pool=[];
+    all.forEach(ch=>ch.cards.forEach(card=>{if(c.filters.grades[card.grade||'unseen'])pool.push({chapId:ch.id,card})}));
+    if(pool.length<2){alert('Pas assez de cartes.');return}
+    const tot=all.reduce((s,ch)=>s+ch.cards.length,0); if(tot<4){alert('Il faut au moins 4 cartes pour le QCM.');return}
+    const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+    const scored=pool.map(i=>({chapId:i.chapId,cardId:i.card.id,w:(wt[i.card.grade||'unseen']||1)*(.9+M.random()*.2)})).sort((a,b)=>b.w-a.w);
+    const sz=M.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length)||10;
+    if(cid.startsWith('group-')){const g=findGrp(getSub(),cid.replace('group-',''));if(g){g.lastUsed=Date.now();saveData()}}
+    State.review={chapterId:cid,queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),mode:'multi',multiChaps:c._ids.slice(),isQCM:!0,qcmOptions:null,qcmAnswered:!1};
+    goReview(!0); return;
+  }
+
+  const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
+  if(pool.length<2){alert('Pas assez de cartes.');return}
+  if(c.cards.length<4){alert('Il faut au moins 4 cartes pour le QCM.');return}
+  c.lastUsed=Date.now();saveData();
+  const queue=bldQ(c,pool,c.settings.sessionSize).map(x=>x.id);
+  State.review={chapterId:cid,queue,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),isQCM:!0,qcmOptions:null,qcmAnswered:!1};
+  goReview(!0);
+}
+
+function renQCM(){
+  const v=$('#view'),r=State.review,{card,chap}=getCur();
+  if(!card||!chap){goDeck(!1);return}
+  const idx=r.index+1,tot=r.queue.length,{f,b}=getSides(card,chap),fT=formatText(f),progress=(r.index/tot)*100;
+  const undoBtn=r.history.length?`<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>`:'';
+
+  if(!r.qcmOptions){
+    let allCards;
+    if(r.mode==='multi'&&r.multiChaps){
+      allCards=r.multiChaps.flatMap(cid=>{const ch=_real(cid);return ch?ch.cards.map(c=>({card:c,chap:ch})):[]});
+    }else{
+      allCards=chap.cards.map(c=>({card:c,chap}));
+    }
+    const others=allCards.filter(p=>p.card.id!==card.id);
+    const unique=others.filter(p=>getSides(p.card,p.chap).b!==b);
+    const source=unique.length>=3?unique:others;
+    const shuffled=[...source].sort(()=>M.random()-.5);
+    const wrong=shuffled.slice(0,3).map(p=>formatText(getSides(p.card,p.chap).b));
+    r.qcmOptions=[{text:formatText(b),correct:!0},...wrong.map(w=>({text:w,correct:!1}))].sort(()=>M.random()-.5);
+    r.qcmAnswered=!1;
+  }
+
+  const letters=['A','B','C','D'];
+  v.innerHTML=`<div class="review-wrap">
+    <div class="progress-bar" style="width:${progress}%"></div>
+    <div class="review-top"><div style="display:flex;align-items:center">${undoBtn} QCM • ${chap.title}</div><div>${idx} / ${tot}</div></div>
+    <div class="review-card">
+      <div class="review-scroller qcm-scroller">
+        <div class="term qcm-question">${fT}</div>
+        <div class="qcm-options">${r.qcmOptions.map((opt,i)=>`<button class="qcm-option" data-idx="${i}"><span class="qcm-letter">${letters[i]}</span><span class="qcm-text">${opt.text}</span></button>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+
+  $('#reviewActionsBar').style.display='none';
+  $('#app').style.setProperty('--row-rev','0px');
+
+  if(r.history.length&&$('#undoBtn'))$('#undoBtn').onclick=undoRev;
+  $$('.qcm-option',v).forEach(btn=>{btn.onclick=()=>{if(!r.qcmAnswered)handleQCMAnswer(parseInt(btn.dataset.idx))}});
+  Media.resolve(v); const scroller=v.querySelector('.review-scroller'); if(scroller)tsLat(scroller);
+}
+
+function handleQCMAnswer(idx){
+  const r=State.review; if(r.qcmAnswered)return; r.qcmAnswered=!0;
+  const opt=r.qcmOptions[idx],isCorrect=opt.correct;
+
+  $$('.qcm-option').forEach((btn,i)=>{
+    btn.disabled=!0;
+    if(r.qcmOptions[i].correct)btn.classList.add('qcm-correct');
+    if(i===idx&&!isCorrect)btn.classList.add('qcm-wrong');
+  });
+  haptic(isCorrect?'success':'error');
+
+  setTimeout(()=>{
+    r.qcmOptions=null;r.qcmAnswered=!1;
+    subG(isCorrect?'bien':'echec');
+  },isCorrect?800:1500);
+}
 async function init(){
   Media.open();
 
