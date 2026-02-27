@@ -781,7 +781,7 @@ async function goCards(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
   const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="cards-grid" id="gridCont"></div></div></div>`;
+    v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
