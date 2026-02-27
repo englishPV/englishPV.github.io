@@ -15,6 +15,7 @@
         <button class="back" id="backBtn" title="Retour">← Retour</button>
         <div class="title" id="title">Deck</div>
         <div class="spacer"></div>
+        <button class="btn btn--ghost btn--tiny" id="syncBtn" style="flex-shrink:0;width:auto;padding:6px 12px;" title="Sync Firebase">🔄</button>
         <a href="https://schedulepv.web.app/" target="_blank" rel="noopener" class="btn btn--primary btn--tiny" style="flex-shrink:0;text-decoration:none;width:auto;padding:6px 12px;">📅</a>
       </header>
       <main id="view"></main>
@@ -29,10 +30,16 @@
     </div>
   </div>
 
-  <script src="data.js"></script>
+    <script src="data.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
+  <!-- Firebase SDKs (compat mode for simplicity) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
   <!-- Fichiers logiques découpés -->
+  <script src="js/01_firebase_sync.js"></script>
   <script src="js/02_utils_formatting_and_helpers.js"></script>
   <script src="js/03_data_storage_and_imports.js"></script>
   <script src="js/04_srs_algorithm_and_stats.js"></script>
