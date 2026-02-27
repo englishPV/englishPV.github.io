@@ -1,60 +1,1136 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Physique Flashcards</title>
-  
-  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Flashcard Trainer</title>
+
+    <!-- Firebase SDK via CDN (compatible) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --card-front: #16213e;
+            --card-back: #1a3a2a;
+            --accent: #e94560;
+            --accent2: #0f3460;
+            --text: #eee;
+            --text-dim: #888;
+            --success: #4ecca3;
+            --fail: #e94560;
+            --gold: #f5c518;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== AUTH SCREEN ===== */
+        #auth-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 20px;
+        }
+        #auth-screen h1 { font-size: 2em; }
+        #auth-screen p { color: var(--text-dim); margin-bottom: 10px; }
+        .google-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .google-btn:hover { background: #3367d6; }
+        #user-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        #user-info img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+        .logout-btn {
+            background: var(--fail);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--accent2), #1a1a2e);
+            padding: 15px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+        .header h1 { font-size: 1.3em; }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        .stat-value { font-weight: bold; color: var(--gold); }
+
+        /* ===== NAVIGATION ===== */
+        .nav-tabs {
+            display: flex;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow-x: auto;
+        }
+        .nav-tab {
+            flex: 1;
+            min-width: max-content;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(233,69,96,0.1);
+        }
+
+        /* ===== VIEWS ===== */
+        .view { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
+        .view.active { display: block; }
+
+        /* ===== FLASHCARD ===== */
+        .card-container {
+            perspective: 1000px;
+            margin: 20px 0;
+            height: 250px;
+            cursor: pointer;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .flashcard.flipped { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 1.5em;
+        }
+        .card-front { background: linear-gradient(135deg, var(--card-front), #1a2a4e); }
+        .card-back {
+            background: linear-gradient(135deg, var(--card-back), #1a4a3a);
+            transform: rotateY(180deg);
+        }
+        .card-level {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.4em;
+            color: var(--text-dim);
+        }
+        .card-category {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 0.35em;
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .card-hint {
+            font-size: 0.4em;
+            color: var(--text-dim);
+            margin-top: 10px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-success { background: var(--success); color: #000; }
+        .btn-fail { background: var(--fail); color: #fff; }
+        .btn-show { background: var(--accent2); color: #fff; width: 100%; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--card-bg); color: var(--text); border: 1px solid rgba(255,255,255,0.2); }
+
+        /* ===== FORM ===== */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-size: 0.85em; color: var(--text-dim); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1em;
+        }
+
+        /* ===== WORD LIST ===== */
+        .word-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .word-item .word-text { flex: 1; }
+        .word-item .word-en { font-weight: bold; }
+        .word-item .word-fr { color: var(--text-dim); font-size: 0.9em; }
+        .word-item .word-actions { display: flex; gap: 6px; }
+        .word-item .word-actions button {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .level-badge {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        .level-0 { background: #e94560; color: white; }
+        .level-1 { background: #e97045; color: white; }
+        .level-2 { background: #e9a845; color: white; }
+        .level-3 { background: #c5e945; color: black; }
+        .level-4 { background: #45e98a; color: black; }
+        .level-5 { background: #45e9e9; color: black; }
+
+        /* ===== CATEGORIES ===== */
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .category-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .category-chip.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* ===== SEARCH ===== */
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-section { margin-bottom: 20px; }
+        .progress-bar-bg {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+        }
+        .empty-state .emoji { font-size: 3em; margin-bottom: 10px; }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .toast.show { opacity: 1; }
+
+        /* ===== IMPORT/EXPORT ===== */
+        .data-section {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .data-section h3 { margin-bottom: 10px; font-size: 1em; }
+        .sync-status {
+            text-align: center;
+            padding: 10px;
+            background: rgba(78, 204, 163, 0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: var(--success);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        /* ===== BULK ADD ===== */
+        .bulk-info {
+            font-size: 0.8em;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        textarea.bulk-area {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 0.9em;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        /* ===== SECURITY INFO BANNER ===== */
+        .security-banner {
+            background: rgba(78, 204, 163, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+        }
+        .security-banner h4 {
+            color: var(--success);
+            margin-bottom: 6px;
+        }
+        .security-banner ul {
+            margin-left: 18px;
+            color: var(--text-dim);
+        }
+        .security-banner li {
+            margin-bottom: 3px;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="phone" id="app">
-       <header class="topbar">
-        <button class="back" id="backBtn" title="Retour">← Retour</button>
-        <div class="title" id="title">Deck</div>
-        <div class="spacer"></div>
-        <a href="https://schedulepv.web.app/" target="_blank" rel="noopener" class="btn btn--primary btn--tiny" style="flex-shrink:0;text-decoration:none;width:auto;padding:6px 12px;">📅</a>
-      </header>
-      <main id="view"></main>
-      <div class="bottom-actions" id="bottomActions">
-        <button class="action btn" id="cardsBtn">Cartes</button>
-        <button class="action btn" id="settingsBtn">Paramètres</button>
-      </div>
-      <footer class="revision-bar" id="revisionBar">
-        <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">Révision</button>
-      </footer>
-      <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen">
+    <h1>📚 Flashcard Trainer</h1>
+    <p>Connecte-toi pour synchroniser tes cartes entre tes appareils</p>
+    <button class="google-btn" onclick="signInWithGoogle()">
+        🔑 Se connecter avec Google
+    </button>
+    <p style="font-size: 0.8em; color: var(--text-dim); margin-top: 20px;">
+        Tes données seront sauvegardées dans le cloud<br>et accessibles depuis n'importe quel appareil.
+    </p>
+</div>
+
+<!-- ===== MAIN APP (hidden until auth) ===== -->
+<div id="main-app" style="display:none;">
+
+    <!-- User info bar -->
+    <div id="user-info" style="display:none;">
+        <img id="user-avatar" src="" alt="">
+        <span id="user-name"></span>
+        <button class="logout-btn" onclick="signOutUser()">Déco</button>
     </div>
-  </div>
 
-  <script src="data.js"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>📚 Flashcard Trainer</h1>
+        <div class="stats-bar">
+            <div class="stat">📦 <span class="stat-value" id="stat-total">0</span> mots</div>
+            <div class="stat">📖 <span class="stat-value" id="stat-due">0</span> à revoir</div>
+            <div class="stat">🔥 <span class="stat-value" id="stat-streak">0</span> série</div>
+            <div class="stat">✅ <span class="stat-value" id="stat-mastered">0</span> maîtrisés</div>
+        </div>
+    </div>
 
-  <!-- === CONFIGURATION FIREBASE (AJOUTÉ ICI) === -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCc8-kMmHvJagbj-nV4ZGcWDUXYytRrD0I",
-      authDomain: "englishpv-b6727.firebaseapp.com",
-      databaseURL: "https://englishpv-b6727-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "englishpv-b6727",
-      storageBucket: "englishpv-b6727.firebasestorage.app",
-      messagingSenderId: "285413164654",
-      appId: "1:285413164654:web:a0d8d27dfa0009ab45887f"
+    <!-- NAV -->
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="showView('study')">📖 Étudier</div>
+        <div class="nav-tab" onclick="showView('add')">➕ Ajouter</div>
+        <div class="nav-tab" onclick="showView('list')">📋 Liste</div>
+        <div class="nav-tab" onclick="showView('stats')">📊 Stats</div>
+    </div>
+
+    <!-- ===== STUDY VIEW ===== -->
+    <div class="view active" id="view-study">
+        <div class="category-filter" id="study-categories"></div>
+
+        <div id="study-content">
+            <div class="card-container" onclick="flipCard()">
+                <div class="flashcard" id="flashcard">
+                    <div class="card-face card-front">
+                        <div class="card-category" id="card-cat"></div>
+                        <div class="card-level" id="card-level"></div>
+                        <div id="card-front-text">Loading...</div>
+                        <div class="card-hint" id="card-hint"></div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div id="card-back-text">...</div>
+                        <div class="card-hint" id="card-example"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-show" onclick="flipCard()" id="btn-show">👆 Tap to reveal</button>
+
+            <div class="btn-row" id="answer-btns" style="display:none;">
+                <button class="btn btn-fail" onclick="answer(false)">❌ Again</button>
+                <button class="btn btn-success" onclick="answer(true)">✅ Got it!</button>
+            </div>
+        </div>
+
+        <div class="empty-state" id="study-empty" style="display:none;">
+            <div class="emoji">🎉</div>
+            <h3>All done for now!</h3>
+            <p>Come back later or add more words</p>
+        </div>
+    </div>
+
+    <!-- ===== ADD VIEW ===== -->
+    <div class="view" id="view-add">
+        <h2 style="margin-bottom: 15px;">➕ Add New Word</h2>
+
+        <div class="form-group">
+            <label>English 🇬🇧</label>
+            <input type="text" id="input-en" placeholder="e.g. ubiquitous">
+        </div>
+        <div class="form-group">
+            <label>French 🇫🇷</label>
+            <input type="text" id="input-fr" placeholder="e.g. omniprésent">
+        </div>
+        <div class="form-group">
+            <label>Category 🏷️</label>
+            <input type="text" id="input-cat" placeholder="e.g. adjective, business, daily..." list="cat-list">
+            <datalist id="cat-list"></datalist>
+        </div>
+        <div class="form-group">
+            <label>Hint / Context 💡 (optional)</label>
+            <input type="text" id="input-hint" placeholder="e.g. Used to describe something everywhere">
+        </div>
+        <div class="form-group">
+            <label>Example 📝 (optional)</label>
+            <input type="text" id="input-example" placeholder="e.g. Smartphones are ubiquitous nowadays">
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top: 5px;" onclick="addWord()">💾 Save Word</button>
+
+        <hr style="margin: 25px 0; border-color: rgba(255,255,255,0.1);">
+
+        <h3 style="margin-bottom: 10px;">📦 Bulk Add</h3>
+        <div class="bulk-info">One pair per line: <code>english : french</code> (optional: <code>: category</code>)</div>
+        <textarea class="bulk-area" id="bulk-input" placeholder="hello : bonjour : greeting&#10;goodbye : au revoir : greeting&#10;cat : chat"></textarea>
+        <button class="btn btn-secondary" style="width:100%; margin-top: 8px;" onclick="bulkAdd()">📦 Add All</button>
+
+        <hr style="margin: 25px 0; border-color: rgba(255,255,255,0.1);">
+
+        <div class="data-section">
+            <h3>📂 Import / Export</h3>
+            <div class="sync-status">☁️ Les données sont automatiquement synchronisées via Firebase</div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="exportData()">📤 Export JSON</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 Import JSON</button>
+                <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LIST VIEW ===== -->
+    <div class="view" id="view-list">
+        <input type="text" class="search-box" id="search-input" placeholder="🔍 Search words..." oninput="renderList()">
+        <div class="category-filter" id="list-categories"></div>
+        <div id="word-list"></div>
+    </div>
+
+    <!-- ===== STATS VIEW ===== -->
+    <div class="view" id="view-stats">
+        <h2 style="margin-bottom: 15px;">📊 Progress</h2>
+
+        <!-- Security Info -->
+        <div class="security-banner">
+            <h4>🔒 Sécurité & Données</h4>
+            <ul>
+                <li>Tes données sont liées à ton compte Google</li>
+                <li>Seul toi peux voir/modifier tes cartes</li>
+                <li>Synchronisation automatique entre appareils</li>
+                <li>Aucune donnée de carte bancaire n'est stockée ici</li>
+            </ul>
+        </div>
+
+        <div class="progress-section">
+            <h3>Level Distribution</h3>
+            <div id="level-bars"></div>
+        </div>
+
+        <div class="progress-section">
+            <h3>Categories</h3>
+            <div id="cat-stats"></div>
+        </div>
+
+        <div class="data-section" style="margin-top: 20px;">
+            <h3>⚠️ Danger Zone</h3>
+            <button class="btn btn-fail" style="width:100%; margin-top: 8px;" onclick="resetAll()">🗑️ Reset All Data</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// FIREBASE INIT
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyCc8-kMmHvJagbj-nV4ZGcWDUXYytRrD0I",
+    authDomain: "englishpv-b6727.firebaseapp.com",
+    databaseURL: "https://englishpv-b6727-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "englishpv-b6727",
+    storageBucket: "englishpv-b6727.firebasestorage.app",
+    messagingSenderId: "285413164654",
+    appId: "1:285413164654:web:a0d8d27dfa0009ab45887f",
+    measurementId: "G-VKX6DSZV4Z"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUser = null;
+let userRef = null;
+
+// ============================================================
+// GUARD: prevent re-entrant saves triggering listener loops
+// ============================================================
+let isSaving = false;       // true while we are writing to Firebase
+let isLoaded = false;       // true once initial load is done
+let activeListener = null;  // so we can detach old listener on logout
+
+// ============================================================
+// AUTH
+// ============================================================
+function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(err => {
+        console.error(err);
+        toast('Erreur de connexion: ' + err.message);
+    });
+}
+
+function signOutUser() {
+    // Detach listener before signing out to avoid ghost callbacks
+    if (userRef && activeListener) {
+        userRef.child('words').off('value', activeListener);
+        activeListener = null;
+    }
+    isLoaded = false;
+    auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUser = user;
+        userRef = db.ref('users/' + user.uid);
+
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        document.getElementById('user-info').style.display = 'flex';
+        document.getElementById('user-name').textContent = user.displayName || user.email;
+        if (user.photoURL) {
+            document.getElementById('user-avatar').src = user.photoURL;
+        }
+
+        // Load data from Firebase
+        loadFromFirebase();
+    } else {
+        currentUser = null;
+        userRef = null;
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('user-info').style.display = 'none';
+    }
+});
+
+// ============================================================
+// DATA
+// ============================================================
+let words = [];
+let streak = 0;
+let studyCat = 'all';
+let listCat = 'all';
+let currentCard = null;
+
+/**
+ * Loads data from Firebase once, attempts migration of old
+ * localStorage data, then attaches a real-time listener for
+ * cross-device sync.  The listener ignores events that were
+ * caused by our own writes (isSaving flag).
+ */
+function loadFromFirebase() {
+    // Detach any previous listener (e.g. if auth state toggled)
+    if (activeListener) {
+        userRef.child('words').off('value', activeListener);
+        activeListener = null;
+    }
+
+    isLoaded = false;
+
+    // 1) One-time read to bootstrap
+    userRef.child('words').once('value').then(snap => {
+        const data = snap.val();
+        words = data ? Object.values(data) : [];
+
+        return userRef.child('streak').once('value');
+    }).then(sSnap => {
+        streak = sSnap.val() || 0;
+
+        // 2) Migrate old localStorage data if Firebase is empty
+        migrateLocalData();
+
+        // 3) Render everything
+        isLoaded = true;
+        refreshUI();
+
+        // 4) Attach real-time listener for OTHER devices/tabs
+        activeListener = userRef.child('words').on('value', snap2 => {
+            // Skip if this event was triggered by our own save
+            if (isSaving) return;
+
+            const d = snap2.val();
+            words = d ? Object.values(d) : [];
+
+            // Also refresh streak
+            userRef.child('streak').once('value').then(s => {
+                streak = s.val() || 0;
+                refreshUI();
+            });
+        });
+    }).catch(err => {
+        console.error('Firebase load error:', err);
+        toast('⚠️ Erreur de chargement');
+    });
+}
+
+/**
+ * Save current words + streak to Firebase.
+ * Sets isSaving flag so the real-time listener ignores
+ * the echo event.
+ */
+function saveToFirebase() {
+    if (!userRef) return;
+
+    isSaving = true;
+
+    const wordsObj = {};
+    words.forEach(w => {
+        const key = w.id || ('word_' + Math.random().toString(36).substr(2, 9));
+        if (!w.id) w.id = key;
+        wordsObj[key] = w;
+    });
+
+    // Use update so both writes go in one call
+    userRef.update({
+        words: wordsObj,
+        streak: streak
+    }).then(() => {
+        // Small delay before clearing flag – lets the listener
+        // event fire and get ignored
+        setTimeout(() => { isSaving = false; }, 500);
+    }).catch(err => {
+        console.error('Save error:', err);
+        isSaving = false;
+        toast('⚠️ Erreur de sauvegarde');
+    });
+}
+
+/**
+ * Convenience: refresh all UI parts without triggering saves
+ */
+function refreshUI() {
+    updateStats();
+    renderCategories();
+    nextCard();
+    renderList();
+}
+
+function generateId() {
+    return 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+}
+
+// ============================================================
+// VIEWS
+// ============================================================
+function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    const tabs = ['study','add','list','stats'];
+    document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+
+    if (name === 'list') renderList();
+    if (name === 'stats') renderStats();
+    if (name === 'study') nextCard();
+    if (name === 'add') updateCatDatalist();
+}
+
+// ============================================================
+// FLASHCARD LOGIC
+// ============================================================
+function getDueWords() {
+    const now = Date.now();
+    let filtered = words.filter(w => !w.nextReview || w.nextReview <= now);
+    if (studyCat !== 'all') filtered = filtered.filter(w => (w.category || 'uncategorized') === studyCat);
+    return filtered.sort((a, b) => (a.level || 0) - (b.level || 0));
+}
+
+function nextCard() {
+    const due = getDueWords();
+    document.getElementById('stat-due').textContent = due.length;
+
+    if (due.length === 0) {
+        document.getElementById('study-content').style.display = 'none';
+        document.getElementById('study-empty').style.display = 'block';
+        return;
+    }
+
+    document.getElementById('study-content').style.display = 'block';
+    document.getElementById('study-empty').style.display = 'none';
+
+    // Pick a random one from top candidates
+    const pool = due.slice(0, Math.min(5, due.length));
+    currentCard = pool[Math.floor(Math.random() * pool.length)];
+
+    const fc = document.getElementById('flashcard');
+    fc.classList.remove('flipped');
+
+    document.getElementById('card-front-text').textContent = currentCard.en;
+    document.getElementById('card-back-text').textContent = currentCard.fr;
+    document.getElementById('card-cat').textContent = currentCard.category || '';
+    document.getElementById('card-level').textContent = '⭐'.repeat(currentCard.level || 0) || 'New';
+    document.getElementById('card-hint').textContent = currentCard.hint || '';
+    document.getElementById('card-example').textContent = currentCard.example || '';
+
+    document.getElementById('btn-show').style.display = 'block';
+    document.getElementById('answer-btns').style.display = 'none';
+}
+
+function flipCard() {
+    document.getElementById('flashcard').classList.add('flipped');
+    document.getElementById('btn-show').style.display = 'none';
+    document.getElementById('answer-btns').style.display = 'flex';
+}
+
+function answer(correct) {
+    if (!currentCard) return;
+
+    const idx = words.findIndex(w => w.id === currentCard.id);
+    if (idx === -1) return;
+
+    if (correct) {
+        words[idx].level = Math.min((words[idx].level || 0) + 1, 5);
+        streak++;
+        // Spaced repetition intervals (minutes): 1, 10, 60, 480, 1440, 4320
+        const intervals = [1, 10, 60, 480, 1440, 4320];
+        const lvl = words[idx].level;
+        words[idx].nextReview = Date.now() + intervals[lvl] * 60000;
+        toast('✅ Correct! Level ' + lvl + ' 🔥' + streak);
+    } else {
+        words[idx].level = 0;
+        words[idx].nextReview = Date.now() + 30000; // 30 sec
+        streak = 0;
+        toast('❌ Review again soon');
+    }
+
+    words[idx].lastReview = Date.now();
+    saveToFirebase();
+    updateStats();
+    setTimeout(nextCard, 300);
+}
+
+// ============================================================
+// ADD WORD
+// ============================================================
+function addWord() {
+    const en = document.getElementById('input-en').value.trim();
+    const fr = document.getElementById('input-fr').value.trim();
+    if (!en || !fr) { toast('⚠️ Fill English and French!'); return; }
+
+    const word = {
+        id: generateId(),
+        en: en,
+        fr: fr,
+        category: document.getElementById('input-cat').value.trim() || 'uncategorized',
+        hint: document.getElementById('input-hint').value.trim(),
+        example: document.getElementById('input-example').value.trim(),
+        level: 0,
+        nextReview: 0,
+        lastReview: null,
+        created: Date.now()
     };
-    // Initialisation de Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
-  <!-- === FIN CONFIGURATION FIREBASE === -->
 
-  <!-- Fichiers logiques découpés -->
-  <script src="js/02_utils_formatting_and_helpers.js"></script>
-  <script src="js/03_data_storage_and_imports.js"></script>
-  <script src="js/04_srs_algorithm_and_stats.js"></script>
-  <script src="js/05_app_ui_and_navigation.js"></script>
+    words.push(word);
+    saveToFirebase();
+    updateStats();
+    renderCategories();
+
+    document.getElementById('input-en').value = '';
+    document.getElementById('input-fr').value = '';
+    document.getElementById('input-hint').value = '';
+    document.getElementById('input-example').value = '';
+    toast('✅ Word added!');
+}
+
+function bulkAdd() {
+    const text = document.getElementById('bulk-input').value.trim();
+    if (!text) return;
+
+    const lines = text.split('\n').filter(l => l.trim());
+    let count = 0;
+
+    lines.forEach(line => {
+        const parts = line.split(':').map(s => s.trim());
+        if (parts.length >= 2) {
+            words.push({
+                id: generateId(),
+                en: parts[0],
+                fr: parts[1],
+                category: parts[2] || 'uncategorized',
+                hint: '',
+                example: '',
+                level: 0,
+                nextReview: 0,
+                lastReview: null,
+                created: Date.now()
+            });
+            count++;
+        }
+    });
+
+    saveToFirebase();
+    updateStats();
+    renderCategories();
+    document.getElementById('bulk-input').value = '';
+    toast(`✅ Added ${count} words!`);
+}
+
+// ============================================================
+// WORD LIST
+// ============================================================
+function renderList() {
+    const search = (document.getElementById('search-input').value || '').toLowerCase();
+    let filtered = words.filter(w => {
+        const matchSearch = w.en.toLowerCase().includes(search) || w.fr.toLowerCase().includes(search);
+        const matchCat = listCat === 'all' || (w.category || 'uncategorized') === listCat;
+        return matchSearch && matchCat;
+    });
+
+    const container = document.getElementById('word-list');
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="emoji">📭</div><p>No words found</p></div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(w => `
+        <div class="word-item">
+            <div class="word-text">
+                <div class="word-en">${escapeHtml(w.en)} <span class="level-badge level-${w.level || 0}">Lv${w.level || 0}</span></div>
+                <div class="word-fr">${escapeHtml(w.fr)}</div>
+            </div>
+            <div class="word-actions">
+                <button onclick="deleteWord('${w.id}')" title="Delete">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Prevent XSS when rendering user-entered text into HTML
+ */
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+}
+
+function deleteWord(id) {
+    if (!confirm('Delete this word?')) return;
+    words = words.filter(w => w.id !== id);
+    saveToFirebase();
+    updateStats();
+    renderList();
+    renderCategories();
+    toast('🗑️ Deleted');
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+function getCategories() {
+    const cats = new Set(words.map(w => w.category || 'uncategorized'));
+    return ['all', ...Array.from(cats).sort()];
+}
+
+function renderCategories() {
+    const cats = getCategories();
+
+    ['study-categories', 'list-categories'].forEach((containerId, i) => {
+        const current = i === 0 ? studyCat : listCat;
+        const fnName = i === 0 ? 'setStudyCat' : 'setListCat';
+        document.getElementById(containerId).innerHTML = cats.map(c =>
+            `<div class="category-chip ${c === current ? 'active' : ''}" onclick="${fnName}('${escapeHtml(c)}')">${c === 'all' ? '📚 All' : escapeHtml(c)}</div>`
+        ).join('');
+    });
+}
+
+function setStudyCat(cat) { studyCat = cat; renderCategories(); nextCard(); }
+function setListCat(cat) { listCat = cat; renderCategories(); renderList(); }
+
+function updateCatDatalist() {
+    const cats = getCategories().filter(c => c !== 'all');
+    document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+    document.getElementById('stat-total').textContent = words.length;
+    document.getElementById('stat-due').textContent = getDueWords().length;
+    document.getElementById('stat-streak').textContent = streak;
+    document.getElementById('stat-mastered').textContent = words.filter(w => (w.level || 0) >= 5).length;
+}
+
+function renderStats() {
+    // Level distribution
+    const levels = [0,1,2,3,4,5];
+    const levelNames = ['New', 'Learning', 'Familiar', 'Good', 'Great', 'Mastered'];
+    const total = words.length || 1;
+
+    document.getElementById('level-bars').innerHTML = levels.map(l => {
+        const count = words.filter(w => (w.level || 0) === l).length;
+        const pct = Math.round(count / total * 100);
+        return `
+            <div style="margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                    <span>${levelNames[l]}</span>
+                    <span>${count} (${pct}%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill level-${l}" style="width: ${pct}%"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Category stats
+    const cats = getCategories().filter(c => c !== 'all');
+    document.getElementById('cat-stats').innerHTML = cats.map(c => {
+        const catWords = words.filter(w => (w.category || 'uncategorized') === c);
+        const avg = catWords.length ? (catWords.reduce((s, w) => s + (w.level || 0), 0) / catWords.length).toFixed(1) : 0;
+        return `
+            <div class="word-item">
+                <div class="word-text">
+                    <div class="word-en">${escapeHtml(c)}</div>
+                    <div class="word-fr">${catWords.length} words · Avg level: ${avg}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// IMPORT / EXPORT
+// ============================================================
+function exportData() {
+    const data = JSON.stringify({ words, streak }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flashcards_backup.json';
+    a.click();
+    toast('📤 Exported!');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.words && Array.isArray(data.words)) {
+                // Merge: add words that don't exist yet (by en+fr)
+                let added = 0;
+                data.words.forEach(w => {
+                    if (!w.id) w.id = generateId();
+                    const exists = words.some(existing => existing.en === w.en && existing.fr === w.fr);
+                    if (!exists) {
+                        words.push(w);
+                        added++;
+                    }
+                });
+                saveToFirebase();
+                updateStats();
+                renderCategories();
+                renderList();
+                toast(`📥 Imported ${added} new words!`);
+            } else {
+                toast('⚠️ Invalid file format');
+            }
+        } catch (err) {
+            toast('⚠️ Error reading file');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function resetAll() {
+    if (!confirm('⚠️ Delete ALL words? This cannot be undone!')) return;
+    if (!confirm('Are you really sure?')) return;
+    words = [];
+    streak = 0;
+    saveToFirebase();
+    refreshUI();
+    toast('🗑️ All data deleted');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// MIGRATE OLD LOCAL DATA TO FIREBASE (one-time)
+// ============================================================
+function migrateLocalData() {
+    try {
+        const localData = localStorage.getItem('flashcards_v2');
+        if (localData && currentUser) {
+            const data = JSON.parse(localData);
+            if (data.words && data.words.length > 0 && words.length === 0) {
+                // Ensure all words have IDs
+                data.words.forEach(w => {
+                    if (!w.id) w.id = generateId();
+                });
+                words = data.words;
+                streak = data.streak || 0;
+                saveToFirebase();
+                localStorage.removeItem('flashcards_v2');
+                toast('☁️ Données locales migrées vers le cloud !');
+            }
+        }
+    } catch (e) {
+        console.error('Migration error:', e);
+    }
+}
+
+</script>
 </body>
 </html>
