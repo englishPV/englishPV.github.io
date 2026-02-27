@@ -1244,7 +1244,6 @@ function handleQCMAnswer(idx){
 async function init(){
   Media.open();
 
-  // Init Firebase sync button FIRST but don't auto-sync yet
   if(typeof FireSync !== 'undefined') {
     FireSync.initSyncButton();
   }
@@ -1257,24 +1256,29 @@ async function init(){
   try {
     data = loadData();
 
-    // TRY TO PULL FROM CLOUD BEFORE reconcile
-    if(typeof FireSync !== 'undefined' && FireSync.isConnected) {
-      console.log('[Init] Firebase connected, pulling cloud data first...');
-      try {
-        await FireSync.pullIfNewer();
-      } catch(e) {
-        console.warn('[Init] Cloud pull failed, using local:', e);
+    // ALWAYS try to pull from cloud on startup
+    if(typeof FireSync !== 'undefined') {
+      // Wait briefly for auth to resolve if not yet connected
+      if(!FireSync.isConnected) {
+        await new Promise(r => {
+          let tries = 0;
+          const check = () => {
+            if(FireSync.isConnected || tries++ > 15) r();
+            else setTimeout(check, 200);
+          };
+          check();
+        });
+      }
+      if(FireSync.isConnected) {
+        console.log('[Init] Pulling cloud data...');
+        try { await FireSync.pullIfNewer(); } catch(e) { console.warn('[Init] Cloud pull failed:', e); }
       }
     }
 
-    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; FireSync.saveDataLocal ? FireSync.saveDataLocal() : saveData(); }
+    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; typeof FireSync!=='undefined'&&FireSync.saveDataLocal ? FireSync.saveDataLocal() : saveData(); }
     pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
 
-    // START periodic save and listening AFTER init complete
     setInterval(saveData, 30000);
-    if(typeof FireSync !== 'undefined' && FireSync.isConnected) {
-      FireSync.startListening();
-    }
   } catch(e) {
     console.error('Init error, resetting:', e);
     localStorage.removeItem(KEY);
