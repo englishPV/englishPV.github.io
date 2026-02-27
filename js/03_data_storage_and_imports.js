@@ -114,9 +114,67 @@ const buildMathSub = () => {
 };
 const buildCanon = () => [buildSub('Physique',dataPHY), buildMathSub(), buildSub('Anglais',dataEN)];
 
-/* --- DATA MANAGEMENT --- */
-function loadData(){ try{const r=LS.getItem(KEY);if(r){const p=JSON.parse(r);if(p.subjects)return p;if(p.chapters)return{subjects:[{id:'anglais',title:'Anglais',chapters:p.chapters,groups:[]}],app:p.app||{theme:'light',currentSubjectId:'anglais'}}}}catch{} const s=buildCanon(); return{subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} }
-function saveData(){ try{LS.setItem(KEY,JSON.stringify(data))}catch{} }
+/* --- DATA MANAGEMENT (MODIFIÉ POUR FIREBASE) --- */
+
+// Fonction pour démarrer la synchronisation Cloud
+function initFirebaseSync() {
+    // On vérifie si Firebase est chargé (depuis index.html)
+    if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
+        const dbRef = db.ref('englishpv_sync_global');
+        
+        // ÉCOUTER: Quand le cloud change, on met à jour le site
+        dbRef.on('value', (snapshot) => {
+            const cloudData = snapshot.val();
+            if (cloudData) {
+                // On compare pour éviter de recharger si c'est pareil
+                const localStr = JSON.stringify(data);
+                const cloudStr = JSON.stringify(cloudData);
+                
+                if (localStr !== cloudStr && window.appLoaded) {
+                    // C'est différent ! On sauvegarde et on rafraîchit
+                    data = cloudData;
+                    LS.setItem(KEY, cloudStr);
+                    // On recharge la page pour afficher les nouveautés
+                    location.reload(); 
+                }
+            } else {
+                // Cloud vide ? On envoie nos données
+                saveData();
+            }
+        });
+    }
+}
+
+function loadData(){ 
+    // 1. Chargement local (Classique)
+    let loaded = null;
+    try{const r=LS.getItem(KEY);if(r) loaded=JSON.parse(r);}catch{} 
+    
+    // Si pas de local, on construit les défauts
+    if(!loaded) { 
+        const s=buildCanon(); 
+        loaded={subjects:s,app:{currentSubjectId:s[0]?.id,theme:'light',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}} 
+    }
+    
+    // 2. On lance la synchro Firebase en arrière-plan
+    setTimeout(() => {
+        window.appLoaded = true;
+        initFirebaseSync();
+    }, 1000);
+
+    return loaded;
+}
+
+function saveData(){ 
+    // 1. Sauvegarde Locale
+    try{LS.setItem(KEY,JSON.stringify(data))}catch{} 
+    
+    // 2. Sauvegarde Cloud (Firebase)
+    if(typeof db !== 'undefined') {
+        // On envoie tout au cloud
+        db.ref('englishpv_sync_global').set(data).catch(e => console.error("Erreur Cloud:", e));
+    }
+}
 
 const debouncedSave = (() => {
   let t; const c = W.cancelIdleCallback || clearTimeout, r = W.requestIdleCallback || (cb=>setTimeout(cb,2000));
