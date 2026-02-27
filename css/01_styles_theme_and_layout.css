@@ -146,13 +146,35 @@ main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-hei
 .review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; transition: background-color 0.4s ease; pointer-events: auto; }
 
 .review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: text; scrollbar-width: none; } .review-scroller::-webkit-scrollbar { display: none; }
-.review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
-.term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; }
+.review-scroller > * { 
+  margin-top: auto; 
+  margin-bottom: auto; 
+  width: 100%; 
+  min-width: 0; /* Autorise le contenu à rétrécir sous sa taille par défaut */
+  max-width: 100%;
+}
+.term, .definition {
+  font-size: var(--fs-term)!important;
+  font-weight: 600;
+  text-align: center;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word; /* Version moderne de word-wrap */
+  word-break: break-word; /* Force la cassure des mots très longs */
+  min-width: 0; /* Empêche Flexbox de déborder */
+  max-width: 100%;
+}
 .definition { font-size: var(--fs-def)!important; font-weight: 900; }
 
 .preview-box { background: var(--card); border: 2px dashed var(--border); border-radius: 14px; margin: 10px 14px; padding: 20px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; gap: 15px; }
-.preview-recto { font-size: var(--fs-term); font-weight: 600; color: var(--text); }
-.preview-verso { font-size: var(--fs-def); font-weight: 900; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px; }
+.preview-recto { 
+  font-size: var(--fs-term); font-weight: 600; color: var(--text);
+  overflow-wrap: break-word; word-break: break-word; min-width: 0; max-width: 100%;
+}
+.preview-verso { 
+  font-size: var(--fs-def); font-weight: 900; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px;
+  overflow-wrap: break-word; word-break: break-word; min-width: 0; max-width: 100%;
+}
 
 /* MathJax & Img */
 mjx-container { overflow: hidden; overflow-x: auto; max-width: 100% !important; display: inline-block !important; padding: 4px 0; white-space: normal !important; vertical-align: middle; box-sizing: border-box; }
