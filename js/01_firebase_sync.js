@@ -223,9 +223,9 @@ const FireSync = (() => {
     clearTimeout(autoSyncTimer);
     autoSyncTimer = setTimeout(() => {
       if (currentUser && !isSyncing) {
-        pushToCloud().catch(e => console.warn('[FireSync] Auto-push failed:', e));
+        pushToCloud(true).catch(e => console.warn('[FireSync] Auto-push failed:', e));
       }
-    }, 120000); // 2 minutes
+    }, 10000); // 10 seconds
   }
 
   // --- LOCAL MOD TIME ---
