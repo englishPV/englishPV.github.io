@@ -17,10 +17,15 @@ let mathCache = new Set();
 const clearMathCache = () => { mathCache = new Set(); };
 
 const needsMath = s => /[$]|\\[(\[]|\\frac|\\sqrt|\\text/.test(s);
-const tsLat = e => { 
-  if(!W.MathJax?.typesetPromise || (e && !needsMath(e.innerHTML))) return Promise.resolve();
+const tsLat = async e => { 
+  if(e && !needsMath(e.innerHTML)) return;
+  if(!W.MathJax?.typesetPromise) {
+    if(!W.loadMathJax) return;
+    await W.loadMathJax();
+    if(!W.MathJax?.typesetPromise) return;
+  }
   const id = e?.id || e?.dataset?.id;
-  if(id) { if(mathCache.has(id)) return Promise.resolve(); mathCache.add(id); }
+  if(id) { if(mathCache.has(id)) return; mathCache.add(id); }
   return W.MathJax.typesetPromise(e ? [e] : null).catch(() => {});
 };
 W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
