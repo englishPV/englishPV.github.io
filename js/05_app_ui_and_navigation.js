@@ -1056,6 +1056,15 @@ async function init(){
   Media.open();
   setInterval(saveData, 30000);
 
+  // Init Firebase sync button
+  if(typeof FireSync !== 'undefined') {
+    FireSync.initSyncButton();
+    // Auto-start listening if already logged in
+    setTimeout(() => {
+      if(FireSync.isConnected) FireSync.startListening();
+    }, 2000);
+  }
+
   try {
     const r = await fetch('math.md');
     if(r.ok) dataMATH = parseMathData(await r.text());
