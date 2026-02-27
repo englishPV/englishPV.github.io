@@ -120,9 +120,15 @@ const FireSync = (() => {
   }
 
   // --- CALLED AFTER LOGIN ---
+   let initSyncDone = false;
+
   async function onLoginComplete() {
     setupPresence();
-    await initialSync();
+    // Don't run initialSync if init() already handled it via pullIfNewer
+    if (!initSyncDone) {
+      initSyncDone = true;
+      await initialSync();
+    }
     startListening();
   }
 
