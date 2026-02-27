@@ -31,7 +31,7 @@
 [data-theme="light"] .btn--ghost{--btn-bg-h:rgba(0,0,0,.06)}
 
 /* --- RESET & LAYOUT --- */
-* { box-sizing: border-box; }
+* { box-sizing: border-box; scrollbar-width: none; } *::-webkit-scrollbar { display: none; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; font-size: 17px; -webkit-font-smoothing: antialiased; }
 .wrapper { height: 100dvh; width: 100%; display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
@@ -51,7 +51,7 @@ main#view { min-height: 0; height: 100%; display: flex; flex-direction: column; 
 .center { text-align: center; }
 .mt6 { margin-top: 6px; }
 .mt8 { margin-top: 8px; }
-.scroll-y { overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; } .scroll-lock { overflow: hidden; touch-action: none!important; }
+.scroll-y { overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; } .scroll-y::-webkit-scrollbar { display: none; } .scroll-lock { overflow: hidden; touch-action: none!important; }
 .list, .flexcol { display: flex; flex-direction: column; gap: 8px; min-height: 0; } .stack { display: flex; flex-direction: column; gap: 6px; }
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -138,14 +138,14 @@ canvas#gradeChart { width: 140px; height: 140px; pointer-events: auto; }
 .legend-item.inactive { opacity: .45; filter: grayscale(20%); }
 .dot { width: 10px; height: 10px; border-radius: 50%; } .dot.gray { background: #9ca3af; } .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.blue { background: var(--blue); } .dot.green { background: var(--green); }
 
-main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; pointer-events: auto; flex: 1; }
+main#view > .card { overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; pointer-events: auto; flex: 1; scrollbar-width: none; } main#view > .card::-webkit-scrollbar { display: none; }
 
 /* Review */
 .review-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .review-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; flex-shrink: 0; padding-bottom: 4px; }
 .review-card { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 0; padding: 0; transition: background-color 0.4s ease; pointer-events: auto; }
 
-.review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: text; }
+.review-scroller { flex: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px; touch-action: pan-y; user-select: text; scrollbar-width: none; } .review-scroller::-webkit-scrollbar { display: none; }
 .review-scroller > * { margin-top: auto; margin-bottom: auto; width: 100%; }
 .term, .definition { font-size: var(--fs-term)!important; font-weight: 600; text-align: center; white-space: pre-wrap; word-wrap: break-word; }
 .definition { font-size: var(--fs-def)!important; font-weight: 900; }
