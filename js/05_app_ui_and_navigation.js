@@ -957,7 +957,7 @@ function openSet(cid,push=true){
     ${sect('Session',
       sRow('','📚','Taille session','Nombre de cartes par révision',sVal(c.settings.sessionSize).replace('s-value','s-value" id="valS'))+sCtrl('sldS','subS','addS','valS',c.settings.sessionSize)
     )}
-    ${sect('Données',
+     ${sect('Données',
       sRow('rowExp','📤','Exporter','Sauvegarder toutes les données',sChev,1)+
       sRow('rowImp','📥','Importer','Restaurer une sauvegarde',sChev,1)+
       '<input type="file" id="impF" class="hidden">'
@@ -1059,50 +1059,158 @@ function ensureMathGrouped(){
   valGrps(mathSub);
 }
 /* === QCM MODE === */
-function startQCM(cid){
-  if(!cid)return; const c=getCh(cid); if(!c)return;
+const QCM_CACHE_KEY='qcm_cache_v2';
+const getQCMCache=()=>{try{return JSON.parse(LS.getItem(QCM_CACHE_KEY)||'{}')}catch{return{}}};
+const setQCMCache=c=>{const k=Object.keys(c);if(k.length>500)k.slice(0,k.length-400).forEach(x=>delete c[x]);try{LS.setItem(QCM_CACHE_KEY,JSON.stringify(c))}catch{}};
+
+function cleanForPrompt(html){
+  return(html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<img[^>]*>/gi,'').replace(/<[^>]+>/g,'')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ')
+    .trim().substring(0,500);
+}
+
+const GEMINI_KEY='AIzaSyDkS9G1fCtVaR1ULvaDP2osbvc6JiNt0rE';
+
+async function callGeminiQCM(apiKey,cards){
+  const prompt=`Tu es un professeur de prépa. Pour chaque flashcard, génère exactement 3 mauvaises réponses plausibles pour un QCM.
+
+Règles STRICTES:
+- Même format que la bonne réponse (si LaTeX avec $..$ ou \\(..\\), les mauvaises aussi)
+- CRÉDIBLES: un bon étudiant pourrait hésiter
+- Liées au même sujet et chapitre
+- Longueur similaire à la bonne réponse
+- JAMAIS répéter la bonne réponse
+- Si c'est une formule, donne des formules avec des erreurs subtiles (mauvais signe, mauvais exposant, variable inversée...)
+- Si c'est une définition, donne des définitions de concepts proches mais différents
+
+Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks:
+[{"id":"...","wrong":["...","...","..."]}]
+
+Flashcards:
+${cards.map(c=>`ID: ${c.id}\nQ: ${c.q}\nR: ${c.a}`).join('\n---\n')}`;
+
+  const resp=await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key='+GEMINI_KEY,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.9,maxOutputTokens:4096}
+    })}
+  );
+  if(!resp.ok)throw new Error('API '+resp.status);
+  const d=await resp.json();
+  const txt=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  const m=txt.match(/\[[\s\S]*\]/);
+  if(!m)throw new Error('No JSON');
+  return JSON.parse(m[0]);
+}
+
+function getRandomDistractors(cardId,reviewState){
+  let allCards;
+  if(reviewState.mode==='multi'&&reviewState.multiChaps){
+    allCards=reviewState.multiChaps.flatMap(cid=>{const ch=_real(cid);return ch?ch.cards.map(c=>({card:c,chap:ch})):[]});
+  }else{
+    const ch=getCh(reviewState.chapterId);
+    allCards=ch?ch.cards.map(c=>({card:c,chap:ch})):[];
+  }
+  const current=allCards.find(p=>p.card.id===cardId);
+  if(!current)return[];
+  const correctB=getSides(current.card,current.chap).b;
+  const others=allCards.filter(p=>p.card.id!==cardId&&getSides(p.card,p.chap).b!==correctB);
+  return[...others].sort(()=>M.random()-.5).slice(0,3).map(p=>getSides(p.card,p.chap).b);
+}
+
+async function generateQCMDistractors(queue,chapterId,mode,multiChaps){
+  const apiKey=data.app.prefs?.geminiKey;
+  const cache=getQCMCache();
+  const result={};
+  const toGenerate=[];
+
+  for(const item of queue){
+    let card,chap,cardId;
+    if(mode==='multi'){cardId=item.cardId;chap=_real(item.chapId);card=chap?.cards.find(c=>c.id===cardId)}
+    else{cardId=item;chap=getCh(chapterId);card=chap?.cards.find(c=>c.id===cardId)}
+    if(!card||!chap)continue;
+    if(cache[cardId]){result[cardId]=cache[cardId]}
+    else{const{f,b}=getSides(card,chap);toGenerate.push({id:cardId,q:cleanForPrompt(f),a:cleanForPrompt(b)})}
+  }
+
+  if(toGenerate.length===0||!GEMINI_KEY)return result;
+
+  try{
+    for(let i=0;i<toGenerate.length;i+=10){
+      const batch=toGenerate.slice(i,i+10);
+      const aiResult=await callGeminiQCM(apiKey,batch);
+      for(const item of aiResult){
+        if(item.id&&Array.isArray(item.wrong)&&item.wrong.length>=3){
+          result[item.id]=item.wrong.slice(0,3);
+          cache[item.id]=item.wrong.slice(0,3);
+        }
+      }
+    }
+    setQCMCache(cache);
+  }catch(e){console.warn('[QCM] Gemini failed:',e)}
+  return result;
+}
+
+async function startQCM(cid){
+  if(!cid)return;const c=getCh(cid);if(!c)return;
+
+  let queue,mode=null,multiChaps=null;
 
   if(c.virtual&&c._ids){
     const all=c._ids.map(_real).filter(Boolean),pool=[];
     all.forEach(ch=>ch.cards.forEach(card=>{if(c.filters.grades[card.grade||'unseen'])pool.push({chapId:ch.id,card})}));
     if(pool.length<2){alert('Pas assez de cartes.');return}
-    const tot=all.reduce((s,ch)=>s+ch.cards.length,0); if(tot<4){alert('Il faut au moins 4 cartes pour le QCM.');return}
+    if(all.reduce((s,ch)=>s+ch.cards.length,0)<4){alert('Il faut au moins 4 cartes.');return}
     const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
     const scored=pool.map(i=>({chapId:i.chapId,cardId:i.card.id,w:(wt[i.card.grade||'unseen']||1)*(.9+M.random()*.2)})).sort((a,b)=>b.w-a.w);
     const sz=M.round(all.reduce((s,ch)=>s+(ch.settings.sessionSize||10),0)/all.length)||10;
     if(cid.startsWith('group-')){const g=findGrp(getSub(),cid.replace('group-',''));if(g){g.lastUsed=Date.now();saveData()}}
-    State.review={chapterId:cid,queue:scored.slice(0,sz),index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),mode:'multi',multiChaps:c._ids.slice(),isQCM:!0,qcmOptions:null,qcmAnswered:!1};
-    goReview(!0); return;
+    queue=scored.slice(0,sz);mode='multi';multiChaps=c._ids.slice();
+  }else{
+    const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
+    if(pool.length<2){alert('Pas assez de cartes.');return}
+    if(c.cards.length<4){alert('Il faut au moins 4 cartes.');return}
+    c.lastUsed=Date.now();saveData();
+    queue=bldQ(c,pool,c.settings.sessionSize).map(x=>x.id);
   }
 
-  const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
-  if(pool.length<2){alert('Pas assez de cartes.');return}
-  if(c.cards.length<4){alert('Il faut au moins 4 cartes pour le QCM.');return}
-  c.lastUsed=Date.now();saveData();
-  const queue=bldQ(c,pool,c.settings.sessionSize).map(x=>x.id);
-  State.review={chapterId:cid,queue,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),isQCM:!0,qcmOptions:null,qcmAnswered:!1};
-  goReview(!0);
+  Nav.push();
+  setTop({title:'QCM'});setBot({actions:!1,revision:!1});hideRevAct();
+  $('#view').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px"><div style="font-size:40px">🧠</div><div style="color:var(--muted);font-weight:700">Génération des questions...</div></div>';
+
+  const distractors=await generateQCMDistractors(queue,cid,mode,multiChaps);
+
+  State.review={
+    chapterId:cid,queue,index:0,flipped:!1,answers:[],history:[],
+    start:Date.now(),end:null,cardStart:Date.now(),
+    isQCM:!0,qcmOptions:null,qcmAnswered:!1,qcmDistractors:distractors,
+    ...(mode==='multi'?{mode:'multi',multiChaps}:{})
+  };
+  goReview(!1);
 }
 
 function renQCM(){
   const v=$('#view'),r=State.review,{card,chap}=getCur();
   if(!card||!chap){goDeck(!1);return}
   const idx=r.index+1,tot=r.queue.length,{f,b}=getSides(card,chap),fT=formatText(f),progress=(r.index/tot)*100;
-  const undoBtn=r.history.length?`<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>`:'';
+  const undoBtn=r.history.length?'<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>':'';
+  const cardId=r.mode==='multi'?r.queue[r.index].cardId:r.queue[r.index];
 
   if(!r.qcmOptions){
-    let allCards;
-    if(r.mode==='multi'&&r.multiChaps){
-      allCards=r.multiChaps.flatMap(cid=>{const ch=_real(cid);return ch?ch.cards.map(c=>({card:c,chap:ch})):[]});
+    const aiWrong=r.qcmDistractors?.[cardId];
+    if(aiWrong&&aiWrong.length>=3){
+      r.qcmOptions=[
+        {text:formatText(b),correct:!0},
+        ...aiWrong.slice(0,3).map(w=>({text:formatText(w),correct:!1}))
+      ].sort(()=>M.random()-.5);
     }else{
-      allCards=chap.cards.map(c=>({card:c,chap}));
+      const wrong=getRandomDistractors(cardId,r);
+      r.qcmOptions=[
+        {text:formatText(b),correct:!0},
+        ...wrong.slice(0,3).map(w=>({text:formatText(w),correct:!1}))
+      ].sort(()=>M.random()-.5);
     }
-    const others=allCards.filter(p=>p.card.id!==card.id);
-    const unique=others.filter(p=>getSides(p.card,p.chap).b!==b);
-    const source=unique.length>=3?unique:others;
-    const shuffled=[...source].sort(()=>M.random()-.5);
-    const wrong=shuffled.slice(0,3).map(p=>formatText(getSides(p.card,p.chap).b));
-    r.qcmOptions=[{text:formatText(b),correct:!0},...wrong.map(w=>({text:w,correct:!1}))].sort(()=>M.random()-.5);
     r.qcmAnswered=!1;
   }
 
@@ -1120,27 +1228,21 @@ function renQCM(){
 
   $('#reviewActionsBar').style.display='none';
   $('#app').style.setProperty('--row-rev','0px');
-
   if(r.history.length&&$('#undoBtn'))$('#undoBtn').onclick=undoRev;
   $$('.qcm-option',v).forEach(btn=>{btn.onclick=()=>{if(!r.qcmAnswered)handleQCMAnswer(parseInt(btn.dataset.idx))}});
-  Media.resolve(v); const scroller=v.querySelector('.review-scroller'); if(scroller)tsLat(scroller);
+  Media.resolve(v);const scroller=v.querySelector('.review-scroller');if(scroller)tsLat(scroller);
 }
 
 function handleQCMAnswer(idx){
-  const r=State.review; if(r.qcmAnswered)return; r.qcmAnswered=!0;
+  const r=State.review;if(r.qcmAnswered)return;r.qcmAnswered=!0;
   const opt=r.qcmOptions[idx],isCorrect=opt.correct;
-
   $$('.qcm-option').forEach((btn,i)=>{
     btn.disabled=!0;
     if(r.qcmOptions[i].correct)btn.classList.add('qcm-correct');
     if(i===idx&&!isCorrect)btn.classList.add('qcm-wrong');
   });
   haptic(isCorrect?'success':'error');
-
-  setTimeout(()=>{
-    r.qcmOptions=null;r.qcmAnswered=!1;
-    subG(isCorrect?'bien':'echec');
-  },isCorrect?800:1500);
+  setTimeout(()=>{r.qcmOptions=null;r.qcmAnswered=!1;subG(isCorrect?'bien':'echec')},isCorrect?800:1500);
 }
 async function init(){
   Media.open();
