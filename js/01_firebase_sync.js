@@ -18,10 +18,9 @@ const FireSync = (() => {
   let currentUser = null;
   let isSyncing = false;
   let lastPushTime = 0;
-  let remoteListener = null;
-  let ignoreNextRemote = false;
   let autoSyncTimer = null;
   let initSyncDone = false;
+  let hasRemoteUpdate = false;
 
   let deviceId = localStorage.getItem('fireSync_deviceId');
   if (!deviceId) {
@@ -32,46 +31,6 @@ const FireSync = (() => {
   // --- REFS ---
   function dataRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/flashcardData') : null; }
   function metaRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/syncMeta') : null; }
-  function presenceRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/presence/' + deviceId) : null; }
-  function allPresenceRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/presence') : null; }
-
-  // --- PRESENCE ---
-  function setupPresence() {
-    if (!currentUser) return;
-    const ref = presenceRef();
-    const connRef = db.ref('.info/connected');
-    connRef.on('value', snap => {
-      if (snap.val() === true) {
-        ref.set({
-          online: true,
-          lastSeen: firebase.database.ServerValue.TIMESTAMP,
-          device: deviceId,
-          userAgent: navigator.userAgent.substring(0, 60)
-        });
-        ref.onDisconnect().set({
-          online: false,
-          lastSeen: firebase.database.ServerValue.TIMESTAMP,
-          device: deviceId,
-          userAgent: navigator.userAgent.substring(0, 60)
-        });
-      }
-    });
-  }
-
-  async function getOtherDevices() {
-    if (!currentUser) return [];
-    const snap = await allPresenceRef().once('value');
-    const val = snap.val() || {};
-    const others = [];
-    const now = Date.now();
-    for (const [id, info] of Object.entries(val)) {
-      if (id === deviceId) continue;
-      if (info.online || (now - (info.lastSeen || 0)) < 120000) {
-        others.push(info);
-      }
-    }
-    return others;
-  }
 
   // --- AUTH ---
   function showLoginPrompt() {
@@ -105,91 +64,47 @@ const FireSync = (() => {
     if (user) {
       console.log('[FireSync] Authenticated:', user.email);
       onLoginComplete();
-    } else {
-      stopListening();
     }
   });
 
   async function logout() {
-    stopListening();
-    const ref = presenceRef();
-    if (ref) await ref.set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP, device: deviceId });
     await auth.signOut();
     currentUser = null;
+    hasRemoteUpdate = false;
     updateSyncUI();
     console.log('[FireSync] Disconnected');
   }
 
   // --- CALLED AFTER LOGIN ---
   async function onLoginComplete() {
-    setupPresence();
-    if (!initSyncDone) {
-      initSyncDone = true;
-      await initialSync();
-    }
-    startListening();
+    if (initSyncDone) return;
+    initSyncDone = true;
+    // Only pull on first login/page load, nothing else automatic
+    await pullIfNewer();
+    updateSyncUI();
   }
 
-  // --- INITIAL SYNC ---
-  async function initialSync() {
-    if (!currentUser || isSyncing) return;
+  // --- PULL IF NEWER (called once on page load) ---
+  async function pullIfNewer() {
+    if (!currentUser) return false;
     isSyncing = true;
     updateSyncUI();
     try {
       const mSnap = await metaRef().once('value');
       const cloudMeta = mSnap.val() || {};
       const cloudTime = cloudMeta.lastModified || 0;
-      const cloudDevice = cloudMeta.fromDevice || '';
-      const localTime = getLocalModTime();
 
       if (cloudTime === 0) {
         console.log('[FireSync] No cloud data, pushing local');
-        await pushToCloud(true);
-        return;
-      }
-
-      if (cloudDevice === deviceId && cloudTime >= localTime) {
-        console.log('[FireSync] Cloud is from this device, skipping');
-        lastPushTime = cloudTime;
-        return;
-      }
-
-      if (cloudTime > localTime + 3000) {
-        console.log('[FireSync] Cloud is newer, auto pulling');
-        await pullFromCloud(true);
-      } else if (localTime > cloudTime + 3000) {
-        console.log('[FireSync] Local is newer, auto pushing');
-        await pushToCloud(true);
-      } else {
-        console.log('[FireSync] Timestamps close, pushing local');
-        await pushToCloud(true);
-      }
-    } catch (e) {
-      console.error('[FireSync] Initial sync error:', e);
-    } finally {
-      isSyncing = false;
-      updateSyncUI();
-    }
-  }
-
-  // --- PULL IF NEWER (called by init before reconcile) ---
-  async function pullIfNewer() {
-    if (!currentUser) return false;
-    try {
-      const mSnap = await metaRef().once('value');
-      const cloudMeta = mSnap.val() || {};
-      const cloudTime = cloudMeta.lastModified || 0;
-
-      if (cloudTime === 0) {
-        console.log('[FireSync] No cloud data exists yet');
+        await pushToCloud();
         return false;
       }
 
       const localTime = getLocalModTime();
-      console.log('[FireSync] pullIfNewer — cloud:', cloudTime, 'local:', localTime);
+      console.log('[FireSync] cloud:', cloudTime, 'local:', localTime);
 
-      if (cloudTime > localTime + 2000) {
-        console.log('[FireSync] Cloud is newer, pulling before reconcile');
+      if (cloudTime > localTime + 5000) {
+        console.log('[FireSync] Cloud is newer, pulling');
         const snap = await dataRef().once('value');
         const raw = snap.val();
         if (!raw) return false;
@@ -200,27 +115,36 @@ const FireSync = (() => {
         data = cloudData;
         saveDataLocal();
         lastPushTime = cloudTime;
-        console.log('[FireSync] Cloud data loaded successfully');
+
+        // Re-render if app is already initialized
+        if (typeof upgrade === 'function') {
+          upgrade(); applyTh(); applyUI();
+          if (typeof Nav !== 'undefined') { Nav.clear(); goDeck(false); }
+        }
+
+        console.log('[FireSync] Cloud data loaded');
         return true;
       } else {
-        console.log('[FireSync] Local is same or newer, keeping local');
+        console.log('[FireSync] Local is same or newer');
         return false;
       }
     } catch (e) {
       console.error('[FireSync] pullIfNewer error:', e);
       return false;
+    } finally {
+      isSyncing = false;
+      updateSyncUI();
     }
   }
 
   // --- PUSH ---
-  async function pushToCloud(silent = false) {
-    if (!currentUser) return;
-    if (typeof data === 'undefined') return;
+  async function pushToCloud() {
+    if (!currentUser || typeof data === 'undefined') return;
+    if (isSyncing) return;
     isSyncing = true;
     updateSyncUI();
     try {
       const now = Date.now();
-      ignoreNextRemote = true;
 
       // Rolling backup (keep last 3)
       try {
@@ -250,8 +174,8 @@ const FireSync = (() => {
         email: currentUser.email
       });
       lastPushTime = now;
+      hasRemoteUpdate = false;
       console.log('[FireSync] Pushed at', new Date(now).toLocaleTimeString());
-      setTimeout(() => { ignoreNextRemote = false; }, 3000);
     } catch (e) {
       console.error('[FireSync] Push error:', e);
     } finally {
@@ -260,23 +184,19 @@ const FireSync = (() => {
     }
   }
 
-  // --- PULL ---
-  async function pullFromCloud(silent = false) {
+  // --- PULL (manual) ---
+  async function pullFromCloud() {
     if (!currentUser) return;
+    if (isSyncing) return;
     isSyncing = true;
     updateSyncUI();
     try {
       const snap = await dataRef().once('value');
       const raw = snap.val();
-      if (!raw) {
-        console.log('[FireSync] No cloud data');
-        return;
-      }
+      if (!raw) { console.log('[FireSync] No cloud data'); return; }
+
       const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (!cloudData.subjects || !cloudData.app) {
-        console.log('[FireSync] Invalid cloud data');
-        return;
-      }
+      if (!cloudData.subjects || !cloudData.app) { console.log('[FireSync] Invalid cloud data'); return; }
 
       data = cloudData;
       upgrade();
@@ -287,6 +207,7 @@ const FireSync = (() => {
       goDeck(false);
 
       lastPushTime = Date.now();
+      hasRemoteUpdate = false;
       console.log('[FireSync] Pulled from cloud');
     } catch (e) {
       console.error('[FireSync] Pull error:', e);
@@ -296,54 +217,15 @@ const FireSync = (() => {
     }
   }
 
-  // --- REAL-TIME LISTENER ---
-  function startListening() {
-    if (!currentUser || remoteListener) return;
-    const ref = metaRef();
-    remoteListener = ref.on('value', async snap => {
-      if (ignoreNextRemote) return;
-      const meta = snap.val();
-      if (!meta) return;
-
-      const cloudTime = meta.lastModified || 0;
-      const fromDevice = meta.fromDevice || '';
-
-      if (fromDevice === deviceId) return;
-      if (cloudTime <= lastPushTime) return;
-
-      console.log('[FireSync] Remote change detected from', fromDevice);
-
-      if (typeof State !== 'undefined' && State.view === 'review' && State.review && !State.review.end) {
-        console.log('[FireSync] Sync queued after review');
-        window._pendingSync = true;
-        return;
-      }
-
-      isSyncing = true;
-      updateSyncUI();
-      await pullFromCloud(true);
-      isSyncing = false;
-      updateSyncUI();
-      console.log('[FireSync] Auto-synced from', fromDevice);
-    });
-  }
-
-  function stopListening() {
-    if (remoteListener && currentUser) {
-      try { metaRef()?.off('value', remoteListener); } catch (e) {}
-      remoteListener = null;
-    }
-  }
-
-  // --- AUTO PUSH ---
+  // --- AUTO PUSH (very debounced — only after 2 minutes of inactivity) ---
   function scheduleAutoSync() {
     if (!currentUser) return;
     clearTimeout(autoSyncTimer);
     autoSyncTimer = setTimeout(() => {
       if (currentUser && !isSyncing) {
-        pushToCloud(true).catch(e => console.warn('[FireSync] Auto-push failed:', e));
+        pushToCloud().catch(e => console.warn('[FireSync] Auto-push failed:', e));
       }
-    }, 5000);
+    }, 120000); // 2 minutes
   }
 
   // --- LOCAL MOD TIME ---
@@ -367,7 +249,7 @@ const FireSync = (() => {
 
   // --- RESTORE FROM BACKUP ---
   async function restoreFromBackup() {
-    if (!currentUser) { console.error('[FireSync] Not connected'); return; }
+    if (!currentUser) return;
     try {
       const backupRef = db.ref('users/' + currentUser.uid + '/backups');
       const snap = await backupRef.once('value');
@@ -381,7 +263,7 @@ const FireSync = (() => {
         const date = new Date(b.savedAt || parseInt(k)).toLocaleString();
         msg += `${i + 1} — ${date} (depuis ${b.fromDevice || '?'})\n`;
       });
-      msg += '\nTapez le numéro (1, 2 ou 3) :';
+      msg += '\nTapez le numéro :';
 
       const choice = prompt(msg);
       const idx = parseInt(choice) - 1;
@@ -389,24 +271,15 @@ const FireSync = (() => {
 
       const backup = backups[keys[idx]];
       const backupData = typeof backup.data === 'string' ? JSON.parse(backup.data) : backup.data;
-
-      if (!backupData.subjects || !backupData.app) {
-        alert('Backup invalide');
-        return;
-      }
-
-      if (!confirm('⚠️ Restaurer le backup du ' + new Date(backup.savedAt || parseInt(keys[idx])).toLocaleString() + ' ?\n\nCeci remplacera TOUTES vos données actuelles.')) return;
+      if (!backupData.subjects || !backupData.app) { alert('Backup invalide'); return; }
+      if (!confirm('⚠️ Restaurer ce backup ?\nCeci remplacera TOUTES vos données.')) return;
 
       data = backupData;
-      upgrade();
-      applyTh();
-      applyUI();
+      upgrade(); applyTh(); applyUI();
       saveDataLocal();
-      Nav.clear();
-      goDeck(false);
-
+      Nav.clear(); goDeck(false);
       console.log('[FireSync] Backup restored');
-      await pushToCloud(true);
+      await pushToCloud();
     } catch (e) {
       console.error('[FireSync] Restore error:', e);
     }
@@ -419,17 +292,14 @@ const FireSync = (() => {
     if (isSyncing) {
       btn.textContent = '⏳';
       btn.disabled = true;
-      btn.classList.add('syncing');
     } else if (currentUser) {
       btn.textContent = '☁️';
       btn.disabled = false;
-      btn.title = 'Sync: ' + currentUser.email;
-      btn.classList.remove('syncing');
+      btn.title = currentUser.email;
     } else {
       btn.textContent = '🔄';
       btn.disabled = false;
-      btn.title = 'Se connecter & synchroniser';
-      btn.classList.remove('syncing');
+      btn.title = 'Se connecter';
     }
   }
 
@@ -447,7 +317,8 @@ const FireSync = (() => {
       if (!currentUser) {
         showLoginPrompt();
       } else {
-        pushToCloud(false);
+        // Simple click = push local to cloud
+        pushToCloud();
       }
     };
 
@@ -458,31 +329,16 @@ const FireSync = (() => {
         if (!currentUser) return;
         const action = prompt(
           'Options sync :\n\n' +
-          '1 = Forcer envoi → Cloud\n' +
-          '2 = Forcer récupération ← Cloud\n' +
+          '1 = Envoyer → Cloud\n' +
+          '2 = Récupérer ← Cloud\n' +
           '3 = Déconnexion\n' +
-          '4 = État sync\n' +
-          '5 = 📦 Restaurer un backup\n\n' +
-          'Tapez 1, 2, 3, 4 ou 5 :'
+          '4 = 📦 Restaurer backup\n\n' +
+          'Tapez 1, 2, 3 ou 4 :'
         );
-        if (action === '1') pushToCloud(false);
-        else if (action === '2') pullFromCloud(false);
+        if (action === '1') pushToCloud();
+        else if (action === '2') pullFromCloud();
         else if (action === '3') logout();
-        else if (action === '4') {
-          getOtherDevices().then(others => {
-            alert(
-              '🔄 État de la synchronisation\n\n' +
-              'Appareil: ' + deviceId + '\n' +
-              'Connecté: ' + (currentUser ? currentUser.email : 'Non') + '\n' +
-              'Dernier push: ' + (lastPushTime ? new Date(lastPushTime).toLocaleString() : 'Jamais') + '\n' +
-              'Autres appareils en ligne: ' + others.length + '\n' +
-              (others.length ? others.map(o => '  • ' + o.device + (o.online ? ' (en ligne)' : ' (hors ligne)')).join('\n') : '')
-            );
-          });
-        }
-        else if (action === '5') {
-          restoreFromBackup();
-        }
+        else if (action === '4') restoreFromBackup();
       }, 800);
     });
     btn.addEventListener('pointerup', (e) => {
@@ -492,7 +348,6 @@ const FireSync = (() => {
     btn.addEventListener('pointercancel', () => clearTimeout(pressTimer));
   }
 
-  // --- PUBLIC API ---
   return {
     login: showLoginPrompt,
     logout,
@@ -501,8 +356,8 @@ const FireSync = (() => {
     pullFromCloud,
     pullIfNewer,
     scheduleAutoSync,
-    startListening,
-    stopListening,
+    startListening: () => {},
+    stopListening: () => {},
     initSyncButton,
     saveDataLocal,
     restoreFromBackup,
