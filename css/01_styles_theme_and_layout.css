@@ -235,3 +235,34 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 #syncBtn.syncing { animation: spin-sync 1s linear infinite; }
 @keyframes spin-sync { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 #syncBtn { font-size: 16px; line-height: 1; }
+
+
+/* === QCM === */
+.qcm-scroller { justify-content: flex-start !important; gap: 16px; }
+.qcm-question { margin-bottom: 8px; }
+.qcm-options { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 8px 0; }
+.qcm-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: left; transition: all 0.25s;
+  width: 100%; appearance: none; outline: none;
+}
+.qcm-option:active { transform: scale(0.98); }
+.qcm-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; color: var(--muted); flex-shrink: 0;
+  transition: all 0.25s;
+}
+.qcm-text { flex: 1; line-height: 1.4; }
+.qcm-option.qcm-correct { background: rgba(34,197,94,0.15); border-color: var(--green); color: #86efac; }
+.qcm-option.qcm-correct .qcm-letter { background: var(--green); color: #fff; border-color: var(--green); }
+.qcm-option.qcm-wrong { background: rgba(239,68,68,0.15); border-color: var(--red); color: #fca5a5; }
+.qcm-option.qcm-wrong .qcm-letter { background: var(--red); color: #fff; border-color: var(--red); }
+.qcm-option:disabled { cursor: default; opacity: 0.8; }
+[data-theme="light"] .qcm-option { background: #f1f5f9; border-color: #e2e8f0; }
+[data-theme="light"] .qcm-option.qcm-correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+[data-theme="light"] .qcm-option.qcm-wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
