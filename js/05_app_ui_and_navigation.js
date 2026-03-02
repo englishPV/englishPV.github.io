@@ -1072,7 +1072,7 @@ function cleanForPrompt(html){
     .trim().substring(0,500);
 }
 
-const GEMINI_KEY='AIzaSyDkS9G1fCtVaR1ULvaDP2osbvc6JiNt0rE';
+const GEMINI_KEY='';
 
 async function callGeminiQCM(apiKey,cards){
   const prompt=`Tu es un professeur de prépa. Pour chaque flashcard, génère exactement 3 mauvaises réponses plausibles pour un QCM.
