@@ -98,8 +98,28 @@ Object.values(PHY_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
 /* --- MAPPING MATHS --- */
 const MATH_MAP = {
+  // Déjà existants
   "CH1": { title: "Ch.1 — Suites, fonctions réelles", emoji: "📊" },
   "CH99": { title: "Travail Février", emoji: "📝" },
+
+  // Nouveaux ajouts basés sur les images
+
+  "SUITES_SERIES": { title: "Suites et séries, familles sommables", emoji: "⛓️" }, // ou 🔢
+  "INTEGRATION": { title: "Intégration", emoji: "🧱" }, // L'intégrale comme somme de blocs/aires
+  "SUITES_FONC": { title: "Suites de fonctions, approximation", emoji: "🎯" }, // Cible pour l'approximation
+  "SERIES_FONC": { title: "Séries de fonctions", emoji: "〰️" },
+  "TOPO": { title: "Topologie", emoji: "🍩" }, // La blague classique : tasse = donut
+  "ALG_LIN": { title: "Algèbre linéaire", emoji: "↗️" }, // Vecteurs
+  "PROBA": { title: "Probabilités", emoji: "🎲" },
+  "SERIES_ENT": { title: "Séries et séries entières", emoji: "♾️" },
+  "CONV_DOM": { title: "Convergence dominée, permutation...", emoji: "🛑" }, // Stop/Limite
+  "INT_PARAM": { title: "Intégrales à paramètre continu", emoji: "🎛️" }, // Boutons de réglage (paramètres)
+  "EQUA_DIFF": { title: "Équations différentielles", emoji: "⚙️" }, // Mécanique/Evolution
+  "CALC_DIFF": { title: "Calcul différentiel", emoji: "⛰️" }, // Pente/Gradient
+  "ALG_GEN": { title: "Algèbre générale", emoji: "💍" }, // Pour les Anneaux/Corps
+  "POLYNOMES": { title: "Polynômes et fractions rationnelles", emoji: "✖️" },
+  "REDUCTION": { title: "Réduction", emoji: "↘️" }, // Diagonale d'une matrice
+  "ALG_EUCL": { title: "Algèbre euclidienne", emoji: "📐" }, // Angle/Norme
 };
 Object.values(MATH_MAP).forEach(v => C_EMOJIS[v.title] = v.emoji);
 
