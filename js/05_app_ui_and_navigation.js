@@ -375,9 +375,10 @@ function renderDeckItem(item, s) {
     if(selectionMode) {
       rightContent = `<button class="remove-x" data-action="delete-folder" data-gid="${g.id}" title="Supprimer le dossier">✕</button>`;
     } else if(isExpanded) {
+      rightContent = `<button class="btn btn--primary btn--tiny" data-action="review-folder" data-gid="${g.id}" style="margin-right:8px;width:auto;padding:5px 10px;font-size:11px">▶ Tout</button>`;
       const parentG = findGrpOfGrp(s, g.id);
       if(parentG) {
-        rightContent = `<button class="remove-x" data-action="remove-subfolder" data-gid="${g.id}" data-parent="${parentG.id}" title="Sortir du dossier" style="margin-right:12px">✕</button>`;
+        rightContent += `<button class="remove-x" data-action="remove-subfolder" data-gid="${g.id}" data-parent="${parentG.id}" title="Sortir du dossier" style="margin-right:4px">✕</button>`;
       }
     }
     
@@ -462,7 +463,10 @@ function bindDeckNew() {
     if(delFolderBtn) { e.stopPropagation(); if(confirm('Supprimer ce dossier ?')) { delGrp(sub, delFolderBtn.dataset.gid); valGrps(sub); saveData(); exitSelectionMode(); } return; }
     const remSubBtn = e.target.closest('[data-action="remove-subfolder"]');
     if(remSubBtn) { e.stopPropagation(); removeChildGrpFromParent(sub, remSubBtn.dataset.parent, remSubBtn.dataset.gid); valGrps(sub); saveData(); goDeckKeepScroll(); return; }
+    const revFolderBtn = e.target.closest('[data-action="review-folder"]');
+    if(revFolderBtn) { e.stopPropagation(); const g=findGrp(sub,revFolderBtn.dataset.gid); if(g){State.virtualChapter=buildVirt(sub,g);goChapter(State.virtualChapter.id)} return; }
   };
+
   
   let longPressTimer = null, startX = 0, startY = 0, pressedEl = null, didLongPress = false;
   let dragging = false, dragData = null, dragGhost = null, dragStarted = false, currentDropTarget = null, dropMode = null; 
@@ -752,7 +756,11 @@ function bindDeckNew() {
   l.addEventListener('pointercancel', onPointerCancel);
 }
 
-function openGrp(s,gid){ const g=findGrp(s,gid); if(g){State.virtualChapter=buildVirt(s,g);goChapter(State.virtualChapter.id)} }
+function openGrp(s,gid){
+  if(expandedFolders.has(gid)) expandedFolders.delete(gid);
+  else expandedFolders.add(gid);
+  goDeckKeepScroll();
+}
 
 D.addEventListener('pointerup', (e) => {
     if(!selectionMode) return;
