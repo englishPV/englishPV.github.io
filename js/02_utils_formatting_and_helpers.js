@@ -50,60 +50,55 @@ const formatText = t => {
   
   let s = t;
 
-  // ── Images ──
-  s = s.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, 
+  // ── 1. Images ──
+  s = s.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g,
     (_, f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`);
 
-  // ── Strip [latex] / [/latex] wrappers ──
+  // ── 2. Strip [latex] / [/latex] wrappers ──
   s = s.replace(/\[latex\]/gi, '').replace(/\[\/latex\]/gi, '');
 
-  // ── Convert LaTeX structural environments to HTML ──
-  // itemize → <ul>
-  s = s.replace(/\\begin\{itemize\}/g, '<ul>');
-  s = s.replace(/\\end\{itemize\}/g, '</ul>');
-
-  // enumerate → <ol>
-  s = s.replace(/\\begin\{enumerate\}/g, '<ol>');
-  s = s.replace(/\\end\{enumerate\}/g, '</ol>');
-
-  // \item → <li>...</li>
-  // Captures everything after \item until the next \item, </ul>, </ol>, or end
-  s = s.replace(/\\item\s+([\s\S]*?)(?=\\item|<\/ul>|<\/ol>|$)/g, 
-    '<li>$1</li>');
-
-  // ── Convert \textbf{...} → <strong> ──
-  s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
-
-  // ── Convert \textit{...} → <em> ──
-  s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
-
-  // ── Convert LaTeX math delimiters for MathJax ──
-  // [$] [/$] shorthand (your existing format)
+  // ── 3. [$] [/$] shorthand ──
   s = s.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
 
-  // ── Convert $...$ to \(...\) for MathJax (but NOT inside already-converted \( \)) ──
-  // Display math $$...$$ → \[...\]
-  s = s.replace(/\$\$([\s\S]*?)\$\$/g, '\\[$1\\]');
-  
-  // Inline math $...$ → \(...\)  (skip if already \( or escaped)
-  s = s.replace(/(?<!\\)\$([^\$]+?)\$/g, '\\($1\\)');
+  // ── 4. Convert LaTeX environments to HTML BEFORE touching newlines ──
+  s = s.replace(/\\begin\{itemize\}/g, '⟨UL⟩');
+  s = s.replace(/\\end\{itemize\}/g, '⟨/UL⟩');
+  s = s.replace(/\\begin\{enumerate\}/g, '⟨OL⟩');
+  s = s.replace(/\\end\{enumerate\}/g, '⟨/OL⟩');
 
-  // ── Newlines → <br> (but NOT inside <ul>/<ol>/<li> to avoid broken lists) ──
-  // First, clean up newlines inside list items
-  s = s.replace(/<li>([\s\S]*?)<\/li>/g, (match, content) => {
-    return '<li>' + content.trim() + '</li>';
+  // ── 5. Convert \item to placeholder ──
+  s = s.replace(/\\item\b\s*/g, '⟨ITEM⟩');
+
+  // ── 6. Convert \textbf / \textit ──
+  s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
+  s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
+
+  // ── 7. Stray \text{} outside math ──
+  s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
+
+  // ── 8. Newlines → <br> (but NOT \\newline eating \begin backslashes) ──
+  s = s.replace(/\\newline/g, '<br>');
+  s = s.replace(/\n/g, '<br>');
+
+  // ── 9. Now convert placeholders to real HTML ──
+  // Split items: everything between ⟨ITEM⟩ markers becomes <li>
+  s = s.replace(/⟨UL⟩([\s\S]*?)⟨\/UL⟩/g, (_, inner) => {
+    const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
+    return '<ul>' + items.map(i => '<li>' + i.replace(/<br>\s*$/,'').trim() + '</li>').join('') + '</ul>';
   });
 
-  // Convert remaining newlines to <br>
-  s = s.replace(/\\newline/g, '<br>');
-  // Only convert \n to <br> if NOT right before/after list tags
-  s = s.replace(/\n(?!<\/?[uo]l>|<\/?li>)/g, '<br>');
-  // Clean up <br> right before list tags
-  s = s.replace(/<br>\s*(<\/?[uo]l>)/g, '$1');
-  s = s.replace(/(<\/?[uo]l>)\s*<br>/g, '$1');
+  s = s.replace(/⟨OL⟩([\s\S]*?)⟨\/OL⟩/g, (_, inner) => {
+    const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
+    return '<ol>' + items.map(i => '<li>' + i.replace(/<br>\s*$/,'').trim() + '</li>').join('') + '</ol>';
+  });
 
-  // ── Cleanup stray \text{} outside math (edge case) ──
-  s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
+  // ── 10. Clean up <br> around list tags ──
+  s = s.replace(/<br>\s*<ul>/g, '<ul>');
+  s = s.replace(/<\/ul>\s*<br>/g, '</ul>');
+  s = s.replace(/<br>\s*<ol>/g, '<ol>');
+  s = s.replace(/<\/ol>\s*<br>/g, '</ol>');
+  s = s.replace(/<br>\s*<li>/g, '<li>');
+  s = s.replace(/<\/li>\s*<br>/g, '</li>');
 
   return s;
 };
