@@ -817,7 +817,11 @@ async function goCards(cid,push=true){
           grid.appendChild(el);
        });
     }
-    await Media.resolve(grid); await tsLat(grid);
+    // FIX: resolve media THEN typeset math THEN done
+    await Media.resolve(grid);
+    if(needsMath(grid.innerHTML)) {
+      await MathJax.typesetPromise([grid]).catch(e => console.warn('MathJax error:', e));
+    }
   };
   await renderCards(); 
   $('#cardSearch').oninput = (e) => renderCards(e.target.value);
