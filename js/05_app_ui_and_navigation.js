@@ -852,8 +852,15 @@ function renRev(){
   </div>`;
   
   const scroller = v.querySelector('.review-scroller');
-  const finishSetup = () => { Media.resolve(v); initGest(); bindSwipeNav(); };
-  if(scroller) tsLat(scroller).then(finishSetup); else finishSetup();
+  const finishSetup = async () => {
+  await Media.resolve(v);
+  if(scroller && needsMath(scroller.innerHTML)) {
+    await MathJax.typesetPromise([scroller]).catch(e => console.warn('MathJax error:', e));
+  }
+  initGest();
+  bindSwipeNav();
+};
+finishSetup();
   if(r.history.length) $('#undoBtn').onclick = undoRev; 
   
   let lastTap = 0;
