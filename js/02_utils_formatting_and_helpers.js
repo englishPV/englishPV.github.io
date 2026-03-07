@@ -60,32 +60,28 @@ const formatText = t => {
   s = s.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
 
   // ══════════════════════════════════════════════════════════
-  // ── 4. PROTECT MATH BLOCKS before any HTML transformation ──
+  // ── 4. PROTECT ALL MATH before any HTML transformation ──
   // ══════════════════════════════════════════════════════════
   const mathHolders = [];
   const holdMath = (match) => {
-    const idx = mathHolders.length;
     mathHolders.push(match);
-    return `⟪MATH${idx}⟫`;
+    return `\x00MATH${mathHolders.length - 1}\x00`;
   };
 
-  // Protect display math $$...$$ first (greedy but non-nested)
-  s = s.replace(/\$\$([\s\S]*?)\$\$/g, holdMath);
-  // Protect \[...\]
-  s = s.replace(/\\\[([\s\S]*?)\\\]/g, holdMath);
-  // Protect \(...\)
-  s = s.replace(/\\\(([\s\S]*?)\\\)/g, holdMath);
-  // Protect inline math $...$ (single line, non-greedy)
-  s = s.replace(/\$([^\$\n]+?)\$/g, holdMath);
+  // Order matters: display math first, then inline
+  s = s.replace(/\$\$([\s\S]*?)\$\$/g, holdMath);       // $$...$$
+  s = s.replace(/\\\[([\s\S]*?)\\\]/g, holdMath);        // \[...\]
+  s = s.replace(/\\\(([\s\S]*?)\\\)/g, holdMath);        // \(...\)
+  s = s.replace(/(?<![\\])\$([^\$]+?)\$/g, holdMath);    // $...$ inline
 
-  // ── 5. Protect LaTeX list environments with Unicode placeholders ──
-  s = s.replace(/\\begin\{itemize\}/g,    '⟨UL⟩');
-  s = s.replace(/\\end\{itemize\}/g,      '⟨/UL⟩');
-  s = s.replace(/\\begin\{enumerate\}/g,  '⟨OL⟩');
-  s = s.replace(/\\end\{enumerate\}/g,    '⟨/OL⟩');
-  s = s.replace(/\\item\b\s*/g,           '⟨ITEM⟩');
+  // ── 5. LaTeX list environments → placeholders ──
+  s = s.replace(/\\begin\{itemize\}/g,    '\x00UL\x00');
+  s = s.replace(/\\end\{itemize\}/g,      '\x00/UL\x00');
+  s = s.replace(/\\begin\{enumerate\}/g,  '\x00OL\x00');
+  s = s.replace(/\\end\{enumerate\}/g,    '\x00/OL\x00');
+  s = s.replace(/\\item\b\s*/g,           '\x00ITEM\x00');
 
-  // ── 6. \textbf / \textit outside math (math is now protected) ──
+  // ── 6. \textbf / \textit OUTSIDE math (safe, math is protected) ──
   s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
 
@@ -93,26 +89,26 @@ const formatText = t => {
   s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g,
     (m, c) => c.includes(' ') ? c : m);
 
-  // ── 8. Newlines → <br> (SAFE: math blocks are placeholders now) ──
+  // ── 8. Newlines → <br> (SAFE: math is placeholder) ──
   s = s.replace(/\\newline/g, '<br>');
   s = s.replace(/\n/g, '<br>');
 
-  // ── 9. Convert list placeholders to real HTML ──
-  s = s.replace(/⟨UL⟩([\s\S]*?)⟨\/UL⟩/g, (_, inner) => {
-    const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
+  // ── 9. Build HTML lists from placeholders ──
+  s = s.replace(/\x00UL\x00([\s\S]*?)\x00\/UL\x00/g, (_, inner) => {
+    const items = inner.split('\x00ITEM\x00').filter(x => x.trim());
     return '<ul>' + items.map(i =>
       '<li>' + i.replace(/<br>\s*$/g, '').replace(/^<br>/g, '').trim() + '</li>'
     ).join('') + '</ul>';
   });
 
-  s = s.replace(/⟨OL⟩([\s\S]*?)⟨\/OL⟩/g, (_, inner) => {
-    const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
+  s = s.replace(/\x00OL\x00([\s\S]*?)\x00\/OL\x00/g, (_, inner) => {
+    const items = inner.split('\x00ITEM\x00').filter(x => x.trim());
     return '<ol>' + items.map(i =>
       '<li>' + i.replace(/<br>\s*$/g, '').replace(/^<br>/g, '').trim() + '</li>'
     ).join('') + '</ol>';
   });
 
-  // ── 10. Clean stray <br> around list tags ──
+  // ── 10. Clean stray <br> around lists ──
   s = s.replace(/<br>\s*<ul>/g,  '<ul>');
   s = s.replace(/<\/ul>\s*<br>/g, '</ul>');
   s = s.replace(/<br>\s*<ol>/g,  '<ol>');
@@ -121,9 +117,9 @@ const formatText = t => {
   s = s.replace(/<\/li>\s*<br>/g, '</li>');
 
   // ══════════════════════════════════════════
-  // ── 11. RESTORE MATH BLOCKS ──
+  // ── 11. RESTORE ALL MATH BLOCKS intact ──
   // ══════════════════════════════════════════
-  s = s.replace(/⟪MATH(\d+)⟫/g, (_, idx) => mathHolders[parseInt(idx)]);
+  s = s.replace(/\x00MATH(\d+)\x00/g, (_, idx) => mathHolders[parseInt(idx)]);
 
   return s;
 };
