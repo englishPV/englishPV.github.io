@@ -49,6 +49,12 @@ const formatText = t => {
   if (!t) return '';
   let s = t;
 
+  // ══════════════════════════════════════════════════════════
+  // ── 0. NORMALIZE: convert any existing <br> back to \n ──
+  //    (handles cards already saved with <br> from prior runs)
+  // ══════════════════════════════════════════════════════════
+  s = s.replace(/<br\s*\/?>/gi, '\n');
+
   // ── 1. Images ──
   s = s.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g,
     (_, f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`);
@@ -68,11 +74,11 @@ const formatText = t => {
     return `\x00MATH${mathHolders.length - 1}\x00`;
   };
 
-  // Order matters: display math first, then inline
-  s = s.replace(/\$\$([\s\S]*?)\$\$/g, holdMath);       // $$...$$
-  s = s.replace(/\\\[([\s\S]*?)\\\]/g, holdMath);        // \[...\]
-  s = s.replace(/\\\(([\s\S]*?)\\\)/g, holdMath);        // \(...\)
-  s = s.replace(/(?<![\\])\$([^\$]+?)\$/g, holdMath);    // $...$ inline
+  // Display math first, then inline (order matters)
+  s = s.replace(/\$\$([\s\S]*?)\$\$/g, holdMath);
+  s = s.replace(/\\\[([\s\S]*?)\\\]/g, holdMath);
+  s = s.replace(/\\\(([\s\S]*?)\\\)/g, holdMath);
+  s = s.replace(/(?<![\\])\$([^\$]+?)\$/g, holdMath);
 
   // ── 5. LaTeX list environments → placeholders ──
   s = s.replace(/\\begin\{itemize\}/g,    '\x00UL\x00');
@@ -81,7 +87,7 @@ const formatText = t => {
   s = s.replace(/\\end\{enumerate\}/g,    '\x00/OL\x00');
   s = s.replace(/\\item\b\s*/g,           '\x00ITEM\x00');
 
-  // ── 6. \textbf / \textit OUTSIDE math (safe, math is protected) ──
+  // ── 6. \textbf / \textit outside math ──
   s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
 
@@ -89,7 +95,7 @@ const formatText = t => {
   s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g,
     (m, c) => c.includes(' ') ? c : m);
 
-  // ── 8. Newlines → <br> (SAFE: math is placeholder) ──
+  // ── 8. Newlines → <br> ──
   s = s.replace(/\\newline/g, '<br>');
   s = s.replace(/\n/g, '<br>');
 
