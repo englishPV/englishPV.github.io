@@ -45,11 +45,68 @@ const md2html = s => s
     .replace(/^\s*[\*\-]\s{2,}/gm, '• ')
     .replace(/\n/g, '<br>');
 
-const formatText = t => t ? t
-    .replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, (_, f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`)
-    .replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m)
-    .replace(/\n|\\newline/g, '<br>').replace(/\[latex\]|\[\/latex\]/g, '').replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)') : '';
+const formatText = t => {
+  if (!t) return '';
+  
+  let s = t;
 
+  // ── Images ──
+  s = s.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g, 
+    (_, f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`);
+
+  // ── Strip [latex] / [/latex] wrappers ──
+  s = s.replace(/\[latex\]/gi, '').replace(/\[\/latex\]/gi, '');
+
+  // ── Convert LaTeX structural environments to HTML ──
+  // itemize → <ul>
+  s = s.replace(/\\begin\{itemize\}/g, '<ul>');
+  s = s.replace(/\\end\{itemize\}/g, '</ul>');
+
+  // enumerate → <ol>
+  s = s.replace(/\\begin\{enumerate\}/g, '<ol>');
+  s = s.replace(/\\end\{enumerate\}/g, '</ol>');
+
+  // \item → <li>...</li>
+  // Captures everything after \item until the next \item, </ul>, </ol>, or end
+  s = s.replace(/\\item\s+([\s\S]*?)(?=\\item|<\/ul>|<\/ol>|$)/g, 
+    '<li>$1</li>');
+
+  // ── Convert \textbf{...} → <strong> ──
+  s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
+
+  // ── Convert \textit{...} → <em> ──
+  s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
+
+  // ── Convert LaTeX math delimiters for MathJax ──
+  // [$] [/$] shorthand (your existing format)
+  s = s.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
+
+  // ── Convert $...$ to \(...\) for MathJax (but NOT inside already-converted \( \)) ──
+  // Display math $$...$$ → \[...\]
+  s = s.replace(/\$\$([\s\S]*?)\$\$/g, '\\[$1\\]');
+  
+  // Inline math $...$ → \(...\)  (skip if already \( or escaped)
+  s = s.replace(/(?<!\\)\$([^\$]+?)\$/g, '\\($1\\)');
+
+  // ── Newlines → <br> (but NOT inside <ul>/<ol>/<li> to avoid broken lists) ──
+  // First, clean up newlines inside list items
+  s = s.replace(/<li>([\s\S]*?)<\/li>/g, (match, content) => {
+    return '<li>' + content.trim() + '</li>';
+  });
+
+  // Convert remaining newlines to <br>
+  s = s.replace(/\\newline/g, '<br>');
+  // Only convert \n to <br> if NOT right before/after list tags
+  s = s.replace(/\n(?!<\/?[uo]l>|<\/?li>)/g, '<br>');
+  // Clean up <br> right before list tags
+  s = s.replace(/<br>\s*(<\/?[uo]l>)/g, '$1');
+  s = s.replace(/(<\/?[uo]l>)\s*<br>/g, '$1');
+
+  // ── Cleanup stray \text{} outside math (edge case) ──
+  s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
+
+  return s;
+};
 const parseMathData = (raw) => {
     if (!raw) return [];
     const result = []; let idCounter = 0;
