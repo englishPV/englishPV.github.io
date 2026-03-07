@@ -253,12 +253,17 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
 /* Math label (less bold) */
 .math-label { color: var(--primary); font-weight: 600; font-size: 0.93em; display: block; margin-top: 10px; margin-bottom: 2px; opacity: 0.8; }
 /* In 01_styles_theme_and_layout.css */
-.card-content ul, .card-content ol {
+
+
+.card-content ul, .card-content ol,
+.definition ul, .definition ol,
+.review-scroller ul, .review-scroller ol {
   margin: 8px 0;
   padding-left: 24px;
   text-align: left;
 }
-.card-content li {
+.card-content li, .definition li,
+.review-scroller li {
   margin-bottom: 6px;
   line-height: 1.6;
 }
