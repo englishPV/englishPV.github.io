@@ -28,7 +28,6 @@ const tsLat = async e => {
   if(id) { if(mathCache.has(id)) return; mathCache.add(id); }
   return W.MathJax.typesetPromise(e ? [e] : null).catch(() => {});
 };
-W.MathJax = { tex:{inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], processEscapes:!0}, options:{skipHtmlTags:['script','style','textarea']}, startup:{typeset:!1} };
 
 const getEmoji = t => (typeof C_EMOJIS !== 'undefined' ? C_EMOJIS[t] : '') || '';
 const isMathChapter = () => { const s = getSub(); return /math/i.test(s?.title || ''); };
