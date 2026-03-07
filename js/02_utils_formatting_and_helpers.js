@@ -47,7 +47,6 @@ const md2html = s => s
 
 const formatText = t => {
   if (!t) return '';
-  
   let s = t;
 
   // ── 1. Images ──
@@ -60,44 +59,46 @@ const formatText = t => {
   // ── 3. [$] [/$] shorthand ──
   s = s.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
 
-  // ── 4. Convert LaTeX environments to HTML BEFORE touching newlines ──
-  s = s.replace(/\\begin\{itemize\}/g, '⟨UL⟩');
-  s = s.replace(/\\end\{itemize\}/g, '⟨/UL⟩');
-  s = s.replace(/\\begin\{enumerate\}/g, '⟨OL⟩');
-  s = s.replace(/\\end\{enumerate\}/g, '⟨/OL⟩');
+  // ── 4. Protect LaTeX environments with Unicode placeholders ──
+  s = s.replace(/\\begin\{itemize\}/g,    '⟨UL⟩');
+  s = s.replace(/\\end\{itemize\}/g,      '⟨/UL⟩');
+  s = s.replace(/\\begin\{enumerate\}/g,  '⟨OL⟩');
+  s = s.replace(/\\end\{enumerate\}/g,    '⟨/OL⟩');
+  s = s.replace(/\\item\b\s*/g,           '⟨ITEM⟩');
 
-  // ── 5. Convert \item to placeholder ──
-  s = s.replace(/\\item\b\s*/g, '⟨ITEM⟩');
-
-  // ── 6. Convert \textbf / \textit ──
+  // ── 5. \textbf / \textit outside math ──
   s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
 
-  // ── 7. Stray \text{} outside math ──
-  s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g, (m, c) => c.includes(' ') ? c : m);
+  // ── 6. Stray \text{} outside math ──
+  s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g,
+    (m, c) => c.includes(' ') ? c : m);
 
-  // ── 8. Newlines → <br> (but NOT \\newline eating \begin backslashes) ──
+  // ── 7. Newlines → <br> (safe now, placeholders protect structure) ──
   s = s.replace(/\\newline/g, '<br>');
   s = s.replace(/\n/g, '<br>');
 
-  // ── 9. Now convert placeholders to real HTML ──
-  // Split items: everything between ⟨ITEM⟩ markers becomes <li>
+  // ── 8. Convert placeholders to real HTML ──
   s = s.replace(/⟨UL⟩([\s\S]*?)⟨\/UL⟩/g, (_, inner) => {
     const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
-    return '<ul>' + items.map(i => '<li>' + i.replace(/<br>\s*$/,'').trim() + '</li>').join('') + '</ul>';
+    return '<ul>' + items.map(i =>
+      '<li>' + i.replace(/<br>\s*$/g, '').replace(/^<br>/g, '').trim() + '</li>'
+    ).join('') + '</ul>';
   });
 
   s = s.replace(/⟨OL⟩([\s\S]*?)⟨\/OL⟩/g, (_, inner) => {
     const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
-    return '<ol>' + items.map(i => '<li>' + i.replace(/<br>\s*$/,'').trim() + '</li>').join('') + '</ol>';
+    return '<ol>' + items.map(i =>
+      '<li>' + i.replace(/<br>\s*$/g, '').replace(/^<br>/g, '').trim() + '</li>'
+    ).join('') + '</ol>';
   });
 
-  // ── 10. Clean up <br> around list tags ──
-  s = s.replace(/<br>\s*<ul>/g, '<ul>');
+  // ── 9. Clean stray <br> around list tags ──
+  s = s.replace(/<br>\s*<ul>/g,  '<ul>');
   s = s.replace(/<\/ul>\s*<br>/g, '</ul>');
-  s = s.replace(/<br>\s*<ol>/g, '<ol>');
+  s = s.replace(/<br>\s*<ol>/g,  '<ol>');
   s = s.replace(/<\/ol>\s*<br>/g, '</ol>');
-  s = s.replace(/<br>\s*<li>/g, '<li>');
+  s = s.replace(/<br>\s*<li>/g,  '<li>');
   s = s.replace(/<\/li>\s*<br>/g, '</li>');
 
   return s;
