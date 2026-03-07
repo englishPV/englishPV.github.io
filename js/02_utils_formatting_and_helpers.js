@@ -56,29 +56,48 @@ const formatText = t => {
   // ── 2. Strip [latex] / [/latex] wrappers ──
   s = s.replace(/\[latex\]/gi, '').replace(/\[\/latex\]/gi, '');
 
-  // ── 3. [$] [/$] shorthand ──
+  // ── 3. [$] [/$] shorthand → \( \) ──
   s = s.replace(/\[\$\]/g, '\\(').replace(/\[\/\$\]/g, '\\)');
 
-  // ── 4. Protect LaTeX environments with Unicode placeholders ──
+  // ══════════════════════════════════════════════════════════
+  // ── 4. PROTECT MATH BLOCKS before any HTML transformation ──
+  // ══════════════════════════════════════════════════════════
+  const mathHolders = [];
+  const holdMath = (match) => {
+    const idx = mathHolders.length;
+    mathHolders.push(match);
+    return `⟪MATH${idx}⟫`;
+  };
+
+  // Protect display math $$...$$ first (greedy but non-nested)
+  s = s.replace(/\$\$([\s\S]*?)\$\$/g, holdMath);
+  // Protect \[...\]
+  s = s.replace(/\\\[([\s\S]*?)\\\]/g, holdMath);
+  // Protect \(...\)
+  s = s.replace(/\\\(([\s\S]*?)\\\)/g, holdMath);
+  // Protect inline math $...$ (single line, non-greedy)
+  s = s.replace(/\$([^\$\n]+?)\$/g, holdMath);
+
+  // ── 5. Protect LaTeX list environments with Unicode placeholders ──
   s = s.replace(/\\begin\{itemize\}/g,    '⟨UL⟩');
   s = s.replace(/\\end\{itemize\}/g,      '⟨/UL⟩');
   s = s.replace(/\\begin\{enumerate\}/g,  '⟨OL⟩');
   s = s.replace(/\\end\{enumerate\}/g,    '⟨/OL⟩');
   s = s.replace(/\\item\b\s*/g,           '⟨ITEM⟩');
 
-  // ── 5. \textbf / \textit outside math ──
+  // ── 6. \textbf / \textit outside math (math is now protected) ──
   s = s.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   s = s.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
 
-  // ── 6. Stray \text{} outside math ──
+  // ── 7. Stray \text{} outside math ──
   s = s.replace(/\\\[\s*\\text\s*\{([^{}]+)\}\s*\\\]/g,
     (m, c) => c.includes(' ') ? c : m);
 
-  // ── 7. Newlines → <br> (safe now, placeholders protect structure) ──
+  // ── 8. Newlines → <br> (SAFE: math blocks are placeholders now) ──
   s = s.replace(/\\newline/g, '<br>');
   s = s.replace(/\n/g, '<br>');
 
-  // ── 8. Convert placeholders to real HTML ──
+  // ── 9. Convert list placeholders to real HTML ──
   s = s.replace(/⟨UL⟩([\s\S]*?)⟨\/UL⟩/g, (_, inner) => {
     const items = inner.split('⟨ITEM⟩').filter(x => x.trim());
     return '<ul>' + items.map(i =>
@@ -93,13 +112,18 @@ const formatText = t => {
     ).join('') + '</ol>';
   });
 
-  // ── 9. Clean stray <br> around list tags ──
+  // ── 10. Clean stray <br> around list tags ──
   s = s.replace(/<br>\s*<ul>/g,  '<ul>');
   s = s.replace(/<\/ul>\s*<br>/g, '</ul>');
   s = s.replace(/<br>\s*<ol>/g,  '<ol>');
   s = s.replace(/<\/ol>\s*<br>/g, '</ol>');
   s = s.replace(/<br>\s*<li>/g,  '<li>');
   s = s.replace(/<\/li>\s*<br>/g, '</li>');
+
+  // ══════════════════════════════════════════
+  // ── 11. RESTORE MATH BLOCKS ──
+  // ══════════════════════════════════════════
+  s = s.replace(/⟪MATH(\d+)⟫/g, (_, idx) => mathHolders[parseInt(idx)]);
 
   return s;
 };
