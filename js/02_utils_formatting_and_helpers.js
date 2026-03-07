@@ -13,8 +13,8 @@ const deepClone = o => JSON.parse(JSON.stringify(o));
 const isSucc = g => g === 'facile' || g === 'bien';
 
 /* --- MATHJAX & TEXT FORMATTING --- */
-let mathCache = new Set();
-const clearMathCache = () => { mathCache = new Set(); };
+let mathCache = null;
+const clearMathCache = () => {};
 
 const needsMath = s => /[$]|\\[(\[]|\\frac|\\sqrt|\\text/.test(s);
 const tsLat = async e => { 
@@ -24,8 +24,7 @@ const tsLat = async e => {
     await W.loadMathJax();
     if(!W.MathJax?.typesetPromise) return;
   }
-  const id = e?.id || e?.dataset?.id;
-  if(id) { if(mathCache.has(id)) return; mathCache.add(id); }
+  // Remove the cache check entirely - let MathJax handle duplicates
   return W.MathJax.typesetPromise(e ? [e] : null).catch(() => {});
 };
 
