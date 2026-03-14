@@ -3,15 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Physique Flashcards</title>
-  
-  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css">
+
+  <!-- AJOUT : preconnect (ouvre les connexions réseau en avance) -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css" />
+
+  <!-- AJOUT : splash screen inline -->
+  <style>
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      background: #0f172a; color: #94a3b8;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: opacity .3s ease-out;
+    }
+    [data-theme="light"] #splash { background: #f8fafc; color: #64748b; }
+    #splash .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(99,102,241,.2);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+    }
+    @keyframes sp { to { transform: rotate(360deg) } }
+  </style>
 </head>
 <body>
+
+  <!-- AJOUT : splash visible instantanément -->
+  <div id="splash">
+    <div class="spinner"></div>
+    <div style="font-size:14px;font-weight:600">Chargement…</div>
+  </div>
+
   <div class="wrapper">
     <div class="phone" id="app">
-       <header class="topbar">
+      <header class="topbar">
         <button class="back" id="backBtn" title="Retour">← Retour</button>
         <div class="title" id="title">Deck</div>
         <div class="spacer"></div>
@@ -30,36 +61,56 @@
     </div>
   </div>
 
-    <script src="data.js"></script>
+  <!-- data.js reste synchrone (fichier local = rapide) -->
+  <script src="data.js"></script>
 
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$','$'], ['\\(','\\)']],
-      displayMath: [['$$','$$'], ['\\[','\\]']],
-      processEscapes: true
-    },
-    options: {
-      skipHtmlTags: ['script', 'style', 'textarea']
-    },
-    startup: {
-      typeset: false
-    }
-  };
-</script>
+  <!-- CHANGÉ : MathJax = lazy loader au lieu de charger le fichier -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','style','textarea'] },
+      startup: { typeset: false }
+    };
 
-<script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    // MathJax se charge SEULEMENT quand une carte contient du LaTeX
+    let _mathJaxLoading = null;
+    window.loadMathJax = function() {
+      if (window.MathJax && window.MathJax.typesetPromise) return Promise.resolve();
+      if (_mathJaxLoading) return _mathJaxLoading;
+      _mathJaxLoading = new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        s.id = 'MathJax-script';
+        s.onload = function() {
+          var check = function() {
+            if (window.MathJax && window.MathJax.typesetPromise) resolve();
+            else setTimeout(check, 50);
+          };
+          check();
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      return _mathJaxLoading;
+    };
+  </script>
 
-  <!-- Firebase SDKs (compat mode for simplicity) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- SUPPRIMÉ : l'ancien <script id="MathJax-script" defer src="...mathjax..."> -->
 
-  <!-- Fichiers logiques découpés -->
-  <script src="js/01_firebase_sync.js"></script>
-  <script src="js/02_utils_formatting_and_helpers.js"></script>
-  <script src="js/03_data_storage_and_imports.js"></script>
-  <script src="js/04_srs_algorithm_and_stats.js"></script>
-  <script src="js/05_app_ui_and_navigation.js"></script>
+  <!-- CHANGÉ : defer ajouté aux 3 scripts Firebase -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <!-- CHANGÉ : defer ajouté à tous les scripts app -->
+  <script defer src="js/01_firebase_sync.js"></script>
+  <script defer src="js/02_utils_formatting_and_helpers.js"></script>
+  <script defer src="js/03_data_storage_and_imports.js"></script>
+  <script defer src="js/04_srs_algorithm_and_stats.js"></script>
+  <script defer src="js/05_app_ui_and_navigation.js"></script>
 </body>
 </html>
