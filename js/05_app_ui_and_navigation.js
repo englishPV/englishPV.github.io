@@ -1266,57 +1266,115 @@ function handleQCMAnswer(idx){
   haptic(isCorrect?'success':'error');
   setTimeout(()=>{r.qcmOptions=null;r.qcmAnswered=!1;subG(isCorrect?'bien':'echec')},isCorrect?800:1500);
 }
-async function init(){
-  Media.open();
+// Polyfill
+window.requestIdleCallback = window.requestIdleCallback ||
+  function(cb, opts) { return setTimeout(cb, opts?.timeout || 1); };
 
-  if(typeof FireSync !== 'undefined') {
-    FireSync.initSyncButton();
+function removeSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.style.opacity = '0';
+  setTimeout(() => splash.remove(), 300);
+}
+
+async function syncInBackground() {
+  if (!FireSync.isConnected) {
+    await Promise.race([
+      new Promise(resolve => {
+        const unsub = firebase.auth().onAuthStateChanged(user => {
+          if (user) { unsub(); resolve(); }
+        });
+      }),
+      new Promise(resolve => setTimeout(resolve, 5000))
+    ]);
   }
 
-  document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'hidden') {
-      saveData();
-      if(typeof FireSync!=='undefined' && FireSync.isConnected) FireSync.pushToCloud();
+  if (FireSync.isConnected) {
+    try {
+      const pulled = await FireSync.pullIfNewer();
+      if (pulled) {
+        toast('Données cloud chargées', 'success', 2000);
+      }
+    } catch (e) {
+      console.warn('[Init] Cloud pull failed:', e);
     }
-  });
+  }
+}
+
+function loadMathLazy() {
+  fetch('math.md')
+    .then(r => r.ok ? r.text() : '')
+    .then(text => {
+      if (!text) return;
+      dataMATH = parseMathData(text);
+      const mathSub = data.subjects.find(s => s.title.toLowerCase() === 'maths');
+      if (mathSub && dataMATH.length) {
+        reconcile();
+        ensureMathGrouped();
+        saveData();
+        if (State.view === 'deck') goDeck(false);
+      }
+    })
+    .catch(() => console.warn('math.md not found'));
+}
+
+async function init() {
+  // 1. Ouvrir IndexedDB (non-bloquant)
+  Media.open();
 
   try {
-    const r = await fetch('math.md');
-    if(r.ok) dataMATH = parseMathData(await r.text());
-  } catch(e){ console.warn('math.md non trouvé, fallback vide'); }
+    // 2. Attendre les données lazy si besoin
+    if (window._dataReady) await window._dataReady;
 
-  try {
+    // 3. Charger les données LOCALES immédiatement
     data = loadData();
 
-    // ALWAYS try to pull from cloud on startup
-    if(typeof FireSync !== 'undefined') {
-      // Wait briefly for auth to resolve if not yet connected
-      if(!FireSync.isConnected) {
-        await new Promise(r => {
-          let tries = 0;
-          const check = () => {
-            if(FireSync.isConnected || tries++ > 15) r();
-            else setTimeout(check, 200);
-          };
-          check();
-        });
-      }
-      if(FireSync.isConnected) {
-        console.log('[Init] Pulling cloud data...');
-        try { await FireSync.pullIfNewer(); } catch(e) { console.warn('[Init] Cloud pull failed:', e); }
-      }
+    if (data.app?.version !== APP_VER) {
+      reconcile();
+      data.app.version = APP_VER;
+      saveData();
     }
 
-    if(data.app?.version !== APP_VER){ reconcile(); data.app.version = APP_VER; typeof FireSync!=='undefined'&&FireSync.saveDataLocal ? FireSync.saveDataLocal() : saveData(); }
-    pruneStats(); upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
+    pruneStats();
+    upgrade();
+    applyTh();
+    applyUI();
+    Nav.clear();
+    goDeck(false);
 
+    // 4. UI VISIBLE → cacher le splash
+    removeSplash();
+
+    // 5. Firebase en arrière-plan (ne bloque RIEN)
+    requestIdleCallback(() => {
+      if (typeof FireSync !== 'undefined') {
+        FireSync.initSyncButton();
+        syncInBackground();
+      }
+    }, { timeout: 2000 });
+
+    // 6. math.md en arrière-plan
+    requestIdleCallback(() => loadMathLazy(), { timeout: 5000 });
+
+    // 7. Auto-save
     setInterval(saveData, 30000);
-  } catch(e) {
+
+    // 8. Save on tab close
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveData();
+        if (typeof FireSync !== 'undefined' && FireSync.isConnected) {
+          FireSync.pushToCloud();
+        }
+      }
+    });
+
+  } catch (e) {
     console.error('Init error, resetting:', e);
     localStorage.removeItem(KEY);
     data = loadData();
-    upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(!1);
-    setInterval(saveData, 30000);
+    upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(false);
+    removeSplash();
   }
 }
 
