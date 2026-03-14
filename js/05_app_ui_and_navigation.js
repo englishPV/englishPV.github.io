@@ -1318,15 +1318,59 @@ function loadMathLazy() {
     .catch(() => console.warn('math.md not found'));
 }
 
+window.requestIdleCallback = window.requestIdleCallback ||
+  function(cb, opts) { return setTimeout(cb, opts?.timeout || 1); };
+
+function removeSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.style.opacity = '0';
+  setTimeout(() => splash.remove(), 300);
+}
+
+async function syncInBackground() {
+  if (!FireSync.isConnected) {
+    await Promise.race([
+      new Promise(resolve => {
+        const unsub = firebase.auth().onAuthStateChanged(user => {
+          if (user) { unsub(); resolve(); }
+        });
+      }),
+      new Promise(resolve => setTimeout(resolve, 5000))
+    ]);
+  }
+
+  if (FireSync.isConnected) {
+    try {
+      const pulled = await FireSync.pullIfNewer();
+      if (pulled) toast('Données cloud chargées', 'success', 2000);
+    } catch (e) {
+      console.warn('[Init] Cloud pull failed:', e);
+    }
+  }
+}
+
+function loadMathLazy() {
+  fetch('math.md')
+    .then(r => r.ok ? r.text() : '')
+    .then(text => {
+      if (!text) return;
+      dataMATH = parseMathData(text);
+      const mathSub = data.subjects.find(s => s.title.toLowerCase() === 'maths');
+      if (mathSub && dataMATH.length) {
+        reconcile();
+        ensureMathGrouped();
+        saveData();
+        if (State.view === 'deck') goDeck(false);
+      }
+    })
+    .catch(() => console.warn('math.md not found'));
+}
+
 async function init() {
-  // 1. Ouvrir IndexedDB (non-bloquant)
   Media.open();
 
   try {
-    // 2. Attendre les données lazy si besoin
-    if (window._dataReady) await window._dataReady;
-
-    // 3. Charger les données LOCALES immédiatement
     data = loadData();
 
     if (data.app?.version !== APP_VER) {
@@ -1342,10 +1386,10 @@ async function init() {
     Nav.clear();
     goDeck(false);
 
-    // 4. UI VISIBLE → cacher le splash
+    // UI visible → splash disparaît
     removeSplash();
 
-    // 5. Firebase en arrière-plan (ne bloque RIEN)
+    // Firebase sync en arrière-plan
     requestIdleCallback(() => {
       if (typeof FireSync !== 'undefined') {
         FireSync.initSyncButton();
@@ -1353,13 +1397,11 @@ async function init() {
       }
     }, { timeout: 2000 });
 
-    // 6. math.md en arrière-plan
+    // math.md en arrière-plan
     requestIdleCallback(() => loadMathLazy(), { timeout: 5000 });
 
-    // 7. Auto-save
     setInterval(saveData, 30000);
 
-    // 8. Save on tab close
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         saveData();
