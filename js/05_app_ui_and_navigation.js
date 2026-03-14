@@ -818,10 +818,8 @@ async function goCards(cid,push=true){
        });
     }
     // FIX: resolve media THEN typeset math THEN done
-    await Media.resolve(grid);
-    if(needsMath(grid.innerHTML)) {
-      await MathJax.typesetPromise([grid]).catch(e => console.warn('MathJax error:', e));
-    }
+        await Media.resolve(grid);
+    await tsLat(grid);
   };
   await renderCards(); 
   $('#cardSearch').oninput = (e) => renderCards(e.target.value);
@@ -853,13 +851,11 @@ function renRev(){
   
   const scroller = v.querySelector('.review-scroller');
   const finishSetup = async () => {
-  await Media.resolve(v);
-  if(scroller && needsMath(scroller.innerHTML)) {
-    await MathJax.typesetPromise([scroller]).catch(e => console.warn('MathJax error:', e));
-  }
-  initGest();
-  bindSwipeNav();
-};
+    await Media.resolve(v);
+    if(scroller) await tsLat(scroller);
+    initGest();
+    bindSwipeNav();
+  };
 finishSetup();
   if(r.history.length) $('#undoBtn').onclick = undoRev; 
   
