@@ -28,7 +28,30 @@ const Media = {
   db: null, cache: new Map(),
   async open(){ if(this.db)return this.db; this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_media',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('files'))r.result.createObjectStore('files',{keyPath:'key'})};r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}); return this.db },
   async save(k,b,m={}){ const d=await this.open(), tx=d.transaction('files','readwrite'); tx.objectStore('files').put({key:k,blob:b,meta:m,ts:Date.now()}); data.mediaIndex=data.mediaIndex||{}; data.mediaIndex[k]={name:m.name||k,type:b.type,size:b.size}; saveData() },
-  async urlFor(k){ if(this.cache.has(k))return this.cache.get(k); const d=await this.open(); return new Promise((s,j)=>{const r=d.transaction('files','readonly').objectStore('files').get(k);r.onsuccess=()=>{if(!r.result?.blob)return j('Missing');const u=URL.createObjectURL(r.result.blob);this.cache.set(k,u);s(u)};r.onerror=()=>j(r.error)}) },
+  // === Dans le module Media — APRÈS ===
+// Ajoutez une méthode pour invalider le cache d'une clé spécifique
+async save(k, b, m = {}) {
+  const d = await this.open(), tx = d.transaction('files', 'readwrite');
+  tx.objectStore('files').put({ key: k, blob: b, meta: m, ts: Date.now() });
+  
+  // ★ NOUVEAU : Invalider le cache mémoire pour cette clé
+  if (this.cache.has(k)) {
+    URL.revokeObjectURL(this.cache.get(k));
+    this.cache.delete(k);
+  }
+  
+  data.mediaIndex = data.mediaIndex || {};
+  data.mediaIndex[k] = { name: m.name || k, type: b.type, size: b.size };
+  saveData();
+},
+
+// ★ NOUVEAU : Méthode pour forcer le rechargement d'une image
+invalidate(k) {
+  if (this.cache.has(k)) {
+    URL.revokeObjectURL(this.cache.get(k));
+    this.cache.delete(k);
+  }
+},
   revokeAll(){ for(const u of this.cache.values())URL.revokeObjectURL(u); this.cache.clear() },
   async clearAll(){ const d=await this.open(), tx=d.transaction('files','readwrite'); tx.objectStore('files').clear(); this.revokeAll(); data.mediaIndex={}; saveData() },
   rwHTML(h,m){ return String(h||'').replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi,(x,p,src,s)=>{const k=m[src.replace(/^.*[\\\/]/,'').replace(/^_+/,'')]||null;return k?`${p}media://${k}${s}`:x}) },
