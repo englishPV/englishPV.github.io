@@ -2999,7 +2999,7 @@ R: On a que \({( \frac{d\vec{u}}{dt} )}_R ={(\frac{d\vec{u}}{dt})}_{R'} = \dot{
 Cela signifie donc que lorsque R' est en translation par rapport à R, l'opération de dérivation d'un vecteur est insensible au référentiel.
 --------------------
 Q: Ylan /
->>> [IMAGE_ID: Capture d] <<<
+>>> [IMAGE_ID: Capture d'écran 2023-09-24 144519.png] <<<
 R: 1. Il est en mouvement de translation rectiligne uniforme 
 2. C'est une droite
 3. Il la voit se déplacer à une vitesse \(\vec{V}=v\vec e_x\)
