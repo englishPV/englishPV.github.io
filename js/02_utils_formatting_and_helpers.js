@@ -55,7 +55,11 @@ const formatText = t => {
 
   // ── 1. Images ──
   s = s.replace(/(?:>>>|>>)?\s*\[IMAGE_ID:\s*(.+?)\](?:\s*<<<)?/g,
-    (_, f) => `<img src="images/${f.trim()}" alt="Schéma" loading="lazy">`);
+  (_, f) => {
+    const filename = f.trim();
+    const cacheBust = `?v=${Date.now()}`;  // ★ Force le navigateur à recharger
+    return `<img src="images/${filename}${cacheBust}" alt="Schéma" loading="lazy">`;
+  });
 
   // ── 2. Strip [latex] / [/latex] wrappers ──
   s = s.replace(/\[latex\]/gi, '').replace(/\[\/latex\]/gi, '');
