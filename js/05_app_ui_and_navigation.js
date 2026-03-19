@@ -1,3 +1,4 @@
+/*05_app_ui_and_navigation.js*/
 /* --- UI STATE & ROUTING --- */
 let selectionMode = false;
 let selectedIds = new Set(); 
