@@ -1,3 +1,4 @@
+/*01_firebase_sync.js*/
 /* === js/01_firebase_sync.js === */
 const FireSync = (() => {
   const firebaseConfig = {
