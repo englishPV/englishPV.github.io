@@ -199,6 +199,10 @@ function renderFABs() {
 const hasSelection = () => window.getSelection()?.toString().length > 0;
 
 function bindPullRefresh(container, onRefresh) {
+  // Prevent binding multiple times on the same container
+  if(container._pullBound) return;
+  container._pullBound = true;
+  
   let startY = 0, pulling = false, indicator = null;
   container.addEventListener('touchstart', e => { if(container.scrollTop <= 5) { startY = e.touches[0].clientY; pulling = true; } }, {passive:!0});
   container.addEventListener('touchmove', e => {
@@ -206,10 +210,16 @@ function bindPullRefresh(container, onRefresh) {
     if(delta > 0 && delta < 120) {
       if(!indicator) { indicator = D.createElement('div'); indicator.innerHTML = '↻'; indicator.style.cssText = 'text-align:center;padding:10px;color:var(--muted);font-size:20px;transition:transform 0.2s'; container.prepend(indicator); }
       indicator.style.transform = `rotate(${delta * 3}deg)`;
+    } else if(delta <= 0 && indicator) {
+      indicator.remove(); indicator = null;
     }
   }, {passive:!0});
   container.addEventListener('touchend', e => {
-    if(indicator) { if(e.changedTouches[0].clientY - startY > 80) { haptic('medium'); onRefresh(); } indicator.remove(); indicator = null; }
+    if(indicator) { if(e.changedTouches[0] && e.changedTouches[0].clientY - startY > 80) { haptic('medium'); onRefresh(); } indicator.remove(); indicator = null; }
+    pulling = false;
+  });
+  container.addEventListener('touchcancel', () => {
+    if(indicator) { indicator.remove(); indicator = null; }
     pulling = false;
   });
 }
@@ -476,6 +486,9 @@ function bindDeckNew() {
   const l = $('#dL'); if(!l) return;
   const sub = getSub();
   
+  // Clean up ALL previous listeners
+  if(bindDeckNew._cleanup) bindDeckNew._cleanup();
+  
   if(bindDeckNew._globalExit) D.removeEventListener('pointerup', bindDeckNew._globalExit);
   bindDeckNew._globalExit = (e) => {
     if(!selectionMode) return;
@@ -484,7 +497,9 @@ function bindDeckNew() {
   };
   D.addEventListener('pointerup', bindDeckNew._globalExit);
 
-  l.onclick = e => {
+    // Use a stored reference so we can remove it later
+  if(bindDeckNew._clickHandler) l.removeEventListener('click', bindDeckNew._clickHandler);
+  bindDeckNew._clickHandler = e => {
     if(e.target.matches('.delCh')) { e.stopPropagation(); if(delImpCh(e.target.dataset.cid)) goDeck(!1); return; }
     const selBox = e.target.closest('[data-action="toggle-select"]');
     if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid); goDeckKeepScroll(); return; }
@@ -497,6 +512,7 @@ function bindDeckNew() {
     const revFolderBtn = e.target.closest('[data-action="review-folder"]');
     if(revFolderBtn) { e.stopPropagation(); const g=findGrp(sub,revFolderBtn.dataset.gid); if(g){State.virtualChapter=buildVirt(sub,g);goChapter(State.virtualChapter.id)} return; }
   };
+  l.addEventListener('click', bindDeckNew._clickHandler);
 
   
   let longPressTimer = null, startX = 0, startY = 0, pressedEl = null, didLongPress = false;
@@ -751,7 +767,7 @@ function bindDeckNew() {
     const item = pressedEl;
     pressedEl = null;
     
-    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
+       if(e.target.closest('button, .sel-checkbox, .remove-x, [data-action]')) return;
     
     const dx = e.clientX - startX, dy = e.clientY - startY;
     if(M.hypot(dx, dy) > 15) return;
@@ -759,10 +775,12 @@ function bindDeckNew() {
     const type = item.dataset.type;
     const id = item.dataset.id;
     
-     if(selectionMode) {
+    // Prevent onclick from also firing
+    e.stopPropagation();
+    
+    if(selectionMode) {
       if(type === 'chapter') {
         if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
-        // Toggle checkbox visuellement sans reconstruire
         const checkbox = item.querySelector('.sel-checkbox');
         if(checkbox) {
           checkbox.classList.toggle('checked', selectedIds.has(id));
@@ -770,12 +788,11 @@ function bindDeckNew() {
           goDeckKeepScroll();
         }
       } else if(type === 'group') {
-        openGrp(sub, id);
+        openGrp(getSub(), id);
       }
     } else {
-      if(type === 'group') { openGrp(sub, id); } else { goChapter(id); }
+      if(type === 'group') { openGrp(getSub(), id); } else { goChapter(id); }
     }
-  };
   
   const onPointerCancel = () => {
     clearTimeout(longPressTimer);
@@ -786,10 +803,19 @@ function bindDeckNew() {
     dragging = false; dragData = null; dragStarted = false; pressedEl = null;
   };
   
-  l.addEventListener('pointerdown', onPointerDown);
+    l.addEventListener('pointerdown', onPointerDown);
   l.addEventListener('pointermove', onPointerMove, {passive: false});
   l.addEventListener('pointerup', onPointerUp);
   l.addEventListener('pointercancel', onPointerCancel);
+  
+  // Store cleanup function to remove listeners on next bind
+   bindDeckNew._cleanup = () => {
+    l.removeEventListener('pointerdown', onPointerDown);
+    l.removeEventListener('pointermove', onPointerMove);
+    l.removeEventListener('pointerup', onPointerUp);
+    l.removeEventListener('pointercancel', onPointerCancel);
+    if(bindDeckNew._clickHandler) l.removeEventListener('click', bindDeckNew._clickHandler);
+  };
 }
 
 function openGrp(s, gid) {
@@ -822,12 +848,7 @@ function openGrp(s, gid) {
 }
 
 
-D.addEventListener('pointerup', (e) => {
-    if(!selectionMode) return;
-    const deckItem = e.target.closest('.deck-item');
-    const fab = e.target.closest('.fab-confirm, .fab-cancel');
-    if(!deckItem && !fab) { exitSelectionMode(); }
-});
+
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
