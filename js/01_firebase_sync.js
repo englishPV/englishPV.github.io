@@ -117,10 +117,14 @@ const FireSync = (() => {
         saveDataLocal();
         lastPushTime = cloudTime;
 
-        // Re-render if app is already initialized
         if (typeof upgrade === 'function') {
           upgrade(); applyTh(); applyUI();
-          if (typeof Nav !== 'undefined') { Nav.clear(); goDeck(false); }
+          // ✅ Ne rafraîchir que si l'utilisateur est sur le deck
+          if (typeof State !== 'undefined' && State.view === 'deck') {
+            goDeck(false);
+          }
+          // Sinon : données mises à jour silencieusement,
+          // appliquées à la prochaine navigation
         }
 
         console.log('[FireSync] Cloud data loaded');
