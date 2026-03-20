@@ -43,7 +43,10 @@ function getDeckTint(item, type) {
         r = (239 * wRed) + (59 * wBlue) + (34 * wGreen); g = (68 * wRed) + (130 * wBlue) + (197 * wGreen); b = (68 * wRed) + (246 * wBlue) + (94 * wGreen); a = 0.25;
     }
     if (item.deadline) {
-        const now = new Date(); now.setHours(0,0,0,0); const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0);
+        const now = new Date(); now.setHours(0,0,0,0);
+        const dp = item.deadline.split('-');
+        const ddl = new Date(+dp[0], +dp[1] - 1, +dp[2]);
+        ddl.setHours(0,0,0,0);
         const diff = (ddl - now) / 864e5; let urgency = 0;
         if (diff <= 0) urgency = 1; else if (diff <= 7) urgency = 1 - (diff / 7);
         if (urgency > 0) { const tR = 239, tG = 68, tB = 68; if (totalGraded === 0) { r = tR; g = tG; b = tB; a = 0.5 * urgency; } else { r = r * (1 - urgency) + tR * urgency; g = g * (1 - urgency) + tG * urgency; b = b * (1 - urgency) + tB * urgency; a = 0.25 + (0.25 * urgency); } }
@@ -54,13 +57,23 @@ function getDeckTint(item, type) {
 
 function checkExpiredDates(list) {
     const now = new Date(); now.setHours(0,0,0,0); let changed = false;
-    list.forEach(item => { if (item.deadline) { const ddl = new Date(item.deadline); ddl.setHours(0,0,0,0); if (ddl < now) { item.deadline = null; changed = true; } } });
+    list.forEach(item => { if (item.deadline) {
+      // ✅ Parser en local
+      const p = item.deadline.split('-');
+      const ddl = new Date(+p[0], +p[1] - 1, +p[2]);
+      ddl.setHours(0,0,0,0);
+      if (ddl < now) { item.deadline = null; changed = true; }
+    } });
     return changed;
 }
 
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
-    const now = new Date(); now.setHours(0,0,0,0); const ddl = new Date(ch.deadline); ddl.setHours(0,0,0,0);
+    const now = new Date(); now.setHours(0,0,0,0);
+    // ✅ Parser la date YYYY-MM-DD en local (pas en UTC)
+    const parts = ch.deadline.split('-');
+    const ddl = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    ddl.setHours(0,0,0,0);
     let days = Math.ceil((ddl - now) / 864e5); if (days <= 0) days = 1;
     const k = ch.stats.gradeCounts || getLive(ch);
     let pool = k.unseen + k.echec + k.difficile, label = "cartes (Mauvaises)";
@@ -451,6 +464,12 @@ function bindDeckNew() {
   const l = $('#dL'); if(!l) return;
   const sub = getSub();
   
+  // ✅ Retirer les anciens pointer listeners AVANT d'en ajouter de nouveaux
+  if(bindDeckNew._cleanup) {
+    bindDeckNew._cleanup();
+    bindDeckNew._cleanup = null;
+  }
+  
   if(bindDeckNew._globalExit) D.removeEventListener('pointerup', bindDeckNew._globalExit);
   bindDeckNew._globalExit = (e) => {
     if(!selectionMode) return;
@@ -762,6 +781,14 @@ function bindDeckNew() {
   l.addEventListener('pointermove', onPointerMove, {passive: false});
   l.addEventListener('pointerup', onPointerUp);
   l.addEventListener('pointercancel', onPointerCancel);
+  
+  // ✅ Stocker la fonction de nettoyage pour le prochain appel
+  bindDeckNew._cleanup = () => {
+    l.removeEventListener('pointerdown', onPointerDown);
+    l.removeEventListener('pointermove', onPointerMove);
+    l.removeEventListener('pointerup', onPointerUp);
+    l.removeEventListener('pointercancel', onPointerCancel);
+  };
 }
 
 function openGrp(s, gid) {
@@ -806,13 +833,20 @@ function goChapter(id,push=true){
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
 
   $('#deadlineInput').onchange = (e) => {
-    const val = e.target.value;
+    // ✅ Stocker null au lieu de "" quand vidé, normaliser le format
+    const raw = e.target.value;
+    const val = raw || null;
+    
     if (c.virtual && c._groupId) {
       const g = findGrp(getSub(), c._groupId);
       if (g) g.deadline = val;
     } else {
       c.deadline = val;
     }
+    
+    // ✅ Invalider le cache d'objectif quotidien
+    delete c._goalCache;
+    
     debouncedSave();
     if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     const newCalc = getDailyGoalCalc(c);
@@ -972,12 +1006,14 @@ function continueOrNew(cid,queue,mode,push,isCont,extras={}){
 function startRev(cid,push=true,isCont=false){
   if(!cid)return;const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
-  if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}}c.settings.sessionSize=c._goalCache.size}
+  // ✅ Utiliser une variable locale au lieu d'écraser le réglage utilisateur
+  let sessionSize = c.settings.sessionSize;
+  if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}} sessionSize=c._goalCache.size}
   let pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
   if(isCont&&State.review?.queue){const seen=new Set(State.review.queue);pool=pool.filter(x=>!seen.has(x.id))}
   if(!pool.length){alert('Plus de cartes disponibles dans ce filtre.');return}
   c.lastUsed=Date.now();saveData();
-  continueOrNew(cid,bldQ(c,pool,c.settings.sessionSize).map(x=>x.id),null,push,isCont)
+    continueOrNew(cid,bldQ(c,pool,sessionSize).map(x=>x.id),null,push,isCont)
 }
 
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
