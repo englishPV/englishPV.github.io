@@ -6,18 +6,17 @@ let expandedFolders = new Set();
 let selectionContext = null; 
 
 const Nav = {
-  stack:[], scrollPos: 0,
+  stack: [], scrollPos: 0,
   push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
   back(){ 
     if(!this.stack.length) return false; 
     const p=this.stack.pop(); 
     State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
-    expandedFolders = new Set(p.expandedFolders ||[]);
+    expandedFolders = new Set(p.expandedFolders || []);
     const savedScroll = p.scrollPos || 0;
     this.scrollPos = savedScroll;
     render(!1);
-    // Restaurer le scroll après que le DOM soit prêt
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const scrollEl = $('#dL');
@@ -148,7 +147,6 @@ function exitSelectionMode() {
   selectionMode = false;
   selectedIds.clear();
   removeFABs();
-  // Update top bar immediately to remove back button flicker
   setTop({title:`Deck • ${getSub().emoji?getSub().emoji+' ':''}${getSub().title}`, showBack: expandedFolders.size > 0});
   goDeckKeepScroll();
 }
@@ -199,10 +197,6 @@ function renderFABs() {
 const hasSelection = () => window.getSelection()?.toString().length > 0;
 
 function bindPullRefresh(container, onRefresh) {
-  // Prevent binding multiple times on the same container
-  if(container._pullBound) return;
-  container._pullBound = true;
-  
   let startY = 0, pulling = false, indicator = null;
   container.addEventListener('touchstart', e => { if(container.scrollTop <= 5) { startY = e.touches[0].clientY; pulling = true; } }, {passive:!0});
   container.addEventListener('touchmove', e => {
@@ -210,16 +204,10 @@ function bindPullRefresh(container, onRefresh) {
     if(delta > 0 && delta < 120) {
       if(!indicator) { indicator = D.createElement('div'); indicator.innerHTML = '↻'; indicator.style.cssText = 'text-align:center;padding:10px;color:var(--muted);font-size:20px;transition:transform 0.2s'; container.prepend(indicator); }
       indicator.style.transform = `rotate(${delta * 3}deg)`;
-    } else if(delta <= 0 && indicator) {
-      indicator.remove(); indicator = null;
     }
   }, {passive:!0});
   container.addEventListener('touchend', e => {
-    if(indicator) { if(e.changedTouches[0] && e.changedTouches[0].clientY - startY > 80) { haptic('medium'); onRefresh(); } indicator.remove(); indicator = null; }
-    pulling = false;
-  });
-  container.addEventListener('touchcancel', () => {
-    if(indicator) { indicator.remove(); indicator = null; }
+    if(indicator) { if(e.changedTouches[0].clientY - startY > 80) { haptic('medium'); onRefresh(); } indicator.remove(); indicator = null; }
     pulling = false;
   });
 }
@@ -309,47 +297,27 @@ function goDeck(push=true){
   const v=$('#view');
   const items = buildDeckItems(s, null, 0);
   
-  // Only rebuild the full shell if it doesn't exist yet
-  if(!$('#deckList', v)) {
-    v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
-    } else {
-    // Just update the edit button state
-    const editBtn = $('#editModeBtn');
-    if(editBtn) {
-      editBtn.className = `btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny`;
-      editBtn.textContent = selectionMode ? '✓ Terminer' : '✏️ Éditer';
-    }
-  }
-
-  // Always rebind these handlers (they use onclick= which replaces, so no stacking)
-
+  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
   const listEl = $('#deckList');
   listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
-  
   const impBtn = $('#impB');
   const impInput = $('#impI');
   if (impBtn && impInput) { impBtn.onclick = () => impInput.click(); }
-  if($('#impI')) $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
+  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
   
-  if($('#editModeBtn')) $('#editModeBtn').onclick = () => {
+  $('#editModeBtn').onclick = () => {
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
   
-  if(!push && Nav.scrollPos > 0) { 
-    requestAnimationFrame(() => { 
-      requestAnimationFrame(() => {
-        const list = $('#dL'); if(list) list.scrollTop = Nav.scrollPos; 
-      });
-    }); 
-  }
-   const list = $('#dL'); if(list && !list._pullBound) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
+  const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
+  
   if(selectionMode) renderFABs();
   bindDeckNew();
 }
 
 function buildDeckItems(s, parentGid, depth) {
   const grps = ensGrps(s);
-  const items =[];
+  const items = [];
   
   const levelGroups = grps.filter(g => (g.parentGroupId||null) === parentGid);
   const inGroupAtLevel = new Set();
@@ -370,12 +338,12 @@ function buildDeckItems(s, parentGid, depth) {
     levelChapters = s.chapters.filter(c => !allInGroups.has(c.id));
   } else {
     const parentG = findGrp(s, parentGid);
-    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) :[];
+    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) : [];
   }
   
   const sorter = (a, b) => { 
-    const aDeadline = a.deadline || (a.type === 'group' ? null : null);
-    const bDeadline = b.deadline || (b.type === 'group' ? null : null);
+    const aDeadline = a.deadline || null;
+    const bDeadline = b.deadline || null;
     if (aDeadline && !bDeadline) return -1; if (!aDeadline && bDeadline) return 1; 
     if (aDeadline && bDeadline) { const diff = new Date(aDeadline) - new Date(bDeadline); if (diff !== 0) return diff; }
     return (b.lastUsed || 0) - (a.lastUsed || 0); 
@@ -448,14 +416,10 @@ function renderDeckItem(item, s) {
     const emoji = c.emoji || getEmoji(c.title) || '📄';
     
     let rightContent = '';
-    if(selectionMode) {
-      const isChecked = selectedIds.has(c.id);
-      rightContent = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
-    } else if(item.parentGid && expandedFolders.has(item.parentGid)) {
+    if(!selectionMode && item.parentGid && expandedFolders.has(item.parentGid)) {
       rightContent = `<button class="remove-x" data-action="remove-from-folder" data-cid="${c.id}" data-gid="${item.parentGid}" title="Sortir du dossier" style="margin-right:12px">✕</button>`;
     }
     
-    if(selectionMode) { rightContent = ''; }
     let selectBox = '';
     if(selectionMode) {
       const isChecked = selectedIds.has(c.id);
@@ -487,9 +451,6 @@ function bindDeckNew() {
   const l = $('#dL'); if(!l) return;
   const sub = getSub();
   
-  // Clean up ALL previous listeners
-  if(bindDeckNew._cleanup) bindDeckNew._cleanup();
-  
   if(bindDeckNew._globalExit) D.removeEventListener('pointerup', bindDeckNew._globalExit);
   bindDeckNew._globalExit = (e) => {
     if(!selectionMode) return;
@@ -498,12 +459,10 @@ function bindDeckNew() {
   };
   D.addEventListener('pointerup', bindDeckNew._globalExit);
 
-    // Use a stored reference so we can remove it later
-  if(bindDeckNew._clickHandler) l.removeEventListener('click', bindDeckNew._clickHandler);
-  bindDeckNew._clickHandler = e => {
+  l.onclick = e => {
     if(e.target.matches('.delCh')) { e.stopPropagation(); if(delImpCh(e.target.dataset.cid)) goDeck(!1); return; }
     const selBox = e.target.closest('[data-action="toggle-select"]');
-    if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid); goDeckKeepScroll(); return; }
+    if(selBox) { e.stopPropagation(); const cid = selBox.dataset.cid; if(selectedIds.has(cid)) selectedIds.delete(cid); else selectedIds.add(cid); selBox.classList.toggle('checked', selectedIds.has(cid)); return; }
     const remBtn = e.target.closest('[data-action="remove-from-folder"]');
     if(remBtn) { e.stopPropagation(); remFromGrp(sub, remBtn.dataset.gid, remBtn.dataset.cid); valGrps(sub); saveData(); goDeckKeepScroll(); return; }
     const delFolderBtn = e.target.closest('[data-action="delete-folder"]');
@@ -513,9 +472,7 @@ function bindDeckNew() {
     const revFolderBtn = e.target.closest('[data-action="review-folder"]');
     if(revFolderBtn) { e.stopPropagation(); const g=findGrp(sub,revFolderBtn.dataset.gid); if(g){State.virtualChapter=buildVirt(sub,g);goChapter(State.virtualChapter.id)} return; }
   };
-  l.addEventListener('click', bindDeckNew._clickHandler);
 
-  
   let longPressTimer = null, startX = 0, startY = 0, pressedEl = null, didLongPress = false;
   let dragging = false, dragData = null, dragGhost = null, dragStarted = false, currentDropTarget = null, dropMode = null; 
   
@@ -603,7 +560,6 @@ function bindDeckNew() {
         const srcG = findGrp(sub, srcId);
         const dstG = findGrp(sub, dstId);
         if(srcG && dstG) {
-          const dstAllChildren = getAllChapIdsRecursive(sub, srcId);
           const isCircular = (function checkCirc(gid) {
             if(gid === srcId) return true;
             const g = findGrp(sub, gid);
@@ -617,7 +573,7 @@ function bindDeckNew() {
               oldParent.childGroupIds = (oldParent.childGroupIds||[]).filter(x => x !== srcId);
             }
             srcG.parentGroupId = dstId;
-            if(!dstG.childGroupIds) dstG.childGroupIds =[];
+            if(!dstG.childGroupIds) dstG.childGroupIds = [];
             if(!dstG.childGroupIds.includes(srcId)) dstG.childGroupIds.push(srcId);
             toast('Dossier imbriqué', 'success');
           } else {
@@ -666,7 +622,7 @@ function bindDeckNew() {
           const newParent = findGrp(sub, targetParentGid);
           if(newParent) {
             srcG.parentGroupId = targetParentGid;
-            if(!newParent.childGroupIds) newParent.childGroupIds =[];
+            if(!newParent.childGroupIds) newParent.childGroupIds = [];
             if(!newParent.childGroupIds.includes(srcId)) newParent.childGroupIds.push(srcId);
           } else {
             srcG.parentGroupId = null;
@@ -768,16 +724,13 @@ function bindDeckNew() {
     const item = pressedEl;
     pressedEl = null;
     
-       if(e.target.closest('button, .sel-checkbox, .remove-x, [data-action]')) return;
+    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
     
     const dx = e.clientX - startX, dy = e.clientY - startY;
     if(M.hypot(dx, dy) > 15) return;
     
     const type = item.dataset.type;
     const id = item.dataset.id;
-    
-    // Prevent onclick from also firing
-    e.stopPropagation();
     
     if(selectionMode) {
       if(type === 'chapter') {
@@ -789,11 +742,12 @@ function bindDeckNew() {
           goDeckKeepScroll();
         }
       } else if(type === 'group') {
-        openGrp(getSub(), id);
+        openGrp(sub, id);
       }
     } else {
-      if(type === 'group') { openGrp(getSub(), id); } else { goChapter(id); }
+      if(type === 'group') { openGrp(sub, id); } else { goChapter(id); }
     }
+  };
   
   const onPointerCancel = () => {
     clearTimeout(longPressTimer);
@@ -804,19 +758,10 @@ function bindDeckNew() {
     dragging = false; dragData = null; dragStarted = false; pressedEl = null;
   };
   
-    l.addEventListener('pointerdown', onPointerDown);
+  l.addEventListener('pointerdown', onPointerDown);
   l.addEventListener('pointermove', onPointerMove, {passive: false});
   l.addEventListener('pointerup', onPointerUp);
   l.addEventListener('pointercancel', onPointerCancel);
-  
-  // Store cleanup function to remove listeners on next bind
-   bindDeckNew._cleanup = () => {
-    l.removeEventListener('pointerdown', onPointerDown);
-    l.removeEventListener('pointermove', onPointerMove);
-    l.removeEventListener('pointerup', onPointerUp);
-    l.removeEventListener('pointercancel', onPointerCancel);
-    if(bindDeckNew._clickHandler) l.removeEventListener('click', bindDeckNew._clickHandler);
-  };
 }
 
 function openGrp(s, gid) {
@@ -826,7 +771,6 @@ function openGrp(s, gid) {
   if (expandedFolders.has(gid)) expandedFolders.delete(gid);
   else expandedFolders.add(gid);
 
-  // Rebuild seulement la liste, pas toute la page
   const listEl = $('#deckList');
   if (listEl) {
     const items = buildDeckItems(s, null, 0);
@@ -837,7 +781,6 @@ function openGrp(s, gid) {
     });
     bindDeckNew();
     if (selectionMode) renderFABs();
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         if (scrollEl) scrollEl.scrollTop = savedScroll;
@@ -848,53 +791,55 @@ function openGrp(s, gid) {
   }
 }
 
-
-
+D.addEventListener('pointerup', (e) => {
+    if(!selectionMode) return;
+    const deckItem = e.target.closest('.deck-item');
+    const fab = e.target.closest('.fab-confirm, .fab-cancel');
+    if(!deckItem && !fab) { exitSelectionMode(); }
+});
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
   const dailyCalc = getDailyGoalCalc(c);
   const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" id="goalDisplay" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
 
-// LIGNE À AJOUTER ICI :
-$('#deadlineInput').onchange = (e) => {
-  const val = e.target.value;
-  if (c.virtual && c._groupId) {
-    const g = findGrp(getSub(), c._groupId);
-    if (g) g.deadline = val;
-  } else {
-    c.deadline = val;
-  }
-  debouncedSave();
-  if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
-
-  // Mettre à jour l'objectif quotidien SANS reconstruire la page
-  const dailyCalc = getDailyGoalCalc(c);
-  const container = e.target.closest('.mt8');
-  if (container) {
-    const goalEl = container.querySelector('.mt6');
-    if (dailyCalc && dailyCalc.val > 0) {
-      const html = `<span>Objectif fixé: <b>${dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span>`;
+  $('#deadlineInput').onchange = (e) => {
+    const val = e.target.value;
+    if (c.virtual && c._groupId) {
+      const g = findGrp(getSub(), c._groupId);
+      if (g) g.deadline = val;
+    } else {
+      c.deadline = val;
+    }
+    debouncedSave();
+    if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+    const newCalc = getDailyGoalCalc(c);
+    const goalEl = $('#goalDisplay');
+    if (newCalc && newCalc.val > 0) {
+      const html = `<span>Objectif fixé: <b>${newCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span>`;
       if (goalEl) {
         goalEl.innerHTML = html;
       } else {
-        const div = D.createElement('div');
-        div.className = 'mt6';
-        div.style.cssText = 'font-size:13px;color:var(--primary);display:flex;justify-content:space-between';
-        div.innerHTML = html;
-        container.appendChild(div);
+        const container = e.target.closest('.mt8');
+        if (container) {
+          const div = D.createElement('div');
+          div.className = 'mt6';
+          div.id = 'goalDisplay';
+          div.style.cssText = 'font-size:13px;color:var(--primary);display:flex;justify-content:space-between';
+          div.innerHTML = html;
+          container.appendChild(div);
+        }
       }
     } else if (goalEl) {
       goalEl.remove();
     }
-  }
-  updRevBar(c);
-};
+    updRevBar(c);
+  };
 
-botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
-if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
+  botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
+  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
@@ -902,11 +847,11 @@ async function goCards(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
   const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-    v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
+  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
-    let filtered =[];
+    let filtered = [];
     if (!cleanQ) { filtered = pool; } else {
         const scored = pool.map(x => {
             const {f,b} = getSides(x,c); const tf = norm(f); const tb = norm(b);
@@ -930,8 +875,7 @@ async function goCards(cid,push=true){
           grid.appendChild(el);
        });
     }
-    // FIX: resolve media THEN typeset math THEN done
-        await Media.resolve(grid);
+    await Media.resolve(grid);
     await tsLat(grid);
   };
   await renderCards(); 
@@ -952,6 +896,7 @@ function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.fi
 function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; $('#app').classList.toggle('focus-mode', data.app.prefs.focusMode); renRev() }
 
 function renRev(){
+  if(State.review?.isQCM) { renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
   const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
@@ -962,18 +907,19 @@ function renRev(){
     <div class="review-card"><div class="review-scroller">${!r.flipped ? `<div class="term" data-face="${ff?'front':'back'}">${fT}</div>` : `<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div>
   </div>`;
   
-  const scroller = v.querySelector('.review-scroller');
   const finishSetup = async () => {
     await Media.resolve(v);
+    const scroller = v.querySelector('.review-scroller');
     if(scroller) await tsLat(scroller);
     initGest();
     bindSwipeNav();
   };
-finishSetup();
-  if(r.history.length) $('#undoBtn').onclick = undoRev; 
+  finishSetup();
+  if(r.history.length && $('#undoBtn')) $('#undoBtn').onclick = undoRev; 
   
   let lastTap = 0;
-  $('.review-scroller').addEventListener('click', e => {
+  const scrollerEl = $('.review-scroller');
+  if(scrollerEl) scrollerEl.addEventListener('click', e => {
     if(e.target.closest('img')) return;
     const now = Date.now();
     if(now - lastTap < 300 && !r.flipped) { haptic('light'); r.flipped = true; renRev(); }
@@ -1003,7 +949,7 @@ function subG(nxt){
   const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
   (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
   r.answers.push({cardId:card.id,prev,next:nxt,ms});
-      if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();renRev()}else{r.end=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();goRecap(!1)}
+  if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();renRev()}else{r.end=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();goRecap(!1)}
 }
 
 function goRecap(push=true){
@@ -1011,7 +957,6 @@ function goRecap(push=true){
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
   $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
   $('#contBtn').onclick=()=>startRev(c.id,!1,true);
-  // Sync pending from another device during review
   if(window._pendingSync && typeof FireSync!=='undefined' && FireSync.isConnected){
     window._pendingSync=false;
     FireSync.pullFromCloud(true);
@@ -1116,10 +1061,10 @@ function openSet(cid,push=true){
   setupControl('#sldD', '#subD', '#addD', '#valD', P, 'fsDef', 'px', '--fs-def', '#preD');
   setupControl('#sldS', '#subS', '#addS', '#valS', c.settings, 'sessionSize', '');
 
-    const cloudSave=()=>{if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud()};
+  const cloudSave=()=>{if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud()};
   $('#rowTitle').onclick=()=>{ const t=prompt('Nouveau titre:', c.title); if(t && t.trim()){ const newTitle = t.trim(); if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.title = newTitle; c.title = newTitle; } else { const real = _real(c.id); if(real) real.title = newTitle; c.title = newTitle; } updChDesc(c); debouncedSave(); cloudSave(); openSet(cid, !1); } };
-    $('#rowEmoji').onclick=()=>{ const emojiActuel = c.emoji || getEmoji(c.title) || ''; const e = prompt('Emoji (laissez vide pour l\'émoji par défaut) :', emojiActuel); if (e !== null) { const newEmoji = e.trim(); if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.emoji = newEmoji; c.emoji = newEmoji; } else { const real = _real(c.id); if (real) real.emoji = newEmoji; c.emoji = newEmoji; } updChDesc(c); debouncedSave(); cloudSave(); openSet(cid, !1); } };
-    $('#rowLang').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;debouncedSave();cloudSave();openSet(cid,!1)};
+  $('#rowEmoji').onclick=()=>{ const emojiActuel = c.emoji || getEmoji(c.title) || ''; const e = prompt('Emoji (laissez vide pour l\'émoji par défaut) :', emojiActuel); if (e !== null) { const newEmoji = e.trim(); if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.emoji = newEmoji; c.emoji = newEmoji; } else { const real = _real(c.id); if (real) real.emoji = newEmoji; c.emoji = newEmoji; } updChDesc(c); debouncedSave(); cloudSave(); openSet(cid, !1); } };
+  $('#rowLang').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;debouncedSave();cloudSave();openSet(cid,!1)};
   $('#rowTheme').onclick=()=>{data.app.theme=isDark?'light':'dark';debouncedSave();cloudSave();applyTh();openSet(cid,!1)};
   $('#rowFocus').onclick=()=>{P.focusMode=!P.focusMode;debouncedSave();cloudSave();openSet(cid,!1)};
   $$('.swatch').forEach(b=>b.onclick=e=>{ e.stopPropagation(); P.accent=b.dataset.accent; debouncedSave(); applyUI(); $$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b)); $$('.s-icon.dynamic').forEach(icon => { icon.style.background = `var(--primary)`; }); haptic('light'); });
@@ -1138,12 +1083,12 @@ function upgrade(){
   if(!data.app) data.app = {theme:'dark'}; 
   data.app.prefs = {fsTerm:22, fsDef:24, accent:'indigo', radius:14, ...(data.app.prefs||{})}; 
   if(data.app.prefs.mathDetail === undefined) data.app.prefs.mathDetail = false;
-if(!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
+  if(!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
   data.subjects.forEach(s => {
     ensGrps(s).forEach(g => {
-      if(!g.childGroupIds) g.childGroupIds =[];
+      if(!g.childGroupIds) g.childGroupIds = [];
       if(!g.parentGroupId) g.parentGroupId = null;
-      if(!g.chapIds) g.chapIds =[];
+      if(!g.chapIds) g.chapIds = [];
     });
     valGrps(s); 
     s.emoji = s.emoji || ''; 
@@ -1179,7 +1124,7 @@ function ensureMathGrouped(){
     grps.push({
       id: 'g-math-all',
       chapIds: courseChaps.map(c => c.id),
-      childGroupIds:[],
+      childGroupIds: [],
       parentGroupId: null,
       createdAt: Date.now(),
       title: 'Résumé de Cours',
@@ -1189,6 +1134,7 @@ function ensureMathGrouped(){
   }
   valGrps(mathSub);
 }
+
 /* === QCM MODE === */
 const QCM_CACHE_KEY='qcm_cache_v2';
 const getQCMCache=()=>{try{return JSON.parse(LS.getItem(QCM_CACHE_KEY)||'{}')}catch{return{}}};
@@ -1447,10 +1393,8 @@ async function init() {
     Nav.clear();
     goDeck(false);
 
-    // UI visible → splash disparaît
     removeSplash();
 
-    // Firebase sync en arrière-plan
     requestIdleCallback(() => {
       if (typeof FireSync !== 'undefined') {
         FireSync.initSyncButton();
@@ -1458,7 +1402,6 @@ async function init() {
       }
     }, { timeout: 2000 });
 
-    // math.md en arrière-plan
     requestIdleCallback(() => loadMathLazy(), { timeout: 5000 });
 
     setInterval(saveData, 30000);
