@@ -312,7 +312,7 @@ function goDeck(push=true){
   // Only rebuild the full shell if it doesn't exist yet
   if(!$('#deckList', v)) {
     v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
-  } else {
+    } else {
     // Just update the edit button state
     const editBtn = $('#editModeBtn');
     if(editBtn) {
@@ -320,6 +320,8 @@ function goDeck(push=true){
       editBtn.textContent = selectionMode ? '✓ Terminer' : '✏️ Éditer';
     }
   }
+
+  // Always rebind these handlers (they use onclick= which replaces, so no stacking)
 
   const listEl = $('#deckList');
   listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
@@ -340,8 +342,7 @@ function goDeck(push=true){
       });
     }); 
   }
-  const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
-  
+   const list = $('#dL'); if(list && !list._pullBound) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
   if(selectionMode) renderFABs();
   bindDeckNew();
 }
