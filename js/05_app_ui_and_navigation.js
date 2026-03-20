@@ -6,14 +6,14 @@ let expandedFolders = new Set();
 let selectionContext = null; 
 
 const Nav = {
-  stack: [], scrollPos: 0,
+  stack:[], scrollPos: 0,
   push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
   back(){ 
     if(!this.stack.length) return false; 
     const p=this.stack.pop(); 
     State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
-    expandedFolders = new Set(p.expandedFolders || []);
+    expandedFolders = new Set(p.expandedFolders ||[]);
     const savedScroll = p.scrollPos || 0;
     this.scrollPos = savedScroll;
     render(!1);
@@ -338,7 +338,7 @@ function goDeck(push=true){
 
 function buildDeckItems(s, parentGid, depth) {
   const grps = ensGrps(s);
-  const items = [];
+  const items =[];
   
   const levelGroups = grps.filter(g => (g.parentGroupId||null) === parentGid);
   const inGroupAtLevel = new Set();
@@ -359,7 +359,7 @@ function buildDeckItems(s, parentGid, depth) {
     levelChapters = s.chapters.filter(c => !allInGroups.has(c.id));
   } else {
     const parentG = findGrp(s, parentGid);
-    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) : [];
+    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) :[];
   }
   
   const sorter = (a, b) => { 
@@ -600,7 +600,7 @@ function bindDeckNew() {
               oldParent.childGroupIds = (oldParent.childGroupIds||[]).filter(x => x !== srcId);
             }
             srcG.parentGroupId = dstId;
-            if(!dstG.childGroupIds) dstG.childGroupIds = [];
+            if(!dstG.childGroupIds) dstG.childGroupIds =[];
             if(!dstG.childGroupIds.includes(srcId)) dstG.childGroupIds.push(srcId);
             toast('Dossier imbriqué', 'success');
           } else {
@@ -649,7 +649,7 @@ function bindDeckNew() {
           const newParent = findGrp(sub, targetParentGid);
           if(newParent) {
             srcG.parentGroupId = targetParentGid;
-            if(!newParent.childGroupIds) newParent.childGroupIds = [];
+            if(!newParent.childGroupIds) newParent.childGroupIds =[];
             if(!newParent.childGroupIds.includes(srcId)) newParent.childGroupIds.push(srcId);
           } else {
             srcG.parentGroupId = null;
@@ -775,7 +775,7 @@ function bindDeckNew() {
     } else {
       if(type === 'group') { openGrp(sub, id); } else { goChapter(id); }
     }
-
+  };
   
   const onPointerCancel = () => {
     clearTimeout(longPressTimer);
@@ -884,7 +884,7 @@ async function goCards(cid,push=true){
 
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
-    let filtered = [];
+    let filtered =[];
     if (!cleanQ) { filtered = pool; } else {
         const scored = pool.map(x => {
             const {f,b} = getSides(x,c); const tf = norm(f); const tb = norm(b);
@@ -1119,9 +1119,9 @@ function upgrade(){
 if(!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
   data.subjects.forEach(s => {
     ensGrps(s).forEach(g => {
-      if(!g.childGroupIds) g.childGroupIds = [];
+      if(!g.childGroupIds) g.childGroupIds =[];
       if(!g.parentGroupId) g.parentGroupId = null;
-      if(!g.chapIds) g.chapIds = [];
+      if(!g.chapIds) g.chapIds =[];
     });
     valGrps(s); 
     s.emoji = s.emoji || ''; 
@@ -1157,7 +1157,7 @@ function ensureMathGrouped(){
     grps.push({
       id: 'g-math-all',
       chapIds: courseChaps.map(c => c.id),
-      childGroupIds: [],
+      childGroupIds:[],
       parentGroupId: null,
       createdAt: Date.now(),
       title: 'Résumé de Cours',
@@ -1353,6 +1353,7 @@ function handleQCMAnswer(idx){
   haptic(isCorrect?'success':'error');
   setTimeout(()=>{r.qcmOptions=null;r.qcmAnswered=!1;subG(isCorrect?'bien':'echec')},isCorrect?800:1500);
 }
+
 // Polyfill
 window.requestIdleCallback = window.requestIdleCallback ||
   function(cb, opts) { return setTimeout(cb, opts?.timeout || 1); };
@@ -1382,55 +1383,6 @@ async function syncInBackground() {
       if (pulled) {
         toast('Données cloud chargées', 'success', 2000);
       }
-    } catch (e) {
-      console.warn('[Init] Cloud pull failed:', e);
-    }
-  }
-}
-
-function loadMathLazy() {
-  fetch('math.md')
-    .then(r => r.ok ? r.text() : '')
-    .then(text => {
-      if (!text) return;
-      dataMATH = parseMathData(text);
-      const mathSub = data.subjects.find(s => s.title.toLowerCase() === 'maths');
-      if (mathSub && dataMATH.length) {
-        reconcile();
-        ensureMathGrouped();
-        saveData();
-        if (State.view === 'deck') goDeck(false);
-      }
-    })
-    .catch(() => console.warn('math.md not found'));
-}
-
-window.requestIdleCallback = window.requestIdleCallback ||
-  function(cb, opts) { return setTimeout(cb, opts?.timeout || 1); };
-
-function removeSplash() {
-  const splash = document.getElementById('splash');
-  if (!splash) return;
-  splash.style.opacity = '0';
-  setTimeout(() => splash.remove(), 300);
-}
-
-async function syncInBackground() {
-  if (!FireSync.isConnected) {
-    await Promise.race([
-      new Promise(resolve => {
-        const unsub = firebase.auth().onAuthStateChanged(user => {
-          if (user) { unsub(); resolve(); }
-        });
-      }),
-      new Promise(resolve => setTimeout(resolve, 5000))
-    ]);
-  }
-
-  if (FireSync.isConnected) {
-    try {
-      const pulled = await FireSync.pullIfNewer();
-      if (pulled) toast('Données cloud chargées', 'success', 2000);
     } catch (e) {
       console.warn('[Init] Cloud pull failed:', e);
     }
