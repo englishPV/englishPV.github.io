@@ -28,7 +28,7 @@ const sVal=v=>`<div class="s-value">${v}</div>`;
 const Media = {
   db: null, cache: new Map(),
   async open(){ if(this.db)return this.db; this.db=await new Promise((s,j)=>{const r=indexedDB.open('flash9x16_media',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('files'))r.result.createObjectStore('files',{keyPath:'key'})};r.onsuccess=()=>s(r.result);r.onerror=()=>j(r.error)}); return this.db },
-      async save(k, b, m = {}) {
+        async save(k, b, m = {}) {
     const d = await this.open(), tx = d.transaction('files', 'readwrite');
     tx.objectStore('files').put({ key: k, blob: b, meta: m, ts: Date.now() });
     
