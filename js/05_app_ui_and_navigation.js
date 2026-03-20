@@ -820,12 +820,7 @@ function openGrp(s, gid) {
   }
 }
 
-D.addEventListener('pointerup', (e) => {
-    if(!selectionMode) return;
-    const deckItem = e.target.closest('.deck-item');
-    const fab = e.target.closest('.fab-confirm, .fab-cancel');
-    if(!deckItem && !fab) { exitSelectionMode(); }
-});
+
 
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
