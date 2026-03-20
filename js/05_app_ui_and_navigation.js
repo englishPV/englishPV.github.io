@@ -8,16 +8,16 @@ let selectionContext = null;
 const Nav = {
   stack: [], scrollPos: 0,
   push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
- back(){ 
+  back(){ 
     if(!this.stack.length) return false; 
     const p=this.stack.pop(); 
     State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
     expandedFolders = new Set(p.expandedFolders || []);
-    this.scrollPos = p.scrollPos || 0;
-    const savedScroll = this.scrollPos;
+    const savedScroll = p.scrollPos || 0;
+    this.scrollPos = savedScroll;
     render(!1);
-    // Restore scroll after render completes
+    // Restaurer le scroll après que le DOM soit prêt
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const scrollEl = $('#dL');
@@ -26,7 +26,6 @@ const Nav = {
     });
     return true;
   },
-
   clear(){ this.stack=[]; this.scrollPos=0 }
 };
 
@@ -129,7 +128,6 @@ function goDeckKeepScroll() {
   const scrollEl = $('#dL');
   const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
   goDeck(false);
-  // Double rAF ensures DOM is fully painted before restoring scroll
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const newScrollEl = $('#dL');
@@ -761,10 +759,10 @@ function bindDeckNew() {
     const type = item.dataset.type;
     const id = item.dataset.id;
     
-    if(selectionMode) {
+     if(selectionMode) {
       if(type === 'chapter') {
         if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
-        // Just toggle the checkbox visually instead of full rebuild
+        // Toggle checkbox visuellement sans reconstruire
         const checkbox = item.querySelector('.sel-checkbox');
         if(checkbox) {
           checkbox.classList.toggle('checked', selectedIds.has(id));
@@ -794,38 +792,29 @@ function bindDeckNew() {
   l.addEventListener('pointercancel', onPointerCancel);
 }
 
-function openGrp(s,gid){
+function openGrp(s, gid) {
   const scrollEl = $('#dL');
   const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
-  const clickedItem = $(`.deck-item[data-id="${gid}"]`);
-  const clickedTop = clickedItem ? clickedItem.getBoundingClientRect().top : null;
-  
-  if(expandedFolders.has(gid)) expandedFolders.delete(gid);
+
+  if (expandedFolders.has(gid)) expandedFolders.delete(gid);
   else expandedFolders.add(gid);
-  
-  // Rebuild only the list content, not the whole view
+
+  // Rebuild seulement la liste, pas toute la page
   const listEl = $('#deckList');
-  if(listEl) {
+  if (listEl) {
     const items = buildDeckItems(s, null, 0);
     listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
-    
-    // Update top bar
-    setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack: selectionMode || expandedFolders.size > 0});
-    
-    // Rebind events
+    setTop({
+      title: `Deck • ${s.emoji ? s.emoji + ' ' : ''}${s.title}`,
+      showBack: selectionMode || expandedFolders.size > 0
+    });
     bindDeckNew();
-    if(selectionMode) renderFABs();
-    
-    // Restore scroll position relative to the clicked folder
+    if (selectionMode) renderFABs();
+
     requestAnimationFrame(() => {
-      const newClickedItem = $(`.deck-item[data-id="${gid}"]`);
-      if(newClickedItem && clickedTop !== null && scrollEl) {
-        const newTop = newClickedItem.getBoundingClientRect().top;
-        const diff = newTop - clickedTop;
-        scrollEl.scrollTop = savedScroll + diff;
-      } else if(scrollEl) {
-        scrollEl.scrollTop = savedScroll;
-      }
+      requestAnimationFrame(() => {
+        if (scrollEl) scrollEl.scrollTop = savedScroll;
+      });
     });
   } else {
     goDeckKeepScroll();
@@ -848,30 +837,42 @@ function goChapter(id,push=true){
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
 
 // LIGNE À AJOUTER ICI :
-$('#deadlineInput').onchange = (e) => { 
-  const val = e.target.value; 
-  if (c.virtual && c._groupId) { 
-    const g = findGrp(getSub(), c._groupId); 
-    if (g) g.deadline = val; 
-  } else { 
-    c.deadline = val; 
-  } 
-  debouncedSave(); 
-  if(typeof FireSync!=='undefined'&&FireSync.isConnected) FireSync.pushToCloud(); 
-  // DON'T rebuild the whole page — just update the daily goal text if present
-  const dailyCalc = getDailyGoalCalc(c);
-  const goalEl = e.target.closest('.mt8')?.querySelector('.mt6');
-  if(goalEl && dailyCalc) {
-    goalEl.innerHTML = `<span>Objectif fixé: <b>${dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span>`;
-  } else if(goalEl && !dailyCalc) {
-    goalEl.remove();
+$('#deadlineInput').onchange = (e) => {
+  const val = e.target.value;
+  if (c.virtual && c._groupId) {
+    const g = findGrp(getSub(), c._groupId);
+    if (g) g.deadline = val;
+  } else {
+    c.deadline = val;
   }
-  // Update the revision bar too
+  debouncedSave();
+  if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+
+  // Mettre à jour l'objectif quotidien SANS reconstruire la page
+  const dailyCalc = getDailyGoalCalc(c);
+  const container = e.target.closest('.mt8');
+  if (container) {
+    const goalEl = container.querySelector('.mt6');
+    if (dailyCalc && dailyCalc.val > 0) {
+      const html = `<span>Objectif fixé: <b>${dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span>`;
+      if (goalEl) {
+        goalEl.innerHTML = html;
+      } else {
+        const div = D.createElement('div');
+        div.className = 'mt6';
+        div.style.cssText = 'font-size:13px;color:var(--primary);display:flex;justify-content:space-between';
+        div.innerHTML = html;
+        container.appendChild(div);
+      }
+    } else if (goalEl) {
+      goalEl.remove();
+    }
+  }
   updRevBar(c);
 };
 
 botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
-       if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
+if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
