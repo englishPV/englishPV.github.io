@@ -464,7 +464,7 @@ function bindDeckNew() {
   const l = $('#dL'); if(!l) return;
   const sub = getSub();
   
-  // ✅ Retirer les anciens pointer listeners AVANT d'en ajouter de nouveaux
+  // ✅ Nettoyer les anciens pointer listeners AVANT d'en ajouter
   if(bindDeckNew._cleanup) {
     bindDeckNew._cleanup();
     bindDeckNew._cleanup = null;
@@ -782,7 +782,7 @@ function bindDeckNew() {
   l.addEventListener('pointerup', onPointerUp);
   l.addEventListener('pointercancel', onPointerCancel);
   
-  // ✅ Stocker la fonction de nettoyage pour le prochain appel
+  // ✅ Stocker la fonction de nettoyage
   bindDeckNew._cleanup = () => {
     l.removeEventListener('pointerdown', onPointerDown);
     l.removeEventListener('pointermove', onPointerMove);
