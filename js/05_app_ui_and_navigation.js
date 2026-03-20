@@ -59,8 +59,8 @@ function checkExpiredDates(list) {
     const now = new Date(); now.setHours(0,0,0,0); let changed = false;
     list.forEach(item => { if (item.deadline) {
       // ✅ Parser en local
-      const p = item.deadline.split('-');
-      const ddl = new Date(+p[0], +p[1] - 1, +p[2]);
+      const dp = item.deadline.split('-');
+      const ddl = new Date(+dp[0], +dp[1] - 1, +dp[2]);
       ddl.setHours(0,0,0,0);
       if (ddl < now) { item.deadline = null; changed = true; }
     } });
@@ -70,11 +70,14 @@ function checkExpiredDates(list) {
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
     const now = new Date(); now.setHours(0,0,0,0);
-    // ✅ Parser la date YYYY-MM-DD en local (pas en UTC)
-    const parts = ch.deadline.split('-');
-    const ddl = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    // ✅ Parser en local pour éviter le décalage UTC
+    const p = ch.deadline.split('-');
+    const ddl = new Date(+p[0], +p[1] - 1, +p[2]);
     ddl.setHours(0,0,0,0);
-    let days = Math.ceil((ddl - now) / 864e5); if (days <= 0) days = 1;
+    // ✅ +1 pour inclure le jour de la deadline
+    // Deadline aujourd'hui → 1 jour, demain → 2 jours, etc.
+    let days = Math.round((ddl - now) / 864e5) + 1;
+    if (days <= 0) days = 1;
     const k = ch.stats.gradeCounts || getLive(ch);
     let pool = k.unseen + k.echec + k.difficile, label = "cartes (Mauvaises)";
     if (pool === 0) { pool = k.bien; label = "cartes (Bien)"; if (pool === 0) return { val: 0, text: "Objectif atteint !", pool: 0 }; }
@@ -322,7 +325,6 @@ function goDeck(push=true){
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
   
-  const list = $('#dL'); if(list) bindPullRefresh(list, () => { toast('Actualisation...', 'info', 1000); goDeck(false); });
   
   if(selectionMode) renderFABs();
   bindDeckNew();
@@ -833,20 +835,15 @@ function goChapter(id,push=true){
   drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
 
   $('#deadlineInput').onchange = (e) => {
-    // ✅ Stocker null au lieu de "" quand vidé, normaliser le format
-    const raw = e.target.value;
-    const val = raw || null;
-    
+    const val = e.target.value || null;
     if (c.virtual && c._groupId) {
       const g = findGrp(getSub(), c._groupId);
       if (g) g.deadline = val;
     } else {
       c.deadline = val;
     }
-    
-    // ✅ Invalider le cache d'objectif quotidien
+    // ✅ Invalider le cache pour forcer le recalcul
     delete c._goalCache;
-    
     debouncedSave();
     if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     const newCalc = getDailyGoalCalc(c);
@@ -1006,14 +1003,14 @@ function continueOrNew(cid,queue,mode,push,isCont,extras={}){
 function startRev(cid,push=true,isCont=false){
   if(!cid)return;const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
-  // ✅ Utiliser une variable locale au lieu d'écraser le réglage utilisateur
+  // ✅ Variable locale — ne modifie plus le réglage utilisateur
   let sessionSize = c.settings.sessionSize;
   if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}} sessionSize=c._goalCache.size}
   let pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
   if(isCont&&State.review?.queue){const seen=new Set(State.review.queue);pool=pool.filter(x=>!seen.has(x.id))}
   if(!pool.length){alert('Plus de cartes disponibles dans ce filtre.');return}
   c.lastUsed=Date.now();saveData();
-    continueOrNew(cid,bldQ(c,pool,sessionSize).map(x=>x.id),null,push,isCont)
+  continueOrNew(cid,bldQ(c,pool,sessionSize).map(x=>x.id),null,push,isCont)
 }
 
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
@@ -1383,10 +1380,8 @@ async function syncInBackground() {
 
   if (FireSync.isConnected) {
     try {
-      const pulled = await FireSync.pullIfNewer();
-      if (pulled) {
-        toast('Données cloud chargées', 'success', 2000);
-      }
+      await FireSync.pullIfNewer();
+      // ✅ Pas de toast — synchronisation silencieuse
     } catch (e) {
       console.warn('[Init] Cloud pull failed:', e);
     }
