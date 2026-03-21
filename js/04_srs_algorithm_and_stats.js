@@ -9,12 +9,26 @@ function getStreak(c) {
   }
   return streak;
 }
-
+function togTypeFilt(c, k){
+    const s = c.filters.types;
+    if(!s) return;
+    const keys = Object.keys(s), actCnt = keys.reduce((n, x) => n + (s[x] ? 1 : 0), 0);
+    if(actCnt === keys.length){ keys.forEach(x => s[x] = (x === k)); }
+    else if(actCnt === 1 && s[k]){ keys.forEach(x => s[x] = !0); }
+    else { s[k] = !s[k]; if(!s[k] && actCnt === 1) s[k] = !0; }
+}
 const getLive = c => { const o = GRADE_INIT(); c.cards.forEach(x => o[x.grade || 'unseen']++); return o; };
 const syncG = c => c.stats.gradeCounts = getLive(c);
 const getTod = c => c.stats.dailyReviews[todayKey()] || 0;
 const getTodCh = c => c.stats.dailyChanges[todayKey()] || {changed:0, total:0};
-const cntAv = c => c.cards.filter(x => c.filters.grades[x.grade || 'unseen']).length;
+// ✅ Filtre universel : grade + type
+const cardPassesFilter = (card, filters) => {
+    if(!filters.grades[card.grade || 'unseen']) return false;
+    if(filters.types && card.cardType && !filters.types[card.cardType]) return false;
+    return true;
+};
+
+const cntAv = c => c.cards.filter(x => cardPassesFilter(x, c.filters)).length;
 
 const getSucc = c => {
   const k = c.stats.gradeCounts, g = k.bien + k.facile, t = g + k.echec + k.difficile;
