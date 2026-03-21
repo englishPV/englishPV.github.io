@@ -1,6 +1,6 @@
 /*03_data_storage_and_imports.js*/
 /* --- CONSTANTES DATA --- */
-const KEY = 'flashcards9x16_data', APP_VER = '2026-06-26-math-v4';
+const KEY = 'flashcards9x16_data', APP_VER = '2026-06-27-math-v4';
 const GRADES = ['unseen','echec','difficile','bien','facile'];
 const GRADE_INIT = () => Object.fromEntries(GRADES.map(g=>[g,0]));
 const GRADE_FILTERS = () => Object.fromEntries(GRADES.map(g=>[g,!0]));
