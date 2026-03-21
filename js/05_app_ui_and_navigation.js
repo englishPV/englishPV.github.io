@@ -152,7 +152,7 @@ startBtn.onclick = () => startRev(State.chapterId);
 
 function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
 function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
-function render(push=true){ if(State.view='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
+function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 /* --- SELECTION & GESTURES --- */
