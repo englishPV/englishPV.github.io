@@ -22,11 +22,7 @@ const syncG = c => c.stats.gradeCounts = getLive(c);
 const getTod = c => c.stats.dailyReviews[todayKey()] || 0;
 const getTodCh = c => c.stats.dailyChanges[todayKey()] || {changed:0, total:0};
 // ✅ Filtre universel : grade + type
-const cardPassesFilter = (card, filters) => {
-    if(!filters.grades[card.grade || 'unseen']) return false;
-    if(filters.types && card.cardType && !filters.types[card.cardType]) return false;
-    return true;
-};
+
 
 const cardPassesFilter = (card, filters) => {
     if(!filters.grades[card.grade || 'unseen']) return false;
