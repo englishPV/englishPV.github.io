@@ -134,32 +134,55 @@ const formatText = t => {
 };
 const parseMathData = (raw) => {
     if (!raw) return [];
-    const result = []; let idCounter = 0;
-    const chapSplit = raw.split(/^#\s+CHAPITRE\s+(\d+)\s*[—–-]\s*(.+)$/gm);
-    for (let i = 1; i + 2 < chapSplit.length; i += 3) {
-        const chNum = chapSplit[i].trim();
-        const chKey = 'CH' + chNum;
-        const chTitle = typeof MATH_MAP !== 'undefined' && MATH_MAP[chKey] ? MATH_MAP[chKey].title : chapSplit[i+1].trim();
-        const content = chapSplit[i+2];
-        const cardSplit = content.split(/^##\s+FLASHCARD\s+\d+\s*[—–-]\s*.+$/gm);
-        for (let j = 1; j < cardSplit.length; j++) {
-            const block = cardSplit[j];
-            const rectoMatch = block.match(/###\s+RECTO\s*\n([\s\S]*?)(?=###\s+VERSO|$)/);
-            const versoMatch = block.match(/###\s+VERSO\s*\n([\s\S]*?)(?=###\s+L[''']ŒIL|---\s*$|$)/);
-            const oeilMatch = block.match(/###\s+L[''']ŒIL DE L[''']X\s*\n([\s\S]*?)(?=---\s*$|$)/);
+    const result = [];
+    let idCounter = 0;
+
+    // Chapitres = lignes commençant par un seul # (pas ## ni ###)
+    const chapRegex = /^# (.+)$/gm;
+    const chapMatches = [...raw.matchAll(chapRegex)];
+
+    for (let ci = 0; ci < chapMatches.length; ci++) {
+        const chTitle = chapMatches[ci][1].trim();
+        const chStart = chapMatches[ci].index + chapMatches[ci][0].length;
+        const chEnd = ci + 1 < chapMatches.length ? chapMatches[ci + 1].index : raw.length;
+        const chContent = raw.substring(chStart, chEnd);
+
+        // Cartes = ### Carte N [M/T/C] — Titre
+        const cardRegex = /^###\s+Carte\s+\d+\s*\[([MTC])\]\s*[—–\-]\s*(.+)$/gm;
+        const cardMatches = [...chContent.matchAll(cardRegex)];
+
+        for (let ki = 0; ki < cardMatches.length; ki++) {
+            const typeCode = cardMatches[ki][1];
+            const cardStart = cardMatches[ki].index + cardMatches[ki][0].length;
+            const cardEnd = ki + 1 < cardMatches.length ? cardMatches[ki + 1].index : chContent.length;
+            let cardBlock = chContent.substring(cardStart, cardEnd);
+
+            // Couper au prochain ## (section MÉTHODE/THÉORÈME/CALCUL)
+            const nextSec = cardBlock.search(/^## /m);
+            if (nextSec > 0) cardBlock = cardBlock.substring(0, nextSec);
+
+            const rectoMatch = cardBlock.match(/\*\*RECTO\s*:\*\*\s*([\s\S]*?)(?=\*\*VERSO|$)/i);
+            const versoMatch = cardBlock.match(/\*\*VERSO\s*:\*\*\s*([\s\S]*)/i);
+
             if (!rectoMatch) continue;
+
             let front = rectoMatch[1].trim();
-            let back = (versoMatch ? versoMatch[1].trim() : '');
-            if (oeilMatch) back += '\n\n---\n\n**🔍 L\'Œil de l\'X :**\n\n' + oeilMatch[1].trim();
-            let mathSimple = null;
-            const hypoM = back.match(/\*\*Hypothèses complètes\s*:\*\*\s*([\s\S]*?)(?=\*\*Énoncé formel|$)/);
-            const enonceM = back.match(/\*\*Énoncé formel\s*:\*\*\s*([\s\S]*?)(?=\*\*Démonstration|\*\*Subtilités|\*\*Extensions|\*\*Pièges|\*\*🔍|###|$)/);
-            const hText = hypoM ? hypoM[1].trim() : '';
-            const eText = enonceM ? enonceM[1].trim() : '';
-            if (hText || eText) {
-                mathSimple = md2html(hText + (hText && eText ? '\n\n' : '') + eText);
-            }
-            result.push({ id: 'math-' + (idCounter++), front: md2html(front), back: md2html(back), mathSimple: mathSimple, chapter: chTitle });
+            let back = versoMatch ? versoMatch[1].trim() : '';
+            // Nettoyer les --- de fin
+            back = back.replace(/(\n?---\s*)+$/, '').trim();
+
+            const cardType = typeCode === 'M' ? 'methode'
+                           : typeCode === 'T' ? 'theoreme'
+                           : 'calcul';
+
+            result.push({
+                id: 'math-' + (idCounter++),
+                front: md2html(front),
+                back: md2html(back),
+                mathSimple: null,
+                chapter: chTitle,
+                cardType: cardType
+            });
         }
     }
     return result;
