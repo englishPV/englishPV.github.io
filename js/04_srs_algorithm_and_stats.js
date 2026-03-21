@@ -28,6 +28,12 @@ const cardPassesFilter = (card, filters) => {
     return true;
 };
 
+const cardPassesFilter = (card, filters) => {
+    if(!filters.grades[card.grade || 'unseen']) return false;
+    if(filters.types && card.cardType && !filters.types[card.cardType]) return false;
+    return true;
+};
+
 const cntAv = c => c.cards.filter(x => cardPassesFilter(x, c.filters)).length;
 
 const getSucc = c => {
