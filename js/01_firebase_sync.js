@@ -114,18 +114,32 @@ const FireSync = (() => {
         if (!cloudData.subjects || !cloudData.app) return false;
 
         data = cloudData;
+        
+        // ✅ Après pull cloud, re-appliquer le reset maths si nécessaire
+        const MATH_RESET_TAG_SYNC = 'math-reset-2025-06-27-v1';
+        if(data.app._mathReset !== MATH_RESET_TAG_SYNC) {
+          data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
+          if(typeof buildMathSub === 'function') {
+            const freshMath = buildMathSub();
+            data.subjects.splice(1, 0, freshMath);
+          }
+          data.app._mathReset = MATH_RESET_TAG_SYNC;
+          if(typeof upgrade === 'function') upgrade();
+          console.log('[FireSync] Math reset applied after cloud pull');
+        }
+        
         saveDataLocal();
         lastPushTime = cloudTime;
 
         if (typeof upgrade === 'function') {
           upgrade(); applyTh(); applyUI();
-          // ✅ Ne rafraîchir que si l'utilisateur est sur le deck
           if (typeof State !== 'undefined' && State.view === 'deck') {
             goDeck(false);
           }
-          // Sinon : données mises à jour silencieusement,
-          // appliquées à la prochaine navigation
         }
+
+        // ✅ Repousser vers le cloud avec les maths corrigées
+        setTimeout(() => pushToCloud(), 2000);
 
         console.log('[FireSync] Cloud data loaded');
         return true;
@@ -203,7 +217,20 @@ const FireSync = (() => {
       const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (!cloudData.subjects || !cloudData.app) { console.log('[FireSync] Invalid cloud data'); return; }
 
-      data = cloudData;
+     data = cloudData;
+      
+      // ✅ Re-appliquer le reset maths après pull manuel
+      const MATH_RESET_TAG_MANUAL = 'math-reset-2025-06-27-v1';
+      if(data.app._mathReset !== MATH_RESET_TAG_MANUAL) {
+        data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
+        if(typeof buildMathSub === 'function') {
+          const freshMath = buildMathSub();
+          data.subjects.splice(1, 0, freshMath);
+        }
+        data.app._mathReset = MATH_RESET_TAG_MANUAL;
+        console.log('[FireSync] Math reset applied after manual pull');
+      }
+      
       upgrade();
       applyTh();
       applyUI();
