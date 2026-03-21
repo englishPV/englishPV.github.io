@@ -1,3 +1,5 @@
+--- START OF FILE Paste March 21, 2026 - 3:57PM ---
+
 /*05_app_ui_and_navigation.js*/
 /* --- UI STATE & ROUTING --- */
 let selectionMode = false;
@@ -30,7 +32,26 @@ const Nav = {
 
 const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey:null, virtualChapter:null };
 const _real = id => getChs().find(c=>c.id===id), getCh = id => (State.virtualChapter?.id===id) ? State.virtualChapter : _real(id);
+
 function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:GRADE_FILTERS()};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); goChapter(ch.id,!1) }
+
+// ✅ Ajout : Mise à jour du filtre par type (Maths)
+function updTypeFilt(ch,key){
+    let t=ch;
+    if(ch.virtual&&ch._groupId){
+        const g=findGrp(getSub(),ch._groupId);
+        if(g){
+            if(!g.filters) g.filters={grades:GRADE_FILTERS()};
+            if(!g.filters.types) g.filters.types=MATH_TYPE_FILTERS();
+            t=g;
+        }
+    }
+    togTypeFilt(t,key);
+    if(t!==ch) ch.filters=deepClone(t.filters);
+    saveData();
+    goChapter(ch.id,!1);
+}
+
 const delImpCh = id => { const s=getSub(), i=s.chapters.findIndex(c=>c.id===id); if(i<0||!s.chapters[i].imported||!confirm('Supprimer ?'))return!1; ensGrps(s).forEach(g=>g.chapIds=g.chapIds.filter(x=>x!==id)); valGrps(s); s.chapters.splice(i,1); if(!s.chapters.length&&s.imported){data.subjects=data.subjects.filter(x=>x.id!==s.id);data.app.currentSubjectId=data.subjects[0]?.id} saveData(); return!0 };
 
 /* --- UI HELPERS & LISTENERS --- */
@@ -58,7 +79,6 @@ function getDeckTint(item, type) {
 function checkExpiredDates(list) {
     const now = new Date(); now.setHours(0,0,0,0); let changed = false;
     list.forEach(item => { if (item.deadline) {
-      // ✅ Parser en local
       const dp = item.deadline.split('-');
       const ddl = new Date(+dp[0], +dp[1] - 1, +dp[2]);
       ddl.setHours(0,0,0,0);
@@ -70,12 +90,9 @@ function checkExpiredDates(list) {
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
     const now = new Date(); now.setHours(0,0,0,0);
-    // ✅ Parser en local pour éviter le décalage UTC
     const p = ch.deadline.split('-');
     const ddl = new Date(+p[0], +p[1] - 1, +p[2]);
     ddl.setHours(0,0,0,0);
-    // ✅ +1 pour inclure le jour de la deadline
-    // Deadline aujourd'hui → 1 jour, demain → 2 jours, etc.
     let days = Math.round((ddl - now) / 864e5) + 1;
     if (days <= 0) days = 1;
     const k = ch.stats.gradeCounts || getLive(ch);
@@ -135,7 +152,7 @@ startBtn.onclick = () => startRev(State.chapterId);
 
 function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
 function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
-function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
+function render(push=true){ if(State.view='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 /* --- SELECTION & GESTURES --- */
@@ -325,7 +342,6 @@ function goDeck(push=true){
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
   
-  
   if(selectionMode) renderFABs();
   bindDeckNew();
 }
@@ -466,7 +482,6 @@ function bindDeckNew() {
   const l = $('#dL'); if(!l) return;
   const sub = getSub();
   
-  // ✅ Nettoyer les anciens pointer listeners AVANT d'en ajouter
   if(bindDeckNew._cleanup) {
     bindDeckNew._cleanup();
     bindDeckNew._cleanup = null;
@@ -784,7 +799,6 @@ function bindDeckNew() {
   l.addEventListener('pointerup', onPointerUp);
   l.addEventListener('pointercancel', onPointerCancel);
   
-  // ✅ Stocker la fonction de nettoyage
   bindDeckNew._cleanup = () => {
     l.removeEventListener('pointerdown', onPointerDown);
     l.removeEventListener('pointermove', onPointerMove);
@@ -820,14 +834,33 @@ function openGrp(s, gid) {
   }
 }
 
-
-
 function goChapter(id,push=true){
   safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
   const dailyCalc = getDailyGoalCalc(c);
   const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div><div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" id="goalDisplay" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
-  drawChart('gradeChart',k,sel); $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); $$('.legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key)); $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
+
+  // ✅ Légende des types (Maths)
+  const hasTypes = c.filters.types && c.cards.some(x => x.cardType);
+  const typeLegendHTML = hasTypes ? (() => {
+      const tSel = c.filters.types;
+      const tCounts = {}; MATH_TYPES.forEach(t => { tCounts[t] = c.cards.filter(x => x.cardType === t).length; });
+      return `<div class="legend mt6" id="typeLegend">${MATH_TYPES.map(t =>
+          `<div class="legend-item ${tSel[t]?'':'inactive'}" data-tkey="${t}"><span class="dot" style="background:${TYPE_COLORS[t]}"></span><span style="flex:1">${TYPE_LABELS[t]}</span><b class="count">${tCounts[t]}</b></div>`
+      ).join('')}</div>`;
+  })() : '';
+
+  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div>${typeLegendHTML}<div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" id="goalDisplay" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
+  
+  drawChart('gradeChart',k,sel); 
+  $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); 
+  
+  // ✅ Bindings des filtres
+  $$('#legend .legend-item').forEach(el=>el.onclick=()=>updFilt(c,el.dataset.key));
+  if(hasTypes) {
+      $$('#typeLegend .legend-item').forEach(el=>el.onclick=()=>updTypeFilt(c,el.dataset.tkey));
+  }
+  
+  $$('.bar7-row').forEach(el=>{el.onclick=()=>goDaily(c.id,el.dataset.day)});
 
   $('#deadlineInput').onchange = (e) => {
     const val = e.target.value || null;
@@ -837,7 +870,6 @@ function goChapter(id,push=true){
     } else {
       c.deadline = val;
     }
-    // ✅ Invalider le cache pour forcer le recalcul
     delete c._goalCache;
     debouncedSave();
     if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
@@ -871,7 +903,8 @@ function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.set
 
 async function goCards(cid,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
-  const c=getCh(cid), pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']), v=$('#view'); 
+  // ✅ Filtrage par type
+  const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
   v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
 
@@ -998,10 +1031,10 @@ function continueOrNew(cid,queue,mode,push,isCont,extras={}){
 function startRev(cid,push=true,isCont=false){
   if(!cid)return;const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
-  // ✅ Variable locale — ne modifie plus le réglage utilisateur
   let sessionSize = c.settings.sessionSize;
   if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}} sessionSize=c._goalCache.size}
-  let pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
+  // ✅ Filtrage par type
+  let pool=c.cards.filter(x=>cardPassesFilter(x,c.filters));
   if(isCont&&State.review?.queue){const seen=new Set(State.review.queue);pool=pool.filter(x=>!seen.has(x.id))}
   if(!pool.length){alert('Plus de cartes disponibles dans ce filtre.');return}
   c.lastUsed=Date.now();saveData();
@@ -1011,7 +1044,13 @@ function startRev(cid,push=true,isCont=false){
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
   const all=ids.map(_real).filter(Boolean),pool=[];
   const seen=isCont&&State.review?new Set(State.review.queue.map(i=>i.cardId)):new Set();
-  all.forEach(ch=>ch.cards.forEach(c=>{if(flt.grades[c.grade||'unseen']&&!seen.has(c.id))pool.push({chapId:ch.id,card:c})}));
+  // ✅ Filtrage par type dans le mode multi
+  all.forEach(ch=>ch.cards.forEach(c=>{
+      if(!flt.grades[c.grade||'unseen']) return;
+      if(flt.types && c.cardType && !flt.types[c.cardType]) return;
+      if(seen.has(c.id)) return;
+      pool.push({chapId:ch.id,card:c});
+  }));
   if(!pool.length){alert('Plus de cartes disponibles.');return}
   const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
   const scored=pool.map(i=>{const g=i.card.grade||'unseen',base=wt[g]||1,due=i.card.dueAt>0?(Date.now()-i.card.dueAt>0?1+M.min(3,(Date.now()-i.card.dueAt)/864e5):.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w);
@@ -1034,7 +1073,7 @@ function undoRev(){
 const getPreviewTxt=()=>{const s=data.subjects.find(s=>s.title.toLowerCase().includes('physique'))||data.subjects[0],a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>!c.front.includes('<img')&&!c.back.includes('<img'));if(!a.length)return{f:"La constante de Planck",b:"h = 6,626 x 10⁻³⁴ J.s"};const r=a[M.floor(M.random()*a.length)];return{f:r.front.replace(/<br>/g,' '),b:r.back.replace(/<br>/g,' ')}};
 
 function openSet(cid,push=true){
-  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
+  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   const isDark = data.app.theme==='dark'; const prev = getPreviewTxt();
   
   const sCtrl=(sId,subId,addId,valId,val,sfx='')=>`<div class="s-control"><button class="step-btn" id="${subId}">-</button><div class="s-slider-container" style="margin:0 10px;flex:1"><input type="range" class="s-slider" id="${sId}" min="12" max="72" value="${val}"></div><button class="step-btn" id="${addId}">+</button></div>`;
@@ -1120,11 +1159,17 @@ function upgrade(){
     });
     valGrps(s); 
     s.emoji = s.emoji || ''; 
+
+    // ✅ Ajout des filtres type pour les chapitres math qui ont des cartes typées
+    const isMathSub = /math/i.test(s.title || '');
     s.chapters.forEach(c => {
       c.emoji = c.emoji || ''; 
       updChDesc(c); 
       c.stats.dailyLog = c.stats.dailyLog || {}; 
       syncG(c);
+      if(isMathSub && !c.filters.types && c.cards.some(x => x.cardType)) {
+          c.filters.types = MATH_TYPE_FILTERS();
+      }
     });
   });
   ensureMathGrouped();
@@ -1148,6 +1193,9 @@ function ensureMathGrouped(){
     }
     const excludedIds = new Set(mathSub.chapters.filter(isExcluded).map(c => c.id));
     existing.chapIds = existing.chapIds.filter(id => !excludedIds.has(id));
+    // ✅ S'assurer que le groupe a les filtres types
+    if(!existing.filters) existing.filters = { grades: GRADE_FILTERS() };
+    if(!existing.filters.types) existing.filters.types = MATH_TYPE_FILTERS();
   } else {
     grps.push({
       id: 'g-math-all',
@@ -1155,9 +1203,11 @@ function ensureMathGrouped(){
       childGroupIds: [],
       parentGroupId: null,
       createdAt: Date.now(),
-      title: 'Résumé de Cours',
+      title: 'Tous les chapitres',
       emoji: '📖',
-      lastUsed: Date.now()
+      lastUsed: Date.now(),
+      // ✅ Ajout des filtres par défaut lors de la création
+      filters: { grades: GRADE_FILTERS(), types: MATH_TYPE_FILTERS() }
     });
   }
   valGrps(mathSub);
@@ -1264,7 +1314,12 @@ async function startQCM(cid){
 
   if(c.virtual&&c._ids){
     const all=c._ids.map(_real).filter(Boolean),pool=[];
-    all.forEach(ch=>ch.cards.forEach(card=>{if(c.filters.grades[card.grade||'unseen'])pool.push({chapId:ch.id,card})}));
+    // ✅ Filtrage par type (Multi)
+    all.forEach(ch=>ch.cards.forEach(card=>{
+        if(!c.filters.grades[card.grade||'unseen']) return;
+        if(c.filters.types && card.cardType && !c.filters.types[card.cardType]) return;
+        pool.push({chapId:ch.id,card});
+    }));
     if(pool.length<2){alert('Pas assez de cartes.');return}
     if(all.reduce((s,ch)=>s+ch.cards.length,0)<4){alert('Il faut au moins 4 cartes.');return}
     const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
@@ -1273,7 +1328,8 @@ async function startQCM(cid){
     if(cid.startsWith('group-')){const g=findGrp(getSub(),cid.replace('group-',''));if(g){g.lastUsed=Date.now();saveData()}}
     queue=scored.slice(0,sz);mode='multi';multiChaps=c._ids.slice();
   }else{
-    const pool=c.cards.filter(x=>c.filters.grades[x.grade||'unseen']);
+    // ✅ Filtrage par type (Solo)
+    const pool=c.cards.filter(x=>cardPassesFilter(x,c.filters));
     if(pool.length<2){alert('Pas assez de cartes.');return}
     if(c.cards.length<4){alert('Il faut au moins 4 cartes.');return}
     c.lastUsed=Date.now();saveData();
@@ -1376,29 +1432,13 @@ async function syncInBackground() {
   if (FireSync.isConnected) {
     try {
       await FireSync.pullIfNewer();
-      // ✅ Pas de toast — synchronisation silencieuse
     } catch (e) {
       console.warn('[Init] Cloud pull failed:', e);
     }
   }
 }
 
-function loadMathLazy() {
-  fetch('math.md')
-    .then(r => r.ok ? r.text() : '')
-    .then(text => {
-      if (!text) return;
-      dataMATH = parseMathData(text);
-      const mathSub = data.subjects.find(s => s.title.toLowerCase() === 'maths');
-      if (mathSub && dataMATH.length) {
-        reconcile();
-        ensureMathGrouped();
-        saveData();
-        if (State.view === 'deck') goDeck(false);
-      }
-    })
-    .catch(() => console.warn('math.md not found'));
-}
+// ✅ loadMathLazy supprimé car données math RAW_MATH dans data.js
 
 async function init() {
   Media.open();
@@ -1428,7 +1468,7 @@ async function init() {
       }
     }, { timeout: 2000 });
 
-    requestIdleCallback(() => loadMathLazy(), { timeout: 5000 });
+    // ✅ Appel loadMathLazy supprimé
 
     setInterval(saveData, 30000);
 
