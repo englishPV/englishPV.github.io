@@ -1073,7 +1073,7 @@ function undoRev(){
 const getPreviewTxt=()=>{const s=data.subjects.find(s=>s.title.toLowerCase().includes('physique'))||data.subjects[0],a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>!c.front.includes('<img')&&!c.back.includes('<img'));if(!a.length)return{f:"La constante de Planck",b:"h = 6,626 x 10⁻³⁴ J.s"};const r=a[M.floor(M.random()*a.length)];return{f:r.front.replace(/<br>/g,' '),b:r.back.replace(/<br>/g,' ')}};
 
 function openSet(cid,push=true){
-  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); hideRevAct(); const v=$('#view'), P=data.app.prefs;
+  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
   const isDark = data.app.theme==='dark'; const prev = getPreviewTxt();
   
   const sCtrl=(sId,subId,addId,valId,val,sfx='')=>`<div class="s-control"><button class="step-btn" id="${subId}">-</button><div class="s-slider-container" style="margin:0 10px;flex:1"><input type="range" class="s-slider" id="${sId}" min="12" max="72" value="${val}"></div><button class="step-btn" id="${addId}">+</button></div>`;
