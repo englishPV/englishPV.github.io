@@ -1447,13 +1447,20 @@ async function init() {
     data = loadData();
 
     if (data.app?.version !== APP_VER) {
-      // ✅ Supprimer les anciennes maths et reconstruire depuis RAW_MATH
-      data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
       reconcile();
       data.app.version = APP_VER;
       saveData();
-      // ✅ Pousser vers le cloud pour que tout le monde ait les nouvelles cartes
-      if(typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+    }
+
+    // ✅ Reset maths one-shot : change le tag pour forcer un nouveau reset
+    const MATH_RESET_TAG = 'math-reset-2025-06-27-v1';
+    if(data.app._mathReset !== MATH_RESET_TAG) {
+      data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
+      const freshMath = buildMathSub();
+      data.subjects.splice(1, 0, freshMath);
+      data.app._mathReset = MATH_RESET_TAG;
+      saveData();
+      console.log('[MATH RESET] Done — new math chapters loaded');
     }
 
     pruneStats();
