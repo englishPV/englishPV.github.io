@@ -4,17 +4,21 @@ const KEY = 'flashcards9x16_data', APP_VER = '2026-06-26-math-v4';
 const GRADES = ['unseen','echec','difficile','bien','facile'];
 const GRADE_INIT = () => Object.fromEntries(GRADES.map(g=>[g,0]));
 const GRADE_FILTERS = () => Object.fromEntries(GRADES.map(g=>[g,!0]));
+const MATH_TYPES = ['methode','theoreme','calcul'];
+const MATH_TYPE_FILTERS = () => Object.fromEntries(MATH_TYPES.map(t=>[t,!0]));
+const TYPE_COLORS = { methode:'#f59e0b', theoreme:'#3b82f6', calcul:'#22c55e' };
+const TYPE_LABELS = { methode:'Méthode', theoreme:'Théorème', calcul:'Calcul' };
 const GC={unseen:'gray',echec:'red',difficile:'amber',bien:'blue',facile:'green'};
 const GB={echec:'btn--red',difficile:'btn--amber',bien:'btn--blue',facile:'btn--green'};
 
 /* --- DATA MODELS --- */
 let data;
-let dataMATH = [];
+let dataMATH = (typeof RAW_MATH !== 'undefined') ? parseMathData(RAW_MATH) : [];
 const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
 const dataEN = (typeof RAW_EN !== 'undefined') ? parseRaw(RAW_EN) : [];
 const dataPHY = (typeof RAW_PHY !== 'undefined') ? parsePhysicsData(RAW_PHY) : [];
 
-const mkCard=(id,f,b,ms=null)=>({id,front:f,back:b,mathSimple:ms,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0});
+const mkCard=(id,f,b,ms=null,ct=null)=>({id,front:f,back:b,mathSimple:ms,cardType:ct||null,grade:'unseen',timesReviewed:0,lastReviewed:0,lastMs:0,avgMs:0,perfEma:.5,ef:2.5,intervalDays:0,dueAt:0,streak:0,successes:0,failures:0});
 const mkStats=n=>({gradeCounts:{...GRADE_INIT(),unseen:n},totalReviews:0,dailyReviews:{},dailyChanges:{},dailyDurMs:{},dailyDurCount:{},dailyLog:{}});
 const mkSettings=()=>({sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1});
 const mkChapter=(id,title,cards,imp)=>({id,title,description:(getEmoji(title)?getEmoji(title)+' ':'')+title,settings:mkSettings(),filters:{grades:GRADE_FILTERS()},stats:mkStats(cards.length),cards,imported:!!imp});
@@ -106,8 +110,13 @@ function buildChs(l){
   sortedKeys.sort((a, b) => { const idxA = orderMap[a] !== undefined ? orderMap[a] : 999; const idxB = orderMap[b] !== undefined ? orderMap[b] : 999; return idxA - idxB; });
   return {
       chapters: sortedKeys.map(n=>{ 
-          const cds=by[n].map(r=>mkCard(`${slugify(n)}-${r.id}`,r.front,r.back,r.mathSimple||null));
-          return mkChapter('chap-'+slugify(n),n,cds)
+          const cds=by[n].map(r=>mkCard(`${slugify(n)}-${r.id}`,r.front,r.back,r.mathSimple||null,r.cardType||null));
+          const ch = mkChapter('chap-'+slugify(n),n,cds);
+          // ✅ Ajouter les filtres par type si des cartes ont un cardType
+          if(cds.some(c => c.cardType)) {
+              ch.filters.types = MATH_TYPE_FILTERS();
+          }
+          return ch;
       }), 
       app:{currentChapterId:null,theme:'dark',prefs:{fsTerm:22,fsDef:24,accent:'indigo',radius:14}}
   };
@@ -167,7 +176,12 @@ function buildVirt(s,g){
   const chs=allIds.map(id=>s.chapters.find(c=>c.id===id)).filter(Boolean), cards=[];
   chs.forEach(ch=>ch.cards.forEach(c=>cards.push({...c,id:`virt-${ch.id}-${c.id}`,_origin:{chapId:ch.id,cardId:c.id}})));
   const gs = buildGrpStats(s,g);
-  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:allIds,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters:g.filters?deepClone(g.filters):{grades:GRADE_FILTERS()},stats:{gradeCounts:gs.counts,...gs.stats},cards,deadline:g.deadline,lastUsed:g.lastUsed}
+  // ✅ Construire les filtres avec types si des cartes ont un cardType
+  const filters = g.filters ? deepClone(g.filters) : {grades:GRADE_FILTERS()};
+  if(cards.some(c => c.cardType) && !filters.types) {
+      filters.types = MATH_TYPE_FILTERS();
+  }
+  return {id:'group-'+g.id,_groupId:g.id,title:g.title||`Fichier (${grpEmojis(s,g)})`,emoji:g.emoji||'',description:(g.emoji?g.emoji+' ':'')+(g.title||'Fichier'),virtual:!0,_ids:allIds,settings:{sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1},filters,stats:{gradeCounts:gs.counts,...gs.stats},cards,deadline:g.deadline,lastUsed:g.lastUsed}
 }
 
 function addGrp(s,ids,p=null){const u=[...new Set(ids)].filter(Boolean);if(u.length<2)return null;const gid='g'+Date.now().toString(36);ensGrps(s).push({id:gid,chapIds:u,childGroupIds:[],parentGroupId:p||null,createdAt:Date.now(),title:'',emoji:'',lastUsed:Date.now()});if(p){const pg=findGrp(s,p);if(pg){if(!pg.childGroupIds)pg.childGroupIds=[];pg.childGroupIds.push(gid);pg.chapIds=pg.chapIds.filter(id=>!u.includes(id))}}return gid}
