@@ -813,15 +813,12 @@ function bindGlobalSearch() {
   const clearBtn = $('#globalSearchClear');
   if(!input || !results) return;
 
-  // Construire l'index une seule fois (toutes matières, tous chapitres)
   const allCards = [];
   for(const sub of data.subjects) {
     for(const ch of (sub.chapters || [])) {
       const emoji = ch.emoji || getEmoji(ch.title) || '📄';
-      const chTitle = ch.title;
-      const subTitle = sub.title;
       for(const card of ch.cards) {
-        allCards.push({ card, ch, sub, emoji, chTitle, subTitle, chId: ch.id, subId: sub.id });
+        allCards.push({ card, ch, sub, emoji, chId: ch.id, subId: sub.id });
       }
     }
   }
@@ -834,13 +831,7 @@ function bindGlobalSearch() {
     clearTimeout(debounceTimer);
     const q = input.value.trim();
     clearBtn.classList.toggle('hidden', !q);
-
-    if(!q) {
-      results.classList.add('hidden');
-      results.innerHTML = '';
-      return;
-    }
-
+    if(!q) { results.classList.add('hidden'); results.innerHTML = ''; return; }
     debounceTimer = setTimeout(() => doSearch(q), 150);
   };
 
@@ -853,31 +844,27 @@ function bindGlobalSearch() {
     input.focus();
   };
 
-  // Fermer quand on clique ailleurs
   D.addEventListener('click', (e) => {
     if(!e.target.closest('#globalSearch, #globalSearchResults, #globalSearchClear')) {
       results.classList.add('hidden');
     }
   });
 
-  input.onfocus = () => {
-    if(input.value.trim()) doSearch(input.value.trim());
-  };
+  input.onfocus = () => { if(input.value.trim()) doSearch(input.value.trim()); };
 
   function doSearch(q) {
     const cleanQ = norm(q);
     if(cleanQ.length < 2) { results.classList.add('hidden'); return; }
 
+    // Score chaque carte
     const scored = [];
     for(const item of allCards) {
       const front = norm(item.card.front);
       const back = norm(item.card.back);
-
       const fStart = front.startsWith(cleanQ);
       const bStart = back.startsWith(cleanQ);
       const fIn = front.includes(cleanQ);
       const bIn = back.includes(cleanQ);
-
       if(!fIn && !bIn) continue;
 
       let score;
@@ -886,39 +873,82 @@ function bindGlobalSearch() {
       else if(fIn) score = 2;
       else score = 3;
 
-      scored.push({ ...item, score, matchFront: fIn });
+      scored.push({ ...item, score });
     }
 
-    scored.sort((a, b) => a.score - b.score);
-    const top = scored.slice(0, 20);
-
-    if(!top.length) {
+    if(!scored.length) {
       results.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Aucun résultat</div>`;
       results.classList.remove('hidden');
       return;
     }
 
-    results.innerHTML = top.map((item, i) => {
-      const {f, b} = getSides(item.card, item.ch);
-      const frontText = stripHTML(f).substring(0, 80);
-      const backText = stripHTML(b).substring(0, 60);
-      const chLabel = item.chTitle.length > 25 ? item.chTitle.substring(0, 22) + '…' : item.chTitle;
-      const gradeClass = item.card.grade || 'unseen';
+    // Grouper par chapitre
+    const byChap = new Map();
+    for(const item of scored) {
+      const key = item.subId + '/' + item.chId;
+      if(!byChap.has(key)) byChap.set(key, { items: [], bestScore: item.score, ch: item.ch, sub: item.sub, emoji: item.emoji, chId: item.chId, subId: item.subId });
+      const group = byChap.get(key);
+      group.items.push(item);
+      if(item.score < group.bestScore) group.bestScore = item.score;
+    }
 
-      return `<div class="gs-result" data-idx="${i}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s">
-        <div style="font-size:18px;flex-shrink:0;width:28px;text-align:center">${item.emoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${frontText}</div>
-          <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${backText}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
-            <span style="font-size:10px;color:var(--muted)">${chLabel}</span>
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--${GC[gradeClass]});flex-shrink:0"></span>
+    // Trier les groupes : celui avec le meilleur match en premier
+    const sortedGroups = [...byChap.values()].sort((a, b) => {
+      if(a.bestScore !== b.bestScore) return a.bestScore - b.bestScore;
+      return b.items.length - a.items.length;
+    });
+
+    // Limiter à 30 résultats total
+    let totalShown = 0;
+    const maxTotal = 30;
+    const maxPerChap = 5;
+
+    let html = '';
+    const flatResults = [];
+
+    for(const group of sortedGroups) {
+      if(totalShown >= maxTotal) break;
+
+      const chLabel = group.ch.title.length > 30 ? group.ch.title.substring(0, 27) + '…' : group.ch.title;
+      const subLabel = group.sub.title;
+
+      html += `<div style="padding:8px 12px 4px;font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;gap:6px;position:sticky;top:0;background:var(--surface);z-index:1"><span>${group.emoji}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${chLabel}</span><span style="font-weight:400;color:var(--muted);text-transform:none">${subLabel}</span></div>`;
+
+      // Trier les cartes du groupe par score
+      group.items.sort((a, b) => a.score - b.score);
+      const shown = group.items.slice(0, Math.min(maxPerChap, maxTotal - totalShown));
+
+      for(const item of shown) {
+        const {f, b} = getSides(item.card, item.ch);
+        const frontText = stripHTML(f).substring(0, 90);
+        const backText = stripHTML(b).substring(0, 70);
+        const gradeClass = item.card.grade || 'unseen';
+        const idx = flatResults.length;
+        flatResults.push(item);
+
+        html += `<div class="gs-result" data-idx="${idx}" style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px 8px 20px;cursor:pointer;border-bottom:1px solid color-mix(in srgb, var(--border) 50%, transparent);transition:background .1s">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--${GC[gradeClass]});flex-shrink:0;margin-top:6px"></span>
+          <div style="flex:1;min-width:0">
+            <div class="gs-front" style="font-size:13px;font-weight:600">${formatText(frontText)}</div>
+            <div class="gs-back" style="font-size:11px;color:var(--muted);margin-top:2px">${formatText(backText)}</div>
           </div>
-        </div>
-      </div>`;
-    }).join('');
+        </div>`;
+        totalShown++;
+      }
 
+      // Lien "voir tout" si le chapitre a plus de résultats
+      if(group.items.length > maxPerChap) {
+        const moreIdx = flatResults.length;
+        flatResults.push({ _seeAll: true, chId: group.chId, subId: group.subId });
+        html += `<div class="gs-result" data-idx="${moreIdx}" style="padding:6px 12px 8px 20px;cursor:pointer;font-size:11px;color:var(--primary);font-weight:700">+ ${group.items.length - maxPerChap} autres résultats dans ce chapitre →</div>`;
+      }
+    }
+
+    results.innerHTML = html;
     results.classList.remove('hidden');
+
+    // Rendre le LaTeX dans les résultats
+    tsLat(results);
 
     // Bind clicks
     $$('.gs-result', results).forEach(el => {
@@ -926,22 +956,20 @@ function bindGlobalSearch() {
       el.onpointerleave = () => el.style.background = '';
       el.onclick = () => {
         const idx = parseInt(el.dataset.idx);
-        const item = top[idx];
+        const item = flatResults[idx];
         if(!item) return;
 
-        // Changer de matière si nécessaire
-        if(item.subId !== data.app.currentSubjectId) {
-          setSub(item.subId);
-        }
+        const targetSubId = item._seeAll ? item.subId : item.subId;
+        const targetChId = item._seeAll ? item.chId : item.chId;
 
-        // Fermer la recherche
+        if(targetSubId !== data.app.currentSubjectId) setSub(targetSubId);
+
         input.value = '';
         clearBtn.classList.add('hidden');
         results.classList.add('hidden');
         results.innerHTML = '';
 
-        // Naviguer vers les cartes du chapitre
-        goCards(item.chId);
+        goCards(targetChId);
       };
     });
   }
