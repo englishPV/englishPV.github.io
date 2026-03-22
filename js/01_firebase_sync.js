@@ -113,8 +113,7 @@ const FireSync = (() => {
         const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
         if (!cloudData.subjects || !cloudData.app) return false;
 
-         data = cloudData;
-        saveDataLocal();
+          data = cloudData;
         lastPushTime = cloudTime;
 
         if (typeof upgrade === 'function') {
@@ -215,9 +214,7 @@ const FireSync = (() => {
       const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (!cloudData.subjects || !cloudData.app) { console.log('[FireSync] Invalid cloud data'); return; }
 
-     data = cloudData;
-      
-     data = cloudData;
+       data = cloudData;
       
       // ✅ Toujours re-appliquer reconcile après un pull
       if(typeof reconcile === 'function') {
