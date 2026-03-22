@@ -133,9 +133,8 @@ const FireSync = (() => {
 
         if (typeof upgrade === 'function') {
           upgrade(); applyTh(); applyUI();
-          if (typeof State !== 'undefined' && State.view === 'deck') {
-            goDeck(false);
-          }
+          // ✅ Ne PAS re-render — les données sont mises à jour silencieusement
+          // Elles seront appliquées à la prochaine navigation naturelle
         }
 
         // ✅ Repousser vers le cloud avec les maths corrigées
