@@ -7039,81 +7039,56 @@ R: >>> [IMAGE_ID: paste-aa07df7df60e8b1ef18471915ce6f54b1d742344.jpg] <<<
 DECK : MQ MPI
 ==================================================
 
-Q: Qu’est-ce qu’une barrière de potentiel ?
-R: C'est une marche de potentiel d’extension limitée.
->>> [IMAGE_ID: paste-c2bd4b96488b55df53548509aa1162b53e0ba5f4.jpg] <<<
+Q: Comment détermine-t-on la densité de probabilité de présence d’une particule ?
+R: La densité de probabilité de présence de la particule au point \(M\) à l’instant \(t\) est : 
+\(|\Psi(M,t)|^2 = \Psi(M,t)\Psi(M,t)^\ast\).
 --------------------
-Q: Qu’est-ce que l’effet tunnel ? Citer des applications
-R: Dans le cas de l'étude d'une barrière de potentiel : Si la décroissance de la fonction d’onde dans la barrière de potentiel est suffisamment lente, on peut s’attendre à ce que la probabilité de présence soit non nulle de l’autre côté de la barrière (une particule quantique a donc la possibilité de traverser la barrière de potentiel) : c’est l’effet tunnel.
-Applications : microscope à effet tunnel, radioactivité alpha
->>> [IMAGE_ID: paste-4a85ca8e92e755c5fcbea42714506c4c37d0a7e9.jpg] <<<
+Q: Comment s’écrit l’équation de Schrödinger à une dimension ?
+R: \(i\hbar \frac{\partial \Psi(x,t)}{\partial t} = - \frac{\hbar^2}{2m} \frac{\partial^2 \Psi(x,t)}{\partial x^2} + V(x)\Psi(x,t)\)
+où \(\hbar\) est la constante de Planck réduite : \(\hbar = \frac{h}{2 \pi} =1,05.10^{-34}J\cdot s^{-1}\)
 --------------------
-Q: Quel est l’influence de la largeur et de la hauteur de la barrière de potentiel sur l’effet tunnel ?
-R: La probabilité de transmission diminue très rapidement lorsque:
-- la largeur de la barrière augmente,
-- la hauteur de la barrière vue par la particule soit \(V_0-E\) augmente
+Q: Comment s’écrit l’équation de Schrödinger indépendante du temps ?
+R: \(- \frac{\hbar^2}{2m} \frac{d^2 \varphi(x)}{dx^2}+V(x) \varphi (x)=E \varphi(x) \)
 --------------------
-Q: Comment se comporte une particule quantique lorsqu'elle rencontre la marche de potentiel ?
-R: Pour E>V0 :
->>> [IMAGE_ID: paste-238eaf4ac206714e0288ba0a46d07211430b993d.jpg] <<<
-Dans la zone I, la fonction d’onde est la superposition d’une OPPM incidente et d’une OPPM réfléchie.
-Dans la zone II, il s'agit d'une OPPM transmise. Contrairement à la particule classique, la particule quantique a une probabilité non nulle de se réfléchir sur la marche, et cette probabilité est d'autant plus importante que l'énergie de E est proche de V0.
-Pour 0<E<V0 :
->>> [IMAGE_ID: paste-2bbc4d9da7acd5186a02712131f447d2e993dfe0.jpg] <<<
-Dans la zone I, la fonction d’onde est la superposition d’une OPPM incidente et d’une OPPM
-réfléchie.
-Pour E<V0, dans la zone II, il s’agit d’une onde évanescente, et la densité de
-probabilité de présence dans la zone II n’est donc pas rigoureusement nulle au-delà de la marche. Cela signifie que la mesure de la position de la particule peut conduire à une valeur positive de son abscisse, contrairement aux prévisions classiques.
+Q: Comment s’écrit la fonction d’onde d’un état stationnaire ?
+R: \(\Psi(x,t) = f(t) \cdot  \varphi(x)\) avec \(f(t) = exp (-i\frac{E}{\hbar} t)\)
+Où \(f(t)\) et \(\varphi(x)\) sont des fonctions à valeurs complexes.
+Considérons une particule qui ne peut se manifester que sur l’axe \((Ox)\) et qui est soumise à un potentiel \(V(x)\) qui ne dépend pas du temps.
+Une telle particule possède des états pour lesquels son énergie est bien définie (indépendante du temps) : on les appelle états stationnaires.
+La partie spatiale de la fonction d’onde \(\varphi(x)\) vérifie l’équation de Schrödinger
+indépendante du temps : 
+\(- \frac{\hbar^2}{2m} \frac{d^2 \varphi(x)}{dx^2}+V(x) \varphi (x)=E \varphi(x) \)
 --------------------
-Q: Quelles sont les conditions de continuité de la fonction d’onde ?
-R: >>> [IMAGE_ID: paste-503d75a14b6c2d0987b9d12926bcc2d01e1db8da.jpg] <<<
+Q: Comment s’écrit la relation de Planck-Einstein ?
+R: \(E = h\nu = \hbar \omega\)
 --------------------
-Q: Comment établir les solutions de l’équation de Schrödinger indépendante du temps dans le cas d’une particule
-incidente sur une marche de potentiel ? Exploiter les conditions de continuité de la fonction d’onde.
-R: Déja le potentiel est constant égale à [latex]$V_0$[/latex], l’équation de Schrödinger devient [latex]$ \frac{d^{2}\varphi}{dx^2}  + \frac{2m(E-V_0)}{\bar{h}^2} \varphi(x) = 0 $[/latex]
-Dans la cas oû [latex]$E>V_0$[/latex] 
-dans la région 1 
-la solution de l’équation de Schrödinger est de la forme 
-[latex]$\varphi_1(x) = A_1\exp(ik_1 x) + B_1\exp(-ik_1 x)$[/latex] avec  [latex]$ k_1 = \frac{\sqrt{2mE}}{\bar{h}} $[/latex]
-dans la région 2
-[latex]$\varphi_2 (x) = A_2\exp(ik_2 x) + B_2\exp(-ik_2 x)$[/latex] avec  [latex]$ k_2 = \frac{\sqrt{2m(E-V_0)}}{\bar{h}} $[/latex]
-puis on sait que [latex]$\psi(x) = f(t)\varphi(x)$[/latex] avec \(f(t)=exp(-i \frac{E}{\hslash} t)=exp(-i\omega t)\)
-donc
- [latex]$\psi_1 (x) = A_1\exp(-i(wt-k_1 x) + B_1\exp(-i(wt+k_1 x)$[/latex] 
- [latex]$\psi_2 (x) = A_2\exp(-i(wt-k_1 x)  $[/latex] 
-Remarque : le terme [latex]$B_2\exp(-i(wt+k_1 x) $[/latex] est impossible car c'est une onde qui se propage selon [latex]$-u_x$[/latex] alors qu'il n'existe aucune source qui peut être à l'origine de cette onde ni aucun obstacle de potentiel.
-Maintenant on va exploiter les condition de continuité de la fonction d'onde 
-[latex]$\varphi_1 (x=0) = \varphi_2(x=0) \rightarrow A_1+B_1=A_2$[/latex]
-[latex]$\varphi_1' (x=0) = \varphi_2'(x=0) \rightarrow A_1-B_1=\frac{k_2}{k_1}A_2$[/latex]
-on trouve alors 
-[latex]$A_2= \frac{2k_1}{k_1+k_2}A_1$[/latex]
-[latex]$B_1= \frac{k_1-k_2}{k_1+k_2}A_1$[/latex]
-on choisit [latex]$A_1=1$[/latex] et on retrouve 
->>> [IMAGE_ID: paste-e01397cac5a386e78f0e6b82d32827ed48f4a333.jpg] <<<
-Dans le cas oû [latex]$E<V_0$[/latex]
-la solution de l’équation de Schrödinger est de la forme:
-dans la zone 1 x<0
-[latex]$\varphi_1(x) = A_1\exp(ik_1 x) + B_1\exp(-ik_1 x)$[/latex] avec  [latex]$ k_1 = \frac{\sqrt{2mE}}{\bar{h}} $[/latex]
-dans la zone 2 x>0
-[latex]$\varphi_2 (x) = B_2\exp(-qx)$[/latex] avec  [latex]$ q = \frac{\sqrt{2m(V_0-E)}}{\bar{h}} $[/latex] 
-Rem: Pas de terme en [latex]$ B_1\exp(qx)$[/latex] qui diverge quand \(x \rightarrow +\infty \)
-par analogie avec ce qu'on a trouvé dans le cas [latex]$E>V_0$[/latex]  (en remplaçant donc \(ik_2\) par \(-q\) soit \(k_2\) par \(iq\)),on retrouve  
->>> [IMAGE_ID: paste-e9426f4c38c2a8f19999e41c811cffd47d29ef9f.jpg] <<<
+Q: Comment s’écrit la relation de De Broglie ?
+R: \(p = \hbar k\)
 --------------------
-Q: Que peut-on dire de l’énergie de la particule confinée? Que vaut son énergie lorsqu’elle est dans son état fondamental ?
-R: >>> [IMAGE_ID: paste-4f63251a51c64707992844072d2e4e1ac1823f1f.jpg] <<<
+Q: Quelles sont les formules de \(E\), \(p\) et \(k\) valable pour une onde de matière et/ou pour un photon dans le vide ?
+R: pour une onde de matière  et un photon dans le vide:
+\(E = \hbar \omega\)
+\(p = \hbar k = \frac{h}{\lambda}\) 
+Pour un photon dans le vide uniquement:
+\(k = \frac{\omega}{c}\) 
+\(E = \frac{hc}{\lambda}\)
 --------------------
-Q: Les solutions de l’équation de Schrödinger dans le cas d’états stationnaires d’une particule de masse \(m\) dans un puits de potentiel infini de largeur \(a\)?
-R: >>> [IMAGE_ID: paste-a1fb0088b24b8e2d826cf21403e2df150910cbcc.jpg] <<<
+Q: Qu’est-ce qu’un paquet d’onde ?
+R: Un paquet d’ondes, superposition d’ondes de De Broglie de vecteur d’onde moyen \(k_0\) et dont les
+vecteurs d’onde sont dans l’intervalle étroit de largeur \(\Delta k\) autour de \(k_0\), décrit un état de la particule
+localisée sur une distance \(\Delta x\) telle que :
+\(\Delta x \cdot \Delta k \approx 1\)
+se déplaçant à la vitesse : \(vg = \frac{\hbar k_0}{m}\)
+égale à la vitesse de la particule quand sa quantité de mouvement est
+\(p_0 = \hbar k_0\)
 --------------------
-Q: Ordre de grandeur de l'énergie de confinement ?
-R: [$]E_{min} \approx \frac{\hbar ^2}{2ma^2} [/$]
+Q: Comment s’écrit l’inégalité d’Heisenberg spatiale ? Comment s’interprète cette inégalité?
+R: \(\Delta p \cdot \Delta x \geqslant \frac{\hbar}{2}\)
+\(\Delta x\) est l’incertitude sur la position de la particule (i.e. l’extension spatiale du paquet d’ondes)
+\(\Delta p\) est l’incertitude sur la quantité de mouvement de la particule.
 --------------------
-Q: Montrer, en prenant l’exemple simple du cours, qu’une superposition de deux états stationnaires (caractérisé par les fonctions d’onde d’énergie respectivement Er et Es) engendre une évolution au cours du temps de l’état de la particule.
-R: [$]\psi(x,t) = \lambda_1 e^{-i\frac{E_r}{\hbar}t}\varphi_r(x) + \lambda_2 e^{-i\frac{E_s}{\hbar}t}\varphi_s(x)[/$]
-La densité de probabilité de présence associée cet état de la particule s’écrit :
-[$]|\psi(x,t)|^2 = |\lambda_1 \lambda_2| (|\varphi_r(x)|^2 + |\varphi_s(x)|^2 + 2\varphi_r(x)\varphi_s(x)\cos(\frac{E_s - E_r}{\hbar}t))[/$]
-On remarque que la densité de probabilité de présence dépend explicitement du temps : l’état de la particule n’est donc pas stationnaire, il évolue au cours du temps.
+Q: Qu'est-ce qu'une particule libre?
+R: [latex]Une particule qui évolue sans subir d'interaction: $\forall x \in]-\infty,+\infty[,V(x)=0$[/latex]
 --------------------
 
 
