@@ -920,17 +920,15 @@ function bindGlobalSearch() {
 
       for(const item of shown) {
         const {f, b} = getSides(item.card, item.ch);
-        const frontText = stripHTML(f).substring(0, 90);
-        const backText = stripHTML(b).substring(0, 70);
         const gradeClass = item.card.grade || 'unseen';
         const idx = flatResults.length;
         flatResults.push(item);
 
         html += `<div class="gs-result" data-idx="${idx}" style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px 8px 20px;cursor:pointer;border-bottom:1px solid color-mix(in srgb, var(--border) 50%, transparent);transition:background .1s">
           <span style="width:7px;height:7px;border-radius:50%;background:var(--${GC[gradeClass]});flex-shrink:0;margin-top:6px"></span>
-          <div style="flex:1;min-width:0">
-            <div class="gs-front" style="font-size:13px;font-weight:600">${formatText(frontText)}</div>
-            <div class="gs-back" style="font-size:11px;color:var(--muted);margin-top:2px">${formatText(backText)}</div>
+          <div style="flex:1;min-width:0;overflow:hidden">
+            <div class="gs-front" style="font-size:13px;font-weight:600;max-height:40px;overflow:hidden">${formatText(f)}</div>
+            <div class="gs-back" style="font-size:11px;color:var(--muted);margin-top:2px;max-height:32px;overflow:hidden">${formatText(b)}</div>
           </div>
         </div>`;
         totalShown++;
