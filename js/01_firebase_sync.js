@@ -113,32 +113,16 @@ const FireSync = (() => {
         const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
         if (!cloudData.subjects || !cloudData.app) return false;
 
-        data = cloudData;
-        
-        // ✅ Après pull cloud, re-appliquer le reset maths si nécessaire
-        const MATH_RESET_TAG_SYNC = 'math-reset-2025-06-27-v1';
-        if(data.app._mathReset !== MATH_RESET_TAG_SYNC) {
-          data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
-          if(typeof buildMathSub === 'function') {
-            const freshMath = buildMathSub();
-            data.subjects.splice(1, 0, freshMath);
-          }
-          data.app._mathReset = MATH_RESET_TAG_SYNC;
-          if(typeof upgrade === 'function') upgrade();
-          console.log('[FireSync] Math reset applied after cloud pull');
-        }
-        
+         data = cloudData;
         saveDataLocal();
         lastPushTime = cloudTime;
 
-                if (typeof upgrade === 'function') {
-          // ✅ Re-appliquer reconcile pour forcer les cartes canoniques à jour
+        if (typeof upgrade === 'function') {
           if(typeof reconcile === 'function') {
             reconcile();
             data.app.version = typeof APP_VER !== 'undefined' ? APP_VER : data.app.version;
           }
           
-          // ✅ Re-appliquer le reset maths si nécessaire
           const MATH_RESET_TAG_SYNC = 'math-reset-2025-06-27-v1';
           if(data.app._mathReset !== MATH_RESET_TAG_SYNC) {
             data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
@@ -152,11 +136,7 @@ const FireSync = (() => {
           upgrade(); applyTh(); applyUI();
           saveDataLocal();
         }
-        
-        // ✅ Repousser les données réconciliées vers le cloud
-        setTimeout(() => pushToCloud(), 2000);
 
-        // ✅ Repousser vers le cloud avec les maths corrigées
         setTimeout(() => pushToCloud(), 2000);
 
         console.log('[FireSync] Cloud data loaded');
