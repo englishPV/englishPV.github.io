@@ -267,6 +267,26 @@ img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-r
   margin-bottom: 6px;
   line-height: 1.6;
 }
+/* Global search results */
+.gs-result:last-child {
+  border-bottom: none;
+}
+
+.gs-result:active {
+  background: rgba(255, 255, 255, .1) !important;
+}
+
+[data-theme="light"] .gs-result:hover {
+  background: rgba(0, 0, 0, .04) !important;
+}
+
+#globalSearchResults {
+  scrollbar-width: none;
+}
+
+#globalSearchResults::-webkit-scrollbar {
+  display: none;
+}
 /* Sync button animation */
 #syncBtn.syncing { animation: spin-sync 1s linear infinite; }
 @keyframes spin-sync { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
