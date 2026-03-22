@@ -330,7 +330,7 @@ function goDeck(push=true){
   const v=$('#view');
   const items = buildDeckItems(s, null, 0);
   
-  v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
+    v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div style="position:relative;margin-bottom:6px"><input type="text" id="globalSearch" class="input" placeholder="🔍 Rechercher une carte..." autocomplete="off" spellcheck="false" style="padding-right:32px"><button id="globalSearchClear" class="hidden" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:0 0;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px">✕</button><div id="globalSearchResults" class="hidden" style="position:absolute;top:100%;left:0;right:0;z-index:50;max-height:60vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius-md) var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.3)"></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
   const listEl = $('#deckList');
   listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
   const impBtn = $('#impB');
@@ -342,8 +342,9 @@ function goDeck(push=true){
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
   
-  if(selectionMode) renderFABs();
+    if(selectionMode) renderFABs();
   bindDeckNew();
+  bindGlobalSearch();
 }
 
 function buildDeckItems(s, parentGid, depth) {
@@ -806,7 +807,149 @@ function bindDeckNew() {
     l.removeEventListener('pointercancel', onPointerCancel);
   };
 }
+function bindGlobalSearch() {
+  const input = $('#globalSearch');
+  const results = $('#globalSearchResults');
+  const clearBtn = $('#globalSearchClear');
+  if(!input || !results) return;
 
+  // Construire l'index une seule fois (toutes matières, tous chapitres)
+  const allCards = [];
+  for(const sub of data.subjects) {
+    for(const ch of (sub.chapters || [])) {
+      const emoji = ch.emoji || getEmoji(ch.title) || '📄';
+      const chTitle = ch.title;
+      const subTitle = sub.title;
+      for(const card of ch.cards) {
+        allCards.push({ card, ch, sub, emoji, chTitle, subTitle, chId: ch.id, subId: sub.id });
+      }
+    }
+  }
+
+  const norm = s => (s||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/<[^>]+>/g,'').replace(/&[^;]+;/g,' ');
+
+  let debounceTimer = null;
+
+  input.oninput = () => {
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    clearBtn.classList.toggle('hidden', !q);
+
+    if(!q) {
+      results.classList.add('hidden');
+      results.innerHTML = '';
+      return;
+    }
+
+    debounceTimer = setTimeout(() => doSearch(q), 150);
+  };
+
+  clearBtn.onclick = (e) => {
+    e.stopPropagation();
+    input.value = '';
+    clearBtn.classList.add('hidden');
+    results.classList.add('hidden');
+    results.innerHTML = '';
+    input.focus();
+  };
+
+  // Fermer quand on clique ailleurs
+  D.addEventListener('click', (e) => {
+    if(!e.target.closest('#globalSearch, #globalSearchResults, #globalSearchClear')) {
+      results.classList.add('hidden');
+    }
+  });
+
+  input.onfocus = () => {
+    if(input.value.trim()) doSearch(input.value.trim());
+  };
+
+  function doSearch(q) {
+    const cleanQ = norm(q);
+    if(cleanQ.length < 2) { results.classList.add('hidden'); return; }
+
+    const scored = [];
+    for(const item of allCards) {
+      const front = norm(item.card.front);
+      const back = norm(item.card.back);
+
+      const fStart = front.startsWith(cleanQ);
+      const bStart = back.startsWith(cleanQ);
+      const fIn = front.includes(cleanQ);
+      const bIn = back.includes(cleanQ);
+
+      if(!fIn && !bIn) continue;
+
+      let score;
+      if(fStart) score = 0;
+      else if(bStart) score = 1;
+      else if(fIn) score = 2;
+      else score = 3;
+
+      scored.push({ ...item, score, matchFront: fIn });
+    }
+
+    scored.sort((a, b) => a.score - b.score);
+    const top = scored.slice(0, 20);
+
+    if(!top.length) {
+      results.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Aucun résultat</div>`;
+      results.classList.remove('hidden');
+      return;
+    }
+
+    results.innerHTML = top.map((item, i) => {
+      const {f, b} = getSides(item.card, item.ch);
+      const frontText = stripHTML(f).substring(0, 80);
+      const backText = stripHTML(b).substring(0, 60);
+      const chLabel = item.chTitle.length > 25 ? item.chTitle.substring(0, 22) + '…' : item.chTitle;
+      const gradeClass = item.card.grade || 'unseen';
+
+      return `<div class="gs-result" data-idx="${i}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s">
+        <div style="font-size:18px;flex-shrink:0;width:28px;text-align:center">${item.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${frontText}</div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${backText}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+            <span style="font-size:10px;color:var(--muted)">${chLabel}</span>
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--${GC[gradeClass]});flex-shrink:0"></span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    results.classList.remove('hidden');
+
+    // Bind clicks
+    $$('.gs-result', results).forEach(el => {
+      el.onpointerenter = () => el.style.background = 'rgba(255,255,255,.06)';
+      el.onpointerleave = () => el.style.background = '';
+      el.onclick = () => {
+        const idx = parseInt(el.dataset.idx);
+        const item = top[idx];
+        if(!item) return;
+
+        // Changer de matière si nécessaire
+        if(item.subId !== data.app.currentSubjectId) {
+          setSub(item.subId);
+        }
+
+        // Fermer la recherche
+        input.value = '';
+        clearBtn.classList.add('hidden');
+        results.classList.add('hidden');
+        results.innerHTML = '';
+
+        // Naviguer vers les cartes du chapitre
+        goCards(item.chId);
+      };
+    });
+  }
+}
+
+function stripHTML(s) {
+  return (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+}
 function openGrp(s, gid) {
   const scrollEl = $('#dL');
   const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
