@@ -471,7 +471,7 @@ function renderDeckItem(item, s) {
       <div class="slide">
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-         <div class="deck-title"><span class="deck-title-wrap" style="${tint?'background:'+tint:''}">${title}</span></div>
+                   <div class="deck-title">${title}</div>
           <div class="deck-sub">
             <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
             <span>${pct}%</span>
@@ -508,7 +508,7 @@ function renderDeckItem(item, s) {
         ${selectBox}
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-          <div class="deck-title"><span class="deck-title-wrap" style="${tint?'background:'+tint:''}">${c.title}</span></div>
+                    <div class="deck-title">${c.title}</div>
           <div class="deck-sub">
             <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
             <span>${pct}%</span>
@@ -1231,7 +1231,7 @@ function openCardEditor(chapter, existingCard, onSave) {
   overlay.innerHTML = `<div class="card-editor">
     <div class="card-editor-header">
       <h3>${isEdit ? 'Modifier' : 'Nouvelle carte'}</h3>
-      <button class="btn btn--ghost btn--tiny" id="ceClose" style="width:auto;padding:8px 12px;font-size:16px">✕</button>
+            <button class="ce-close-btn" id="ceClose">✕</button>
     </div>
     <div class="card-editor-body">
       <div class="editor-face-tabs">
