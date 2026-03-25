@@ -1594,33 +1594,61 @@ function reconcile(){
   o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); 
   if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id 
 }
-function upgrade(){ 
-  if(!data.app) data.app = {theme:'dark'}; 
-  data.app.prefs = {fsTerm:22, fsDef:24, accent:'indigo', radius:14, ...(data.app.prefs||{})}; 
-  if(data.app.prefs.mathDetail === undefined) data.app.prefs.mathDetail = false;
-  if(!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
+function upgrade() {
+  // 1. Initialisation des préférences de base
+  if (!data.app) data.app = { theme: 'dark' };
+  data.app.prefs = { fsTerm: 22, fsDef: 24, accent: 'indigo', radius: 14, ...(data.app.prefs || {}) };
+  
+  if (data.app.prefs.mathDetail === undefined) data.app.prefs.mathDetail = false;
+  if (!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
+
+  // ── Migration SM-2 → FSRS (Le nouveau bloc à ajouter ici) ──
+  if (!data.app._fsrsMigrated) {
+    data.subjects.forEach(s => {
+      (s.chapters || []).forEach(ch => {
+        ch.cards.forEach(card => {
+          if (card.timesReviewed > 0 && !card.stability) {
+            // Estimer la stabilité à partir de l'ancien intervalDays
+            card.stability = Math.max(0.5, card.intervalDays || 1);
+            // Convertir ef en difficulté FSRS (1-10)
+            const ef = card.ef || 2.5;
+            // Utilisation de Math.min(Math.max()) si clamp n'est pas défini globalement
+            card.difficulty = Math.min(Math.max(Math.round((3.5 - ef) / 0.2), 1), 10);
+          }
+        });
+      });
+    });
+    data.app._fsrsMigrated = true;
+    if (typeof saveData === 'function') saveData(); // Sauvegarde les changements
+    console.log('[FSRS] Migration SM-2 → FSRS completed');
+  }
+
+  // 2. Mise à jour des structures de données existantes
   data.subjects.forEach(s => {
     ensGrps(s).forEach(g => {
-      if(!g.childGroupIds) g.childGroupIds =[];
-      if(!g.parentGroupId) g.parentGroupId = null;
-      if(!g.chapIds) g.chapIds =[];
+      if (!g.childGroupIds) g.childGroupIds = [];
+      if (!g.parentGroupId) g.parentGroupId = null;
+      if (!g.chapIds) g.chapIds = [];
     });
-    valGrps(s); 
-    s.emoji = s.emoji || ''; 
+    valGrps(s);
+    s.emoji = s.emoji || '';
 
-    // ✅ Ajout des filtres type pour les chapitres math qui ont des cartes typées
+    // Ajout des filtres type pour les chapitres math
     const isMathSub = /math/i.test(s.title || '');
     s.chapters.forEach(c => {
-      c.emoji = c.emoji || ''; 
-      updChDesc(c); 
-      c.stats.dailyLog = c.stats.dailyLog || {}; 
+      c.emoji = c.emoji || '';
+      updChDesc(c);
+      c.stats.dailyLog = c.stats.dailyLog || {};
       syncG(c);
-      if(isMathSub && !c.filters.types && c.cards.some(x => x.cardType)) {
+      if (isMathSub && !c.filters.types && c.cards.some(x => x.cardType)) {
+        if (typeof MATH_TYPE_FILTERS === 'function') {
           c.filters.types = MATH_TYPE_FILTERS();
+        }
       }
     });
   });
-  ensureMathGrouped();
+
+  if (typeof ensureMathGrouped === 'function') ensureMathGrouped();
 }
 
 function ensureMathGrouped(){
