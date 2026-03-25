@@ -738,8 +738,10 @@ function bindDeckNew() {
   const onPointerMove = e => {
     if(!pressedEl) return;
     const dx = e.clientX - startX, dy = e.clientY - startY;
+    const dist = M.hypot(dx, dy);
     
-    if(!dragging && M.hypot(dx, dy) > 15) { clearTimeout(longPressTimer); return; }
+    // ← CORRECTION : annuler long-press seulement si mouvement significatif
+    if(!dragging && dist > 20) { clearTimeout(longPressTimer); }
     
     if(dragging) {
       e.preventDefault();
@@ -789,15 +791,16 @@ function bindDeckNew() {
       return;
     }
     
-    if(!pressedEl || didLongPress) { pressedEl = null; return; }
+    if(!pressedEl || didLongPress) { pressedEl = null; didLongPress = false; return; }
     
     const item = pressedEl;
     pressedEl = null;
     
     if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
     
+    // ← CORRECTION : seuil plus tolérant pour mobile (30px au lieu de 15px)
     const dx = e.clientX - startX, dy = e.clientY - startY;
-    if(M.hypot(dx, dy) > 15) return;
+    if(M.hypot(dx, dy) > 30) return;
     
     const type = item.dataset.type;
     const id = item.dataset.id;
