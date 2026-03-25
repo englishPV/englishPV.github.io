@@ -106,6 +106,22 @@ const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), re
 function renSubMenu(){
   let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
   m.innerHTML=data.subjects.map(s=>`<div class="subject-item" data-id="${s.id}"><div class="name">${s.emoji?s.emoji+' ':''}${s.title}</div><div class="meta">${s.chapters?.length||0} chap.</div>${s.id===data.app.currentSubjectId?'<div class="muted">✓</div>':''}<div class="subject-actions"><button class="btn btn--tiny rs">✏️</button>${!(s.chapters?.length)?'<button class="btn btn--tiny ds">🗑️</button>':''}</div></div>`).join('');
+    // ✅ Bouton créer matière
+  m.innerHTML += `<div class="add-subject-btn" id="addSubjectBtn">+ Nouvelle matière</div>`;
+  $('#addSubjectBtn', m).onclick = (e) => {
+    e.stopPropagation();
+    const title = prompt('Nom de la matière :');
+    if(!title || !title.trim()) return;
+    const emoji = prompt('Emoji (optionnel) :', '') || '';
+    const newSub = { id: 'sub-' + slugify(title) + '-' + Date.now(), title: title.trim(), emoji: emoji.trim(), chapters: [], groups: [], imported: false };
+    data.subjects.push(newSub);
+    data.app.currentSubjectId = newSub.id;
+    saveData();
+    closeSubMenu();
+    goDeck(false);
+    toast('Matière créée !', 'success');
+  };
+
   $$('.subject-item',m).forEach(el=>{
     el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
     const r=el.querySelector('.rs'); if(r)r.onclick=e=>{e.stopPropagation();const id=el.dataset.id,s=data.subjects.find(x=>x.id===id),t=prompt('Nom:',s.title);if(t){renSub(id,t,prompt('Emoji:',s.emoji));renSubMenu();setTop({title:`Deck • ${getSub().title}`});goDeck(!1)}};
@@ -331,8 +347,19 @@ function goDeck(push=true){
   const items = buildDeckItems(s, null, 0);
   
     v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div style="position:relative;margin-bottom:6px"><input type="text" id="globalSearch" class="input" placeholder="🔍 Rechercher une carte..." autocomplete="off" spellcheck="false" style="padding-right:32px"><button id="globalSearchClear" class="hidden" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:0 0;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px">✕</button><div id="globalSearchResults" class="hidden" style="position:absolute;top:100%;left:0;right:0;z-index:50;max-height:60vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius-md) var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.3)"></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
-  const listEl = $('#deckList');
-  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
+    const listEl = $('#deckList');
+  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') + `<button class="add-chapter-btn" id="addChapterBtn">+ Nouveau chapitre</button>`;
+  
+  $('#addChapterBtn').onclick = () => {
+    const title = prompt('Nom du chapitre :');
+    if(!title || !title.trim()) return;
+    const sub = getSub();
+    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(), []);
+    sub.chapters.push(ch);
+    saveData();
+    goDeck(false);
+    toast('Chapitre créé !', 'success');
+  };
   const impBtn = $('#impB');
   const impInput = $('#impI');
   if (impBtn && impInput) { impBtn.onclick = () => impInput.click(); }
@@ -428,7 +455,7 @@ function renderDeckItem(item, s) {
       <div class="slide">
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-          <div class="deck-title">${title}</div>
+         <div class="deck-title"><span class="deck-title-wrap" style="${tint?'background:'+tint:''}">${title}</span></div>
           <div class="deck-sub">
             <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
             <span>${pct}%</span>
@@ -458,13 +485,13 @@ function renderDeckItem(item, s) {
       selectBox = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
     }
     
-    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}" style="${tint?'background-color:'+tint:''}">
+    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
       ${c.imported?'<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
       <div class="slide">
         ${selectBox}
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-          <div class="deck-title">${c.title}</div>
+          <div class="deck-title"><span class="deck-title-wrap" style="${tint?'background:'+tint:''}">${c.title}</span></div>
           <div class="deck-sub">
             <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
             <span>${pct}%</span>
@@ -1075,8 +1102,7 @@ async function goCards(cid,push=true){
   // ✅ Filtrage par type
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-  v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div class="section-title">Cartes (${pool.length})</div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
-
+    v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:6px 14px">+ Carte</button></div><div style="margin:8px 0 10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
     let filtered = [];
@@ -1107,10 +1133,176 @@ async function goCards(cid,push=true){
     await tsLat(grid);
   };
   await renderCards(); 
-  $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+    $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+  
+  $('#addCardBtn').onclick = () => openCardEditor(c, null, () => {
+    // Refresh après ajout
+    goCards(cid, false);
+  });
   $('#cardsGrid').onclick=e=>{ const b=e.target.closest('.card-block'); if(b){ $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')}); b.classList.toggle('flipped'); } };
 }
+function openCardEditor(chapter, existingCard, onSave) {
+  // Fermer si déjà ouvert
+  $$('.card-editor-overlay').forEach(el => el.remove());
 
+  const isEdit = !!existingCard;
+  const frontInit = isEdit ? existingCard.front.replace(/<br\s*\/?>/gi, '\n') : '';
+  const backInit = isEdit ? existingCard.back.replace(/<br\s*\/?>/gi, '\n') : '';
+
+  const overlay = D.createElement('div');
+  overlay.className = 'card-editor-overlay';
+
+  const latexBtns = [
+    { label: '𝑥²', insert: '$x^{2}$' },
+    { label: '√', insert: '$\\sqrt{}$', cursor: -2 },
+    { label: 'frac', insert: '$\\frac{}{}$', cursor: -4 },
+    { label: 'Σ', insert: '$\\sum_{n=0}^{+\\infty}$' },
+    { label: '∫', insert: '$\\int_{a}^{b}$' },
+    { label: 'lim', insert: '$\\lim_{n \\to +\\infty}$' },
+    { label: '→', insert: '$\\to$' },
+    { label: '≤', insert: '$\\leq$' },
+    { label: '≥', insert: '$\\geq$' },
+    { label: '≠', insert: '$\\neq$' },
+    { label: '∈', insert: '$\\in$' },
+    { label: '⊂', insert: '$\\subset$' },
+    { label: '∀', insert: '$\\forall$' },
+    { label: '∃', insert: '$\\exists$' },
+    { label: 'ℝ', insert: '$\\mathbb{R}$' },
+    { label: 'α', insert: '$\\alpha$' },
+    { label: 'β', insert: '$\\beta$' },
+    { label: '$…$', insert: '$$', cursor: -1 },
+    { label: '$$…$$', insert: '$$$$', cursor: -2 },
+  ];
+
+  const toolbarHTML = `<div class="latex-toolbar">${latexBtns.map((b, i) => 
+    `<button class="latex-btn" data-idx="${i}" title="${b.insert}">${b.label}</button>`
+  ).join('')}</div>`;
+
+  overlay.innerHTML = `<div class="card-editor">
+    <div class="card-editor-header">
+      <h3>${isEdit ? 'Modifier la carte' : 'Nouvelle carte'}</h3>
+      <button class="btn btn--ghost btn--tiny" id="ceClose" style="width:auto">✕</button>
+    </div>
+    <div class="card-editor-body">
+      <div class="card-editor-field">
+        <label>Recto (Question)</label>
+        ${toolbarHTML}
+        <textarea id="ceFront" placeholder="Ex: Quelle est la dérivée de $e^x$ ?">${frontInit}</textarea>
+        <div class="card-editor-preview" id="ceFrontPreview"></div>
+      </div>
+      <div class="card-editor-field">
+        <label>Verso (Réponse)</label>
+        <textarea id="ceBack" placeholder="Ex: $\\frac{d}{dx} e^x = e^x$">${backInit}</textarea>
+        <div class="card-editor-preview" id="ceBackPreview"></div>
+      </div>
+    </div>
+    <div class="card-editor-footer">
+      <button class="btn btn--ghost" id="ceCancel">Annuler</button>
+      <button class="btn btn--solid btn--primary" id="ceSave">${isEdit ? 'Modifier' : 'Ajouter'}</button>
+    </div>
+  </div>`;
+
+  D.body.appendChild(overlay);
+
+  const frontTA = $('#ceFront');
+  const backTA = $('#ceBack');
+  const frontPrev = $('#ceFrontPreview');
+  const backPrev = $('#ceBackPreview');
+  let activeTA = frontTA;
+
+  // Focus tracking
+  frontTA.onfocus = () => activeTA = frontTA;
+  backTA.onfocus = () => activeTA = backTA;
+
+  // Toolbar buttons
+  $$('.latex-btn', overlay).forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const idx = parseInt(btn.dataset.idx);
+      const b = latexBtns[idx];
+      const ta = activeTA;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const text = ta.value;
+      const selected = text.substring(start, end);
+      
+      let insertText = b.insert;
+      let newCursor = start + insertText.length;
+      
+      // Si du texte est sélectionné et que c'est un wrapper $...$
+      if(selected && (b.insert === '$$' || b.insert === '$$$$')) {
+        const wrapper = b.insert.length === 2 ? '$' : '$$';
+        insertText = wrapper + selected + wrapper;
+        newCursor = start + insertText.length;
+      } else if(b.cursor) {
+        newCursor = start + insertText.length + b.cursor;
+      }
+      
+      ta.value = text.substring(0, start) + insertText + text.substring(end);
+      ta.focus();
+      ta.setSelectionRange(newCursor, newCursor);
+      updatePreview();
+    };
+  });
+
+  // Live preview with debounce
+  let previewTimer = null;
+  function updatePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      frontPrev.innerHTML = formatText(frontTA.value);
+      backPrev.innerHTML = formatText(backTA.value);
+      tsLat(frontPrev);
+      tsLat(backPrev);
+    }, 300);
+  }
+
+  frontTA.oninput = updatePreview;
+  backTA.oninput = updatePreview;
+
+  // Initial preview
+  if(isEdit) updatePreview();
+
+  // Close
+  const close = () => overlay.remove();
+  $('#ceClose').onclick = close;
+  $('#ceCancel').onclick = close;
+  overlay.onclick = (e) => { if(e.target === overlay) close(); };
+
+  // Save
+  $('#ceSave').onclick = () => {
+    const front = frontTA.value.trim();
+    const back = backTA.value.trim();
+    
+    if(!front) { toast('Le recto est vide', 'error'); frontTA.focus(); return; }
+    if(!back) { toast('Le verso est vide', 'error'); backTA.focus(); return; }
+    
+    if(isEdit) {
+      existingCard.front = front;
+      existingCard.back = back;
+    } else {
+      const newCard = mkCard(
+        'card-' + Date.now() + '-' + M.floor(M.random() * 1000),
+        front,
+        back
+      );
+      chapter.cards.push(newCard);
+      syncG(chapter);
+      chapter.stats = mkStats(chapter.cards.length);
+      // Recalculate stats keeping existing grades
+      syncG(chapter);
+    }
+    
+    saveData();
+    if(typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+    close();
+    toast(isEdit ? 'Carte modifiée !' : 'Carte ajoutée !', 'success');
+    if(onSave) onSave();
+  };
+
+  // Focus front textarea
+  setTimeout(() => frontTA.focus(), 100);
+}
 async function goDaily(cid,k,push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='daily'; State.chapterId=cid; State.dailyKey=k; const c=getCh(cid), sub=getSub(); setTop({title:`Activité • ${fmtDayFR(k)}`}); setBot({actions:!1,revision:!1});
   const log=c.virtual?(findGrp(sub,c._groupId)?getLogGrp(sub,findGrp(sub,c._groupId),k):[]):(c.stats.dailyLog[k]||[]), v=$('#view'); if(!log.length){v.innerHTML=`<div class="card"><div class="section-title">Activité ${fmtDayFR(k)}</div><div class="muted">Aucune donnée.</div></div>`;return}
