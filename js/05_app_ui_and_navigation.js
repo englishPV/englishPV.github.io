@@ -122,6 +122,21 @@ function renSubMenu(){
     toast('Matière créée !', 'success');
   };
 
+    m.innerHTML += `<div class="add-row" id="addSubjectBtn" style="padding:10px"><div class="add-row-icon">+</div><span>Nouvelle matière</span></div>`;
+  $('#addSubjectBtn', m).onclick = (e) => {
+    e.stopPropagation();
+    const title = prompt('Nom de la matière :');
+    if(!title || !title.trim()) return;
+    const emoji = prompt('Emoji (optionnel) :', '') || '';
+    const newSub = { id: 'sub-' + slugify(title) + '-' + Date.now(), title: title.trim(), emoji: emoji.trim(), chapters: [], groups: [] };
+    data.subjects.push(newSub);
+    data.app.currentSubjectId = newSub.id;
+    saveData();
+    closeSubMenu();
+    goDeck(false);
+    toast('Matière créée !', 'success');
+  };
+
   $$('.subject-item',m).forEach(el=>{
     el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
     const r=el.querySelector('.rs'); if(r)r.onclick=e=>{e.stopPropagation();const id=el.dataset.id,s=data.subjects.find(x=>x.id===id),t=prompt('Nom:',s.title);if(t){renSub(id,t,prompt('Emoji:',s.emoji));renSubMenu();setTop({title:`Deck • ${getSub().title}`});goDeck(!1)}};
@@ -451,7 +466,8 @@ function renderDeckItem(item, s) {
       }
     }
     
-    return `<div class="deck-item${depthClass}" data-type="group" data-id="${g.id}" style="${tint?'background-color:'+tint:''}">
+        return `<div class="deck-item${depthClass}" data-type="group" data-id="${g.id}">
+      ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
       <div class="slide">
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
@@ -485,7 +501,8 @@ function renderDeckItem(item, s) {
       selectBox = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
     }
     
-    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
+        return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
+      ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
       ${c.imported?'<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
       <div class="slide">
         ${selectBox}
@@ -1012,8 +1029,20 @@ function openGrp(s, gid) {
 
   const listEl = $('#deckList');
   if (listEl) {
-    const items = buildDeckItems(s, null, 0);
-    listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('');
+      const listEl = $('#deckList');
+  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
+    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
+  
+  $('#addChapterBtn').onclick = () => {
+    const title = prompt('Nom du chapitre :');
+    if(!title || !title.trim()) return;
+    const sub = getSub();
+    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(), []);
+    sub.chapters.push(ch);
+    saveData();
+    goDeck(false);
+    toast('Chapitre créé !', 'success');
+  };
     setTop({
       title: `Deck • ${s.emoji ? s.emoji + ' ' : ''}${s.title}`,
       showBack: selectionMode || expandedFolders.size > 0
@@ -1102,7 +1131,7 @@ async function goCards(cid,push=true){
   // ✅ Filtrage par type
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-    v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:6px 14px">+ Carte</button></div><div style="margin:8px 0 10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
+      v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:8px 16px;font-size:14px">+ Carte</button></div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
     let filtered = [];
@@ -1133,16 +1162,14 @@ async function goCards(cid,push=true){
     await tsLat(grid);
   };
   await renderCards(); 
-    $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+      $('#cardSearch').oninput = (e) => renderCards(e.target.value);
   
-  $('#addCardBtn').onclick = () => openCardEditor(c, null, () => {
-    // Refresh après ajout
-    goCards(cid, false);
-  });
+  $('#addCardBtn').onclick = () => openCardEditor(c, null, () => goCards(cid, false));
+  
+
   $('#cardsGrid').onclick=e=>{ const b=e.target.closest('.card-block'); if(b){ $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')}); b.classList.toggle('flipped'); } };
 }
 function openCardEditor(chapter, existingCard, onSave) {
-  // Fermer si déjà ouvert
   $$('.card-editor-overlay').forEach(el => el.remove());
 
   const isEdit = !!existingCard;
@@ -1152,53 +1179,81 @@ function openCardEditor(chapter, existingCard, onSave) {
   const overlay = D.createElement('div');
   overlay.className = 'card-editor-overlay';
 
-  const latexBtns = [
-    { label: '𝑥²', insert: '$x^{2}$' },
-    { label: '√', insert: '$\\sqrt{}$', cursor: -2 },
-    { label: 'frac', insert: '$\\frac{}{}$', cursor: -4 },
-    { label: 'Σ', insert: '$\\sum_{n=0}^{+\\infty}$' },
-    { label: '∫', insert: '$\\int_{a}^{b}$' },
-    { label: 'lim', insert: '$\\lim_{n \\to +\\infty}$' },
-    { label: '→', insert: '$\\to$' },
-    { label: '≤', insert: '$\\leq$' },
-    { label: '≥', insert: '$\\geq$' },
-    { label: '≠', insert: '$\\neq$' },
-    { label: '∈', insert: '$\\in$' },
-    { label: '⊂', insert: '$\\subset$' },
-    { label: '∀', insert: '$\\forall$' },
-    { label: '∃', insert: '$\\exists$' },
-    { label: 'ℝ', insert: '$\\mathbb{R}$' },
-    { label: 'α', insert: '$\\alpha$' },
-    { label: 'β', insert: '$\\beta$' },
-    { label: '$…$', insert: '$$', cursor: -1 },
-    { label: '$$…$$', insert: '$$$$', cursor: -2 },
+  // Boutons organisés par catégorie, gros pour mobile
+  const latexSections = [
+    { title: 'Structures', btns: [
+      { label: '$…$', insert: '$$', cursor: -1, tip: 'Inline' },
+      { label: '$$…$$', insert: '$$$$', cursor: -2, tip: 'Display' },
+      { label: 'a/b', insert: '$\\frac{}{}$', cursor: -4 },
+      { label: '√', insert: '$\\sqrt{}$', cursor: -2 },
+      { label: 'x²', insert: '$^{}$', cursor: -2 },
+      { label: 'xₙ', insert: '$_{}$', cursor: -2 },
+    ]},
+    { title: 'Opérateurs', btns: [
+      { label: 'Σ', insert: '$\\sum_{k=0}^{n}$' },
+      { label: '∫', insert: '$\\int_{a}^{b}$' },
+      { label: 'lim', insert: '$\\lim_{n \\to +\\infty}$' },
+      { label: 'Π', insert: '$\\prod_{k=1}^{n}$' },
+    ]},
+    { title: 'Relations', btns: [
+      { label: '→', insert: '$\\to$' },
+      { label: '⟹', insert: '$\\Rightarrow$' },
+      { label: '⟺', insert: '$\\Leftrightarrow$' },
+      { label: '≤', insert: '$\\leq$' },
+      { label: '≥', insert: '$\\geq$' },
+      { label: '≠', insert: '$\\neq$' },
+      { label: '∈', insert: '$\\in$' },
+      { label: '∀', insert: '$\\forall$' },
+      { label: '∃', insert: '$\\exists$' },
+    ]},
+    { title: 'Ensembles & Lettres', btns: [
+      { label: 'ℝ', insert: '$\\mathbb{R}$' },
+      { label: 'ℕ', insert: '$\\mathbb{N}$' },
+      { label: 'ℂ', insert: '$\\mathbb{C}$' },
+      { label: 'α', insert: '$\\alpha$' },
+      { label: 'β', insert: '$\\beta$' },
+      { label: 'λ', insert: '$\\lambda$' },
+      { label: 'ε', insert: '$\\varepsilon$' },
+      { label: '∞', insert: '$\\infty$' },
+    ]},
   ];
 
-  const toolbarHTML = `<div class="latex-toolbar">${latexBtns.map((b, i) => 
-    `<button class="latex-btn" data-idx="${i}" title="${b.insert}">${b.label}</button>`
-  ).join('')}</div>`;
+  const allBtns = [];
+  let toolbarHTML = '';
+  for(const sec of latexSections) {
+    toolbarHTML += `<div class="latex-toolbar-section">${sec.title}</div>`;
+    for(const b of sec.btns) {
+      toolbarHTML += `<button class="latex-btn" data-idx="${allBtns.length}">${b.label}</button>`;
+      allBtns.push(b);
+    }
+  }
 
   overlay.innerHTML = `<div class="card-editor">
     <div class="card-editor-header">
-      <h3>${isEdit ? 'Modifier la carte' : 'Nouvelle carte'}</h3>
-      <button class="btn btn--ghost btn--tiny" id="ceClose" style="width:auto">✕</button>
+      <h3>${isEdit ? 'Modifier' : 'Nouvelle carte'}</h3>
+      <button class="btn btn--ghost btn--tiny" id="ceClose" style="width:auto;padding:8px 12px;font-size:16px">✕</button>
     </div>
     <div class="card-editor-body">
-      <div class="card-editor-field">
-        <label>Recto (Question)</label>
-        ${toolbarHTML}
-        <textarea id="ceFront" placeholder="Ex: Quelle est la dérivée de $e^x$ ?">${frontInit}</textarea>
+      <div class="editor-face-tabs">
+        <button class="editor-face-tab active" data-face="front">Recto</button>
+        <button class="editor-face-tab" data-face="back">Verso</button>
+      </div>
+      
+      <div id="ceFrontWrap">
+        <textarea id="ceFront" placeholder="Question ou terme à apprendre..." style="min-height:90px">${frontInit}</textarea>
         <div class="card-editor-preview" id="ceFrontPreview"></div>
       </div>
-      <div class="card-editor-field">
-        <label>Verso (Réponse)</label>
-        <textarea id="ceBack" placeholder="Ex: $\\frac{d}{dx} e^x = e^x$">${backInit}</textarea>
+      
+      <div id="ceBackWrap" style="display:none">
+        <textarea id="ceBack" placeholder="Réponse, formule, définition..." style="min-height:90px">${backInit}</textarea>
         <div class="card-editor-preview" id="ceBackPreview"></div>
       </div>
+      
+      <div class="latex-toolbar">${toolbarHTML}</div>
     </div>
     <div class="card-editor-footer">
       <button class="btn btn--ghost" id="ceCancel">Annuler</button>
-      <button class="btn btn--solid btn--primary" id="ceSave">${isEdit ? 'Modifier' : 'Ajouter'}</button>
+      <button class="btn btn--solid btn--primary" id="ceSave">${isEdit ? 'Enregistrer' : 'Ajouter'}</button>
     </div>
   </div>`;
 
@@ -1208,36 +1263,49 @@ function openCardEditor(chapter, existingCard, onSave) {
   const backTA = $('#ceBack');
   const frontPrev = $('#ceFrontPreview');
   const backPrev = $('#ceBackPreview');
+  const frontWrap = $('#ceFrontWrap');
+  const backWrap = $('#ceBackWrap');
   let activeTA = frontTA;
+  let activeFace = 'front';
 
-  // Focus tracking
-  frontTA.onfocus = () => activeTA = frontTA;
-  backTA.onfocus = () => activeTA = backTA;
+  // Tab switching
+  $$('.editor-face-tab', overlay).forEach(tab => {
+    tab.onclick = () => {
+      const face = tab.dataset.face;
+      activeFace = face;
+      $$('.editor-face-tab', overlay).forEach(t => t.classList.toggle('active', t === tab));
+      frontWrap.style.display = face === 'front' ? '' : 'none';
+      backWrap.style.display = face === 'back' ? '' : 'none';
+      activeTA = face === 'front' ? frontTA : backTA;
+      activeTA.focus();
+    };
+  });
 
-  // Toolbar buttons
+  frontTA.onfocus = () => { activeTA = frontTA; };
+  backTA.onfocus = () => { activeTA = backTA; };
+
+  // Toolbar
   $$('.latex-btn', overlay).forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
-      const idx = parseInt(btn.dataset.idx);
-      const b = latexBtns[idx];
+      const b = allBtns[parseInt(btn.dataset.idx)];
       const ta = activeTA;
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
       const text = ta.value;
       const selected = text.substring(start, end);
-      
+
       let insertText = b.insert;
       let newCursor = start + insertText.length;
-      
-      // Si du texte est sélectionné et que c'est un wrapper $...$
+
       if(selected && (b.insert === '$$' || b.insert === '$$$$')) {
-        const wrapper = b.insert.length === 2 ? '$' : '$$';
-        insertText = wrapper + selected + wrapper;
+        const w = b.insert.length === 2 ? '$' : '$$';
+        insertText = w + selected + w;
         newCursor = start + insertText.length;
       } else if(b.cursor) {
         newCursor = start + insertText.length + b.cursor;
       }
-      
+
       ta.value = text.substring(0, start) + insertText + text.substring(end);
       ta.focus();
       ta.setSelectionRange(newCursor, newCursor);
@@ -1245,7 +1313,7 @@ function openCardEditor(chapter, existingCard, onSave) {
     };
   });
 
-  // Live preview with debounce
+  // Live preview
   let previewTimer = null;
   function updatePreview() {
     clearTimeout(previewTimer);
@@ -1254,13 +1322,11 @@ function openCardEditor(chapter, existingCard, onSave) {
       backPrev.innerHTML = formatText(backTA.value);
       tsLat(frontPrev);
       tsLat(backPrev);
-    }, 300);
+    }, 400);
   }
 
   frontTA.oninput = updatePreview;
   backTA.oninput = updatePreview;
-
-  // Initial preview
   if(isEdit) updatePreview();
 
   // Close
@@ -1273,26 +1339,32 @@ function openCardEditor(chapter, existingCard, onSave) {
   $('#ceSave').onclick = () => {
     const front = frontTA.value.trim();
     const back = backTA.value.trim();
-    
-    if(!front) { toast('Le recto est vide', 'error'); frontTA.focus(); return; }
-    if(!back) { toast('Le verso est vide', 'error'); backTA.focus(); return; }
-    
+
+    if(!front) { 
+      toast('Le recto est vide', 'error'); 
+      $$('.editor-face-tab', overlay)[0].click();
+      frontTA.focus(); 
+      return; 
+    }
+    if(!back) { 
+      toast('Le verso est vide', 'error'); 
+      $$('.editor-face-tab', overlay)[1].click();
+      backTA.focus(); 
+      return; 
+    }
+
     if(isEdit) {
       existingCard.front = front;
       existingCard.back = back;
     } else {
       const newCard = mkCard(
         'card-' + Date.now() + '-' + M.floor(M.random() * 1000),
-        front,
-        back
+        front, back
       );
       chapter.cards.push(newCard);
-      syncG(chapter);
-      chapter.stats = mkStats(chapter.cards.length);
-      // Recalculate stats keeping existing grades
-      syncG(chapter);
     }
-    
+
+    syncG(chapter);
     saveData();
     if(typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     close();
@@ -1300,16 +1372,7 @@ function openCardEditor(chapter, existingCard, onSave) {
     if(onSave) onSave();
   };
 
-  // Focus front textarea
-  setTimeout(() => frontTA.focus(), 100);
-}
-async function goDaily(cid,k,push=true){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='daily'; State.chapterId=cid; State.dailyKey=k; const c=getCh(cid), sub=getSub(); setTop({title:`Activité • ${fmtDayFR(k)}`}); setBot({actions:!1,revision:!1});
-  const log=c.virtual?(findGrp(sub,c._groupId)?getLogGrp(sub,findGrp(sub,c._groupId),k):[]):(c.stats.dailyLog[k]||[]), v=$('#view'); if(!log.length){v.innerHTML=`<div class="card"><div class="section-title">Activité ${fmtDayFR(k)}</div><div class="muted">Aucune donnée.</div></div>`;return}
-  log.sort((a,b)=>a.ts-b.ts); const byC=new Map(); for(const e of log){const cur=byC.get(e.cardId)||{f:e.prev,l:e.next,ts:e.ts,lts:e.ts,_c:e._chapId};if(e.ts>cur.lts){cur.l=e.next;cur.lts=e.ts}byC.set(e.cardId,cur)}
-  const rows=[...byC].map(([id,i])=>{const ch=c.virtual?_real(i._c):c,card=ch.cards.find(x=>x.id===id);return card?{t:formatText(getSides(card,ch).f),d:formatText(getSides(card,ch).b),b:i.f,a:i.l}:null}).filter(Boolean);
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="section-title">Activité ${fmtDayFR(k)}</div><div id="dayL" class="scroll-y" style="flex:1"><div class="list">${rows.map(r=>`<div class="grid2"><div class="card-block grade-${r.b}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div><div class="card-block grade-${r.a}"><div class="term">${r.t}</div><div class="definition">${r.d}</div></div></div>`).join('')}</div></div></div>`;
-  await Media.resolve(v); await tsLat(v); $('#dayL').onclick=e=>{const b=e.target.closest('.card-block');if(b)b.classList.toggle('flipped')}
+  setTimeout(() => frontTA.focus(), 150);
 }
 function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.find(c=>c.id===cid);return(ch?.stats?.dailyLog?.[k]||[]).map(e=>({...e,_chapId:cid}))}) }
 
