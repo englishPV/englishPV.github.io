@@ -122,8 +122,18 @@ function renSubMenu(){
     toast('Matière créée !', 'success');
   };
 
-    m.innerHTML += `<div class="add-row" id="addSubjectBtn" style="padding:10px"><div class="add-row-icon">+</div><span>Nouvelle matière</span></div>`;
-  $('#addSubjectBtn', m).onclick = (e) => {
+      $$('.subject-item',m).forEach(el=>{
+    el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
+    const r=el.querySelector('.rs'); if(r)r.onclick=e=>{e.stopPropagation();const id=el.dataset.id,s=data.subjects.find(x=>x.id===id),t=prompt('Nom:',s.title);if(t){renSub(id,t,prompt('Emoji:',s.emoji));renSubMenu();setTop({title:`Deck • ${getSub().title}`});goDeck(!1)}};
+    const d=el.querySelector('.ds'); if(d)d.onclick=e=>{e.stopPropagation();const id=el.dataset.id;if(confirm('Supprimer ?')){data.subjects=data.subjects.filter(s=>s.id!==id);if(data.app.currentSubjectId===id)data.app.currentSubjectId=data.subjects[0]?.id;closeSubMenu();goDeck(!1);saveData()}}
+    });
+  
+  // ✅ Bouton "Nouvelle matière" — ajouté une seule fois à la fin
+  const addBtn = D.createElement('div');
+  addBtn.className = 'add-row';
+  addBtn.style.cssText = 'padding:10px;color:var(--green)';
+  addBtn.innerHTML = `<div class="add-row-icon" style="border-color:color-mix(in srgb, var(--green) 50%, transparent);background:color-mix(in srgb, var(--green) 8%, transparent);color:var(--green)">+</div><span>Nouvelle matière</span>`;
+  addBtn.onclick = (e) => {
     e.stopPropagation();
     const title = prompt('Nom de la matière :');
     if(!title || !title.trim()) return;
@@ -136,12 +146,7 @@ function renSubMenu(){
     goDeck(false);
     toast('Matière créée !', 'success');
   };
-
-  $$('.subject-item',m).forEach(el=>{
-    el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
-    const r=el.querySelector('.rs'); if(r)r.onclick=e=>{e.stopPropagation();const id=el.dataset.id,s=data.subjects.find(x=>x.id===id),t=prompt('Nom:',s.title);if(t){renSub(id,t,prompt('Emoji:',s.emoji));renSubMenu();setTop({title:`Deck • ${getSub().title}`});goDeck(!1)}};
-    const d=el.querySelector('.ds'); if(d)d.onclick=e=>{e.stopPropagation();const id=el.dataset.id;if(confirm('Supprimer ?')){data.subjects=data.subjects.filter(s=>s.id!==id);if(data.app.currentSubjectId===id)data.app.currentSubjectId=data.subjects[0]?.id;closeSubMenu();goDeck(!1);saveData()}}
-  })
+  m.appendChild(addBtn);
 }
 const openSubMenu = () => { renSubMenu(); const m=$('#subjectMenu'), r=titleEl.getBoundingClientRect(); m.style.top=`${r.bottom+6}px`; m.style.left=`${r.left}px`; m.style.display='block'; setTimeout(()=>D.addEventListener('click',clsOnOut),0) };
 const closeSubMenu = () => { const m=$('#subjectMenu'); if(m)m.style.display='none'; D.removeEventListener('click',clsOnOut) };
@@ -1030,8 +1035,8 @@ function openGrp(s, gid) {
   const listEl = $('#deckList');
   if (listEl) {
       const listEl = $('#deckList');
-  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
-    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
+    listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
+    + `<div class="add-row" id="addChapterBtn" style="color:var(--green)"><div class="add-row-icon" style="border-color:color-mix(in srgb, var(--green) 50%, transparent);background:color-mix(in srgb, var(--green) 8%, transparent);color:var(--green)">+</div><span>Nouveau chapitre</span></div>`;
   
   $('#addChapterBtn').onclick = () => {
     const title = prompt('Nom du chapitre :');
@@ -1568,8 +1573,23 @@ function openSet(cid,push=true){
 
 function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
-function reconcile(){ const c=buildCanon(), o=data.subjects||[], oMap=Object.fromEntries(o.map(s=>[s.title,s])); data.subjects=c.map(x=>{const old=oMap[x.title]||{}, ocMap=Object.fromEntries((old.chapters||[]).map(c=>[c.title,c])); const chs=x.chapters.map(nc=>{const oc=ocMap[nc.title]; if(!oc)return nc; const cardMap=Object.fromEntries(oc.cards.map(c=>[extractId(c.id),c])); return{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=cardMap[extractId(cd.id)]; return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}}); return{...x,chapters:chs,groups:old.groups||[]}}); o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id }
-
+function reconcile(){ 
+  const c=buildCanon(), o=data.subjects||[], oMap=Object.fromEntries(o.map(s=>[s.title,s])); 
+  data.subjects=c.map(x=>{
+    const old=oMap[x.title]||{}, ocMap=Object.fromEntries((old.chapters||[]).map(c=>[c.title,c])); 
+    const chs=x.chapters.map(nc=>{
+      const oc=ocMap[nc.title]; if(!oc)return nc; 
+      const cardMap=Object.fromEntries(oc.cards.map(c=>[extractId(c.id),c])); 
+      return{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=cardMap[extractId(cd.id)]; return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}
+    }); 
+    // ✅ Conserver les chapitres créés manuellement (pas dans le canon)
+    const canonTitles = new Set(x.chapters.map(nc => nc.title));
+    const userChapters = (old.chapters||[]).filter(oc => !canonTitles.has(oc.title));
+    return{...x,chapters:[...chs, ...userChapters],groups:old.groups||[]}
+  }); 
+  o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); 
+  if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id 
+}
 function upgrade(){ 
   if(!data.app) data.app = {theme:'dark'}; 
   data.app.prefs = {fsTerm:22, fsDef:24, accent:'indigo', radius:14, ...(data.app.prefs||{})}; 
