@@ -1,5 +1,3 @@
-
-
 /*05_app_ui_and_navigation.js*/
 /* --- UI STATE & ROUTING --- */
 let selectionMode = false;
@@ -8,14 +6,14 @@ let expandedFolders = new Set();
 let selectionContext = null; 
 
 const Nav = {
-  stack: [], scrollPos: 0,
+  stack:[], scrollPos: 0,
   push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
   back(){ 
     if(!this.stack.length) return false; 
     const p=this.stack.pop(); 
     State.virtualChapter=null; 
     State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
-    expandedFolders = new Set(p.expandedFolders || []);
+    expandedFolders = new Set(p.expandedFolders ||[]);
     const savedScroll = p.scrollPos || 0;
     this.scrollPos = savedScroll;
     render(!1);
@@ -106,21 +104,6 @@ const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), re
 function renSubMenu(){
   let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
   m.innerHTML=data.subjects.map(s=>`<div class="subject-item" data-id="${s.id}"><div class="name">${s.emoji?s.emoji+' ':''}${s.title}</div><div class="meta">${s.chapters?.length||0} chap.</div>${s.id===data.app.currentSubjectId?'<div class="muted">✓</div>':''}<div class="subject-actions"><button class="btn btn--tiny rs">✏️</button>${!(s.chapters?.length)?'<button class="btn btn--tiny ds">🗑️</button>':''}</div></div>`).join('');
-    // ✅ Bouton créer matière
-  m.innerHTML += `<div class="add-subject-btn" id="addSubjectBtn">+ Nouvelle matière</div>`;
-  $('#addSubjectBtn', m).onclick = (e) => {
-    e.stopPropagation();
-    const title = prompt('Nom de la matière :');
-    if(!title || !title.trim()) return;
-    const emoji = prompt('Emoji (optionnel) :', '') || '';
-    const newSub = { id: 'sub-' + slugify(title) + '-' + Date.now(), title: title.trim(), emoji: emoji.trim(), chapters: [], groups: [], imported: false };
-    data.subjects.push(newSub);
-    data.app.currentSubjectId = newSub.id;
-    saveData();
-    closeSubMenu();
-    goDeck(false);
-    toast('Matière créée !', 'success');
-  };
 
       $$('.subject-item',m).forEach(el=>{
     el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
@@ -131,14 +114,14 @@ function renSubMenu(){
   // ✅ Bouton "Nouvelle matière" — ajouté une seule fois à la fin
   const addBtn = D.createElement('div');
   addBtn.className = 'add-row';
-  addBtn.style.cssText = 'padding:10px;color:var(--green)';
-  addBtn.innerHTML = `<div class="add-row-icon" style="border-color:color-mix(in srgb, var(--green) 50%, transparent);background:color-mix(in srgb, var(--green) 8%, transparent);color:var(--green)">+</div><span>Nouvelle matière</span>`;
+  addBtn.style.cssText = 'padding:10px;';
+  addBtn.innerHTML = `<div class="add-row-icon">+</div><span>Nouvelle matière</span>`;
   addBtn.onclick = (e) => {
     e.stopPropagation();
     const title = prompt('Nom de la matière :');
     if(!title || !title.trim()) return;
     const emoji = prompt('Emoji (optionnel) :', '') || '';
-    const newSub = { id: 'sub-' + slugify(title) + '-' + Date.now(), title: title.trim(), emoji: emoji.trim(), chapters: [], groups: [] };
+    const newSub = { id: 'sub-' + slugify(title) + '-' + Date.now(), title: title.trim(), emoji: emoji.trim(), chapters: [], groups:[] };
     data.subjects.push(newSub);
     data.app.currentSubjectId = newSub.id;
     saveData();
@@ -368,13 +351,14 @@ function goDeck(push=true){
   
     v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div style="position:relative;margin-bottom:6px"><input type="text" id="globalSearch" class="input" placeholder="🔍 Rechercher une carte..." autocomplete="off" spellcheck="false" style="padding-right:32px"><button id="globalSearchClear" class="hidden" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:0 0;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px">✕</button><div id="globalSearchResults" class="hidden" style="position:absolute;top:100%;left:0;right:0;z-index:50;max-height:60vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius-md) var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.3)"></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
     const listEl = $('#deckList');
-  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') + `<button class="add-chapter-btn" id="addChapterBtn">+ Nouveau chapitre</button>`;
+  listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
+    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
   
   $('#addChapterBtn').onclick = () => {
     const title = prompt('Nom du chapitre :');
     if(!title || !title.trim()) return;
     const sub = getSub();
-    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(), []);
+    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(),[]);
     sub.chapters.push(ch);
     saveData();
     goDeck(false);
@@ -396,7 +380,7 @@ function goDeck(push=true){
 
 function buildDeckItems(s, parentGid, depth) {
   const grps = ensGrps(s);
-  const items = [];
+  const items =[];
   
   const levelGroups = grps.filter(g => (g.parentGroupId||null) === parentGid);
   const inGroupAtLevel = new Set();
@@ -417,7 +401,7 @@ function buildDeckItems(s, parentGid, depth) {
     levelChapters = s.chapters.filter(c => !allInGroups.has(c.id));
   } else {
     const parentG = findGrp(s, parentGid);
-    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) : [];
+    levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) :[];
   }
   
   const sorter = (a, b) => { 
@@ -659,7 +643,7 @@ function bindDeckNew() {
               oldParent.childGroupIds = (oldParent.childGroupIds||[]).filter(x => x !== srcId);
             }
             srcG.parentGroupId = dstId;
-            if(!dstG.childGroupIds) dstG.childGroupIds = [];
+            if(!dstG.childGroupIds) dstG.childGroupIds =[];
             if(!dstG.childGroupIds.includes(srcId)) dstG.childGroupIds.push(srcId);
             toast('Dossier imbriqué', 'success');
           } else {
@@ -708,7 +692,7 @@ function bindDeckNew() {
           const newParent = findGrp(sub, targetParentGid);
           if(newParent) {
             srcG.parentGroupId = targetParentGid;
-            if(!newParent.childGroupIds) newParent.childGroupIds = [];
+            if(!newParent.childGroupIds) newParent.childGroupIds =[];
             if(!newParent.childGroupIds.includes(srcId)) newParent.childGroupIds.push(srcId);
           } else {
             srcG.parentGroupId = null;
@@ -862,9 +846,9 @@ function bindGlobalSearch() {
   const clearBtn = $('#globalSearchClear');
   if(!input || !results) return;
 
-  const allCards = [];
+  const allCards =[];
   for(const sub of data.subjects) {
-    for(const ch of (sub.chapters || [])) {
+    for(const ch of (sub.chapters ||[])) {
       const emoji = ch.emoji || getEmoji(ch.title) || '📄';
       for(const card of ch.cards) {
         allCards.push({ card, ch, sub, emoji, chId: ch.id, subId: sub.id });
@@ -906,7 +890,7 @@ function bindGlobalSearch() {
     if(cleanQ.length < 2) { results.classList.add('hidden'); return; }
 
     // Score chaque carte
-    const scored = [];
+    const scored =[];
     for(const item of allCards) {
       const front = norm(item.card.front);
       const back = norm(item.card.back);
@@ -935,14 +919,14 @@ function bindGlobalSearch() {
     const byChap = new Map();
     for(const item of scored) {
       const key = item.subId + '/' + item.chId;
-      if(!byChap.has(key)) byChap.set(key, { items: [], bestScore: item.score, ch: item.ch, sub: item.sub, emoji: item.emoji, chId: item.chId, subId: item.subId });
+      if(!byChap.has(key)) byChap.set(key, { items:[], bestScore: item.score, ch: item.ch, sub: item.sub, emoji: item.emoji, chId: item.chId, subId: item.subId });
       const group = byChap.get(key);
       group.items.push(item);
       if(item.score < group.bestScore) group.bestScore = item.score;
     }
 
     // Trier les groupes : celui avec le meilleur match en premier
-    const sortedGroups = [...byChap.values()].sort((a, b) => {
+    const sortedGroups =[...byChap.values()].sort((a, b) => {
       if(a.bestScore !== b.bestScore) return a.bestScore - b.bestScore;
       return b.items.length - a.items.length;
     });
@@ -953,7 +937,7 @@ function bindGlobalSearch() {
     const maxPerChap = 5;
 
     let html = '';
-    const flatResults = [];
+    const flatResults =[];
 
     for(const group of sortedGroups) {
       if(totalShown >= maxTotal) break;
@@ -1036,13 +1020,13 @@ function openGrp(s, gid) {
   if (listEl) {
       const listEl = $('#deckList');
     listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
-    + `<div class="add-row" id="addChapterBtn" style="color:var(--green)"><div class="add-row-icon" style="border-color:color-mix(in srgb, var(--green) 50%, transparent);background:color-mix(in srgb, var(--green) 8%, transparent);color:var(--green)">+</div><span>Nouveau chapitre</span></div>`;
+    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
   
   $('#addChapterBtn').onclick = () => {
     const title = prompt('Nom du chapitre :');
     if(!title || !title.trim()) return;
     const sub = getSub();
-    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(), []);
+    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(),[]);
     sub.chapters.push(ch);
     saveData();
     goDeck(false);
@@ -1139,7 +1123,7 @@ async function goCards(cid,push=true){
       v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:8px 16px;font-size:14px">+ Carte</button></div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
-    let filtered = [];
+    let filtered =[];
     if (!cleanQ) { filtered = pool; } else {
         const scored = pool.map(x => {
             const {f,b} = getSides(x,c); const tf = norm(f); const tb = norm(b);
@@ -1185,8 +1169,8 @@ function openCardEditor(chapter, existingCard, onSave) {
   overlay.className = 'card-editor-overlay';
 
   // Boutons organisés par catégorie, gros pour mobile
-  const latexSections = [
-    { title: 'Structures', btns: [
+  const latexSections =[
+    { title: 'Structures', btns:[
       { label: '$…$', insert: '$$', cursor: -1, tip: 'Inline' },
       { label: '$$…$$', insert: '$$$$', cursor: -2, tip: 'Display' },
       { label: 'a/b', insert: '$\\frac{}{}$', cursor: -4 },
@@ -1194,13 +1178,13 @@ function openCardEditor(chapter, existingCard, onSave) {
       { label: 'x²', insert: '$^{}$', cursor: -2 },
       { label: 'xₙ', insert: '$_{}$', cursor: -2 },
     ]},
-    { title: 'Opérateurs', btns: [
+    { title: 'Opérateurs', btns:[
       { label: 'Σ', insert: '$\\sum_{k=0}^{n}$' },
       { label: '∫', insert: '$\\int_{a}^{b}$' },
       { label: 'lim', insert: '$\\lim_{n \\to +\\infty}$' },
       { label: 'Π', insert: '$\\prod_{k=1}^{n}$' },
     ]},
-    { title: 'Relations', btns: [
+    { title: 'Relations', btns:[
       { label: '→', insert: '$\\to$' },
       { label: '⟹', insert: '$\\Rightarrow$' },
       { label: '⟺', insert: '$\\Leftrightarrow$' },
@@ -1211,7 +1195,7 @@ function openCardEditor(chapter, existingCard, onSave) {
       { label: '∀', insert: '$\\forall$' },
       { label: '∃', insert: '$\\exists$' },
     ]},
-    { title: 'Ensembles & Lettres', btns: [
+    { title: 'Ensembles & Lettres', btns:[
       { label: 'ℝ', insert: '$\\mathbb{R}$' },
       { label: 'ℕ', insert: '$\\mathbb{N}$' },
       { label: 'ℂ', insert: '$\\mathbb{C}$' },
@@ -1223,7 +1207,7 @@ function openCardEditor(chapter, existingCard, onSave) {
     ]},
   ];
 
-  const allBtns = [];
+  const allBtns =[];
   let toolbarHTML = '';
   for(const sec of latexSections) {
     toolbarHTML += `<div class="latex-toolbar-section">${sec.title}</div>`;
@@ -1535,6 +1519,7 @@ function openSet(cid,push=true){
     )}
     ${sect('Zone dangereuse',
       sRow('rowRstC','🔄','Réinitialiser ce chapitre','Remettre toutes les cartes à "Non vu"','',1)+
+      sRow('rowDelC','🗑️','Supprimer ce chapitre','Supprime le chapitre et toutes ses cartes','',1)+
       `<div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div>`
     )}
     <div class="settings-footer">Flashcards v${APP_VER}<br><span style="opacity:.7;font-size:.9em">JB. C</span></div></div>`;
@@ -1567,7 +1552,22 @@ function openSet(cid,push=true){
   $('#rowExp').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()};
   $('#rowImp').onclick=()=>$('#impF').click();
   $('#impF').onchange=async e=>{if(confirm("Écraser toutes les données ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}};
+  
   $('#rowRstC').onclick=()=>{if(confirm('Réinitialiser ce chapitre ?')){c.cards.forEach(x=>Object.assign(x,{grade:'unseen',timesReviewed:0,ef:2.5,intervalDays:0,dueAt:0,streak:0}));c.stats=mkStats(c.cards.length);saveData();cloudSave();openSet(cid,!1)}};
+  $('#rowDelC').onclick=()=>{
+    if(!confirm('Supprimer "' + c.title + '" et toutes ses cartes ?')) return;
+    const sub = getSub();
+    const idx = sub.chapters.findIndex(x => x.id === c.id);
+    if(idx >= 0) {
+      ensGrps(sub).forEach(g => g.chapIds = g.chapIds.filter(x => x !== c.id));
+      valGrps(sub);
+      sub.chapters.splice(idx, 1);
+      saveData();
+      cloudSave();
+      goDeck(false);
+      toast('Chapitre supprimé', 'success');
+    }
+  };
   $('#rowRstA').onclick=async()=>{if(confirm('⚠️ Supprimer TOUTES les données ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}};
 }
 
@@ -1597,9 +1597,9 @@ function upgrade(){
   if(!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
   data.subjects.forEach(s => {
     ensGrps(s).forEach(g => {
-      if(!g.childGroupIds) g.childGroupIds = [];
+      if(!g.childGroupIds) g.childGroupIds =[];
       if(!g.parentGroupId) g.parentGroupId = null;
-      if(!g.chapIds) g.chapIds = [];
+      if(!g.chapIds) g.chapIds =[];
     });
     valGrps(s); 
     s.emoji = s.emoji || ''; 
@@ -1644,7 +1644,7 @@ function ensureMathGrouped(){
     grps.push({
       id: 'g-math-all',
       chapIds: courseChaps.map(c => c.id),
-      childGroupIds: [],
+      childGroupIds:[],
       parentGroupId: null,
       createdAt: Date.now(),
       title: 'Tous les chapitres',
@@ -1682,8 +1682,7 @@ Règles STRICTES:
 - Si c'est une formule, donne des formules avec des erreurs subtiles (mauvais signe, mauvais exposant, variable inversée...)
 - Si c'est une définition, donne des définitions de concepts proches mais différents
 
-Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks:
-[{"id":"...","wrong":["...","...","..."]}]
+Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks:[{"id":"...","wrong":["...","...","..."]}]
 
 Flashcards:
 ${cards.map(c=>`ID: ${c.id}\nQ: ${c.q}\nR: ${c.a}`).join('\n---\n')}`;
@@ -1899,7 +1898,7 @@ async function init() {
     // ✅ Reset maths one-shot : change le tag pour forcer un nouveau reset
     const MATH_RESET_TAG = 'math-reset-2025-06-27-v1';
     if(data.app._mathReset !== MATH_RESET_TAG) {
-      data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
+      data.subjects = (data.subjects ||[]).filter(s => !/math/i.test(s.title || ''));
       const freshMath = buildMathSub();
       data.subjects.splice(1, 0, freshMath);
       data.app._mathReset = MATH_RESET_TAG;
