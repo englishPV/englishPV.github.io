@@ -1018,20 +1018,21 @@ function openGrp(s, gid) {
 
   const listEl = $('#deckList');
   if (listEl) {
-      const listEl = $('#deckList');
-    listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
-    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
-  
-  $('#addChapterBtn').onclick = () => {
-    const title = prompt('Nom du chapitre :');
-    if(!title || !title.trim()) return;
-    const sub = getSub();
-    const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(),[]);
-    sub.chapters.push(ch);
-    saveData();
-    goDeck(false);
-    toast('Chapitre créé !', 'success');
-  };
+    const items = buildDeckItems(s, null, 0);  // ← CORRECTION : construire les items
+    listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('')
+      + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
+
+    $('#addChapterBtn').onclick = () => {
+      const title = prompt('Nom du chapitre :');
+      if(!title || !title.trim()) return;
+      const sub = getSub();
+      const ch = mkChapter('chap-' + slugify(title) + '-' + Date.now(), title.trim(), []);
+      sub.chapters.push(ch);
+      saveData();
+      goDeck(false);
+      toast('Chapitre créé !', 'success');
+    };
+
     setTop({
       title: `Deck • ${s.emoji ? s.emoji + ' ' : ''}${s.title}`,
       showBack: selectionMode || expandedFolders.size > 0
