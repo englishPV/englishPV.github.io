@@ -7035,28 +7035,31 @@ R: >>> [IMAGE_ID: paste-aa07df7df60e8b1ef18471915ce6f54b1d742344.jpg] <<<
 --------------------
 
 
+
+
+
 ==================================================
 DECK : MQ MPI
 ==================================================
 
 Q: Comment détermine-t-on la densité de probabilité de présence d’une particule ?
-R: La densité de probabilité de présence de la particule au point \(M\) à l’instant \(t\) est : 
+R: La densité de probabilité de présence de la particule au point \(M\) à l’instant \(t\) est : 
 \(|\Psi(M,t)|^2 = \Psi(M,t)\Psi(M,t)^\ast\).
 --------------------
 Q: Comment s’écrit l’équation de Schrödinger à une dimension ?
 R: \(i\hbar \frac{\partial \Psi(x,t)}{\partial t} = - \frac{\hbar^2}{2m} \frac{\partial^2 \Psi(x,t)}{\partial x^2} + V(x)\Psi(x,t)\)
-où \(\hbar\) est la constante de Planck réduite : \(\hbar = \frac{h}{2 \pi} =1,05.10^{-34}J\cdot s^{-1}\)
+où \(\hbar\) est la constante de Planck réduite : \(\hbar = \frac{h}{2 \pi} =1,05.10^{-34}J\cdot s^{-1}\)
 --------------------
 Q: Comment s’écrit l’équation de Schrödinger indépendante du temps ?
 R: \(- \frac{\hbar^2}{2m} \frac{d^2 \varphi(x)}{dx^2}+V(x) \varphi (x)=E \varphi(x) \)
 --------------------
 Q: Comment s’écrit la fonction d’onde d’un état stationnaire ?
-R: \(\Psi(x,t) = f(t) \cdot  \varphi(x)\) avec \(f(t) = exp (-i\frac{E}{\hbar} t)\)
-Où \(f(t)\) et \(\varphi(x)\) sont des fonctions à valeurs complexes.
-Considérons une particule qui ne peut se manifester que sur l’axe \((Ox)\) et qui est soumise à un potentiel \(V(x)\) qui ne dépend pas du temps.
+R: \(\Psi(x,t) = f(t) \cdot  \varphi(x)\) avec \(f(t) = exp (-i\frac{E}{\hbar} t)\)
+Où \(f(t)\) et \(\varphi(x)\) sont des fonctions à valeurs complexes.
+Considérons une particule qui ne peut se manifester sur l’axe \((Ox)\) et qui est soumise à un potentiel \(V(x)\) qui ne dépend pas du temps.
 Une telle particule possède des états pour lesquels son énergie est bien définie (indépendante du temps) : on les appelle états stationnaires.
-La partie spatiale de la fonction d’onde \(\varphi(x)\) vérifie l’équation de Schrödinger
-indépendante du temps : 
+La partie spatiale de la fonction d’onde \(\varphi(x)\) vérifie l’équation de Schrödinger
+indépendante du temps : 
 \(- \frac{\hbar^2}{2m} \frac{d^2 \varphi(x)}{dx^2}+V(x) \varphi (x)=E \varphi(x) \)
 --------------------
 Q: Comment s’écrit la relation de Planck-Einstein ?
@@ -7065,30 +7068,110 @@ R: \(E = h\nu = \hbar \omega\)
 Q: Comment s’écrit la relation de De Broglie ?
 R: \(p = \hbar k\)
 --------------------
-Q: Quelles sont les formules de \(E\), \(p\) et \(k\) valable pour une onde de matière et/ou pour un photon dans le vide ?
-R: pour une onde de matière  et un photon dans le vide:
+Q: Quelles sont les formules de \(E\), \(p\) et \(k\) valable pour une onde de matière et/ou pour un photon dans le vide ?
+R: pour une onde de matière et un photon dans le vide:
 \(E = \hbar \omega\)
-\(p = \hbar k = \frac{h}{\lambda}\) 
+\(p = \hbar k = \frac{h}{\lambda}\) 
 Pour un photon dans le vide uniquement:
-\(k = \frac{\omega}{c}\) 
+\(k = \frac{\omega}{c}\) 
 \(E = \frac{hc}{\lambda}\)
 --------------------
 Q: Qu’est-ce qu’un paquet d’onde ?
-R: Un paquet d’ondes, superposition d’ondes de De Broglie de vecteur d’onde moyen \(k_0\) et dont les
-vecteurs d’onde sont dans l’intervalle étroit de largeur \(\Delta k\) autour de \(k_0\), décrit un état de la particule
-localisée sur une distance \(\Delta x\) telle que :
+R: Un paquet d’ondes, superposition d’ondes de De Broglie de vecteur d’onde moyen \(k_0\) et dont les
+vecteurs d’onde sont dans l’intervalle étroit de largeur \(\Delta k\) autour de \(k_0\), décrit un état de la particule
+localisée sur une distance \(\Delta x\) telle que :
 \(\Delta x \cdot \Delta k \approx 1\)
-se déplaçant à la vitesse : \(vg = \frac{\hbar k_0}{m}\)
+se déplaçant à la vitesse : \(vg = \frac{\hbar k_0}{m}\)
 égale à la vitesse de la particule quand sa quantité de mouvement est
 \(p_0 = \hbar k_0\)
 --------------------
 Q: Comment s’écrit l’inégalité d’Heisenberg spatiale ? Comment s’interprète cette inégalité?
 R: \(\Delta p \cdot \Delta x \geqslant \frac{\hbar}{2}\)
-\(\Delta x\) est l’incertitude sur la position de la particule (i.e. l’extension spatiale du paquet d’ondes)
-\(\Delta p\) est l’incertitude sur la quantité de mouvement de la particule.
+\(\Delta x\) est l’incertitude sur la position de la particule (i.e. l’extension spatiale du paquet d’ondes)
+\(\Delta p\) est l’incertitude sur la quantité de mouvement de la particule.
 --------------------
 Q: Qu'est-ce qu'une particule libre?
 R: [latex]Une particule qui évolue sans subir d'interaction: $\forall x \in]-\infty,+\infty[,V(x)=0$[/latex]
+--------------------
+Q: Quelles sont les conditions de continuité de la fonction d'onde ?
+R: Dans le cas où le potentiel subi par une particule est discontinu en \(x = x_0\) :
+- Si la discontinuité est finie, \(\varphi(x)\) et \(\frac{d\varphi}{dx}(x)\) sont continues en \(x_0\) :
+\(\varphi(x_0^-) = \varphi(x_0^+)\) et \(\varphi'(x_0^-) = \varphi'(x_0^+)\)
+- Si \(x_0\) sépare une région de potentiel fini d'une région de potentiel positif infini :
+\(\varphi(x_0^-) = \varphi(x_0^+) = 0\) et il n'y a pas de condition sur \(\frac{d\varphi}{dx}(x)\)
+--------------------
+Q: Les solutions de l'équation de Schrödinger dans le cas d'états stationnaires d'une particule de masse m dans un puits de potentiel infini de largeur a? Leurs énergies? L'énergie de confinement?
+R: \(\psi_n(x,t) = A_n \sin(k_n x) \exp(-i \omega_n t)\) Avec \(k_n = n \frac{\pi}{a}\), \(n \in \mathbb{N}^*\)
+et \(E_n = \frac{1}{2m}(\hbar k_n)^2 = n^2 \frac{\pi^2 \hbar^2}{2 m a^2}\)
+Energie de confinement: \(E_{min} = E_1 = \frac{\pi^2 \hbar^2}{2 m a^2}\)
+--------------------
+Q: Montrer, en prenant l'exemple simple du cours, qu'une superposition de deux états stationnaires (caractérisé par les fonctions d'onde d'énergie respectivement Er et Es) engendre une évolution au cours du temps de l'état de la particule.
+R: \(\psi(x,t) = \frac{1}{\sqrt{2}} e^{-i \frac{E_r}{\hbar} t} \varphi_r(x) + \frac{1}{\sqrt{2}} e^{-i \frac{E_s}{\hbar} t} \varphi_s(x)\)
+
+Après calcul du module carré de la fonction d'onde, on obtient que la densité de probabilité de présence associée à cet état de la particule s'écrit :
+\(|\psi(x,t)|^2 = \frac{1}{2} (|\varphi_r(x)|^2 + |\varphi_s(x)|^2 + 2 \varphi_r(x) \varphi_s(x) \cos(\frac{E_s - E_r}{\hbar} t))\)
+
+On remarque que la densité de probabilité de présence dépend explicitement du temps : l'état de la particule n'est donc pas stationnaire, il évolue au cours du temps.
+--------------------
+Q: Qu'est-ce que l'effet tunnel ? Citer des applications
+R: Dans le cas de l'étude d'une barrière de potentiel : Si la décroissance de la fonction d'onde dans la barrière de potentiel est suffisamment lente, on peut s'attendre à ce que la probabilité de présence soit non nulle de l'autre côté de la barrière (une particule quantique a donc la possibilité de traverser la barrière de potentiel) : c'est l'effet tunnel.
+Applications : microscope à effet tunnel, radioactivité alpha
+--------------------
+Q: Quel est l'influence de la largeur et de la hauteur de la barrière de potentiel sur l'effet tunnel ?
+R: La probabilité de transmission diminue très rapidement lorsque :
+- la largeur de la barrière augmente,
+- la hauteur de la barrière vue par la particule soit \(V_0 - E\) augmente
+--------------------
+Q: Comment établir les solutions de l'équation de Schrödinger indépendante du temps dans le cas d'une particule incidente sur une marche de potentiel ? Exploiter les conditions de continuité de la fonction d'onde.
+R: Le potentiel est constant par morceaux égal à \(V_0\) pour \(x > 0\) et nul pour \(x < 0\).
+L'équation de Schrödinger s'écrit:
+
+\(\frac{d^2\varphi}{dx^2} + \frac{2m(E-V_0)}{\hbar^2}\varphi(x) = 0\) pour \(x > 0\)
+et \(\frac{d^2\varphi}{dx^2} + \frac{2mE}{\hbar^2}\varphi(x) = 0\) pour \(x < 0\)
+
+Dans le cas où \(E > V_0\) :
+
+Dans la région 1 (\(x<0\)), la solution de l'équation de Schrödinger est de la forme
+\(\varphi_1(x) = A_1 \exp(i k_1 x) + B_1 \exp(-i k_1 x)\) avec \(k_1 = \frac{\sqrt{2mE}}{\hbar}\)
+Dans la région 2 (\(x>0\)) :
+\(\varphi_2(x) = A_2 \exp(i k_2 x) + B_2 \exp(-i k_2 x)\) avec \(k_2 = \frac{\sqrt{2m(E-V_0)}}{\hbar}\)
+
+Puis on sait que \(\psi(x) = f(t)\varphi(x)\) avec \(f(t) = \exp(-i\frac{E}{\hbar}t) = \exp(-i\omega t)\) donc
+\(\psi_1(x) = A_1 \exp(-i(\omega t - k_1 x)) + B_1 \exp(-i(\omega t + k_1 x))\)
+\(\psi_2(x) = A_2 \exp(-i(\omega t - k_2 x))\)
+
+Rem : le terme \(B_2 \exp(-i(\omega t + k_1 x))\) est impossible car c'est une onde qui se propage selon \(-u_x\) alors qu'il n'existe aucune source qui peut être à l'origine de cette onde ni aucun obstacle de potentiel.
+
+Maintenant on va exploiter les conditions de continuité de la fonction d'onde
+\(\varphi_1(x=0) = \varphi_2(x=0) \rightarrow A_1 + B_1 = A_2\)
+\(\varphi'_1(x=0) = \varphi'_2(x=0) \rightarrow A_1 - B_1 = \frac{k_2}{k_1} A_2\)
+
+on trouve alors
+\(A_2 = \frac{2k_1}{k_1+k_2} A_1\)
+\(B_1 = \frac{k_1-k_2}{k_1+k_2} A_1\)
+
+on choisit \(A_1 = 1\) et on retrouve
+\(\psi(x,t) = \begin{cases} A_1 e^{-i\frac{E}{\hbar}t} \left( e^{i k_1 x} + \frac{k_1 - k_2}{k_1 + k_2} e^{-i k_1 x} \right) & \text{si } x < 0 \text{ : zone I} \\ A_1 e^{-i\frac{E}{\hbar}t} \frac{2 k_1}{k_1 + k_2} e^{i k_2 x} & \text{si } x > 0 \text{ : zone II} \end{cases}\)
+
+Dans le cas où \(E < V_0\) :
+
+Dans la zone 1 (\(x<0\)), la solution de l'équation de Schrödinger est de la forme :
+\(\varphi_1(x) = A_1 \exp(i k_1 x) + B_1 \exp(-i k_1 x)\) avec \(k_1 = \frac{\sqrt{2mE}}{\hbar}\)
+Dans la zone 2 (\(x>0\)) :
+\(\varphi_2(x) = B_2 \exp(-q x)\) avec \(q = \frac{\sqrt{2m(V_0-E)}}{\hbar}\)
+
+Rem: Pas de terme en \(B_1 \exp(qx)\) qui diverge quand \(x \rightarrow +\infty\)
+par analogie avec ce qu'on a trouvé dans le cas \(E > V_0\) (en remplaçant donc \(i k_2\) par \(-q\) soit \(k_2\) par \(i q\)), on trouve
+\(\psi(x,t) = \begin{cases} A_1 e^{-i\frac{E}{\hbar}t} \left( e^{i k_1 x} + \frac{k_1 - i q}{k_1 + i q} e^{-i k_1 x} \right) & \text{si } x < 0 \text{ : zone I} \\ A_1 e^{-i\frac{E}{\hbar}t} \frac{2 k_1}{k_1 + i q} e^{-q x} & \text{si } x > 0 \text{ : zone II} \end{cases}\)
+--------------------
+Q: Comment se comporte une particule quantique lorsqu'elle rencontre la marche de potentiel ?
+R: Pour \(E > V_0\) :
+Dans la zone I, la fonction d'onde est la superposition d'une OPPM incidente et d'une OPPM réfléchie.
+Dans la zone II, il s'agit d'une OPPM transmise. Contrairement à la particule classique, la particule quantique a une probabilité non nulle de se réfléchir sur la marche, et cette probabilité est d'autant plus importante que l'énergie de E est proche de V0.
+
+Pour \(0 < E < V_0\) :
+Dans la zone I, la fonction d'onde est la superposition d'une OPPM incidente et d'une OPPM réfléchie.
+Dans la zone II, il s'agit d'une onde évanescente, et la densité de probabilité de présence dans la zone II n'est donc pas rigoureusement nulle au-delà de la marche. Cela signifie que la mesure de la position de la particule peut conduire à une valeur positive de son abscisse, contrairement aux prévisions classiques.
 --------------------
 
 
