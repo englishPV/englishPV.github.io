@@ -148,7 +148,7 @@ const parseMathData = (raw) => {
         const chContent = raw.substring(chStart, chEnd);
 
         // Cartes = ### Carte N [M/T/C] — Titre
-        const cardRegex = /^###\s+Carte\s+\d+\s*\[([MTC])\]\s*[—–\-]\s*(.+)$/gm;
+        const cardRegex = /^###\s+Carte\s+\d+\s*\[([MTCP])\]\s*[—–\-]\s*(.+)$/gm;
         const cardMatches = [...chContent.matchAll(cardRegex)];
 
         for (let ki = 0; ki < cardMatches.length; ki++) {
@@ -172,8 +172,9 @@ const parseMathData = (raw) => {
             back = back.replace(/(\n?---\s*)+$/, '').trim();
 
             const cardType = typeCode === 'M' ? 'methode'
-                           : typeCode === 'T' ? 'theoreme'
-                           : 'calcul';
+               : typeCode === 'T' ? 'theoreme'
+               : typeCode === 'P' ? 'piege'
+               : 'calcul';
 
             result.push({
                 id: 'math-' + (idCounter++),
