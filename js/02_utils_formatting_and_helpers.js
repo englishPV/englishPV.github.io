@@ -206,14 +206,7 @@ const parsePhysicsData = (rawData) => {
 
 
 // ✅ Fingerprint automatique — plus jamais besoin de changer un tag manuellement
-const MATH_FINGERPRINT = (() => {
-  if (typeof RAW_MATH === 'undefined') return 'none';
-  let h = 0;
-  for (let i = 0; i < RAW_MATH.length; i++) {
-    h = ((h << 5) - h + RAW_MATH.charCodeAt(i)) | 0;
-  }
-  return 'math-auto-' + (h >>> 0).toString(36) + '-' + dataMATH.length;
-})();
+
 
 /* --- UI HELPERS --- */
 function toast(msg, type='info', dur=2500) {
