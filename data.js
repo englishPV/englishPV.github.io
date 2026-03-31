@@ -3867,7 +3867,7 @@ La fonction $x \mapsto x^3 \varphi(x)$ est **impaire**. Sous réserve de converg
 
 ### Carte 7 [M] — VA à densité
 
-**RECTO :** Trigger (Informatique & Probas) : On dispose de $U \sim \mathcal{U}(]0,1[)$ via `rd.random()`. Quelle variable poser pour simuler un tirage de loi $\mathcal{E}(\lambda)$ ?
+**RECTO :** Trigger (Informatique & Probas) : On dispose de $U \sim \mathcal{U}(]0,1[)$ via rd.random(). Quelle variable poser pour simuler un tirage de loi $\mathcal{E}(\lambda)$ ?
 
 **VERSO :**
 **Méthode d'inversion de la fonction de répartition.**
