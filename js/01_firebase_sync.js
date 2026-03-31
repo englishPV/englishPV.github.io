@@ -122,14 +122,14 @@ const FireSync = (() => {
             data.app.version = typeof APP_VER !== 'undefined' ? APP_VER : data.app.version;
           }
           
-          const MATH_RESET_TAG_SYNC = 'math-reset-2025-06-27-v1';
-          if(data.app._mathReset !== MATH_RESET_TAG_SYNC) {
+         
+          if(data.app._mathReset !== MATH_FINGERPRINT) {
             data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
             if(typeof buildMathSub === 'function') {
               const freshMath = buildMathSub();
               data.subjects.splice(1, 0, freshMath);
             }
-            data.app._mathReset = MATH_RESET_TAG_SYNC;
+            data.app._mathReset = MATH_FINGERPRINT;
           }
           
           upgrade(); applyTh(); applyUI();
@@ -223,14 +223,13 @@ const FireSync = (() => {
       }
       
       // ✅ Re-appliquer le reset maths
-      const MATH_RESET_TAG_MANUAL = 'math-reset-2025-06-27-v1';
-      if(data.app._mathReset !== MATH_RESET_TAG_MANUAL) {
+      if(data.app._mathReset !== MATH_FINGERPRINT) {
         data.subjects = (data.subjects || []).filter(s => !/math/i.test(s.title || ''));
         if(typeof buildMathSub === 'function') {
           const freshMath = buildMathSub();
           data.subjects.splice(1, 0, freshMath);
         }
-        data.app._mathReset = MATH_RESET_TAG_MANUAL;
+        data.app._mathReset = MATH_FINGERPRINT;
       }
       
       upgrade();
