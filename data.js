@@ -119,7 +119,10 @@ const MATH_CHAPTER_EMOJIS = {
   "Espaces probabilisés": "🎲",
   "Variables aléatoires discrètes": "🎯",
   "Variables aléatoires à densité et variables générales": "📈",
-  "Vecteurs aléatoires et théorèmes limites": "🔔"
+  "Vecteurs aléatoires et théorèmes limites": "🔔",
+  // ✅ NOUVEAUX
+  "Fonctions vectorielles d'une variable réelle": "🪢",
+  "Convergences d'une suite de variables aléatoires": "🔔"
 };
 Object.entries(MATH_CHAPTER_EMOJIS).forEach(([k,v]) => C_EMOJIS[k] = v);
 
