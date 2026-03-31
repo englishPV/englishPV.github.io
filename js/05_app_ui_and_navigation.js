@@ -1928,12 +1928,11 @@ async function init() {
     }
 
     // ✅ Reset maths one-shot : change le tag pour forcer un nouveau reset
-    const MATH_RESET_TAG = 'math-reset-2025-06-28-v3';
-    if(data.app._mathReset !== MATH_RESET_TAG) {
+    if(data.app._mathReset !== MATH_FINGERPRINT) {
       data.subjects = (data.subjects ||[]).filter(s => !/math/i.test(s.title || ''));
       const freshMath = buildMathSub();
       data.subjects.splice(1, 0, freshMath);
-      data.app._mathReset = MATH_RESET_TAG;
+      data.app._mathReset = MATH_FINGERPRINT;
       saveData();
       console.log('[MATH RESET] Done — new math chapters loaded');
     }
