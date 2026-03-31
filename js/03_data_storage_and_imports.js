@@ -14,6 +14,14 @@ const GB={echec:'btn--red',difficile:'btn--amber',bien:'btn--blue',facile:'btn--
 /* --- DATA MODELS --- */
 let data;
 let dataMATH = (typeof RAW_MATH !== 'undefined') ? parseMathData(RAW_MATH) : [];
+const MATH_FINGERPRINT = (() => {
+  if (typeof RAW_MATH === 'undefined') return 'none';
+  let h = 0;
+  for (let i = 0; i < RAW_MATH.length; i++) {
+    h = ((h << 5) - h + RAW_MATH.charCodeAt(i)) | 0;
+  }
+  return 'math-auto-' + (h >>> 0).toString(36) + '-' + dataMATH.length;
+})();
 const parseRaw = r => r.split(/\r?\n/).map(l=>{ const p=l.split('|'); return p.length!==4 ? null : {id:p[0].trim(),front:p[1].trim(),back:p[2].trim(),chapter:p[3].trim()} }).filter(Boolean);
 const dataEN = (typeof RAW_EN !== 'undefined') ? parseRaw(RAW_EN) : [];
 const dataPHY = (typeof RAW_PHY !== 'undefined') ? parsePhysicsData(RAW_PHY) : [];
