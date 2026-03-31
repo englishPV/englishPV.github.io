@@ -4,10 +4,10 @@ const KEY = 'flashcards9x16_data', APP_VER = '2026-06-28-math-v15';
 const GRADES = ['unseen','echec','difficile','bien','facile'];
 const GRADE_INIT = () => Object.fromEntries(GRADES.map(g=>[g,0]));
 const GRADE_FILTERS = () => Object.fromEntries(GRADES.map(g=>[g,!0]));
-const MATH_TYPES = ['methode','theoreme','calcul'];
+const MATH_TYPES = ['methode','theoreme','calcul','piege'];
 const MATH_TYPE_FILTERS = () => Object.fromEntries(MATH_TYPES.map(t=>[t,!0]));
-const TYPE_COLORS = { methode:'#f59e0b', theoreme:'#3b82f6', calcul:'#22c55e' };
-const TYPE_LABELS = { methode:'Méthode', theoreme:'Théorème', calcul:'Calcul' };
+const TYPE_COLORS = { methode:'#f59e0b', theoreme:'#3b82f6', calcul:'#22c55e', piege:'#ef4444' };
+const TYPE_LABELS = { methode:'Méthode', theoreme:'Théorème', calcul:'Calcul', piege:'Piège' };
 const GC={unseen:'gray',echec:'red',difficile:'amber',bien:'blue',facile:'green'};
 const GB={echec:'btn--red',difficile:'btn--amber',bien:'btn--blue',facile:'btn--green'};
 
