@@ -1928,7 +1928,7 @@ async function init() {
     }
 
     // ✅ Reset maths one-shot : change le tag pour forcer un nouveau reset
-    const MATH_RESET_TAG = 'math-reset-2025-06-28-v2';
+    const MATH_RESET_TAG = 'math-reset-2025-06-28-v3';
     if(data.app._mathReset !== MATH_RESET_TAG) {
       data.subjects = (data.subjects ||[]).filter(s => !/math/i.test(s.title || ''));
       const freshMath = buildMathSub();
