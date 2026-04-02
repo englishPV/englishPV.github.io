@@ -153,9 +153,16 @@ backBtn.onclick = () => {
     // ✅ Révision rapide → retour immédiat sans confirmation
     if(State.review?.singleCardMode && State.review?.returnToCards) {
       const ret = State.review.returnToCards;
+      if(ret.chapterId.startsWith('group-')) {
+        const gid = ret.chapterId.replace('group-', '');
+        const sub = getSub();
+        const g = findGrp(sub, gid);
+        if(g) State.virtualChapter = buildVirt(sub, g);
+      }
       if(Nav.stack.length) Nav.stack.pop();
       State.review = null;
-      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos);
+      $('#app').classList.remove('focus-mode');
+      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos, ret.cardId);
       return;
     }
     if(!State.review?.end && !confirm('Quitter la révision ?')) return;
@@ -1127,8 +1134,9 @@ function goChapter(id,push=true){
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
-async function goCards(cid, push=true, savedSearch='', savedScroll=0){
+async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCardId=null){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
+  $('#app').classList.remove('focus-mode');
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
       v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:8px 16px;font-size:14px">+ Carte</button></div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
@@ -1163,6 +1171,7 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0){
   };
   await renderCards(savedSearch); 
 
+  // ✅ Restaurer la recherche dans l'input
   if(savedSearch) {
     $('#cardSearch').value = savedSearch;
   }
@@ -1206,13 +1215,18 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0){
     }
   };
 
-  // Restaurer le scroll si on revient d'une révision rapide
-  if(savedScroll > 0) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if(cg) cg.scrollTop = savedScroll;
-      });
-    });
+  // ✅ Scroll vers la carte évaluée (scrollIntoView = fiable)
+  if(scrollToCardId) {
+    setTimeout(() => {
+      const cardEl = cg?.querySelector(`.card-block[data-id="${scrollToCardId}"]`);
+      if(cardEl) {
+        cardEl.scrollIntoView({ block: 'center', behavior: 'instant' });
+        cardEl.classList.add('just-graded');
+        setTimeout(() => cardEl.classList.remove('just-graded'), 1500);
+      }
+    }, 80);
+  } else if(savedScroll > 0) {
+    setTimeout(() => { if(cg) cg.scrollTop = savedScroll; }, 80);
   }
 }
 function openCardEditor(chapter, existingCard, onSave) {
@@ -1482,16 +1496,28 @@ function subG(nxt){
   if(r.index<r.queue.length-1){
     r.index++;r.flipped=!1;r.cardStart=Date.now();
     debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
-    renRev()
+    renRev();
   } else {
     r.end=Date.now();
-    debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
+    saveData();
+    if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
 
     // ✅ Mode carte unique → retour direct au menu Cartes
     if(r.singleCardMode && r.returnToCards) {
       const ret = r.returnToCards;
+
+      // Reconstruire le chapitre virtuel pour qu'il reflète les grades à jour
+      if(ret.chapterId.startsWith('group-')) {
+        const gid = ret.chapterId.replace('group-', '');
+        const sub = getSub();
+        const g = findGrp(sub, gid);
+        if(g) State.virtualChapter = buildVirt(sub, g);
+      }
+
+      State.review = null;
+      $('#app').classList.remove('focus-mode');
       if(Nav.stack.length) Nav.stack.pop();
-      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos);
+      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos, ret.cardId);
     } else {
       goRecap(!1);
     }
@@ -1534,11 +1560,9 @@ function startSingleCardReview(chapterId, cardId, searchQuery, scrollPos) {
   if(!card) return;
 
   Nav.push();
-
-  const returnInfo = { chapterId, searchQuery, scrollPos };
+  const returnInfo = { chapterId, cardId, searchQuery, scrollPos };
 
   if(card._origin) {
-    // Carte de chapitre virtuel → mode multi avec la vraie carte
     State.review = {
       chapterId,
       queue: [{ chapId: card._origin.chapId, cardId: card._origin.cardId }],
