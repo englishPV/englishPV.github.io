@@ -150,6 +150,14 @@ backBtn.onclick = () => {
     } else if(t) goChapter(t,!1);
     else goDeck(!1);
   } else if(State.view==='review') {
+    // ✅ Révision rapide → retour immédiat sans confirmation
+    if(State.review?.singleCardMode && State.review?.returnToCards) {
+      const ret = State.review.returnToCards;
+      if(Nav.stack.length) Nav.stack.pop();
+      State.review = null;
+      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos);
+      return;
+    }
     if(!State.review?.end && !confirm('Quitter la révision ?')) return;
     if(Nav.stack.length) Nav.back();
     else goDeck(!1);
@@ -1119,9 +1127,8 @@ function goChapter(id,push=true){
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
-async function goCards(cid,push=true){
+async function goCards(cid, push=true, savedSearch='', savedScroll=0){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
-  // ✅ Filtrage par type
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
       v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:8px 16px;font-size:14px">+ Carte</button></div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
@@ -1154,13 +1161,59 @@ async function goCards(cid,push=true){
     await Media.resolve(grid);
     await tsLat(grid);
   };
-  await renderCards(); 
-      $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+  await renderCards(savedSearch); 
+
+  if(savedSearch) {
+    $('#cardSearch').value = savedSearch;
+  }
+
+  $('#cardSearch').oninput = (e) => renderCards(e.target.value);
   
   $('#addCardBtn').onclick = () => openCardEditor(c, null, () => goCards(cid, false));
-  
 
-  $('#cardsGrid').onclick=e=>{ const b=e.target.closest('.card-block'); if(b){ $$('.card-block').forEach(x=>{if(x!==b)x.classList.remove('flipped')}); b.classList.toggle('flipped'); } };
+  // === APPUI LONG → RÉVISION RAPIDE D'UNE CARTE ===
+  let lpTimer = null, lpDid = false, lpX = 0, lpY = 0;
+  const cg = $('#cardsGrid');
+
+  cg.addEventListener('pointerdown', e => {
+    const block = e.target.closest('.card-block');
+    if(!block || e.target.closest('img')) return;
+    lpX = e.clientX; lpY = e.clientY; lpDid = false;
+    lpTimer = setTimeout(() => {
+      lpDid = true;
+      haptic('medium');
+      startSingleCardReview(cid, block.dataset.id,
+        $('#cardSearch')?.value || '', cg.scrollTop || 0);
+    }, 400);
+  });
+
+  cg.addEventListener('pointermove', e => {
+    if(lpTimer && M.hypot(e.clientX - lpX, e.clientY - lpY) > 15) {
+      clearTimeout(lpTimer); lpTimer = null;
+    }
+  });
+
+  cg.addEventListener('pointerup', () => { clearTimeout(lpTimer); lpTimer = null; });
+  cg.addEventListener('pointercancel', () => { clearTimeout(lpTimer); lpTimer = null; });
+
+  // Click → flip (bloqué après un appui long)
+  cg.onclick = e => {
+    if(lpDid) { lpDid = false; return; }
+    const b = e.target.closest('.card-block');
+    if(b) {
+      $$('.card-block').forEach(x => { if(x !== b) x.classList.remove('flipped'); });
+      b.classList.toggle('flipped');
+    }
+  };
+
+  // Restaurer le scroll si on revient d'une révision rapide
+  if(savedScroll > 0) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if(cg) cg.scrollTop = savedScroll;
+      });
+    });
+  }
 }
 function openCardEditor(chapter, existingCard, onSave) {
   $$('.card-editor-overlay').forEach(el => el.remove());
@@ -1425,7 +1478,24 @@ function subG(nxt){
   const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
   (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
   r.answers.push({cardId:card.id,prev,next:nxt,ms});
-  if(r.index<r.queue.length-1){r.index++;r.flipped=!1;r.cardStart=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();renRev()}else{r.end=Date.now();debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();goRecap(!1)}
+
+  if(r.index<r.queue.length-1){
+    r.index++;r.flipped=!1;r.cardStart=Date.now();
+    debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
+    renRev()
+  } else {
+    r.end=Date.now();
+    debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
+
+    // ✅ Mode carte unique → retour direct au menu Cartes
+    if(r.singleCardMode && r.returnToCards) {
+      const ret = r.returnToCards;
+      if(Nav.stack.length) Nav.stack.pop();
+      goCards(ret.chapterId, false, ret.searchQuery, ret.scrollPos);
+    } else {
+      goRecap(!1);
+    }
+  }
 }
 
 function goRecap(push=true){
@@ -1457,7 +1527,38 @@ function startRev(cid,push=true,isCont=false){
   c.lastUsed=Date.now();saveData();
   continueOrNew(cid,bldQ(c,pool,sessionSize).map(x=>x.id),null,push,isCont)
 }
+function startSingleCardReview(chapterId, cardId, searchQuery, scrollPos) {
+  const c = getCh(chapterId);
+  if(!c) return;
+  const card = c.cards.find(x => x.id === cardId);
+  if(!card) return;
 
+  Nav.push();
+
+  const returnInfo = { chapterId, searchQuery, scrollPos };
+
+  if(card._origin) {
+    // Carte de chapitre virtuel → mode multi avec la vraie carte
+    State.review = {
+      chapterId,
+      queue: [{ chapId: card._origin.chapId, cardId: card._origin.cardId }],
+      index: 0, flipped: false, answers: [], history: [],
+      start: Date.now(), end: null, cardStart: Date.now(),
+      mode: 'multi', multiChaps: [card._origin.chapId],
+      singleCardMode: true, returnToCards: returnInfo
+    };
+  } else {
+    State.review = {
+      chapterId,
+      queue: [cardId],
+      index: 0, flipped: false, answers: [], history: [],
+      start: Date.now(), end: null, cardStart: Date.now(),
+      singleCardMode: true, returnToCards: returnInfo
+    };
+  }
+
+  goReview(false);
+}
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
   const all=ids.map(_real).filter(Boolean),pool=[];
   const seen=isCont&&State.review?new Set(State.review.queue.map(i=>i.cardId)):new Set();
