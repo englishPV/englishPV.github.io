@@ -1,0 +1,90 @@
+{
+ "v": 1,
+ "rev": 1791324271174,
+ "generatedAt": 1791324271174,
+ "repo": "englishPV/englishPV.github.io",
+ "branch": "arena/ab6565b9-englishpv-github-io",
+ "publishedBy": "jb.cedric0@gmail.com",
+ "drives": [
+  {
+   "id": "drv-mux87w0o-ury3b",
+   "slug": "exemple-41se",
+   "title": "Exemple",
+   "emoji": "📚",
+   "createdAt": 1791324269016,
+   "order": 10
+  }
+ ],
+ "files": [
+  {
+   "id": "fld-mux87w0o-eq5vo",
+   "driveId": "drv-mux87w0o-ury3b",
+   "parentId": null,
+   "name": "Chapitre 1 — Démonstration",
+   "kind": "folder",
+   "mime": "",
+   "size": 0,
+   "addedAt": 1791324269016,
+   "updatedAt": 1791324269016,
+   "publishedAt": 1791324271175,
+   "path": "content/drive/exemple-41se/Chapitre 1 — Démonstration",
+   "by": "jb.cedric0@gmail.com"
+  },
+  {
+   "id": "fil-mux87w0p-94gxd",
+   "driveId": "drv-mux87w0o-ury3b",
+   "parentId": "fld-mux87w0o-eq5vo",
+   "name": "fiche-revision.tex",
+   "kind": "latex",
+   "mime": "application/x-tex",
+   "size": 1705,
+   "addedAt": 1791324269017,
+   "updatedAt": 1791324269017,
+   "publishedAt": 1791324271175,
+   "path": "content/drive/exemple-41se/Chapitre 1 — Démonstration/fiche-revision.tex",
+   "by": "jb.cedric0@gmail.com"
+  },
+  {
+   "id": "fil-mux87w0s-zokig",
+   "driveId": "drv-mux87w0o-ury3b",
+   "parentId": "fld-mux87w0o-eq5vo",
+   "name": "vocabulaire.txt",
+   "kind": "text",
+   "mime": "text/plain",
+   "size": 62,
+   "addedAt": 1791324269020,
+   "updatedAt": 1791324269020,
+   "publishedAt": 1791324271175,
+   "path": "content/drive/exemple-41se/Chapitre 1 — Démonstration/vocabulaire.txt",
+   "by": "jb.cedric0@gmail.com"
+  },
+  {
+   "id": "fil-mux87w0s-w7r7i",
+   "driveId": "drv-mux87w0o-ury3b",
+   "parentId": null,
+   "name": "lisez-moi.md",
+   "kind": "markdown",
+   "mime": "text/plain",
+   "size": 146,
+   "addedAt": 1791324269020,
+   "updatedAt": 1791324269020,
+   "publishedAt": 1791324271175,
+   "path": "content/drive/exemple-41se/lisez-moi.md",
+   "by": "jb.cedric0@gmail.com"
+  },
+  {
+   "id": "fil-mux87w0t-bn15y",
+   "driveId": "drv-mux87w0o-ury3b",
+   "parentId": "fld-mux87w0o-eq5vo",
+   "name": "demo.png",
+   "kind": "image",
+   "mime": "image/png",
+   "size": 286,
+   "addedAt": 1791324269021,
+   "updatedAt": 1791324269021,
+   "publishedAt": 1791324271175,
+   "path": "content/drive/exemple-41se/Chapitre 1 — Démonstration/demo.png",
+   "by": "jb.cedric0@gmail.com"
+  }
+ ]
+}
