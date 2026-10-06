@@ -6169,6 +6169,38 @@ const RAW_EN = String.raw`
 8123|enrouler|wind / wound / wound|${VI}
 8124|(se) retirer, retirer de l’argent|withdraw / withdrew / withdrawn|${VI}
 8125|écrire|write / wrote / written|${VI}
+8126|respecter (la loi)|abide / abode / abode|${VI}
+8127|s'élever, survenir|arise / arose / arisen|${VI}
+8128|(se) réveiller|awake / awoke / awoken|${VI}
+8129|offrir (un prix)|bid / bid / bid|${VI}
+8130|élever (du bétail)|breed / bred / bred|${VI}
+8131|habiter|dwell / dwelt / dwelt|${VI}
+8132|jeter violemment|fling / flung / flung|${VI}
+8133|moudre|grind / ground / ground|${VI}
+8134|poser à plat|lay / laid / laid|${VI}
+8135|sauter|leap / leapt / leapt|${VI}
+8136|être étendu|lie / lay / lain|${VI}
+8137|payer|pay / paid / paid|${VI}
+8138|débarrasser|rid / rid / rid|${VI}
+8139|coudre|sew / sewed / sewn|${VI}
+8140|tondre (des moutons)|shear / sheared / shorn|${VI}
+8141|verser (des larmes)|shed / shed / shed|${VI}
+8142|ferrer, chausser|shoe / shod / shod|${VI}
+8143|lancer (avec force)|sling / slung / slung|${VI}
+8144|aller furtivement|slink / slunk / slunk|${VI}
+8145|fendre, inciser|slit / slit / slit|${VI}
+8146|semer|sow / sowed / sown|${VI}
+8147|épeler|spell / spelt / spelt|${VI}
+8148|renverser (un liquide)|spill / spilt / spilt|${VI}
+8149|cracher|spit / spat / spat|${VI}
+8150|puer|stink / stank / stunk|${VI}
+8151|marcher à grands pas|stride / strode / stridden|${VI}
+8152|enfiler, tendre (une corde)|string / strung / strung|${VI}
+8153|s'efforcer|strive / strove / striven|${VI}
+8154|balayer|sweep / swept / swept|${VI}
+8155|enfoncer|thrust / thrust / thrust|${VI}
+8156|pleurer|weep / wept / wept|${VI}
+8157|tordre|wring / wrung / wrung|${VI}
 
 `.trim();
 
