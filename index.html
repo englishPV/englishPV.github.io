@@ -79,10 +79,16 @@
       aspect-ratio: 9/16; height: 100%; width: auto;
       max-width: 100%; max-height: 100%;
       display: grid;
-      grid-template-rows: var(--row-top,52px) 1fr var(--row-actions,0px) var(--row-rev,0px);
+      grid-template-rows: var(--row-top,52px) var(--row-tabs,0px) 1fr
+                          var(--row-actions,0px) var(--row-rev,0px);
       position: relative; min-height: 0;
       touch-action: pan-y; overflow: hidden;
     }
+    .topbar { grid-row: 1; }
+    #driveTabs { grid-row: 2; }
+    main#view { grid-row: 3; }
+    .bottom-actions { grid-row: 4; }
+    .revision-bar, .review-actions-bar { grid-row: 5; }
     @media(min-width: 1024px) {
       .phone { aspect-ratio: auto; width: 100%; height: 100dvh; }
     }
@@ -142,8 +148,11 @@
     <link rel="preload" href="css/01_styles_theme_and_layout.css?v=27d"
   
         as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" href="css/02_drive.css?v=1"
+        as="style" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript>
     <link rel="stylesheet" href="css/01_styles_theme_and_layout.css" />
+    <link rel="stylesheet" href="css/02_drive.css" />
   </noscript>
 </head>
 <body>
@@ -172,6 +181,9 @@
            style="flex-shrink:0;text-decoration:none;
                   width:auto;padding:6px 12px">📅</a>
       </header>
+
+      <!-- Onglets Drive (admin : création + publication ; autres : lecture) -->
+      <nav id="driveTabs" class="drive-tabs hidden" aria-label="Onglets Drive"></nav>
 
       <main id="view"></main>
 
@@ -236,5 +248,10 @@
   <script defer src="js/03_data_storage_and_imports.js"></script>
   <script defer src="js/04_srs_algorithm_and_stats.js?v=fsrs1"></script>
   <script defer src="js/05_app_ui_and_navigation.js?v=27d"></script>
+
+  <!-- Drive : stockage + publication GitHub, compilation LaTeX, interface -->
+  <script defer src="js/06_drive_store.js?v=1"></script>
+  <script defer src="js/07_drive_tex.js?v=1"></script>
+  <script defer src="js/08_drive_ui.js?v=1"></script>
 </body>
 </html>

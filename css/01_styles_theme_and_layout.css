@@ -35,8 +35,9 @@
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; font-size: 17px; -webkit-font-smoothing: antialiased; }
 .wrapper { height: 100dvh; width: 100%; display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-.phone { aspect-ratio: 9/16; height: 100%; width: auto; max-width: 100%; max-height: 100%; display: grid; grid-template-rows: var(--row-top,52px) 1fr var(--row-actions,52px) var(--row-rev,64px); position: relative; min-height: 0; touch-action: pan-y; overflow: hidden; }
-@media(min-width: 1024px) { .phone { aspect-ratio: auto; width: 100%; height: 100dvh; } .topbar, main#view, .bottom-actions, .revision-bar, .review-actions-bar { max-width: 1200px; margin: 0 auto; width: 100%; } main#view { padding: 16px 20px; overflow-y: auto; } }
+.phone { aspect-ratio: 9/16; height: 100%; width: auto; max-width: 100%; max-height: 100%; display: grid; grid-template-rows: var(--row-top,52px) var(--row-tabs,0px) 1fr var(--row-actions,52px) var(--row-rev,64px); position: relative; min-height: 0; touch-action: pan-y; overflow: hidden; }
+.topbar { grid-row: 1; } #driveTabs { grid-row: 2; } main#view { grid-row: 3; } .bottom-actions { grid-row: 4; } .revision-bar { grid-row: 5; }
+@media(min-width: 1024px) { .phone { aspect-ratio: auto; width: 100%; height: 100dvh; } .topbar, #driveTabs, main#view, .bottom-actions, .revision-bar, .review-actions-bar { max-width: 1200px; margin: 0 auto; width: 100%; } main#view { padding: 16px 20px; overflow-y: auto; } }
 
 /* --- COMPONENTS --- */
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; padding: 0 10px; }
@@ -184,7 +185,7 @@ mjx-math { white-space: normal !important; max-width: 100%; }
 img { display: block; max-width: 100%; height: auto; margin: 10px auto; border-radius: 8px; background: var(--border); user-select: none; object-fit: contain; opacity: 1 !important; }
 
 .bottom-actions, .revision-bar, .review-actions-bar { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); display: none; background: 0 0; border-top: 0; }
-.bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 4; backdrop-filter: blur(8px) saturate(140%); }
+.bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; } .review-actions-bar { grid-row: 5; backdrop-filter: blur(8px) saturate(140%); }
 
 .btn, .action, .rev-btn { background: var(--btn-bg,var(--btn-neutral-bg)); color: var(--btn-fg,var(--btn-neutral-fg)); border: 1px solid var(--btn-bd,var(--btn-neutral-bd)); border-radius: var(--radius-md); padding: 10px 12px; font-weight: 900; cursor: pointer; transition: .15s; width: 100%; appearance: none; outline: 0; font-size: 15px; }
 .btn:hover { background: var(--btn-bg-h,var(--btn-bg,var(--btn-neutral-bg-h))); } .btn:disabled { opacity: .6; cursor: not-allowed; }
