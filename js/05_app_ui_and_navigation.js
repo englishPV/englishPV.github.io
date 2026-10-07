@@ -1621,11 +1621,16 @@ function subG(nxt){
 
   if(r.index<r.queue.length-1){
     r.index++;r.flipped=!1;r.cardStart=Date.now();
-    debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
+    debouncedSave();
+    /* Synchro cloud toutes les 10 cartes : avant, un push de l'intégralité
+       des données par carte se cumulait (2 à 6 s par push) et la plupart
+       des pushes étaient jetés → divergence entre appareils. */
+    if(r.answers.length%10===0 && typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
     renRev();
   } else {
     r.end=Date.now();
     saveData();
+    /* Fin de session → push toujours effectué (jamais perdu) */
     if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
 
     // ✅ Mode carte unique → retour direct au menu Cartes
@@ -2169,13 +2174,15 @@ function removeSplash() {
 async function syncInBackground() {
   if (typeof firebase === 'undefined') return; // mode local : pas de sync
   if (!FireSync.isConnected) {
+    /* Attendre la restauration de la session (peut prendre quelques
+       secondes sur téléphone) avant la synchronisation de démarrage */
     await Promise.race([
       new Promise(resolve => {
         const unsub = firebase.auth().onAuthStateChanged(user => {
           if (user) { unsub(); resolve(); }
         });
       }),
-      new Promise(resolve => setTimeout(resolve, 5000))
+      new Promise(resolve => setTimeout(resolve, 8000))
     ]);
   }
 
@@ -2239,6 +2246,12 @@ async function init() {
           FireSync.pushToCloud();
         }
       }
+    });
+    /* pagehide : dernier effort avant la fermeture de l'onglet/app
+       (couvre iOS quand visibilitychange ne suffit pas) */
+    window.addEventListener('pagehide', () => {
+      try { saveData(); } catch (e) {}
+      if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     });
 
   } catch (e) {
