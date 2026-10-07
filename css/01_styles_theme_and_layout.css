@@ -279,17 +279,18 @@ img { display: block; max-width: 100%; height: auto; }
   display: flex; align-items: center; gap: 10px;
   padding: 6px 8px 14px;
 }
-.brand-mark {
-  width: 32px; height: 32px; flex: none; border-radius: 9px;
-  display: grid; place-items: center;
-  color: #fff;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--primary) 92%, white),
-                                        color-mix(in srgb, var(--primary) 78%, black));
-  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--primary) 75%, transparent), var(--inset-hi);
+.brand-logo {
+  width: 26px; height: 26px; flex: none;
+  color: var(--primary);
+  fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
-.brand-mark .ico { stroke-width: 1.9; }
-.brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.02em; }
-.brand-sub { font-size: 11.5px; color: var(--faint); font-weight: 500; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.brand-name { font-size: 14.5px; font-weight: 700; letter-spacing: -.02em; }
+.brand-sub {
+  font-size: 11.5px; color: var(--faint); font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;
+}
 
 .sidebar__label {
   padding: 4px 10px 2px;

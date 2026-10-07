@@ -58,7 +58,12 @@ Composants prêts à l'emploi : `.btn` (+ `--primary`, `--solid`, `--outline`, `
 | `⌘/Ctrl` + `K` ou `/` | Rechercher une carte |
 | `Espace` / `Entrée` (révision) | Retourner la carte |
 | `1` `2` `3` `4` (révision) | Échec · Difficile · Bien · Facile |
+| `Maj` + molette | Agrandir / réduire la police (équivalent du pincement tactile) |
 | `Échap` | Fermer le tiroir, les menus et la visionneuse d'images |
+
+Sur ordinateur, `Maj` + molette agit sur la face survolée en révision (recto ou verso)
+et sur les deux tailles ailleurs ; un petit indicateur affiche la valeur courante. La
+grille de cartes suit également ces deux réglages.
 
 ## Développement
 

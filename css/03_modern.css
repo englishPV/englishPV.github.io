@@ -961,3 +961,26 @@ mjx-container[display="true"] { display: block; }
 .dcrumb-sep .ico { width: 13px; height: 13px; }
 .dfile-head .ico, .drow-acts .ico { vertical-align: -3px; }
 .dpub .ico, .dbtn .ico { flex: none; }
+
+/* ───────────  19. Zoom typographique (Maj + molette)  ─────────── */
+.zoom-hud {
+  position: fixed; left: 50%; bottom: 26px; z-index: 9500;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-full);
+  background: var(--glass-strong);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  color: var(--text);
+  font-size: 12.5px; font-weight: 650; font-variant-numeric: tabular-nums;
+  box-shadow: var(--shadow-2);
+  opacity: 0; pointer-events: none;
+  transform: translateX(-50%) translateY(8px);
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease-out);
+}
+.zoom-hud.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.zoom-hud .ico { color: var(--muted); }
+
+/* La grille de cartes suit aussi la taille de police choisie */
+.card-block .term { font-size: clamp(14px, calc(var(--fs-term) * .75), 26px); }
+.card-block .definition { font-size: clamp(12.5px, calc(var(--fs-def) * .58), 22px); }

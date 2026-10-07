@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Choix du logo — Flashcards</title>
+  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css?v=31" />
+  <link rel="stylesheet" href="css/03_modern.css?v=31" />
+  <style>
+    body { overflow: auto; background: var(--bg); }
+    .lab { max-width: 940px; margin: 0 auto; padding: 40px 20px 80px; }
+    .lab h1 { font-size: 26px; letter-spacing: -.03em; margin-bottom: 6px; }
+    .lab__intro { color: var(--muted); font-size: 14px; margin-bottom: 28px; max-width: 62ch; }
+    .lab__grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 720px) { .lab__grid { grid-template-columns: 1fr 1fr; } }
+    .lab__card {
+      border: 1px solid var(--hairline); border-radius: var(--radius-lg);
+      background: var(--surface); box-shadow: var(--shadow-1); overflow: hidden;
+    }
+    .lab__head { display: flex; align-items: baseline; gap: 10px; padding: 12px 16px 0; }
+    .lab__num {
+      display: grid; place-items: center; width: 22px; height: 22px; flex: none;
+      border-radius: var(--radius-full); background: var(--primary-soft); color: var(--btn-soft-primary-fg);
+      font-size: 11.5px; font-weight: 700;
+    }
+    .lab__title { font-size: 13.5px; font-weight: 650; }
+    .lab__desc { padding: 2px 16px 0 48px; font-size: 12.5px; color: var(--faint); }
+    .lab__demo { padding: 18px 16px 16px; }
+    .lab__strip { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .lab__tile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--surface) 55%, transparent);
+      border: 1px solid var(--divider);
+    }
+    .lab__light { background: #fff; color: #0f1319; border-color: #e2e5eb; }
+    [data-theme="light"] .lab__light { background: #fff; }
+    .lab__size { font-size: 11px; color: var(--faint); }
+
+    /* ── les 6 pistes ── */
+    .brand-logo { width: 26px; height: 26px; flex: none; fill: none; stroke: currentColor;
+                  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .brand-logo--accent { color: var(--primary); }
+    .brand-mark {
+      display: grid; place-items: center; flex: none; width: 32px; height: 32px;
+      border-radius: 9px; background: var(--primary); color: #fff;
+      box-shadow: var(--inset-hi);
+    }
+    .brand-mark .brand-logo { width: 19px; height: 19px; stroke-width: 2; color: inherit; }
+    .brand-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex: none;
+      background: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+    .wordmark { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+    .wordmark .name { font-size: 14.5px; font-weight: 700; letter-spacing: -.02em; }
+    .wordmark .sub { font-size: 11.5px; color: var(--faint); font-weight: 500; }
+    .lab__light .wordmark .sub { color: #6c7488; }
+    .swatch-mini { width: 16px; height: 16px; }
+    .swatch-mini .brand-logo { width: 16px; height: 16px; }
+    .swatch-mini .brand-mark { width: 20px; height: 20px; border-radius: 6px; }
+    .swatch-mini .brand-mark .brand-logo { width: 13px; height: 13px; }
+  </style>
+</head>
+<body>
+<div class="lab">
+  <h1>Quel logo ?</h1>
+  <p class="lab__intro">
+    Six pistes pour la marque en haut à gauche (et la favicon). Chaque piste est montrée
+    telle qu'elle apparaît dans la barre latérale, en thème sombre et clair, puis en toute
+    petite taille. Répondez simplement avec le numéro qui vous plaît — je l'installe partout.
+  </p>
+
+  <div class="lab__grid" id="lab"></div>
+</div>
+
+<script>
+const CARD_GLYPH = `
+  <rect x="3" y="6.6" width="12.4" height="14.4" rx="3" />
+  <path d="M8.6 3h7.9A3.5 3.5 0 0 1 20 6.5V16" />
+  <path d="M6.6 11.4h5.4M6.6 14.8h3.4" />`;
+
+const BOLT_GLYPH = `<path d="M13.2 2.2 4.6 13.4h6.1l-1 8.4 8.7-11.2h-6.1z" />`;
+
+const F_GLYPH = `<path d="M8.5 19.5V4.5h7.5" /><path d="M8.5 11.6h5.6" />`;
+
+const VARIANTS = [
+  {
+    n: 1, title: 'Glyphe seul, en accent',
+    desc: 'Deux cartes empilées, trait fin, plus de pavé violet. Discret, s’accorde avec la couleur d’accent choisie.',
+    logo: `<svg class="brand-logo brand-logo--accent" viewBox="0 0 24 24" aria-hidden="true">${CARD_GLYPH}</svg>`
+  },
+  {
+    n: 2, title: 'Pavé plein plat',
+    desc: 'Le pavé arrondi revient, mais sans dégradé : un aplat de la couleur d’accent, glyphe blanc.',
+    logo: `<span class="brand-mark"><svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true">${CARD_GLYPH}</svg></span>`
+  },
+  {
+    n: 3, title: 'Éclair',
+    desc: 'Référence directe aux « flash »cards. Lisible à toute taille, très identifiable.',
+    logo: `<svg class="brand-logo brand-logo--accent" viewBox="0 0 24 24" aria-hidden="true">${BOLT_GLYPH}</svg>`
+  },
+  {
+    n: 4, title: 'Éclair sur pavé',
+    desc: 'Même éclair, dans un pavé d’accent plein. Plus « app », plus visible dans le coin.',
+    logo: `<span class="brand-mark"><svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true">${BOLT_GLYPH}</svg></span>`
+  },
+  {
+    n: 5, title: 'Monogramme F',
+    desc: 'Un F dessiné au trait, sans emoji ni pictogramme : sobre, proche d’une marque produit.',
+    logo: `<svg class="brand-logo brand-logo--accent" viewBox="0 0 24 24" aria-hidden="true">${F_GLYPH}</svg>`
+  },
+  {
+    n: 6, title: 'Sans logo',
+    desc: 'Uniquement le nom, avec une pastille d’accent. Le plus neutre, aucun risque de mauvais goût.',
+    logo: `<span class="brand-dot"></span>`
+  }
+];
+
+document.getElementById('lab').innerHTML = VARIANTS.map(v => `
+  <section class="lab__card">
+    <div class="lab__head"><span class="lab__num">${v.n}</span><span class="lab__title">${v.title}</span></div>
+    <div class="lab__desc">${v.desc}</div>
+    <div class="lab__demo">
+      <div class="lab__strip">
+        <div class="lab__tile">
+          ${v.logo}
+          <span class="wordmark"><span class="name">Flashcards</span><span class="sub">Physique</span></span>
+        </div>
+        <div class="lab__tile lab__light">
+          ${v.logo}
+          <span class="wordmark"><span class="name">Flashcards</span><span class="sub">Physique</span></span>
+        </div>
+      </div>
+      <div class="lab__strip" style="margin-top:14px; align-items:center">
+        <span class="lab__size">petite taille :</span>
+        <span class="swatch-mini">${v.logo}</span>
+        <span class="lab__size" style="font-size:16px">— et sur une page GitHub / aperçu d’onglet, le pavé reste plus lisible.</span>
+      </div>
+    </div>
+  </section>`).join('');
+</script>
+</body>
+</html>

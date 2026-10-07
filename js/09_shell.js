@@ -271,6 +271,68 @@
     if (back) back.onclick = () => goChapter(cid, false);
   };
 
+  /* ─────────── Zoom typographique : Maj + molette (ordinateur) ───────────
+     Équivalent souris du pincement sur mobile : agit sur la face survolée
+     (recto / verso) en révision, sinon sur les deux tailles à la fois. */
+  const FZ_MIN = 12, FZ_MAX = 72;
+  let lastZoomStep = 0, hudTimer = null, zoomAcc = 0;
+
+  function zoomHud(text) {
+    let el = document.getElementById('zoomHud');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'zoomHud';
+      el.className = 'zoom-hud';
+      el.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(el);
+    }
+    el.innerHTML = `${ico('keyboard', 'ico--sm')}<span></span>`;
+    el.lastElementChild.textContent = text;
+    el.classList.add('show');
+    clearTimeout(hudTimer);
+    hudTimer = setTimeout(() => el.classList.remove('show'), 1100);
+  }
+
+  /* Si l'écran des réglages est ouvert, les curseurs suivent le zoom */
+  function syncFontControls(P) {
+    if (typeof State === 'undefined' || State.view !== 'settings') return;
+    const sT = document.getElementById('sldT');
+    const sD = document.getElementById('sldD');
+    if (sT) { sT.value = P.fsTerm; sT.dispatchEvent(new Event('input')); }
+    if (sD) { sD.value = P.fsDef; sD.dispatchEvent(new Event('input')); }
+  }
+
+  document.addEventListener('wheel', (e) => {
+    if (!e.shiftKey) return;
+    if (!e.target || !e.target.closest) return;
+    if (e.target.closest('.scroll-x')) return;           // laisse le défilement horizontal
+    const delta = e.deltaY || e.deltaX;
+    if (!delta) return;
+    e.preventDefault();
+
+    const now = Date.now();
+    if (now - lastZoomStep < 85) return;                 // cadence régulière, même au trackpad
+    lastZoomStep = now;
+
+    let face = 'both';
+    if (e.target.closest('.review-card')) {
+      face = e.target.closest('.term') ? 'term' : (e.target.closest('.definition') ? 'def' : 'both');
+    }
+
+    const P = data?.app?.prefs;
+    if (!P) return;
+    const step = v => Math.min(FZ_MAX, Math.max(FZ_MIN, Math.round(v * (delta > 0 ? 0.95 : 1.05))));
+    if (face !== 'def') P.fsTerm = step(P.fsTerm || 20);
+    if (face !== 'term') P.fsDef = step(P.fsDef || 24);
+
+    applyUI();
+    if (typeof debouncedSave === 'function') debouncedSave();
+    syncFontControls(P);
+    zoomHud(face === 'term' ? `Recto · ${P.fsTerm} px`
+          : face === 'def' ? `Verso · ${P.fsDef} px`
+          : `Police · ${P.fsTerm} / ${P.fsDef} px`);
+  }, { passive: false });
+
   /* Navigation clavier sur le titre (matières) */
   $('#title')?.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#title').click(); }
