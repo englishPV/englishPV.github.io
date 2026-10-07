@@ -1,18 +1,32 @@
 /* ════════════════════════════════════════════════════
-   03_modern.css — Refresh visuel (à charger EN DERNIER)
-   Ne touche ni au layout ni aux classes → 0 perte de fonction.
-   Rollback : supprimer le <link>.
+   03_modern.css — Refresh visuel complet (v2)
    ════════════════════════════════════════════════════ */
 
-/* ── 1. Tokens ── */
+/* ── 1. Tokens & Variables ── */
 :root {
   --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px;
   --ease: cubic-bezier(.2,.8,.2,1);
   --spring: cubic-bezier(.34,1.56,.64,1);
   --hairline: color-mix(in srgb, var(--border) 70%, transparent);
   --ring: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent);
+
+  /* Pastilles d'accent manquantes */
+  --teal: #14b8a6; --emerald: #10b981; --rose: #f43f5e; --violet: #8b5cf6;
+
+  /* Retours visuels (feedback) */
+  --m-ok: #10b981;  --m-ok-bg: rgba(16,185,129,.14);
+  --m-ko: #f43f5e;  --m-ko-bg: rgba(244,63,94,.14);
+  --m-tint: rgba(99,102,241,.13);  --m-ring: rgba(99,102,241,.30);
 }
-/* Thème sombre uniquement (sinon on écraserait le thème clair) */
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  :root {
+    --m-tint: color-mix(in srgb, var(--primary) 13%, transparent);
+    --m-ring: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+}
+
+/* Thème sombre (par défaut) */
 :root:not([data-theme="light"]) {
   color-scheme: dark;
   --bg: #090d1a; --surface: #10152a; --surface-2: #151b33; --card: #141a30;
@@ -24,6 +38,8 @@
   --btn-neutral-bg: rgb(255 255 255 / .045);
   --btn-neutral-bg-h: rgb(255 255 255 / .085);
 }
+
+/* Thème clair */
 [data-theme="light"] {
   color-scheme: light;
   --surface-2: #f8fafc; --border: #dbe2ec;
@@ -43,13 +59,13 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   letter-spacing: -.006em;
 }
-button, input, textarea, select { font-family: inherit; } /* les boutons n'héritaient pas la police */
+button, input, textarea, select { font-family: inherit; }
 ::selection { background: color-mix(in srgb, var(--primary) 35%, transparent); }
 :is(.btn, .dbtn, .dtab, .dact, .dtool, .latex-btn, .editor-face-tab, .step-btn, .topbar .back, .dmodal-x, .ce-close-btn):focus-visible {
   outline: 2px solid var(--primary); outline-offset: 2px;
 }
 
-/* ── 3. Barres ── */
+/* ── 3. Barres & Navigation ── */
 .topbar {
   background: var(--glass);
   backdrop-filter: blur(16px) saturate(170%); -webkit-backdrop-filter: blur(16px) saturate(170%);
@@ -76,14 +92,111 @@ button, input, textarea, select { font-family: inherit; } /* les boutons n'héri
 }
 .rev-btn { padding: 14px 16px; font-size: 16px; border-radius: 16px; }
 
-/* ── 5. Champs ── */
-.input, .card-editor-field textarea {
+/* ── 5. Champs simples ── */
+.input {
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
   transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
 }
-.input:focus, .card-editor-field textarea:focus { border-color: var(--primary); box-shadow: var(--ring); }
+.input:focus { border-color: var(--primary); box-shadow: var(--ring); }
 
-/* ── 6. Liste des decks ── */
+/* ── 6. Éditeur de carte (vrais sélecteurs) ── */
+#ceFrontWrap textarea,
+#ceBackWrap textarea {
+  width: 100%; box-sizing: border-box; min-height: 120px; resize: vertical;
+  margin: 0; padding: 12px 14px;
+  font: inherit; font-size: 16px; line-height: 1.5; /* 16px évite le zoom auto sur iOS */
+  color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--radius-md, 14px);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+#ceFrontWrap textarea:focus,
+#ceBackWrap textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--m-ring); }
+.card-editor-preview {
+  margin-top: 10px; padding: 12px 14px;
+  background: var(--surface); border: 1px dashed var(--border);
+  border-radius: var(--radius-md, 14px); overflow-x: auto;
+}
+.card-editor-preview:empty { padding: 0; border: 0; margin: 0; }
+
+/* ── 7. Module QCM ── */
+:where(.qcm-options) { display: grid; gap: 10px; }
+:where(.qcm-option) { display: flex; }
+:where(.qcm-letter) { display: grid; place-items: center; }
+
+.qcm-question {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-lg, 18px);
+  box-shadow: var(--shadow-1);
+  padding: 18px 16px; margin: 0 0 14px;
+  font-size: 1.06rem; font-weight: 600; line-height: 1.5;
+  overflow-wrap: break-word;
+}
+.qcm-option {
+  -webkit-appearance: none; appearance: none;
+  align-items: flex-start; justify-content: flex-start; gap: 12px;
+  width: 100%; margin: 0; padding: 12px 14px;
+  text-align: left; font: inherit; color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: var(--radius-md, 14px);
+  box-shadow: var(--shadow-1);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform .12s var(--ease), border-color .2s, background-color .2s, box-shadow .2s;
+}
+.qcm-option:active:not(:disabled) { transform: scale(.985); }
+@media (hover: hover) {
+  .qcm-option:hover:not(:disabled) { border-color: var(--primary); box-shadow: var(--shadow-2); }
+}
+.qcm-letter {
+  flex: 0 0 28px; height: 28px; border-radius: 9px;
+  background: var(--m-tint); color: var(--primary);
+  font-weight: 800; font-size: .85rem; line-height: 1;
+  transition: background-color .2s, color .2s;
+}
+.qcm-text { flex: 1 1 auto; min-width: 0; padding-top: 3px; line-height: 1.45; color: inherit; overflow-wrap: break-word; }
+
+.qcm-option.qcm-correct {
+  border-color: var(--m-ok);
+  background: linear-gradient(var(--m-ok-bg), var(--m-ok-bg)) var(--surface);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.18);
+  animation: m-pop .32s var(--spring, cubic-bezier(.34,1.56,.64,1));
+}
+.qcm-option.qcm-wrong {
+  border-color: var(--m-ko);
+  background: linear-gradient(var(--m-ko-bg), var(--m-ko-bg)) var(--surface);
+  animation: m-shake .36s ease;
+}
+.qcm-option.qcm-correct .qcm-letter { background: var(--m-ok); color: #fff; }
+.qcm-option.qcm-wrong   .qcm-letter { background: var(--m-ko); color: #fff; }
+.qcm-option:disabled { cursor: default; color: var(--text); opacity: 1; }
+.qcm-option:disabled:not(.qcm-correct):not(.qcm-wrong) { opacity: .5; box-shadow: none; }
+
+@keyframes m-pop { 0% { transform: scale(.97); } 60% { transform: scale(1.02); } 100% { transform: scale(1); } }
+@keyframes m-shake {
+  0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); }
+}
+
+/* ── 8. Récapitulatif de fin de session ── */
+.card.recap {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 22px;
+  box-shadow: var(--shadow-2);
+  padding: 24px 18px 18px; text-align: center;
+  animation: m-rise .35s var(--ease) both;
+}
+.card.recap h2 { margin: 0 0 4px; font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; }
+.card.recap .subtitle { margin: 0 0 18px; color: var(--muted); font-size: .92rem; }
+:where(.card.recap .grid2) { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card.recap .stat {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-md, 14px); padding: 12px 10px;
+}
+.card.recap .stat .label { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.card.recap .stat .val { margin-top: 4px; font-size: 1.55rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.card.recap .cta { margin-top: 18px; }
+@keyframes m-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── 9. Liste des decks & Navigation ── */
 .deck-item { border-bottom-color: var(--hairline); }
 .deck-emoji {
   border-radius: 13px;
@@ -93,8 +206,39 @@ button, input, textarea, select { font-family: inherit; } /* les boutons n'héri
 .deck-info .deck-title { font-weight: 700; letter-spacing: -.01em; }
 .deck-info .deck-sub .mini-bar { height: 5px; border-radius: 99px; }
 .add-row-icon { border-radius: 13px; }
+.folder-badge { border-radius: 999px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mini-bar { border-radius: 999px; overflow: hidden; }
+.drag-ghost { box-shadow: var(--shadow-3); border-radius: var(--radius-lg, 18px); }
+.sel-checkbox { accent-color: var(--primary); }
 
-/* ── 7. Stats ── */
+/* ── 10. Recherche globale (surcharge propre du inline) ── */
+#globalSearchResults { box-shadow: var(--shadow-3) !important; }
+.gs-result { border-radius: 12px; transition: background-color .15s; }
+@media (hover: hover) { .gs-result:hover { background: var(--m-tint) !important; } }
+.gs-result:active { background: var(--m-tint) !important; }
+.gs-front { font-weight: 600; }
+.gs-back { color: var(--muted); }
+
+/* ── 11. Cartes & Révision ── */
+.card-block { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-1); }
+.card-block.flipped { box-shadow: var(--shadow-2); }
+.term, .definition { line-height: 1.45; letter-spacing: -.01em; }
+.definition { font-weight: 800; }
+.progress-bar { height: 4px; box-shadow: 0 0 12px color-mix(in srgb, var(--primary) 60%, transparent); }
+#reviewActionsBar .btn { border-radius: 14px; }
+#reviewActionsBar .row-4 .btn { text-transform: capitalize; font-weight: 800; letter-spacing: .01em; }
+.definition[style*="border-top"] { border-top: 1px solid var(--border) !important; }
+#undoBtn { border-radius: 999px !important; box-shadow: var(--shadow-2) !important; font-weight: 700; }
+.deadline-box {
+  padding: 10px 12px; background: var(--m-tint);
+  border: 1px solid var(--border); border-radius: var(--radius-md, 14px);
+}
+mjx-container[display="true"]:not(.review-card *) {
+  max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  padding: 2px 0; -webkit-overflow-scrolling: touch;
+}
+
+/* ── 12. Statistiques ── */
 .section-title { font-weight: 800; letter-spacing: .02em; }
 .stat-card {
   background: linear-gradient(180deg, var(--surface-2), var(--surface));
@@ -104,25 +248,21 @@ button, input, textarea, select { font-family: inherit; } /* les boutons n'héri
 .legend-item { border-radius: 999px; padding: 4px 10px; }
 .bar7-row .bar7-track { background: color-mix(in srgb, var(--border) 80%, transparent); }
 
-/* ── 8. Cartes & révision ── */
-.card-block { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-1); }
-.card-block.flipped { box-shadow: var(--shadow-2); }
-.term, .definition { line-height: 1.45; letter-spacing: -.01em; }
-.definition { font-weight: 800; }
-.progress-bar { height: 4px; box-shadow: 0 0 12px color-mix(in srgb, var(--primary) 60%, transparent); }
-
-/* ── 9. Paramètres ── */
+/* ── 13. Paramètres ── */
 .settings-hero { font-weight: 800; letter-spacing: -.025em; }
 .settings-section { border-radius: 16px; border-color: var(--hairline); box-shadow: var(--shadow-1); }
 .settings-row { border-bottom-color: var(--hairline); }
 .settings-row .s-icon { border-radius: 9px; box-shadow: inset 0 1px 0 rgb(255 255 255 / .2); }
 .s-toggle, .s-toggle::after { transition-duration: .25s; transition-timing-function: var(--spring); }
+.s-slider { accent-color: var(--primary); }
+.step-btn { border-radius: 10px; font-weight: 800; }
+.preview-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md, 14px); }
 
-/* ── 10. Menus, modales, éditeur, toast ── */
+/* ── 14. Modales, éditeur overlay, Drive ── */
 .subject-menu { border-radius: 16px; box-shadow: var(--shadow-3); }
 .card-editor-overlay { background: rgb(2 6 23 / .55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .card-editor { border-radius: 24px 24px 0 0; box-shadow: var(--shadow-3); animation-duration: .32s; animation-timing-function: var(--ease); }
-.card-editor::before { /* poignée style iOS */
+.card-editor::before {
   content: ""; align-self: center; flex-shrink: 0;
   width: 38px; height: 5px; margin-top: 8px; border-radius: 99px; background: var(--border);
 }
@@ -136,14 +276,24 @@ button, input, textarea, select { font-family: inherit; } /* les boutons n'héri
   border-radius: 14px; background: var(--glass); box-shadow: var(--shadow-2);
   backdrop-filter: blur(16px) saturate(170%); -webkit-backdrop-filter: blur(16px) saturate(170%);
 }
-
-/* ── 11. Drive ── */
-.dtab { font-family: inherit; line-height: 1.2; } /* le raccourci `font: … inherit` était invalide */
+.dtab { font-family: inherit; line-height: 1.2; }
 .drow { border-radius: 14px; transition: background .15s, border-color .15s, box-shadow .2s var(--ease), transform .1s; }
 .drow-name { font-weight: 700; }
-.dedit-text { background: var(--surface-2); } /* color-mix(var(--bg)) cassait en thème clair */
+.dedit-text { background: var(--surface-2); }
+.dtitle-sub { margin-left: 6px; color: var(--muted); font-weight: 600; font-size: .78em; }
+:where(.dbadge-big) { display: inline-flex; align-items: center; gap: 6px; }
+.dbadge-big {
+  padding: 4px 10px; border-radius: 999px;
+  background: var(--m-tint); color: var(--primary);
+  font-weight: 800; font-size: .8rem; font-variant-numeric: tabular-nums;
+}
+.scroll-x {
+  overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: thin;
+}
+.dlatex { max-width: 100%; overflow-x: auto; }
 
-/* ── 12. Survol : seulement sur souris (évite le hover "collé" sur mobile) ── */
+/* ── 15. Survol (souris uniquement) ── */
 @media (hover: hover) {
   .btn--solid.btn--primary:hover { filter: brightness(1.08); }
   .topbar .back:hover { background: var(--btn-neutral-bg-h); }
@@ -152,8 +302,19 @@ button, input, textarea, select { font-family: inherit; } /* les boutons n'héri
   .drow:hover { box-shadow: var(--shadow-2); }
 }
 
-/* ── 13. Accessibilité ── */
+/* ── 16. Impression ── */
+@media print {
+  :root, :root:not([data-theme="light"]) {
+    --bg: #fff; --surface: #fff; --surface-2: #f6f7f9; --card: #fff;
+    --text: #111; --muted: #555; --border: #d0d5dd;
+  }
+  * { box-shadow: none !important; backdrop-filter: none !important;
+     -webkit-backdrop-filter: none !important; animation: none !important; }
+  body { background: #fff !important; }
+}
+
+/* ── 17. Accessibilité (mouvements réduits) ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; }
-  .card-editor { animation: none; }
+  .card-editor, .qcm-option, .card.recap { animation: none !important; }
 }
