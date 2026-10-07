@@ -493,8 +493,21 @@ const Drive = (() => {
         body.querySelector('img').onclick = e => { try { openLB(e.target, body); } catch { W.open(u, '_blank'); } };
       } else if (n.kind === 'pdf') {
         const p = n.path || n.publishedPath;
-        body.innerHTML = `<iframe class="dpdf" src="${esc(S.pagesUrl(p))}#toolbar=1" title="${esc(n.name)}"></iframe>
-          <div class="dimg-tip">Si l'aperçu ne s'affiche pas, utilise « Télécharger » ou « Nouvel onglet ».</div>`;
+        body.classList.add('dfile-body--pdf');
+        body.innerHTML = `
+          <div class="dpdf-zone">
+            <iframe class="dpdf" src="${esc(S.pagesUrl(p))}#toolbar=1" title="${esc(n.name)}" loading="eager"></iframe>
+            <button class="dpdf-fs" data-act="fs" title="Plein écran" aria-label="Plein écran">${ico('maximize','ico--sm')}</button>
+          </div>
+          <div class="dimg-tip dimg-tip--pdf">Si l'aperçu ne s'affiche pas, utilise « Télécharger » ou « Nouvel onglet ».</div>`;
+        const fsBtn = body.querySelector('.dpdf-fs');
+        if (fsBtn) fsBtn.onclick = () => {
+          const zone = body.querySelector('.dpdf-zone');
+          if (!zone) return;
+          const req = zone.requestFullscreen || zone.webkitRequestFullscreen || zone.msRequestFullscreen;
+          if (req) { try { const r = req.call(zone); if (r && r.catch) r.catch(() => {}); } catch { W.open(S.pagesUrl(p), '_blank', 'noopener'); } }
+          else W.open(S.pagesUrl(p), '_blank', 'noopener');
+        };
       } else if (n.kind === 'audio') {
         const u = await objectUrlFor(n);
         body.innerHTML = `<div class="dmedia"><audio controls src="${esc(u)}"></audio></div>`;

@@ -1272,15 +1272,19 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCa
     await Media.resolve(grid);
     await tsLat(grid);
   };
-  await renderCards(savedSearch); 
+  await renderCards(savedSearch);
+
+  // La vue peut avoir changé pendant le chargement (retour rapide, etc.) :
+  // dans ce cas les éléments ci-dessous n'existent plus.
+  if (State.view !== 'cards' || State.chapterId !== cid) return;
 
   // ✅ Restaurer la recherche dans l'input
   if(savedSearch) {
     $('#cardSearch').value = savedSearch;
   }
 
-  $('#cardSearch').oninput = (e) => renderCards(e.target.value);
-  
+  if ($('#cardSearch')) $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+
   $('#addCardBtn').onclick = () => openCardEditor(c, null, () => goCards(cid, false));
 
   // === APPUI LONG → RÉVISION RAPIDE D'UNE CARTE ===
@@ -1617,11 +1621,16 @@ function subG(nxt){
 
   if(r.index<r.queue.length-1){
     r.index++;r.flipped=!1;r.cardStart=Date.now();
-    debouncedSave();if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
+    debouncedSave();
+    /* Synchro cloud toutes les 10 cartes : avant, un push de l'intégralité
+       des données par carte se cumulait (2 à 6 s par push) et la plupart
+       des pushes étaient jetés → divergence entre appareils. */
+    if(r.answers.length%10===0 && typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
     renRev();
   } else {
     r.end=Date.now();
     saveData();
+    /* Fin de session → push toujours effectué (jamais perdu) */
     if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
 
     // ✅ Mode carte unique → retour direct au menu Cartes
@@ -2163,14 +2172,17 @@ function removeSplash() {
 }
 
 async function syncInBackground() {
+  if (typeof firebase === 'undefined') return; // mode local : pas de sync
   if (!FireSync.isConnected) {
+    /* Attendre la restauration de la session (peut prendre quelques
+       secondes sur téléphone) avant la synchronisation de démarrage */
     await Promise.race([
       new Promise(resolve => {
         const unsub = firebase.auth().onAuthStateChanged(user => {
           if (user) { unsub(); resolve(); }
         });
       }),
-      new Promise(resolve => setTimeout(resolve, 5000))
+      new Promise(resolve => setTimeout(resolve, 8000))
     ]);
   }
 
@@ -2235,13 +2247,24 @@ async function init() {
         }
       }
     });
+    /* pagehide : dernier effort avant la fermeture de l'onglet/app
+       (couvre iOS quand visibilitychange ne suffit pas) */
+    window.addEventListener('pagehide', () => {
+      try { saveData(); } catch (e) {}
+      if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+    });
 
   } catch (e) {
     console.error('Init error, resetting:', e);
-    localStorage.removeItem(KEY);
-    data = loadData();
-    upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(false);
-    removeSplash();
+    try {
+      localStorage.removeItem(KEY);
+      data = loadData();
+      upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(false);
+    } catch (e2) {
+      console.error('Init reset failed:', e2);
+    } finally {
+      removeSplash(); // le splash doit disparaître dans tous les cas
+    }
   }
 }
 

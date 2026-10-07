@@ -115,6 +115,7 @@
   border: 1px solid var(--border); background: var(--btn-neutral-bg);
   color: var(--text); font-weight: 800; font-size: 12.5px; white-space: nowrap;
   text-decoration: none; transition: .15s;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .dbtn:hover { border-color: var(--primary); }
 .dbtn:disabled { opacity: .45; cursor: not-allowed; }
@@ -145,6 +146,7 @@
   border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
   transition: background .15s, border-color .15s, transform .1s;
   min-width: 0;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .drow:hover { border-color: color-mix(in srgb, var(--primary) 45%, transparent); }
 .drow:active { transform: scale(.995); }
@@ -251,7 +253,34 @@
 .dimgwrap { display: flex; justify-content: center; padding: 6px; }
 .dimg { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border); cursor: zoom-in; background: #fff; }
 .dimg-tip, .dbinary-tip { text-align: center; font-size: 11.5px; color: var(--muted); padding: 6px 10px; }
-.dpdf { width: 100%; min-height: 62vh; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+
+/* ── Lecture PDF : l'aperçu occupe TOUTE la hauteur disponible ──
+   (avant : hauteur bloquée à ~62 vh → on ne voyait que la moitié
+   de la page, surtout sur grand écran) */
+.dfile-body.dfile-body--pdf { display: flex; flex-direction: column; gap: 6px; }
+.dpdf-zone { position: relative; flex: 1 1 0; min-height: 48vh; min-height: 48dvh; display: flex; }
+.dpdf {
+  width: 100%; flex: 1 1 0; min-height: 0;
+  border: 1px solid var(--border); border-radius: 12px; background: #fff;
+}
+.dpdf-fs {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.dpdf-fs:hover { background: var(--surface-2); }
+.dpdf-fs:active { transform: scale(.94); }
+html:fullscreen .dpdf-zone, body:fullscreen .dpdf-zone { min-height: 0; }
+.dpdf-zone:fullscreen { border-radius: 0; }
+.dpdf-zone:fullscreen .dpdf { border: 0; border-radius: 0; }
+.dimg-tip--pdf { padding: 2px 10px 4px; flex: none; }
+@media (pointer: coarse) { .dpdf-fs { display: none; } }
 .dmedia { display: flex; justify-content: center; padding: 12px 4px; }
 .dmedia audio, .dmedia video { max-width: 100%; border-radius: 12px; }
 .dbinary { text-align: center; padding: 30px 14px; color: var(--text); }
@@ -364,6 +393,28 @@ textarea.dfield-input { resize: vertical; line-height: 1.5; font-family: inherit
 @media (max-width: 760px) {
   .dmodal.split .dedit-body { flex-direction: column; }
   .dedit-text { min-height: 26vh; }
+}
+
+/* ─────────── 6b. Téléphone : lecteur de fichier compact ───────────
+   L'objectif : quand on ouvre un drive qui contient un PDF,
+   l'aperçu occupe le maximum de l'écran (en-tête et actions
+   réduits, chemin masqué, aucun gaspillage vertical). */
+@media (max-width: 620px) {
+  #view.drive-open { padding: 8px 8px 10px; }
+  .drive-wrap { gap: 6px; }
+  .drive-top { gap: 0; }
+  .drive-topmeta { font-size: 10.5px; }
+  .dfile-head { gap: 8px; padding: 0; }
+  .dfile-ico { width: 34px; height: 34px; font-size: 17px; border-radius: 10px; }
+  .dfile-name { font-size: 14.5px; }
+  .dfile-meta { margin-top: 1px; font-size: 10px; gap: 1px 4px; }
+  .dfile-path { display: none; }
+  .dfile-actions { padding-bottom: 0; }
+  .dbtn { padding: 6px 9px; font-size: 12px; border-radius: 10px; }
+  .drow { padding: 8px 9px; gap: 8px; }
+  .drow-ico { width: 34px; height: 34px; font-size: 17px; }
+  .dpdf-zone { min-height: 42vh; min-height: 42dvh; }
+  .dimg-tip--pdf { font-size: 10px; padding: 0 8px 2px; }
 }
 
 /* ─────────── 7. Rendu LaTeX (feuille blanche) ─────────── */
