@@ -212,7 +212,10 @@ const parsePhysicsData = (rawData) => {
 function toast(msg, type='info', dur=2500) {
   let el = $('#toast') || Object.assign(D.createElement('div'), {id:'toast'});
   if(!el.parentNode) D.body.appendChild(el);
-  el.textContent = msg; el.className = `toast ${type}`;
+  const glyph = { success:'circle-check', error:'circle-alert', info:'info' }[type] || 'info';
+  el.className = `toast ${type}`;
+  el.innerHTML = `${ico(glyph, 'ico--sm')}<span></span>`;
+  el.lastElementChild.textContent = msg;
   requestAnimationFrame(() => { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), dur); });
 }
 

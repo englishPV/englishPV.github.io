@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Flashcards">
+  <rect width="64" height="64" rx="15" fill="#6366f1" />
+  <g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="11" y="21" width="26" height="31" rx="7" />
+    <path d="M22.5 12h16A7.5 7.5 0 0 1 46 19.5V42" />
+    <path d="M19 32h11.5M19 39.5h7" />
+  </g>
+</svg>

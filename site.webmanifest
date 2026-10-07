@@ -1,8 +1,15 @@
 {
-"name": "Flash Cards Français-Anglais",
-"short_name": "Flash Cards FR/EN",
-"icons": [],
-"theme_color": "#f5f7fa",
-"background_color": "#f5f7fa",
-"display": "standalone"
+  "name": "Flashcards · Physique & Maths",
+  "short_name": "Flashcards",
+  "description": "Révisions espacées (FSRS) : flashcards de physique et de mathématiques, avec LaTeX, statistiques et synchronisation.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0b0f",
+  "theme_color": "#0a0b0f",
+  "lang": "fr",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
 }

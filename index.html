@@ -3,193 +3,202 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport"
-    content="width=device-width, initial-scale=1,
-             viewport-fit=cover, maximum-scale=1,
-             user-scalable=no" />
-  <title>Physique Flashcards</title>
+        content="width=device-width, initial-scale=1, viewport-fit=cover,
+                 maximum-scale=1, user-scalable=no" />
+  <title>Flashcards · Physique</title>
+  <meta name="description"
+        content="Révisions espacées (FSRS) : plus de 1 000 flashcards de physique et de mathématiques, avec LaTeX, statistiques et synchronisation." />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="manifest" href="site.webmanifest" />
 
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="dns-prefetch"
-    href="https://englishpv-b6727-default-rtdb.europe-west1.firebasedatabase.app" />
+        href="https://englishpv-b6727-default-rtdb.europe-west1.firebasedatabase.app" />
 
-  <!-- CSS critique inline (zéro requête réseau → splash instantané) -->
+  <!-- ── CSS critique inline : 1er rendu instantané, sans requête réseau ── -->
   <style>
+    @font-face {
+      font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap;
+      src: url('fonts/inter-latin-wght-normal.woff2') format('woff2');
+    }
+    :root, :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0a0b0f; --surface: #12141a; --surface-2: #171922; --surface-3: #1e212b;
+      --card: #12141a; --text: #f2f4f8; --muted: #98a1b3; --faint: #6c7488;
+      --border: #242835; --divider: rgba(255,255,255,.06);
+      --primary: #6366f1; --primary-600: #5457e6;
+      --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b; --red: #ef4444;
+      --fs-term: 20px; --fs-def: 24px;
+      --radius-md: 12px; --radius-lg: 16px; --radius-full: 999px;
+      --font-sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f6f7f9; --surface: #fff; --surface-2: #f4f5f7; --surface-3: #eceef2;
+      --card: #fff; --text: #0f1319; --muted: #5c6472; --faint: #8b93a1;
+      --border: #e2e5eb; --divider: rgba(15,23,42,.07);
+      --primary: #3b82f6; --primary-600: #2563eb;
+    }
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       height: 100%; margin: 0; overflow: hidden;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont,
-                   "Segoe UI", Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-sans); font-size: 15px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; letter-spacing: -.011em;
     }
-    :root {
-      --bg: #0b1020; --surface: #12172b; --text: #e6ecff;
-      --primary: #6366f1; --primary-600: #5457e6;
-      --border: #232a48; --muted: #8aa0d3;
-      --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b; --red: #ef4444;
-      --fs-term: 20px; --fs-def: 24px; --radius-md: 14px;
-      --btn-neutral-bg: rgba(255,255,255,.06);
-      --btn-neutral-fg: #e6ecff;
-      --btn-neutral-bd: #232a48;
-      --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 22%,transparent);
-      --btn-soft-primary-fg: #dbe4ff;
-      --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 55%,transparent);
-      --btn-solid-primary-bg: var(--primary);
-      --btn-solid-primary-fg: #fff;
-      --btn-solid-primary-bd: var(--primary-600);
-    }
-    [data-theme="light"] {
-      --bg: #f8fafc; --surface: #fff; --text: #0f172a;
-      --primary: #3b82f6; --primary-600: #2563eb;
-      --border: #cbd5e1; --muted: #475569;
-      --btn-neutral-bg: #f1f5f9;
-      --btn-neutral-fg: #0f172a;
-      --btn-neutral-bd: #cbd5e1;
-      --btn-soft-primary-bg: color-mix(in srgb,var(--primary) 14%,white 86%);
-      --btn-soft-primary-fg: color-mix(in srgb,var(--primary) 78%,black 22%);
-      --btn-soft-primary-bd: color-mix(in srgb,var(--primary) 35%,white 65%);
-    }
-    body { background: var(--bg); color: var(--text); font-size: 17px; }
-
-    /* Splash */
     #splash {
       position: fixed; inset: 0; z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px;
-      background: var(--bg);
-      transition: opacity .3s ease-out;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+      background: var(--bg); transition: opacity .3s ease-out;
     }
     #splash .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid color-mix(in srgb, var(--primary) 25%, transparent);
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2.5px solid color-mix(in srgb, var(--primary) 22%, transparent);
       border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: sp .6s linear infinite;
+      animation: sp .7s linear infinite;
     }
-    @keyframes sp { to { transform: rotate(360deg) } }
-
-    /* Layout squelette */
-    .wrapper {
-      height: 100dvh; width: 100%;
-      display: flex; align-items: center; justify-content: center;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right)
-               env(safe-area-inset-bottom) env(safe-area-inset-left);
-    }
+    @keyframes sp { to { transform: rotate(360deg); } }
+    #splash .splash-text { font-size: 12.5px; font-weight: 600; color: var(--faint); }
+    .app-shell { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
     .phone {
-      aspect-ratio: 9/16; height: 100%; width: auto;
-      max-width: 100%; max-height: 100%;
+      position: relative; flex: 1; min-width: 0; height: 100%;
       display: grid;
-      grid-template-rows: var(--row-top,52px) var(--row-tabs,0px) 1fr
-                          var(--row-actions,0px) var(--row-rev,0px);
-      position: relative; min-height: 0;
-      touch-action: pan-y; overflow: hidden;
+      grid-template-rows: var(--row-top, 56px) var(--row-tabs, 0px) 1fr
+                          var(--row-actions, 0px) var(--row-rev, 0px);
+      overflow: hidden;
     }
-    .topbar { grid-row: 1; }
-    #driveTabs { grid-row: 2; }
-    main#view { grid-row: 3; }
-    .bottom-actions { grid-row: 4; }
-    .revision-bar, .review-actions-bar { grid-row: 5; }
-    @media(min-width: 1024px) {
-      .phone { aspect-ratio: auto; width: 100%; height: 100dvh; }
-    }
+    .topbar { grid-row: 1; } #driveTabs { grid-row: 2; } main#view { grid-row: 3; }
+    .bottom-actions { grid-row: 4; } .revision-bar, .review-actions-bar { grid-row: 5; }
     .topbar {
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; padding: 0 10px;
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--divider);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
     }
-    .topbar .back {
-      appearance: none; border: 0; outline: 0; background: 0 0;
-      color: var(--text); padding: 8px 10px; margin-right: 4px;
-      border-radius: 10px; display: flex; align-items: center;
-      gap: 8px; cursor: pointer; font-weight: 700;
+    .topbar-inner { display: flex; align-items: center; gap: 6px; width: 100%; height: 100%; padding: 0 8px; }
+    .title {
+      display: inline-flex; align-items: center; gap: 7px; min-width: 0;
+      padding: 6px 10px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; letter-spacing: -.018em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
     }
-    .topbar .title {
-      font-weight: 800; font-size: 16px; margin-left: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; min-width: 0; flex-shrink: 1;
+    .icon-btn {
+      display: inline-grid; place-items: center; width: 38px; height: 38px; flex: none;
+      border: 1px solid transparent; border-radius: 8px;
+      background: transparent; color: var(--muted); font-size: 15px;
     }
-    main#view {
-      min-height: 0; height: 100%; display: flex; flex-direction: column;
-      overflow: hidden; overflow-x: hidden; padding: 8px; gap: 10px;
-      min-width: 0; max-width: 100%;
-    }
+    .spacer { flex: 1; }
+    .ico { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
+           stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .ico--xs { width: 14px; height: 14px; } .ico--sm { width: 16px; height: 16px; }
+    main#view { min-height: 0; min-width: 0; height: 100%; display: flex; flex-direction: column; padding: 12px 10px; }
     .hidden { display: none !important; }
-    .bottom-actions, .revision-bar, .review-actions-bar {
-      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      display: none; background: 0 0; border-top: 0;
-    }
-    .bottom-actions { gap: 8px; grid-template-columns: 1fr 1fr; }
-
-    /* Boutons minimaux pour le premier rendu */
     .btn {
-      background: var(--btn-bg, var(--btn-neutral-bg));
-      color: var(--btn-fg, var(--btn-neutral-fg));
-      border: 1px solid var(--btn-bd, var(--btn-neutral-bd));
-      border-radius: var(--radius-md);
-      padding: 10px 12px; font-weight: 900; cursor: pointer;
-      width: 100%; appearance: none; outline: 0; font-size: 15px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; min-height: 40px; padding: 9px 14px;
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: rgba(255,255,255,.05); color: var(--text);
+      font: 600 14px/1 var(--font-sans); cursor: pointer;
     }
-    .btn--ghost {
-      --btn-bg: transparent; --btn-fg: var(--muted); --btn-bd: var(--border);
-    }
-    .btn--primary {
-      --btn-bg: var(--btn-soft-primary-bg);
-      --btn-fg: var(--btn-soft-primary-fg);
-      --btn-bd: var(--btn-soft-primary-bd);
-    }
-    .btn--solid.btn--primary {
-      --btn-bg: var(--btn-solid-primary-bg);
-      --btn-fg: var(--btn-solid-primary-fg);
-      --btn-bd: var(--btn-solid-primary-bd);
-    }
-    .btn--tiny { padding: 6px 8px; font-size: 13px; border-radius: 8px; }
+    .btn--solid.btn--primary { background: var(--primary); border-color: var(--primary-600); color: #fff; }
   </style>
 
-  <!-- CSS complet chargé en non-bloquant -->
-    <link rel="preload" href="css/01_styles_theme_and_layout.css?v=28"
-  
-        as="style" onload="this.onload=null;this.rel='stylesheet'" />
-  <link rel="preload" href="css/02_drive.css?v=2"
-        as="style" onload="this.onload=null;this.rel='stylesheet'" />
-
-
-  <link rel="preload" href="css/03_modern.css?v=2"
-  as="style" onload="this.onload=null;this.rel='stylesheet'" />
-
-<noscript>
-  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css" />
-  <link rel="stylesheet" href="css/02_drive.css" />
-  <link rel="stylesheet" href="css/03_modern.css?v=2" />
-</noscript>
+  <!-- Feuilles de style (fichiers statiques same-origin : chargement direct) -->
+  <link rel="stylesheet" href="css/01_styles_theme_and_layout.css?v=31" />
+  <link rel="stylesheet" href="css/02_drive.css?v=31" />
+  <link rel="stylesheet" href="css/03_modern.css?v=31" />
 </head>
 <body>
 
-  <!-- Splash instantané -->
+  <!-- Écran de démarrage -->
   <div id="splash">
     <div class="spinner"></div>
-    <div style="font-size:13px;font-weight:600;color:var(--muted)">
-      Chargement…
-    </div>
+    <div class="splash-text">Chargement des flashcards…</div>
   </div>
 
-  <div class="wrapper">
+  <div class="app-shell">
+    <!-- ══ Navigation latérale (desktop + tiroir mobile) ══ -->
+    <aside class="sidebar" id="sidebar" aria-label="Navigation principale">
+      <div class="sidebar__brand">
+        <svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <rect x="3" y="6.6" width="12.4" height="14.4" rx="3" />
+          <path d="M8.6 3h7.9A3.5 3.5 0 0 1 20 6.5V16" />
+          <path d="M6.6 11.4h5.4M6.6 14.8h3.4" />
+        </svg>
+        <span class="brand-text">
+          <span class="brand-name">Flashcards</span>
+          <span class="brand-sub" id="brandSub">Physique</span>
+        </span>
+      </div>
+
+      <nav class="sidebar__nav" id="sidebarNav" aria-label="Vues"></nav>
+
+      <div class="sidebar__label" id="subjectsLabel">Matières</div>
+      <div class="sidebar__scroll" id="sidebarSubjects"></div>
+
+      <div class="sidebar__foot">
+        <span id="sidebarFoot">v—</span>
+        <a class="icon-btn" href="https://schedulepv.web.app/" target="_blank"
+           rel="noopener" title="Emploi du temps" aria-label="Emploi du temps">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 2v4M16 2v4M3 4h18v17H3zM3 10h18" />
+          </svg>
+        </a>
+      </div>
+    </aside>
+
+    <div class="drawer-scrim" id="drawerScrim" hidden></div>
+
+    <!-- ══ Colonne applicative ══ -->
     <div class="phone" id="app">
       <header class="topbar">
-        <button class="back hidden" id="backBtn"
-                title="Retour">← Retour</button>
-        <div class="title" id="title">Deck</div>
-        <div style="flex:1"></div>
-        <button class="btn btn--ghost btn--tiny" id="syncBtn"
-          style="flex-shrink:0;width:auto;padding:6px 12px"
-          title="Sync">🔄</button>
-        <a href="https://schedulepv.web.app/" target="_blank"
-           rel="noopener"
-           class="btn btn--primary btn--tiny"
-           style="flex-shrink:0;text-decoration:none;
-                  width:auto;padding:6px 12px">📅</a>
+        <div class="topbar-inner">
+          <button class="icon-btn menu-btn" id="menuBtn" aria-label="Ouvrir le menu"
+                  title="Menu">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+
+          <button class="back hidden" id="backBtn" title="Retour">
+            <svg class="ico ico--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5m7 7-7-7 7-7" />
+            </svg>
+            <span class="back-label">Retour</span>
+          </button>
+
+          <div class="title" id="title" role="button" tabindex="0"
+               aria-haspopup="menu" aria-label="Changer de matière">Deck</div>
+
+          <div class="spacer"></div>
+
+          <button class="icon-btn" id="syncBtn" title="Synchroniser" aria-label="Synchroniser">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+              <path d="M8 16H3v5" />
+            </svg>
+          </button>
+
+          <a href="https://schedulepv.web.app/" target="_blank" rel="noopener"
+             class="icon-btn" title="Emploi du temps" aria-label="Emploi du temps">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2v4M16 2v4M3 4h18v17H3zM3 10h18" />
+            </svg>
+          </a>
+        </div>
       </header>
 
       <!-- Onglets Drive (admin : création + publication ; autres : lecture) -->
-      <nav id="driveTabs" class="drive-tabs hidden" aria-label="Onglets Drive"></nav>
+      <nav id="driveTabs" class="hidden" aria-label="Onglets Drive"></nav>
 
       <main id="view"></main>
 
@@ -199,36 +208,34 @@
       </div>
 
       <footer class="revision-bar" id="revisionBar">
-        <button id="startReviewBtn"
-                class="rev-btn btn btn--solid btn--primary">
+        <button id="startReviewBtn" class="rev-btn btn btn--solid btn--primary">
           Révision
         </button>
       </footer>
 
-      <footer id="reviewActionsBar" class="review-actions-bar"
-              aria-live="polite"></footer>
+      <footer id="reviewActionsBar" class="review-actions-bar" aria-live="polite"></footer>
     </div>
   </div>
 
-  <!-- MathJax config (aucun téléchargement ici) -->
+  <!-- MathJax : configuration seule, le script n'est chargé qu'à la demande -->
   <script>
     window.MathJax = {
       tex: {
-        inlineMath: [['$','$'],['\\(','\\)']],
-        displayMath: [['$$','$$'],['\\[','\\]']],
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
         processEscapes: true
       },
-      options: { skipHtmlTags: ['script','style','textarea'] },
+      options: { skipHtmlTags: ['script', 'style', 'textarea'] },
       startup: { typeset: false }
     };
     let _mathJaxLoading = null;
-    window.loadMathJax = function() {
+    window.loadMathJax = function () {
       if (window.MathJax?.typesetPromise) return Promise.resolve();
       if (_mathJaxLoading) return _mathJaxLoading;
       _mathJaxLoading = new Promise((res, rej) => {
         const s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-        s.onload = function() {
+        s.onload = function () {
           (function check() {
             window.MathJax?.typesetPromise ? res() : setTimeout(check, 50);
           })();
@@ -240,24 +247,28 @@
     };
   </script>
 
-  <!-- Data (synchrone, fichier local = rapide) -->
+  <!-- Données locales (fichier statique : lecture instantanée) -->
   <script src="data.js"></script>
 
-  <!-- Firebase -->
+  <!-- Firebase (compat) -->
   <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-  <!-- App scripts -->
+  <!-- Application -->
+  <script defer src="js/00_icons.js?v=1"></script>
   <script defer src="js/01_firebase_sync.js"></script>
-  <script defer src="js/02_utils_formatting_and_helpers.js"></script>
-  <script defer src="js/03_data_storage_and_imports.js"></script>
+  <script defer src="js/02_utils_formatting_and_helpers.js?v=31"></script>
+  <script defer src="js/03_data_storage_and_imports.js?v=31"></script>
   <script defer src="js/04_srs_algorithm_and_stats.js?v=fsrs1"></script>
-  <script defer src="js/05_app_ui_and_navigation.js?v=27d"></script>
+  <script defer src="js/05_app_ui_and_navigation.js?v=31"></script>
 
   <!-- Drive : stockage + publication GitHub, compilation LaTeX, interface -->
   <script defer src="js/06_drive_store.js?v=2"></script>
   <script defer src="js/07_drive_tex.js?v=2"></script>
-  <script defer src="js/08_drive_ui.js?v=2"></script>
+  <script defer src="js/08_drive_ui.js?v=31"></script>
+
+  <!-- Coquille : navigation latérale, raccourcis clavier -->
+  <script defer src="js/09_shell.js?v=1"></script>
 </body>
 </html>
