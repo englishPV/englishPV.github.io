@@ -51,10 +51,20 @@ main#view > .card--flush { overflow: hidden; display: flex; flex-direction: colu
   padding: 0 10px;
   border: 1px solid transparent; border-radius: var(--radius-lg);
   background: transparent;
-  cursor: pointer; user-select: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   touch-action: pan-y;
   transition: background-color var(--t-base) var(--ease), border-color var(--t-base) var(--ease),
               box-shadow var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+}
+.deck-item, .deck-item * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 .deck-item:hover {
   background: var(--surface);
@@ -231,8 +241,29 @@ main#view > .card--flush { overflow: hidden; display: flex; flex-direction: colu
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   box-shadow: var(--shadow-3);
   pointer-events: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transform: translate(-9999px, -9999px) scale(1.02);
 }
+
+/* Pendant un drag : bloque scroll natif, sélection de texte et menu « Copier » iOS */
+html.is-dnd,
+html.is-dnd body,
+html.is-dnd .scroll-y {
+  overflow: hidden !important;
+  touch-action: none !important;
+  overscroll-behavior: none;
+}
+html.is-dnd,
+html.is-dnd * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+html.is-dnd { cursor: grabbing; }
+html.is-dnd .deck-item { touch-action: none; }
 
 /* ───────────────────────────  3. Recherche globale  ─────────────────────────── */
 #globalSearchResults {

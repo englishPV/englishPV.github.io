@@ -15,6 +15,7 @@ const _fireSyncLocal = {
   checkRemote: () => Promise.resolve(false),
   scheduleAutoSync() {}, startListening() {}, stopListening() {},
   initSyncButton() {}, saveDataLocal() {}, restoreFromBackup: () => Promise.resolve(),
+  flushPending() {},
   get isSyncing() { return false; }, get isConnected() { return false; }
 };
 const FireSync = (() => {
@@ -48,6 +49,8 @@ const FireSync = (() => {
   let pullQueued = false;
   let metaListenerRef = null;
   let pollTimer = null;
+  let lastPushedPayload = null;
+  let loginSyncPromise = null;
 
   let deviceId = localStorage.getItem('fireSync_deviceId');
   if (!deviceId) {
@@ -59,20 +62,26 @@ const FireSync = (() => {
   function dataRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/flashcardData') : null; }
   function metaRef() { return currentUser ? db.ref('users/' + currentUser.uid + '/syncMeta') : null; }
 
-  // --- HORS RÉVISION ? (on ne remplace JAMAIS les données pendant une session) ---
+  // --- En session de cartes ? (on ne remplace JAMAIS les données pendant) ---
   function inReview() {
-    try { return typeof State !== 'undefined' && State && (State.view === 'review' || State.view === 'recap'); }
+    try { return typeof State !== 'undefined' && State && State.view === 'review'; }
     catch (e) { return false; }
   }
 
-  // --- Horodatage local : la dernière révision d'une carte.
-  // (Consciemment PAS l'heure du boot : un appareil tout neuf doit
-  //  toujours rattraper le cloud, et non l'écraser.) ---
+  // Horodatage local : data.app.lastModified (dossiers, réglages, révisions…).
+  // Repli pour les anciennes sauvegardes sans ce champ : max(lastReviewed, lastUsed).
   function localModTime() {
-    if (typeof data === 'undefined' || !data.subjects) return 0;
+    if (typeof data === 'undefined' || !data) return 0;
+    const stamped = Number(data.app && data.app.lastModified) || 0;
+    if (stamped) return stamped;
     let latest = 0;
-    for (const s of data.subjects) {
+    for (const s of data.subjects || []) {
+      for (const g of (s.groups || [])) {
+        if (g.lastUsed > latest) latest = g.lastUsed;
+        if (g.createdAt > latest) latest = g.createdAt;
+      }
       for (const c of (s.chapters || [])) {
+        if (c.lastUsed > latest) latest = c.lastUsed;
         for (const card of (c.cards || [])) {
           if (card.lastReviewed > latest) latest = card.lastReviewed;
         }
@@ -115,6 +124,9 @@ const FireSync = (() => {
       onLoginComplete();
     } else {
       stopListening();
+      initSyncDone = false;
+      loginSyncPromise = null;
+      lastPushedPayload = null;
     }
   });
 
@@ -122,6 +134,9 @@ const FireSync = (() => {
     await auth.signOut();
     currentUser = null;
     hasRemoteUpdate = false;
+    initSyncDone = false;
+    loginSyncPromise = null;
+    lastPushedPayload = null;
     updateSyncUI();
     console.log('[FireSync] Disconnected');
   }
@@ -130,10 +145,13 @@ const FireSync = (() => {
   async function onLoginComplete() {
     startListening();
     startPolling();
-    if (initSyncDone) return;
-    initSyncDone = true;
-    // Synchronisation bidirectionnelle à la connexion
-    await syncNow();
+    if (!loginSyncPromise) {
+      loginSyncPromise = (async () => {
+        try { await syncNow(); }
+        finally { initSyncDone = true; }
+      })();
+    }
+    await loginSyncPromise;
     updateSyncUI();
   }
 
@@ -141,8 +159,12 @@ const FireSync = (() => {
   // redirect=true → retour à l'écran decks (pull manuel / boot) ;
   // redirect=false → re-rend la vue courante (synchro de fond).
   function applyRemoteData(cloudData, redirect) {
+    const before = JSON.stringify(cloudData);
     data = cloudData;
     try {
+      if (data.app && !data.app.lastModified) {
+        data.app.lastModified = lastPushTime || Date.now();
+      }
       if (typeof reconcile === 'function') {
         reconcile();
         data.app.version = typeof APP_VER !== 'undefined' ? APP_VER : data.app.version;
@@ -159,10 +181,14 @@ const FireSync = (() => {
       saveDataLocal();
     } catch (e) { console.error('[FireSync] applyRemoteData:', e); }
 
+    lastPushedPayload = JSON.stringify(data);
+    const mutated = lastPushedPayload !== before;
+
     if (typeof Nav !== 'undefined' && Nav && typeof goDeck === 'function') {
       if (redirect) { try { Nav.clear(); goDeck(false); } catch (e) {} }
       else if (typeof render === 'function') { try { render(false); } catch (e) {} }
     }
+    return mutated;
   }
 
   // --- SYNC BIDIRECTIONNEL (dès l'ouverture, bouton ☁, après session) ---
@@ -172,6 +198,7 @@ const FireSync = (() => {
   //   à jour             → on ne touche à rien
   async function syncNow() {
     if (!currentUser || typeof data === 'undefined') return false;
+    if (inReview()) { hasRemoteUpdate = true; return false; }
     if (isSyncing) { pullQueued = true; return false; }
     isSyncing = true; updateSyncUI();
     try {
@@ -189,10 +216,10 @@ const FireSync = (() => {
 
       if (cloudOk && cloudTime > localTime) {
         console.log('[FireSync] Cloud is newer, pulling');
-        applyRemoteData(cloudData, true);
         lastPushTime = cloudTime;
+        const mutated = applyRemoteData(cloudData, true);
         hasRemoteUpdate = false;
-        setTimeout(pushToCloud, 1500); // réécrire le cloud depuis cet appareil (normalise)
+        if (mutated) setTimeout(() => { if (currentUser && !isSyncing) pushToCloud(); }, 1500);
         return true;
       }
       if (!cloudOk && (localTime > 0 || (data.subjects || []).length)) {
@@ -205,6 +232,7 @@ const FireSync = (() => {
         await doPush();
         return true;
       }
+      lastPushedPayload = JSON.stringify(data);
       return false; // à jour
     } catch (e) {
       console.error('[FireSync] syncNow error:', e);
@@ -265,10 +293,12 @@ const FireSync = (() => {
     }, 5 * 60 * 1000);
   }
 
-  // --- File d'attente : plus de push/pull « perdus » si un autre op' est en cours ---
+  // Une seule reco : compare les horodatages au lieu d'enchaîner push+pull (ping-pong).
   function settleQueued() {
-    if (pushQueued) { pushQueued = false; setTimeout(pushToCloud, 500); }
-    if (pullQueued) { pullQueued = false; setTimeout(pullFromCloud, 500); }
+    if (!pushQueued && !pullQueued) return;
+    pushQueued = false;
+    pullQueued = false;
+    setTimeout(() => { if (currentUser && !isSyncing) syncNow(); }, 400);
   }
 
   // --- PUSH ---
@@ -276,7 +306,13 @@ const FireSync = (() => {
   // l'appelant) ; pushToCloud = le public, qui met en file au lieu de
   // jeter le push s'une opération est déjà en cours.
   async function doPush() {
-    const now = Date.now();
+    if (data && data.app && !data.app.lastModified) data.app.lastModified = Date.now();
+    const payload = JSON.stringify(data);
+    if (payload === lastPushedPayload) {
+      console.log('[FireSync] Skip unchanged push');
+      return;
+    }
+    const now = Number(data.app && data.app.lastModified) || Date.now();
 
     // Rolling backup (keep last 3)
     try {
@@ -299,12 +335,13 @@ const FireSync = (() => {
       console.warn('[FireSync] Backup failed:', backupErr);
     }
 
-    await dataRef().set(JSON.stringify(data));
+    await dataRef().set(payload);
     await metaRef().set({
       lastModified: now,
       fromDevice: deviceId,
       email: currentUser.email
     });
+    lastPushedPayload = payload;
     lastPushTime = now;
     hasRemoteUpdate = false;
     console.log('[FireSync] Pushed at', new Date(now).toLocaleTimeString());
@@ -329,6 +366,7 @@ const FireSync = (() => {
   // --- PULL (manuel « Récupérer ← Cloud », temps réel, sonde de fond) ---
   async function pullFromCloud() {
     if (!currentUser) return;
+    if (inReview()) { hasRemoteUpdate = true; return; }
     if (isSyncing) { pullQueued = true; return; }
     isSyncing = true;
     updateSyncUI();
@@ -340,14 +378,14 @@ const FireSync = (() => {
       const cloudData = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (!cloudData.subjects || !cloudData.app) { console.log('[FireSync] Invalid cloud data'); return; }
 
-      const inRev = inReview();
-      applyRemoteData(cloudData, !inRev);
+      const cloudMeta = mSnap.val() || {};
+      lastPushTime = cloudMeta.lastModified || Date.now();
+      const stay = typeof State !== 'undefined' && State && State.view === 'recap';
+      const mutated = applyRemoteData(cloudData, !stay);
 
-      lastPushTime = Date.now();
       hasRemoteUpdate = false;
       console.log('[FireSync] Pulled from cloud');
-      // Réécrire le cloud depuis cet appareil pour normaliser l'horodatage
-      setTimeout(pushToCloud, 2000);
+      if (mutated) setTimeout(() => { if (currentUser && !isSyncing) pushToCloud(); }, 1500);
     } catch (e) {
       console.error('[FireSync] Pull error:', e);
     } finally {
@@ -357,15 +395,21 @@ const FireSync = (() => {
     }
   }
 
-  // --- AUTO PUSH (very debounced — only after 2 minutes of inactivity) ---
   function scheduleAutoSync() {
-    if (!currentUser) return;
+    if (!currentUser || !initSyncDone) return;
+    if (inReview()) return;
     clearTimeout(autoSyncTimer);
     autoSyncTimer = setTimeout(() => {
-      if (currentUser && !isSyncing) {
-        pushToCloud(true).catch(e => console.warn('[FireSync] Auto-push failed:', e));
+      if (currentUser && !isSyncing && !inReview()) {
+        pushToCloud().catch(e => console.warn('[FireSync] Auto-push failed:', e));
       }
-    }, 3000); // 10 seconds
+    }, 4000);
+  }
+
+  function flushPending() {
+    if (inReview()) return Promise.resolve();
+    hasRemoteUpdate = false;
+    return syncNow();
   }
 
   // --- SAVE LOCAL ONLY ---
@@ -492,6 +536,7 @@ const FireSync = (() => {
     initSyncButton,
     saveDataLocal,
     restoreFromBackup,
+    flushPending,
     get isSyncing() { return isSyncing; },
     get isConnected() { return !!currentUser; }
   };
