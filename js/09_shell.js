@@ -60,11 +60,12 @@
     if (!navEl) return;
     const current = activeKey();
     navEl.innerHTML = NAV.map(it => {
-      const on = it.enabled === undefined ? true : it.enabled();
-      const badge = it.badge ? it.badge() : 0;
-      return `<button class="nav-item ${current === it.key ? 'is-active' : ''}"
-                data-nav="${it.key}" ${on ? '' : 'aria-disabled="true" title="Ouvre un chapitre pour commencer"'}
-                ${on ? '' : 'disabled'}>
+      let on = true;
+      try { on = it.enabled === undefined ? true : !!it.enabled(); } catch { on = false; }
+      let badge = 0;
+      try { badge = it.badge ? it.badge() : 0; } catch { badge = 0; }
+      return `<button class="nav-item ${current === it.key ? 'is-active' : ''}${on ? '' : ' is-disabled'}"
+                data-nav="${it.key}" ${on ? '' : 'aria-disabled="true" title="Ouvre un chapitre pour commencer"'}>
           ${ico(it.icon)}
           <span>${it.label}</span>
           ${badge > 0 ? `<span class="nav-item__badge">${badge}</span>` : ''}
@@ -74,8 +75,21 @@
     $$('.nav-item', navEl).forEach(btn => {
       btn.addEventListener('click', () => {
         const it = NAV.find(x => x.key === btn.dataset.nav);
-        if (!it || btn.disabled) return;
-        it.run();
+        if (!it) return;
+        let on = true;
+        try { on = it.enabled === undefined ? true : !!it.enabled(); } catch { on = false; }
+        if (!on) {
+          /* Bouton indisponible : on le signale au lieu de rester muet */
+          if (typeof toast === 'function') toast('Ouvre d’abord un chapitre pour commencer', 'info');
+          closeDrawer();
+          return;
+        }
+        try {
+          it.run();
+        } catch (e) {
+          console.error('[nav]', e);
+          if (typeof toast === 'function') toast('Action impossible pour le moment', 'error');
+        }
         closeDrawer();
       });
     });
@@ -133,9 +147,11 @@
   /* ─────────────────────────────── Synchro UI ─────────────────────────────── */
   let syncTimer = null;
   function syncShell() {
+    /* Chaque section est rendue séparément : une erreur ponctuelle ne
+       doit jamais vider tout le menu. */
+    try { renderNav(); } catch (e) { console.error('[shell] renderNav', e); }
+    try { renderSubjects(); } catch (e) { console.error('[shell] renderSubjects', e); }
     try {
-      renderNav();
-      renderSubjects();
       const s = typeof getSub === 'function' ? getSub() : null;
       if (brandSub && s) brandSub.textContent = `${s.emoji ? s.emoji + ' ' : ''}${s.title}`;
       if (footEl && typeof APP_VER !== 'undefined') footEl.textContent = `v${APP_VER}`;
@@ -147,6 +163,7 @@
   /* ──────────────────────────────── Tiroir ──────────────────────────────── */
   function openDrawer() {
     if (!sidebar) return;
+    try { syncShell(); } catch { /* le tiroir doit s'ouvrir quoi qu'il arrive */ }
     sidebar.classList.add('is-open');
     if (scrim) { scrim.hidden = false; requestAnimationFrame(() => scrim.classList.add('is-open')); }
     if (typeof haptic === 'function') haptic('light');

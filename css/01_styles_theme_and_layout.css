@@ -306,10 +306,19 @@ img { display: block; max-width: 100%; height: auto; }
   border: 0; border-radius: var(--radius-md);
   background: transparent; color: var(--muted);
   font-size: 13.5px; font-weight: 600; text-align: left;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .nav-item:hover { background: var(--btn-neutral-bg-h); color: var(--text); }
 .nav-item.is-active { background: var(--primary-soft); color: var(--btn-soft-primary-fg); }
+/* Élément indisponible (aucun chapitre ouvert) : visuellement atténué
+   et un appui affiche une explication au lieu de ne rien faire. */
+.nav-item.is-disabled, .nav-item[aria-disabled="true"] {
+  opacity: .42; cursor: not-allowed;
+}
+.nav-item.is-disabled:hover, .nav-item[aria-disabled="true"]:hover {
+  background: transparent; color: var(--muted);
+}
 .nav-item .ico { opacity: .95; }
 .nav-item__badge {
   margin-left: auto; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
@@ -330,6 +339,7 @@ img { display: block; max-width: 100%; height: auto; }
   width: 100%; padding: 8px 10px; border: 0; border-radius: var(--radius-md);
   background: transparent; color: var(--muted);
   font-size: 13.5px; font-weight: 600; text-align: left;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .subj-item:hover { background: var(--btn-neutral-bg-h); color: var(--text); }
@@ -441,6 +451,7 @@ main#view { grid-row: 3; }
   border: 1px solid transparent; border-radius: var(--radius-sm);
   background: transparent; color: var(--muted);
   text-decoration: none;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
               border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
@@ -460,7 +471,9 @@ main#view { grid-row: 3; }
 
 @media (max-width: 999px) {
   .topbar-inner { padding-inline: 8px; }
-  .icon-btn { width: 38px; height: 38px; }
+  /* Cibles tactiles un peu plus généreuses sur téléphone */
+  .icon-btn { width: 42px; height: 42px; }
+  .menu-btn { width: 44px; height: 44px; }
 }
 
 /* ────────────────────────  6. Zone de contenu  ───────────────────────── */

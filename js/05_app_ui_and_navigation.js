@@ -1272,15 +1272,19 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCa
     await Media.resolve(grid);
     await tsLat(grid);
   };
-  await renderCards(savedSearch); 
+  await renderCards(savedSearch);
+
+  // La vue peut avoir changé pendant le chargement (retour rapide, etc.) :
+  // dans ce cas les éléments ci-dessous n'existent plus.
+  if (State.view !== 'cards' || State.chapterId !== cid) return;
 
   // ✅ Restaurer la recherche dans l'input
   if(savedSearch) {
     $('#cardSearch').value = savedSearch;
   }
 
-  $('#cardSearch').oninput = (e) => renderCards(e.target.value);
-  
+  if ($('#cardSearch')) $('#cardSearch').oninput = (e) => renderCards(e.target.value);
+
   $('#addCardBtn').onclick = () => openCardEditor(c, null, () => goCards(cid, false));
 
   // === APPUI LONG → RÉVISION RAPIDE D'UNE CARTE ===
@@ -2163,6 +2167,7 @@ function removeSplash() {
 }
 
 async function syncInBackground() {
+  if (typeof firebase === 'undefined') return; // mode local : pas de sync
   if (!FireSync.isConnected) {
     await Promise.race([
       new Promise(resolve => {
@@ -2238,10 +2243,15 @@ async function init() {
 
   } catch (e) {
     console.error('Init error, resetting:', e);
-    localStorage.removeItem(KEY);
-    data = loadData();
-    upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(false);
-    removeSplash();
+    try {
+      localStorage.removeItem(KEY);
+      data = loadData();
+      upgrade(); applyTh(); applyUI(); Nav.clear(); goDeck(false);
+    } catch (e2) {
+      console.error('Init reset failed:', e2);
+    } finally {
+      removeSplash(); // le splash doit disparaître dans tous les cas
+    }
   }
 }
 

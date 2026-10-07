@@ -1,6 +1,26 @@
 /*01_firebase_sync.js*/
 /* === js/01_firebase_sync.js === */
+/* Repli « mode local » : si les scripts Firebase ne sont pas chargés
+   (blocage réseau/extension, hors-ligne, erreur d'init), l'app doit
+   rester 100 % fonctionnelle.
+   ⚠️ FireSync doit TOUJOURS être initialisé : sinon le binding `const`
+   reste dans sa temporal dead zone et chaque `typeof FireSync` des
+   autres scripts lève une ReferenceError qui bloque toute l'appli. */
+const _fireSyncLocal = {
+  login() {}, logout() {}, getUser: () => null,
+  pushToCloud: () => Promise.resolve(),
+  pullFromCloud: () => Promise.resolve(),
+  pullIfNewer: () => Promise.resolve(false),
+  scheduleAutoSync() {}, startListening() {}, stopListening() {},
+  initSyncButton() {}, saveDataLocal() {}, restoreFromBackup: () => Promise.resolve(),
+  get isSyncing() { return false; }, get isConnected() { return false; }
+};
 const FireSync = (() => {
+  try {
+  if (typeof firebase === 'undefined') {
+    console.warn('[FireSync] Scripts Firebase non chargés — mode local.');
+    return _fireSyncLocal;
+  }
   const firebaseConfig = {
     apiKey: "AIzaSyCc8-kMmHvJagbj-nV4ZGcWDUXYytRrD0I",
     authDomain: "englishpv-b6727.firebaseapp.com",
@@ -400,4 +420,8 @@ const FireSync = (() => {
     get isSyncing() { return isSyncing; },
     get isConnected() { return !!currentUser; }
   };
+  } catch (e) {
+    console.warn('[FireSync] Initialisation en échec — mode local :', e);
+    return _fireSyncLocal;
+  }
 })();
