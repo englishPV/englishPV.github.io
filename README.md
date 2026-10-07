@@ -2,8 +2,8 @@
 
 Application web de révision par répétition espacée (algorithme **FSRS**) : plus de
 1 000 flashcards de physique et de mathématiques, support **LaTeX** complet (MathJax),
-statistiques détaillées, synchronisation cloud optionnelle et « Drive » de documents
-publiés depuis GitHub.
+tableau de bord statistique global, synchronisation cloud optionnelle et « Drive » de
+documents publiés depuis GitHub.
 
 Site : <https://englishpv.github.io> · Emploi du temps : <https://schedulepv.web.app>
 
@@ -27,12 +27,27 @@ index.html                     coquille de l'application (barre latérale + barr
 css/01_styles_theme_and_layout.css   design tokens, reset, coquille, primitives UI
 css/02_drive.css               module Drive (onglets, listes, lecteur, éditeur)
 css/03_modern.css              composants applicatifs (listes, stats, révision, QCM, réglages)
+css/04_insights.css            pages défilantes : réglages, tableau de bord, menu Cartes
 js/00_icons.js                 jeu d'icônes SVG inline (aucune requête réseau)
 js/01..08_*.js                 logique applicative (sync, données, SRS, UI, Drive)
 js/09_shell.js                 navigation latérale, tiroir mobile, raccourcis clavier
+js/10_insights.js              statistiques globales + navigateur de cartes multi-chapitres
 fonts/                         Inter variable (woff2, subset latin)
 images/ · content/drive/       médias et documents publiés
 ```
+
+## Vues
+
+| Vue | Contenu |
+| --- | --- |
+| **Mes decks** | chapitres, dossiers (regroupements), import, accès direct aux stats et réglages |
+| **Cartes** | navigateur global : sélecteurs matière / chapitre, filtres de niveau et de type, recherche, tri, révision directe — un chapitre ouvert est simplement présélectionné |
+| **Statistiques** | tableau de bord global (période 7 j → 1 an) : KPI, donut des niveaux, activité quotidienne, carte de chaleur, prévisions FSRS, progression par chapitre, cartes difficiles, médias et stockage — export CSV |
+| **Paramètres** | toujours accessibles, avec ou sans chapitre : onglet *Application* (apparence, typographie, révision, synchronisation, données) et onglet *Chapitre* (nom, emoji, filtres, session, échéance, danger) |
+
+Sans chapitre sélectionné, **Cartes**, **Statistiques** et **Paramètres** s'ouvrent sur
+leur version globale ; la barre latérale ne désactive plus que la *Révision*, qui a
+besoin d'un chapitre pour construire sa file.
 
 ## Design system
 
@@ -51,7 +66,12 @@ Composants prêts à l'emploi : `.btn` (+ `--primary`, `--solid`, `--outline`, `
 `--red/--amber/--blue/--green`, `--sm`, `--tiny`, `--icon`), `.icon-btn`, `.input`,
 `.chip`, `.card`, `.stat-card`, `.legend-item`, `.dmodal`, `.toast`, `.empty`, `.ico`.
 
-## Raccourcis clavier
+## Statistiques
+
+Les statistiques sont recalculées localement (aucun serveur) à partir des compteurs
+`dailyReviews`, `dailyDurMs`, `dailyChanges` et des journaux `dailyLog` conservés
+180 jours par `pruneStats()`. La rétention moyenne et les prévisions utilisent
+directement le modèle FSRS (`stability`, `difficulty`, `dueAt`).
 
 | Touche | Action |
 | --- | --- |

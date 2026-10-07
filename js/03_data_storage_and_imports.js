@@ -64,6 +64,21 @@ const Media = {
   revokeAll(){ for(const u of this.cache.values())URL.revokeObjectURL(u); this.cache.clear() },
   async clearAll(){ const d=await this.open(), tx=d.transaction('files','readwrite'); tx.objectStore('files').clear(); this.revokeAll(); data.mediaIndex={}; saveData() },
   rwHTML(h,m){ return String(h||'').replace(/(<img\b[^>]?\bsrc=["'])([^"']+)(["'][^>]*>)/gi,(x,p,src,s)=>{const k=m[src.replace(/^.*[\\\/]/,'').replace(/^_+/,'')]||null;return k?`${p}media://${k}${s}`:x}) },
+  /* Récupère un média (blob) de l'IndexedDB et renvoie une URL locale stable.
+     L'URL est mise en cache puis révoquée par revokeAll()/invalidate(). */
+  async urlFor(k){
+    if(!k) throw new Error('Clé média vide');
+    if(this.cache.has(k)) return this.cache.get(k);
+    const d = await this.open();
+    const rec = await new Promise((s,j)=>{ const r=d.transaction('files','readonly').objectStore('files').get(k); r.onsuccess=()=>s(r.result); r.onerror=()=>j(r.error) });
+    if(!rec) throw new Error('Média introuvable : '+k);
+    const url = URL.createObjectURL(rec.blob);
+    this.cache.set(k, url);
+    return url;
+  },
+  /* Nombre de médias importés + poids total (octets) */
+  stats(){ const idx=data.mediaIndex||{}, keys=Object.keys(idx); let size=0; keys.forEach(k=>size+=(idx[k]?.size||0)); return { count:keys.length, size, keys } },
+  async sizeOnDisk(){ try{ const d=await this.open(); return await new Promise(s=>{ const r=d.transaction('files','readonly').objectStore('files').count(); r.onsuccess=()=>s(r.result); r.onerror=()=>s(0) }) }catch{ return 0 } },
   async resolve(el){ const i=[...el.querySelectorAll('img[src^="media://"]')]; await Promise.all(i.map(async x=>{try{x.src=await Media.urlFor(x.getAttribute('src').replace(/^media:\/\//,''))}catch{}})) }
 };
 

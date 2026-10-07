@@ -27,8 +27,14 @@
     },
     {
       key: 'cards', icon: 'grid', label: 'Cartes',
-      run: () => State.chapterId && goCards(State.chapterId),
-      enabled: () => !!State.chapterId
+      /* Menu global (sélecteurs matière / chapitre). Si un chapitre est ouvert,
+         il est simplement présélectionné dans les filtres. */
+      run: () => {
+        if (!State.chapterId) return goAllCards(true);
+        const sub = (data.subjects || []).find(s => (s.chapters || []).some(c => c.id === State.chapterId));
+        return goAllCards(true, '', { subjectId: sub ? sub.id : '', chapterId: State.chapterId });
+      },
+      enabled: () => true
     },
     {
       key: 'review', icon: 'zap', label: 'Révision',
@@ -38,13 +44,15 @@
     },
     {
       key: 'stats', icon: 'chart', label: 'Statistiques',
-      run: () => State.chapterId && goChapter(State.chapterId, true),
-      enabled: () => !!State.chapterId
+      /* Toujours accessible : sans chapitre → tableau de bord global */
+      run: () => goStats(true),
+      enabled: () => true
     },
     {
       key: 'settings', icon: 'settings', label: 'Paramètres',
-      run: () => State.chapterId && openSet(State.chapterId),
-      enabled: () => !!State.chapterId
+      /* Toujours accessible : sans chapitre → réglages généraux */
+      run: () => openSet(State.chapterId || null, true, 'general'),
+      enabled: () => true
     }
   ];
 
@@ -53,6 +61,8 @@
     if (State.view === 'cards') return 'cards';
     if (State.view === 'review' || State.view === 'recap') return 'review';
     if (State.view === 'settings') return 'settings';
+    if (State.view === 'stats' || State.view === 'dailyAll') return 'stats';
+    if (State.view === 'daily') return State.chapterId ? 'cards' : 'stats';
     return 'stats';
   }
 
