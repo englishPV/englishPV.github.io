@@ -31,9 +31,11 @@ const mkStats=n=>({gradeCounts:{...GRADE_INIT(),unseen:n},totalReviews:0,dailyRe
 const mkSettings=()=>({sessionSize:10,dailyGoal:10,reviewOrder:'front-first',langSwap:!1});
 const mkChapter=(id,title,cards,imp)=>({id,title,description:(getEmoji(title)?getEmoji(title)+' ':'')+title,settings:mkSettings(),filters:{grades:GRADE_FILTERS()},stats:mkStats(cards.length),cards,imported:!!imp});
 
-const sRow=(id,icon,title,sub,right,click)=>`<div class="settings-row" ${id?'id="'+id+'"':''}${click?' style="cursor:pointer"':''}><div class="s-icon dynamic">${icon}</div><div class="s-label"><div class="s-title">${title}</div>${sub?'<div class="s-sub">'+sub+'</div>':''}</div>${right||''}</div>`;
-const sToggle=on=>`<div class="s-toggle ${on?'on':''}"></div>`;
-const sChev=`<div class="s-chevron">›</div>`;
+/* Icône de réglage : nom du jeu d'icônes SVG, ou texte de repli (ex. « Aa ») */
+const sIconHTML=k=>(typeof ICO!=='undefined'&&ICO[k])?ico(k):(k?`<span class="s-glyph">${k}</span>`:ico('dot'));
+const sRow=(id,icon,title,sub,right,click)=>`<div class="settings-row"${id?' id="'+id+'"':''}${click?' style="cursor:pointer"':''}><div class="s-icon dynamic">${sIconHTML(icon)}</div><div class="s-label"><div class="s-title">${title}</div>${sub?'<div class="s-sub">'+sub+'</div>':''}</div>${right||''}</div>`;
+const sToggle=on=>`<div class="s-toggle ${on?'on':''}" role="switch" aria-checked="${on?'true':'false'}"></div>`;
+const sChev=`<div class="s-chevron">${ico('chevron-right','ico--sm')}</div>`;
 const sVal=v=>`<div class="s-value">${v}</div>`;
 
 /* --- DATABASE (IndexedDB) --- */

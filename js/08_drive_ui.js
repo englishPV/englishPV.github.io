@@ -12,7 +12,7 @@ const Drive = (() => {
   'use strict';
 
   const S = DriveStore;
-  const KIND_ICON = { folder: '📁', text: '📄', latex: '📐', markdown: '📝', image: '🖼️', pdf: '📕', audio: '🎵', video: '🎬', archive: '🗜️', file: '📎' };
+  const KIND_ICON = { folder: 'folder', text: 'file-text', latex: 'file-code', markdown: 'list', image: 'image', pdf: 'book', audio: 'music', video: 'video', archive: 'archive', file: 'paperclip' };
   const KIND_LABEL = { folder: 'Dossier', text: 'Texte', latex: 'LaTeX', markdown: 'Markdown', image: 'Image', pdf: 'PDF', audio: 'Audio', video: 'Vidéo', archive: 'Archive', file: 'Fichier' };
   const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
 
@@ -52,7 +52,7 @@ const Drive = (() => {
     if (diff < 604800e3) return `il y a ${M.round(diff / 86400e3)} j`;
     return fmtShort(ts);
   }
-  const icon = n => KIND_ICON[n.kind] || KIND_ICON.file;
+  const icon = n => ico(KIND_ICON[n.kind] || KIND_ICON.file);
   function trackUrl(u) { objUrls.push(u); if (objUrls.length > 30) URL.revokeObjectURL(objUrls.shift()); return u; }
 
   function notify(msg, type) { try { toast(msg, type || 'info'); } catch { console.log(msg); } }
@@ -86,7 +86,7 @@ const Drive = (() => {
           ${f.hint ? `<small class="dfield-hint">${f.hint}</small>` : ''}
         </label>`).join('');
       const m = openModal(`
-        <div class="dmodal-head"><h3>${esc(title)}</h3><button class="dmodal-x" data-x="cancel">✕</button></div>
+        <div class="dmodal-head"><h3>${esc(title)}</h3><button class="dmodal-x" data-x="cancel" aria-label="Fermer">${ico('x','ico--sm')}</button></div>
         <div class="dmodal-body">${body}</div>
         <div class="dmodal-foot">${btnRow('cancel', 'Annuler', 'btn--ghost')}${btnRow('ok', esc(okLabel), danger ? 'btn--red' : 'btn--solid btn--primary')}</div>`,
         (el, close) => {
@@ -138,14 +138,14 @@ const Drive = (() => {
     bar.innerHTML = `
       <div class="dtabs-scroll scroll-x">
         <button class="dtab dtab-main ${!isOpen ? 'is-active' : ''}" data-act="main" title="Retour aux flashcards">
-          <span class="dtab-emoji">🏠</span><span class="dtab-name">Main</span>
+          <span class="dtab-emoji">${ico('home','ico--sm')}</span><span class="dtab-name">Flashcards</span>
         </button>
         ${tabs}
-        ${admin() ? `<button class="dtab dtab-add" data-act="add-drive" title="Ajouter un onglet (admin)">＋</button>` : ''}
+        ${admin() ? `<button class="dtab dtab-add" data-act="add-drive" title="Ajouter un onglet (admin)">${ico('plus','ico--sm')}</button>` : ''}
       </div>
       ${admin() ? `<div class="dtabs-side">
           <button class="dpub ${pend && pend.any ? 'is-dirty' : ''}" data-act="publish" title="Publier sur GitHub">
-            <span>📤</span><span class="dpub-label">Publier</span>
+            ${ico('upload','ico--sm')}<span class="dpub-label">Publier</span>
             ${pend && pend.any ? `<i class="dbadge dbadge-pub">${pend.count > 9 ? '9+' : pend.count}</i>` : ''}
           </button>
         </div>` : ''}`;
@@ -249,7 +249,7 @@ const Drive = (() => {
         <div class="drive-top">
           <div class="drive-crumb">
             <button class="dcrumb" data-act="root">${esc(d.emoji || '📁')} ${esc(d.title)}</button>
-            ${crumb.map(c => `<span class="dcrumb-sep">›</span><button class="dcrumb ${c.id === cur.folderId ? 'is-cur' : ''}" data-go="${esc(c.id)}">${esc(c.name)}</button>`).join('')}
+            ${crumb.map(c => `<span class="dcrumb-sep">${ico('chevron-right','ico--xs')}</span><button class="dcrumb ${c.id === cur.folderId ? 'is-cur' : ''}" data-go="${esc(c.id)}">${esc(c.name)}</button>`).join('')}
           </div>
           <div class="drive-topmeta">
             ${totalFiles} fichier${totalFiles > 1 ? 's' : ''}${unread ? ` · <span class="dunread-txt">${unread} nouveau${unread > 1 ? 'x' : ''}</span>` : ''}
@@ -259,20 +259,20 @@ const Drive = (() => {
 
         ${admin() ? `
         <div class="drive-toolbar">
-          <button class="dbtn" data-act="new-text" title="Nouveau fichier texte"><span>📄</span>Texte</button>
-          <button class="dbtn" data-act="new-latex" title="Nouveau fichier LaTeX"><span>📐</span>LaTeX</button>
-          <button class="dbtn" data-act="new-md" title="Nouveau fichier Markdown"><span>📝</span>Markdown</button>
-          <button class="dbtn" data-act="new-folder" title="Nouveau dossier"><span>📁</span>Dossier</button>
-          <button class="dbtn dbtn-accent" data-act="import" title="Importer des fichiers"><span>⬆️</span>Importer</button>
+          <button class="dbtn" data-act="new-text" title="Nouveau fichier texte">${ico('file-text','ico--sm')}Texte</button>
+          <button class="dbtn" data-act="new-latex" title="Nouveau fichier LaTeX">${ico('file-code','ico--sm')}LaTeX</button>
+          <button class="dbtn" data-act="new-md" title="Nouveau fichier Markdown">${ico('list','ico--sm')}Markdown</button>
+          <button class="dbtn" data-act="new-folder" title="Nouveau dossier">${ico('folder','ico--sm')}Dossier</button>
+          <button class="dbtn dbtn-accent" data-act="import" title="Importer des fichiers">${ico('upload','ico--sm')}Importer</button>
           <input type="file" id="driveImport" multiple class="hidden">
         </div>` : ''}
 
         <div class="drive-filter">
-          <input class="input dsearch" id="driveSearch" placeholder="🔍 Rechercher dans ${esc(d.title)}…" value="${esc(query)}" autocomplete="off" spellcheck="false">
-          ${query ? '<button class="dbtn-icon" data-act="clear-search">✕</button>' : ''}
-          <button class="dbtn-icon" data-act="sort" title="Trier">${sortMode === 'recent' ? '🕓' : sortMode === 'name' ? '🔤' : '🗂️'}</button>
-          <button class="dbtn-icon" data-act="refresh" title="Recharger depuis GitHub">🔄</button>
-          ${admin() ? '<button class="dbtn-icon" data-act="admin-panel" title="Administration">⚙️</button>' : ''}
+          <input class="input dsearch" id="driveSearch" placeholder="Rechercher dans ${esc(d.title)}…" value="${esc(query)}" autocomplete="off" spellcheck="false">
+          ${query ? `<button class="dbtn-icon" data-act="clear-search" title="Effacer la recherche">${ico('x','ico--sm')}</button>` : ''}
+          <button class="dbtn-icon" data-act="sort" title="Trier">${ico(sortMode === 'recent' ? 'clock' : sortMode === 'name' ? 'list' : 'grid','ico--sm')}</button>
+          <button class="dbtn-icon" data-act="refresh" title="Recharger depuis GitHub">${ico('refresh','ico--sm')}</button>
+          ${admin() ? `<button class="dbtn-icon" data-act="admin-panel" title="Administration">${ico('settings','ico--sm')}</button>` : ''}
         </div>
 
         <div class="drive-scroll scroll-y" id="driveScroll">
@@ -281,17 +281,17 @@ const Drive = (() => {
           </div>
         </div>
 
-        ${admin() ? `<div class="drive-dropzone" id="driveDrop">⬆️ Dépose tes fichiers ici pour les ajouter à « ${esc(folder ? folder.name : d.title)} »</div>` : ''}
-        ${admin() && S.pending().any ? `<div class="drive-pubbar" data-act="publish">📤 ${S.pending().count} modification(s) en attente — <strong>Publier sur GitHub</strong></div>` : ''}
+        ${admin() ? `<div class="drive-dropzone" id="driveDrop">${ico('upload','ico--sm')} Dépose tes fichiers ici pour les ajouter à « ${esc(folder ? folder.name : d.title)} »</div>` : ''}
+        ${admin() && S.pending().any ? `<div class="drive-pubbar" data-act="publish">${ico('upload','ico--sm')} ${S.pending().count} modification(s) en attente — <strong>Publier sur GitHub</strong></div>` : ''}
       </div>`;
 
     bindList(v, d);
   }
 
   function emptyHtml(folder) {
-    if (query) return `<div class="dempty">🔍 Aucun résultat pour « ${esc(query)} ».</div>`;
+    if (query) return `<div class="dempty">${ico('search','ico--lg')}<div class="dempty-t">Aucun résultat</div><div class="dempty-s">Aucun fichier ne correspond à « ${esc(query)} ».</div></div>`;
     return `<div class="dempty">
-      ${folder ? '📂' : '🗂️'} <div class="dempty-t">${folder ? 'Ce dossier est vide' : 'Cet onglet est vide'}</div>
+      ${ico(folder ? 'folder-open' : 'folder','ico--lg')} <div class="dempty-t">${folder ? 'Ce dossier est vide' : 'Cet onglet est vide'}</div>
       <div class="dempty-s">${admin() ? 'Utilise la barre d’outils pour créer un fichier, un dossier ou importer des documents.' : 'L’administrateur n’a encore rien publié ici.'}</div>
     </div>`;
   }
@@ -313,11 +313,11 @@ const Drive = (() => {
           </div>
         </div>
         <div class="drow-acts">
-          ${!isFolder ? `<button class="dact" data-act="download" title="Télécharger">⬇</button>` : ''}
-          ${admin() ? `<button class="dact" data-act="rename" title="Renommer">✏️</button>
-                       <button class="dact" data-act="move" title="Déplacer">📂</button>
-                       <button class="dact dact-danger" data-act="delete" title="Supprimer">🗑</button>` : ''}
-          <div class="drow-chev">›</div>
+          ${!isFolder ? `<button class="dact" data-act="download" title="Télécharger">${ico('download','ico--sm')}</button>` : ''}
+          ${admin() ? `<button class="dact" data-act="rename" title="Renommer">${ico('pencil','ico--sm')}</button>
+                       <button class="dact" data-act="move" title="Déplacer">${ico('folder-open','ico--sm')}</button>
+                       <button class="dact dact-danger" data-act="delete" title="Supprimer">${ico('trash','ico--sm')}</button>` : ''}
+          <div class="drow-chev">${ico('chevron-right','ico--sm')}</div>
         </div>
       </div>`;
   }
@@ -434,8 +434,8 @@ const Drive = (() => {
           <div class="dfile-info">
             <div class="dfile-name">${esc(n.name)}${S.isUnread(n) ? '<i class="dnew"></i>' : ''}</div>
             <div class="dfile-meta">
-              <span>📥 Ajouté le <strong>${fmtDate(n.addedAt)}</strong></span>
-              ${n.updatedAt > n.addedAt + 60000 ? `<span>· ✏️ modifié le ${fmtDate(n.updatedAt)}</span>` : ''}
+              <span>${ico('clock','ico--xs')} Ajouté le <strong>${fmtDate(n.addedAt)}</strong></span>
+              ${n.updatedAt > n.addedAt + 60000 ? `<span>· modifié le ${fmtDate(n.updatedAt)}</span>` : ''}
               <span>· ${S.fmtSize(n.size)}</span><span>· ${KIND_LABEL[n.kind] || 'Fichier'}</span>
               ${n.by ? `<span>· par ${esc(n.by)}</span>` : ''}
             </div>
@@ -444,16 +444,16 @@ const Drive = (() => {
         </div>
 
         <div class="dfile-actions">
-          <button class="dbtn" data-act="download"><span>⬇</span>Télécharger</button>
+          <button class="dbtn" data-act="download">${ico('download','ico--sm')}Télécharger</button>
           ${(n.kind === 'latex' || n.kind === 'markdown') ? `
             <div class="dseg">
               <button class="dseg-b ${mode === 'render' ? 'on' : ''}" data-act="view-render">Rendu</button>
               <button class="dseg-b ${mode === 'source' ? 'on' : ''}" data-act="view-source">Source</button>
             </div>` : ''}
           ${n.kind === 'latex' || n.kind === 'markdown' || n.kind === 'text' ? `<button class="dbtn" data-act="print"><span>🖨</span>PDF</button>` : ''}
-          ${n.kind === 'pdf' ? `<button class="dbtn" data-act="newtab"><span>↗</span>Nouvel onglet</button>` : ''}
-          ${admin() ? `<button class="dbtn" data-act="edit"><span>✏️</span>Éditer</button>
-                       <button class="dbtn dbtn-danger" data-act="delete"><span>🗑</span></button>` : ''}
+          ${n.kind === 'pdf' ? `<button class="dbtn" data-act="newtab">${ico('external-link','ico--sm')}Nouvel onglet</button>` : ''}
+          ${admin() ? `<button class="dbtn" data-act="edit">${ico('pencil','ico--sm')}Éditer</button>
+                       <button class="dbtn dbtn-danger" data-act="delete" title="Supprimer">${ico('trash','ico--sm')}</button>` : ''}
         </div>
 
         <div class="dfile-body scroll-y" id="dfileBody">
@@ -686,7 +686,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
   async function importFiles(driveId, parentId, files) {
     if (!admin()) return;
     const m = openModal(`
-      <div class="dmodal-head"><h3>⬆️ Import en cours</h3></div>
+      <div class="dmodal-head"><h3>Import en cours</h3></div>
       <div class="dmodal-body"><div class="dprogress"><div class="dprogress-bar"><i style="width:0%"></i></div>
       <div class="dprogress-txt" id="impTxt">Préparation…</div></div></div>`, null, { locked: true });
     try {
@@ -778,12 +778,12 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
     const isTex = n.kind === 'latex';
     const m = openModal(`
       <div class="dmodal-head">
-        <h3>${isTex ? '📐' : n.kind === 'markdown' ? '📝' : '📄'} Éditeur ${KIND_LABEL[n.kind] || ''}</h3>
-        <button class="dmodal-x" data-x="close">✕</button>
+        <h3>${ico(isTex ? 'file-code' : n.kind === 'markdown' ? 'list' : 'file-text','ico--sm')} Éditeur ${KIND_LABEL[n.kind] || ''}</h3>
+        <button class="dmodal-x" data-x="close" aria-label="Fermer">${ico('x','ico--sm')}</button>
       </div>
       <div class="dedit-name">
         <input class="input" id="edName" value="${esc(n.name)}" spellcheck="false">
-        <button class="dbtn" id="edPreviewBtn" ${n.kind === 'text' ? 'disabled' : ''}>${'👁 Aperçu'}</button>
+        <button class="dbtn" id="edPreviewBtn" ${n.kind === 'text' ? 'disabled' : ''}>${ico('eye','ico--sm')}Aperçu</button>
       </div>
       ${isTex ? `<div class="dedit-tools">${SNIPPETS.map((s, i) => `<button class="dtool" data-sn="${i}" title="${esc(s.v)}">${esc(s.l)}</button>`).join('')}</div>` : ''}
       <div class="dedit-body">
@@ -793,8 +793,8 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
       <div class="dmodal-foot">
         <span class="dedit-stat muted" id="edStat"></span>
         <button class="btn btn--ghost" data-x="close">Fermer</button>
-        <button class="btn btn--solid btn--primary" data-x="save">💾 Enregistrer</button>
-        <button class="btn btn--primary" data-x="savepub">💾 + 📤 Publier</button>
+        <button class="btn btn--solid btn--primary" data-x="save">${ico('save','ico--sm')}Enregistrer</button>
+        <button class="btn btn--primary" data-x="savepub">${ico('upload','ico--sm')}Enregistrer + publier</button>
       </div>`,
       async (el, close) => {
         const ta = el.querySelector('#edText');
@@ -861,12 +861,12 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
      ══════════════════════════════════════════════════════════ */
   async function publishModal() {
     if (!admin()) return notify('Réservé aux administrateurs', 'error');
-    if (!S.isSignedIn()) return notify('Connecte-toi d’abord avec Google (bouton 🔄 en haut)', 'error');
+    if (!S.isSignedIn()) return notify('Connecte-toi d’abord avec Google (bouton de synchronisation en haut)', 'error');
 
     const ch = S.pending();
     if (!S.hasToken()) return tokenModal(() => publishModal());
     if (!ch.any) return openModal(`
-      <div class="dmodal-head"><h3>📤 Publier</h3></div>
+      <div class="dmodal-head"><h3>Publier sur GitHub</h3></div>
       <div class="dmodal-body"><p class="dmodal-text">✅ Tout est déjà publié.<br><span class="muted">Dernière publication : ${S.lastPublish() ? fmtDate(S.lastPublish().at) : 'jamais'}</span></p></div>
       <div class="dmodal-foot">${btnRow('ok', 'OK', 'btn--solid btn--primary')}</div>`,
       (el, close) => el.querySelector('[data-x="ok"]').onclick = close);
@@ -878,7 +878,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
     ].join('');
 
     openModal(`
-      <div class="dmodal-head"><h3>📤 Publier sur GitHub</h3><button class="dmodal-x" data-x="cancel">✕</button></div>
+      <div class="dmodal-head"><h3>Publier sur GitHub</h3><button class="dmodal-x" data-x="cancel" aria-label="Fermer">${ico('x','ico--sm')}</button></div>
       <div class="dmodal-body">
         <p class="dmodal-text">Ces modifications seront commitées directement sur <strong>${esc(S.CFG.branch)}</strong> de
           <a href="https://github.com/${esc(S.CFG.owner)}/${esc(S.CFG.repo)}" target="_blank" rel="noopener">${esc(S.CFG.owner)}/${esc(S.CFG.repo)}</a>
@@ -892,7 +892,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
       </div>
       <div class="dmodal-foot">
         <button class="btn btn--ghost" data-x="cancel">Annuler</button>
-        <button class="btn btn--solid btn--primary" data-x="go">🚀 Publier maintenant</button>
+        <button class="btn btn--solid btn--primary" data-x="go">${ico('upload','ico--sm')}Publier maintenant</button>
       </div>`,
       (el, close) => {
         const prog = el.querySelector('#pubProg'), bar = prog.querySelector('i'), txt = prog.querySelector('.dprogress-txt'), res = el.querySelector('#pubRes');
@@ -917,14 +917,14 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
             res.innerHTML = `✅ Publié — commit <code>${esc(last.sha.slice(0, 7))}</code> à ${fmtDate(last.at)}.
               <br><span class="muted">Visible par les autres utilisateurs dès que GitHub Pages a redéployé (~1 min).</span>
               <br><a href="https://github.com/${esc(S.CFG.owner)}/${esc(S.CFG.repo)}/commit/${esc(last.sha)}" target="_blank" rel="noopener">Voir le commit sur GitHub →</a>`;
-            b.textContent = '✅ Publié';
+            b.innerHTML = ico('circle-check','ico--sm') + 'Publié';
             renderTabs(); paint();
             notify('Publication réussie !', 'success');
           } catch (err) {
             res.classList.remove('hidden');
             res.className = 'dp-result dp-error';
             res.innerHTML = `⚠️ Échec : ${esc(err.message || err)}`;
-            b.disabled = false; b.textContent = '🔁 Réessayer';
+            b.disabled = false; b.innerHTML = ico('refresh','ico--sm') + 'Réessayer';
             el.querySelector('[data-x="cancel"]').classList.remove('hidden');
             notify('Publication échouée', 'error');
           }
@@ -934,7 +934,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
 
   function tokenModal(after) {
     openModal(`
-      <div class="dmodal-head"><h3>🔑 Token GitHub requis</h3><button class="dmodal-x" data-x="cancel">✕</button></div>
+      <div class="dmodal-head"><h3>${ico('key','ico--sm')} Token GitHub requis</h3><button class="dmodal-x" data-x="cancel" aria-label="Fermer">${ico('x','ico--sm')}</button></div>
       <div class="dmodal-body">
         <p class="dmodal-text">Pour publier directement dans le dépôt depuis ton navigateur, il faut un
           <strong>fine-grained personal access token</strong>. Il est stocké <strong>uniquement dans ce navigateur</strong>
@@ -951,7 +951,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
       </div>
       <div class="dmodal-foot">
         <button class="btn btn--ghost" data-x="cancel">Plus tard</button>
-        <button class="btn btn--solid btn--primary" data-x="test">✔ Tester &amp; enregistrer</button>
+        <button class="btn btn--solid btn--primary" data-x="test">${ico('check','ico--sm')}Tester &amp; enregistrer</button>
       </div>`,
       (el, close) => {
         const res = el.querySelector('#tokRes');
@@ -971,7 +971,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
             S.setToken('');
             res.className = 'dp-result dp-error'; res.classList.remove('hidden');
             res.innerHTML = `⚠️ ${esc(err.message || err)}`;
-            b.disabled = false; b.textContent = '✔ Tester & enregistrer';
+            b.disabled = false; b.innerHTML = ico('check','ico--sm') + 'Tester & enregistrer';
           }
         };
       }, { wide: true });
@@ -984,7 +984,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
     const last = S.lastPublish();
     const pend = S.pending();
     openModal(`
-      <div class="dmodal-head"><h3>⚙️ Administration du Drive</h3><button class="dmodal-x" data-x="cancel">✕</button></div>
+      <div class="dmodal-head"><h3>${ico('settings','ico--sm')} Administration du Drive</h3><button class="dmodal-x" data-x="cancel">✕</button></div>
       <div class="dmodal-body">
         <div class="dpanel-grid">
           <div><span class="muted">Connecté</span><br><strong>${esc(S.adminEmail() || '—')}</strong></div>
@@ -995,14 +995,14 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
         <div class="dpanel-sep"></div>
         <div class="dpanel-title">Onglet « ${esc(d ? d.title : '')} »</div>
         <div class="dpanel-actions">
-          <button class="btn" data-x="rename-drive">✏️ Renommer l’onglet</button>
-          <button class="btn btn--red" data-x="del-drive">🗑 Supprimer l’onglet</button>
+          <button class="btn" data-x="rename-drive">Renommer l’onglet</button>
+          <button class="btn btn--red" data-x="del-drive">Supprimer l’onglet</button>
         </div>
         <div class="dpanel-sep"></div>
         <div class="dpanel-title">Dépôt</div>
         <div class="dpanel-actions">
-          <button class="btn" data-x="token">🔑 Token GitHub</button>
-          <button class="btn" data-x="resync">🔄 Resynchroniser depuis GitHub</button>
+          <button class="btn" data-x="token">Token GitHub</button>
+          <button class="btn" data-x="resync">Resynchroniser depuis GitHub</button>
           <button class="btn" data-x="publish">📤 Publier</button>
           <a class="btn" href="https://github.com/${esc(S.CFG.owner)}/${esc(S.CFG.repo)}/tree/${esc(S.CFG.branch)}/${esc(S.CFG.dir)}" target="_blank" rel="noopener">↗ Voir sur GitHub</a>
         </div>
@@ -1127,7 +1127,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
     const rev = (S.remoteInfo() || {}).rev || 0;
     if (rev && rev <= known) return;
     LSset('pv_drive_notif_rev', rev);
-    notify(`📥 ${ids.length} nouveauté(s) dans le Drive`, 'info', 3500);
+    notify(`${ids.length} nouveauté(s) dans le Drive`, 'info', 3500);
   }
 
   return {

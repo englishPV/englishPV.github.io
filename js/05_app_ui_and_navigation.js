@@ -103,7 +103,16 @@ const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), re
 
 function renSubMenu(){
   let m=$('#subjectMenu'); if(!m){m=D.createElement('div');m.id='subjectMenu';m.className='subject-menu';D.body.appendChild(m)}
-  m.innerHTML=data.subjects.map(s=>`<div class="subject-item" data-id="${s.id}"><div class="name">${s.emoji?s.emoji+' ':''}${s.title}</div><div class="meta">${s.chapters?.length||0} chap.</div>${s.id===data.app.currentSubjectId?'<div class="muted">✓</div>':''}<div class="subject-actions"><button class="btn btn--tiny rs">✏️</button>${!(s.chapters?.length)?'<button class="btn btn--tiny ds">🗑️</button>':''}</div></div>`).join('');
+  m.innerHTML=data.subjects.map(s=>`<div class="subject-item ${s.id===data.app.currentSubjectId?'is-current':''}" data-id="${s.id}">
+      <span class="subj-emoji">${s.emoji || ''}</span>
+      <span class="name">${s.title}</span>
+      <span class="meta">${s.chapters?.length||0}</span>
+      ${s.id===data.app.currentSubjectId?`<span class="check">${ico('check','ico--xs')}</span>`:''}
+      <span class="subject-actions">
+        <button class="btn btn--ghost btn--icon rs" title="Renommer" style="width:28px;min-height:28px;padding:0">${ico('pencil','ico--xs')}</button>
+        ${!(s.chapters?.length)?`<button class="btn btn--ghost btn--icon ds" title="Supprimer" style="width:28px;min-height:28px;padding:0">${ico('trash','ico--xs')}</button>`:''}
+      </span>
+    </div>`).join('');
 
       $$('.subject-item',m).forEach(el=>{
     el.onclick=e=>{if(e.target.closest('button'))return;const id=el.dataset.id;if(id!==data.app.currentSubjectId){setSub(id);closeSubMenu();goDeck(!1)}else closeSubMenu();e.stopPropagation()};
@@ -112,10 +121,9 @@ function renSubMenu(){
     });
   
   // ✅ Bouton "Nouvelle matière" — ajouté une seule fois à la fin
-  const addBtn = D.createElement('div');
+  const addBtn = D.createElement('button');
   addBtn.className = 'add-row';
-  addBtn.style.cssText = 'padding:10px;';
-  addBtn.innerHTML = `<div class="add-row-icon">+</div><span>Nouvelle matière</span>`;
+  addBtn.innerHTML = `${ico('plus')}<span>Nouvelle matière</span>`;
   addBtn.onclick = (e) => {
     e.stopPropagation();
     const title = prompt('Nom de la matière :');
@@ -228,7 +236,7 @@ function renderFABs() {
   
   const fabConfirm = D.createElement('button');
   fabConfirm.className = 'fab-confirm';
-  fabConfirm.innerHTML = '✓';
+  fabConfirm.innerHTML = ico('check','ico--lg');
   fabConfirm.title = 'Créer un dossier';
   fabConfirm.onclick = () => {
     const ids = [...selectedIds];
@@ -255,7 +263,7 @@ function renderFABs() {
   
   const fabCancel = D.createElement('button');
   fabCancel.className = 'fab-cancel';
-  fabCancel.innerHTML = '✕';
+  fabCancel.innerHTML = ico('x','ico--lg');
   fabCancel.title = 'Annuler';
   fabCancel.onclick = () => exitSelectionMode();
   D.body.appendChild(fabCancel);
@@ -269,7 +277,7 @@ function bindPullRefresh(container, onRefresh) {
   container.addEventListener('touchmove', e => {
     if(!pulling) return; const delta = e.touches[0].clientY - startY;
     if(delta > 0 && delta < 120) {
-      if(!indicator) { indicator = D.createElement('div'); indicator.innerHTML = '↻'; indicator.style.cssText = 'text-align:center;padding:10px;color:var(--muted);font-size:20px;transition:transform 0.2s'; container.prepend(indicator); }
+      if(!indicator) { indicator = D.createElement('div'); indicator.innerHTML = ico('refresh'); indicator.style.cssText = 'text-align:center;padding:10px;color:var(--muted);font-size:20px;transition:transform 0.2s'; container.prepend(indicator); }
       indicator.style.transform = `rotate(${delta * 3}deg)`;
     }
   }, {passive:!0});
@@ -364,10 +372,36 @@ function goDeck(push=true){
   const v=$('#view');
   const items = buildDeckItems(s, null, 0);
   
-    v.innerHTML=`<div class="card flexcol" style="flex:1"><div class="deck-head" style="display:flex;align-items:center;justify-content:space-between"><div class="section-title" style="margin:0">Chapitres & Fichiers</div><div class="actions" style="display:flex;gap:6px"><button class="btn ${selectionMode?'btn--primary':'btn--ghost'} btn--tiny" id="editModeBtn">${selectionMode?'✓ Terminer':'✏️ Éditer'}</button><button class="btn btn--ghost btn--tiny" id="impB">Importer</button><input id="impI" type="file" class="hidden" accept="*/*" multiple/></div></div><div style="position:relative;margin-bottom:6px"><input type="text" id="globalSearch" class="input" placeholder="🔍 Rechercher une carte..." autocomplete="off" spellcheck="false" style="padding-right:32px"><button id="globalSearchClear" class="hidden" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:0 0;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px">✕</button><div id="globalSearchResults" class="hidden" style="position:absolute;top:100%;left:0;right:0;z-index:50;max-height:60vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius-md) var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.3)"></div></div><div id="dL" class="scroll-y" style="flex:1;min-height:0;padding-right:4px"><div class="list" id="deckList"></div></div></div>`;
+    const nbCh = s.chapters.length, nbCards = s.chapters.reduce((n,ch)=>n+ch.cards.length,0);
+    v.innerHTML = `
+      <div class="card card--flush">
+        <div class="view-head">
+          <div>
+            <h2 class="view-head__title">Chapitres &amp; fichiers</h2>
+            <div class="view-head__meta">${nbCh} chapitre${nbCh>1?'s':''} · ${nbCards} carte${nbCards>1?'s':''}</div>
+          </div>
+          <div class="view-head__actions">
+            <button class="btn ${selectionMode?'btn--primary':'btn--outline'} btn--sm" id="editModeBtn">
+              ${ico(selectionMode?'check':'pencil')}<span>${selectionMode?'Terminer':'Éditer'}</span>
+            </button>
+            <button class="btn btn--outline btn--sm" id="impB">${ico('upload')}<span>Importer</span></button>
+            <input id="impI" type="file" class="hidden" accept="*/*" multiple />
+          </div>
+        </div>
+        <div class="search-field deck-search">
+          ${ico('search')}
+          <input type="text" id="globalSearch" class="input" placeholder="Rechercher une carte…" autocomplete="off" spellcheck="false" />
+          <button id="globalSearchClear" class="clear-btn hidden" aria-label="Effacer la recherche">${ico('x','ico--sm')}</button>
+          <span class="search-kbd" aria-hidden="true"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+          <div id="globalSearchResults" class="hidden"></div>
+        </div>
+        <div id="dL" class="scroll-y deck-scroll">
+          <div class="deck-list" id="deckList"></div>
+        </div>
+      </div>`;
     const listEl = $('#deckList');
   listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('') 
-    + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
+    + `<button class="add-row" id="addChapterBtn">${ico('plus')}<span>Nouveau chapitre</span></button>`;
   
   $('#addChapterBtn').onclick = () => {
     const title = prompt('Nom du chapitre :');
@@ -447,7 +481,7 @@ function buildDeckItems(s, parentGid, depth) {
 
 function renderDeckItem(item, s) {
   const depthClass = item.depth > 0 ? ` folder-child${item.depth >= 2 ? ` folder-child-depth-${Math.min(item.depth, 3)}` : ''}` : '';
-  
+
   if(item.type === 'group') {
     const g = item.group;
     const {counts:c} = buildGrpStats(s, g);
@@ -457,35 +491,34 @@ function renderDeckItem(item, s) {
     const emoji = g.emoji || '📁';
     const title = g.title || 'Fichier ('+grpEmojis(s,g)+')';
     const isExpanded = expandedFolders.has(g.id);
-    const chevron = isExpanded ? '▾' : '›';
-    
+
     let rightContent = '';
     if(selectionMode) {
-      rightContent = `<button class="remove-x" data-action="delete-folder" data-gid="${g.id}" title="Supprimer le dossier">✕</button>`;
+      rightContent = `<button class="remove-x" data-action="delete-folder" data-gid="${g.id}" title="Supprimer le dossier">${ico('x','ico--xs')}</button>`;
     } else if(isExpanded) {
-      rightContent = `<button class="btn btn--primary btn--tiny" data-action="review-folder" data-gid="${g.id}" style="margin-right:8px;width:auto;padding:5px 10px;font-size:11px">▶ Tout</button>`;
+      rightContent = `<button class="btn btn--primary btn--sm" data-action="review-folder" data-gid="${g.id}">${ico('play','ico--sm')}<span>Tout</span></button>`;
       const parentG = findGrpOfGrp(s, g.id);
       if(parentG) {
-        rightContent += `<button class="remove-x" data-action="remove-subfolder" data-gid="${g.id}" data-parent="${parentG.id}" title="Sortir du dossier" style="margin-right:4px">✕</button>`;
+        rightContent += `<button class="remove-x" data-action="remove-subfolder" data-gid="${g.id}" data-parent="${parentG.id}" title="Sortir du dossier">${ico('x','ico--xs')}</button>`;
       }
     }
-    
-        return `<div class="deck-item${depthClass}" data-type="group" data-id="${g.id}">
+
+    return `<div class="deck-item${depthClass}${isExpanded ? ' is-open' : ''}" data-type="group" data-id="${g.id}">
       ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
       <div class="slide">
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-                   <div class="deck-title">${title}</div>
+          <div class="deck-title">${title}</div>
           <div class="deck-sub">
-            <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
-            <span>${pct}%</span>
-            <div class="mini-dots"><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--amber)"></div><div class="md" style="background:var(--blue)"></div><div class="md" style="background:var(--green)"></div></div>
-            <span>${c.echec}·${c.difficile}·${c.bien}·${c.facile}</span>
+            <span class="mini-bar"><span class="mini-bar-fill" style="width:${pct}%"></span></span>
+            <span class="pct">${pct}%</span>
+            <span class="mini-dots"><i class="md" style="background:var(--red)"></i><i class="md" style="background:var(--amber)"></i><i class="md" style="background:var(--blue)"></i><i class="md" style="background:var(--green)"></i></span>
+            <span>${c.echec} · ${c.difficile} · ${c.bien} · ${c.facile}</span>
             <span class="folder-badge">${getAllChapIdsRecursive(s, g.id).length} chap.</span>
           </div>
         </div>
         ${rightContent}
-        <div class="deck-chevron">${chevron}</div>
+        <div class="deck-chevron">${ico('chevron-right','ico--sm')}</div>
       </div>
     </div>`;
   } else {
@@ -493,35 +526,35 @@ function renderDeckItem(item, s) {
     const k = getLive(c), tot = c.cards.length, pct = tot ? M.round((tot-k.unseen)/tot*100) : 0;
     const tint = getDeckTint(c, 'chapter');
     const emoji = c.emoji || getEmoji(c.title) || '📄';
-    
+
     let rightContent = '';
     if(!selectionMode && item.parentGid && expandedFolders.has(item.parentGid)) {
-      rightContent = `<button class="remove-x" data-action="remove-from-folder" data-cid="${c.id}" data-gid="${item.parentGid}" title="Sortir du dossier" style="margin-right:12px">✕</button>`;
+      rightContent = `<button class="remove-x" data-action="remove-from-folder" data-cid="${c.id}" data-gid="${item.parentGid}" title="Sortir du dossier">${ico('x','ico--xs')}</button>`;
     }
-    
+
     let selectBox = '';
     if(selectionMode) {
       const isChecked = selectedIds.has(c.id);
       selectBox = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
     }
-    
-        return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
+
+    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
       ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
-      ${c.imported?'<div class="right-action"><button class="btn btn--solid btn--red btn--tiny delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
+      ${c.imported?'<div class="right-action"><button class="btn btn--red btn--sm delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
       <div class="slide">
         ${selectBox}
         <div class="deck-emoji">${emoji}</div>
         <div class="deck-info">
-                    <div class="deck-title">${c.title}</div>
+          <div class="deck-title">${c.title}</div>
           <div class="deck-sub">
-            <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
-            <span>${pct}%</span>
-            <div class="mini-dots"><div class="md" style="background:#9ca3af"></div><div class="md" style="background:var(--red)"></div><div class="md" style="background:var(--green)"></div></div>
-            <span>${k.unseen}·${k.echec}·${k.facile}</span>
+            <span class="mini-bar"><span class="mini-bar-fill" style="width:${pct}%"></span></span>
+            <span class="pct">${pct}%</span>
+            <span class="mini-dots"><i class="md" style="background:#9ca3af"></i><i class="md" style="background:var(--red)"></i><i class="md" style="background:var(--green)"></i></span>
+            <span>${k.unseen} non vues · ${k.echec} à revoir · ${k.facile} acquises</span>
           </div>
         </div>
         ${rightContent}
-        <div class="deck-chevron">›</div>
+        <div class="deck-chevron">${ico('chevron-right','ico--sm')}</div>
       </div>
     </div>`;
   }
@@ -882,6 +915,7 @@ function bindGlobalSearch() {
     clearTimeout(debounceTimer);
     const q = input.value.trim();
     clearBtn.classList.toggle('hidden', !q);
+    input.closest('.search-field')?.classList.toggle('has-query', !!q);
     if(!q) { results.classList.add('hidden'); results.innerHTML = ''; return; }
     debounceTimer = setTimeout(() => doSearch(q), 150);
   };
@@ -890,6 +924,7 @@ function bindGlobalSearch() {
     e.stopPropagation();
     input.value = '';
     clearBtn.classList.add('hidden');
+    input.closest('.search-field')?.classList.remove('has-query');
     results.classList.add('hidden');
     results.innerHTML = '';
     input.focus();
@@ -928,7 +963,7 @@ function bindGlobalSearch() {
     }
 
     if(!scored.length) {
-      results.innerHTML = `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Aucun résultat</div>`;
+      results.innerHTML = `<div class="gs-empty">Aucun résultat pour « ${q} ».</div>`;
       results.classList.remove('hidden');
       return;
     }
@@ -963,7 +998,11 @@ function bindGlobalSearch() {
       const chLabel = group.ch.title.length > 30 ? group.ch.title.substring(0, 27) + '…' : group.ch.title;
       const subLabel = group.sub.title;
 
-      html += `<div style="padding:8px 12px 4px;font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;gap:6px;position:sticky;top:0;background:var(--surface);z-index:1"><span>${group.emoji}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${chLabel}</span><span style="font-weight:400;color:var(--muted);text-transform:none">${subLabel}</span></div>`;
+      html += `<div class="gs-group">
+        <span class="gs-group-emoji">${group.emoji}</span>
+        <span class="gs-group-name">${chLabel}</span>
+        <span class="gs-group-sub">${subLabel}</span>
+      </div>`;
 
       // Trier les cartes du groupe par score
       group.items.sort((a, b) => a.score - b.score);
@@ -975,21 +1014,21 @@ function bindGlobalSearch() {
         const idx = flatResults.length;
         flatResults.push(item);
 
-        html += `<div class="gs-result" data-idx="${idx}" style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px 8px 20px;cursor:pointer;border-bottom:1px solid color-mix(in srgb, var(--border) 50%, transparent);transition:background .1s">
-          <span style="width:7px;height:7px;border-radius:50%;background:var(--${GC[gradeClass]});flex-shrink:0;margin-top:6px"></span>
-          <div style="flex:1;min-width:0;overflow:hidden">
-            <div class="gs-front" style="font-size:13px;font-weight:600;max-height:40px;overflow:hidden">${formatText(f)}</div>
-            <div class="gs-back" style="font-size:11px;color:var(--muted);margin-top:2px;max-height:32px;overflow:hidden">${formatText(b)}</div>
+        html += `<div class="gs-result" data-idx="${idx}" role="button" tabindex="0">
+          <span class="gs-dot" style="background:var(--${GC[gradeClass]})"></span>
+          <div class="gs-main">
+            <div class="gs-front">${formatText(f)}</div>
+            <div class="gs-back">${formatText(b)}</div>
           </div>
         </div>`;
         totalShown++;
       }
 
-      // Lien "voir tout" si le chapitre a plus de résultats
+      // Lien « voir tout » si le chapitre a plus de résultats
       if(group.items.length > maxPerChap) {
         const moreIdx = flatResults.length;
         flatResults.push({ _seeAll: true, chId: group.chId, subId: group.subId });
-        html += `<div class="gs-result" data-idx="${moreIdx}" style="padding:6px 12px 8px 20px;cursor:pointer;font-size:11px;color:var(--primary);font-weight:700">+ ${group.items.length - maxPerChap} autres résultats dans ce chapitre →</div>`;
+        html += `<div class="gs-result is-more" data-idx="${moreIdx}" role="button" tabindex="0">+ ${group.items.length - maxPerChap} autres résultats dans ce chapitre →</div>`;
       }
     }
 
@@ -1001,8 +1040,6 @@ function bindGlobalSearch() {
 
     // Bind clicks
     $$('.gs-result', results).forEach(el => {
-      el.onpointerenter = () => el.style.background = 'rgba(255,255,255,.06)';
-      el.onpointerleave = () => el.style.background = '';
       el.onclick = () => {
         const idx = parseInt(el.dataset.idx);
         const item = flatResults[idx];
@@ -1038,7 +1075,7 @@ function openGrp(s, gid) {
   if (listEl) {
     const items = buildDeckItems(s, null, 0);  // ← CORRECTION : construire les items
     listEl.innerHTML = items.map(item => renderDeckItem(item, s)).join('')
-      + `<div class="add-row" id="addChapterBtn"><div class="add-row-icon">+</div><span>Nouveau chapitre</span></div>`;
+      + `<button class="add-row" id="addChapterBtn">${ico('plus')}<span>Nouveau chapitre</span></button>`;
 
     $('#addChapterBtn').onclick = () => {
       const title = prompt('Nom du chapitre :');
@@ -1082,8 +1119,53 @@ function goChapter(id,push=true){
       ).join('')}</div>`;
   })() : '';
 
-  v.innerHTML=`<div class="card" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0"><div class="section-title">${c.virtual?c.description:(getEmoji(c.title)?getEmoji(c.title)+' ':'')+'Statistiques'}</div><div class="stats-row"><div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div><div class="bar7-side"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">7 derniers jours</div>${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}"><div class="bar7-label">${lbls7[i].substring(0,3)}</div><div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div><div class="bar7-val">${val}</div></div>`).join('')}</div></div><div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}"><span class="dot ${GC[x]}"></span><span style="flex:1">${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b></div>`).join('')}</div>${typeLegendHTML}<div class="stats-grid mt8"><div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div><div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total</div></div><div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Aujourd'hui</div></div><div class="stat-card"><div class="stat-val">${getStreak(c)}j</div><div class="stat-lbl">🔥 Streak</div></div><div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div><div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'s':'—'}</div><div class="stat-lbl">Moy. 7j</div></div></div><div class="mt8" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:bold;color:var(--muted)">Date Limite:</span><input type="date" id="deadlineInput" class="input" style="width:auto;padding:4px 8px;" value="${c.deadline||''}"></div>${dailyCalc?`<div class="mt6" id="goalDisplay" style="font-size:13px;color:var(--primary);display:flex;justify-content:space-between"><span>Objectif fixé: <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span></div>`:''}</div></div>`;
-  
+  const statsLabel = c.virtual ? c.description : ((getEmoji(c.title) ? getEmoji(c.title) + ' ' : '') + 'Statistiques');
+  v.innerHTML = `
+    <div class="card card--flush">
+      <div class="view-head">
+        <div>
+          <h2 class="view-head__title">${c.title}</h2>
+          <div class="view-head__meta">${c.cards.length} carte${c.cards.length>1?'s':''} · ${k.unseen} non vue${k.unseen>1?'s':''} · ${cntAv(c)} à réviser</div>
+        </div>
+      </div>
+      <div class="view-body">
+        <div class="section-title">${statsLabel}</div>
+        <div class="stats-row">
+          <div class="chart-wrap"><canvas id="gradeChart" width="140" height="140"></canvas></div>
+          <div class="bar7-side">
+            <div class="bar7-head">7 derniers jours</div>
+            ${last7.map((val,i)=>`<div class="bar7-row" data-day="${dayKeyIdx(7,i)}" title="Voir le détail du jour">
+              <div class="bar7-label">${lbls7[i].substring(0,3)}</div>
+              <div class="bar7-track"><div class="bar7-fill" style="width:${max7?(val/max7*100):0}%"></div></div>
+              <div class="bar7-val">${val}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+
+        <div class="legend" id="legend">${GRADES.map(x=>`<div class="legend-item ${sel[x]?'':'inactive'}" data-key="${x}" title="Filtrer les cartes « ${x} »">
+          <span class="dot ${GC[x]}"></span><span>${x[0].toUpperCase()+x.slice(1)}</span><b class="count">${k[x]}</b>
+        </div>`).join('')}</div>
+        ${typeLegendHTML}
+
+        <div class="section-title mt8">Chiffres clés</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div>
+          <div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Total cartes</div></div>
+          <div class="stat-card"><div class="stat-val">${getTod(c)}</div><div class="stat-lbl">Révisées aujourd'hui</div></div>
+          <div class="stat-card"><div class="stat-val">${getStreak(c)}&nbsp;j</div><div class="stat-lbl">Série en cours</div></div>
+          <div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Taux de réussite</div></div>
+          <div class="stat-card"><div class="stat-val">${get7dAvgMs(c)?M.round(get7dAvgMs(c)/100)/10+'&nbsp;s':'—'}</div><div class="stat-lbl">Temps moyen (7 j)</div></div>
+        </div>
+
+        <div class="section-title mt8">Échéance</div>
+        <div class="deadline-box mt8">
+          <label class="field-label" for="deadlineInput">Date limite de révision</label>
+          <input type="date" id="deadlineInput" class="input" value="${c.deadline||''}">
+        </div>
+        ${dailyCalc?`<div class="goal-line" id="goalDisplay"><span>Objectif : <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste <b>${cntAv(c)}</b> cartes disponibles</span></div>`:''}
+      </div>
+    </div>`;
+
   drawChart('gradeChart',k,sel); 
   $('#gradeChart').onclick=e=>hChartClk(e,'gradeChart',c); 
   
@@ -1139,7 +1221,28 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCa
   $('#app').classList.remove('focus-mode');
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
-      v.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden"><div style="flex-shrink:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="section-title" style="margin:0">Cartes (${pool.length})</div><button class="btn btn--primary btn--tiny" id="addCardBtn" style="width:auto;padding:8px 16px;font-size:14px">+ Carte</button></div><div style="margin-bottom:10px"><input type="text" id="cardSearch" class="input" placeholder="Rechercher..." autocomplete="off" spellcheck="false"></div></div><div id="cardsGrid" class="scroll-y" style="flex:1;min-height:0;overflow-x:hidden"><div class="cards-grid" id="gridCont"></div></div></div>`;
+      v.innerHTML = `
+        <div class="card card--flush">
+          <div class="view-head">
+            <div>
+              <h2 class="view-head__title">${c.title}</h2>
+              <div class="view-head__meta">${pool.length} carte${pool.length>1?'s':''} dans le filtre courant</div>
+            </div>
+            <div class="view-head__actions">
+              <button class="btn btn--solid btn--primary btn--sm" id="addCardBtn">
+                ${ico('plus')}<span>Nouvelle carte</span>
+              </button>
+            </div>
+          </div>
+          <div class="search-field deck-search">
+            ${ico('search')}
+            <input type="text" id="cardSearch" class="input" placeholder="Rechercher dans ce chapitre…" autocomplete="off" spellcheck="false" />
+          </div>
+          <div id="cardsGrid" class="scroll-y deck-scroll">
+            <div class="cards-grid" id="gridCont"></div>
+          </div>
+        </div>`;
+
   const renderCards = async (q='') => {
     const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), cleanQ = norm(q);
     let filtered =[];
@@ -1156,7 +1259,7 @@ async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCa
         filtered = scored.map(s => s.card);
     }
     const grid = $('#gridCont'); grid.innerHTML = '';
-    if(filtered.length === 0) { grid.innerHTML = `<div class="muted center" style="grid-column:1/-1;padding:20px">Aucune carte trouvée.</div>`; } 
+    if(filtered.length === 0) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${ico('search','ico--lg')}<div class="empty__title">Aucune carte trouvée</div><div class="empty__sub">Essaie un autre terme, ou vérifie les filtres du chapitre.</div></div>`; } 
     else {
        filtered.forEach(x => {
           const {f,b} = getSides(x,c), el = D.createElement('div');
@@ -1291,7 +1394,7 @@ function openCardEditor(chapter, existingCard, onSave) {
   overlay.innerHTML = `<div class="card-editor">
     <div class="card-editor-header">
       <h3>${isEdit ? 'Modifier' : 'Nouvelle carte'}</h3>
-            <button class="ce-close-btn" id="ceClose">✕</button>
+            <button class="ce-close-btn" id="ceClose" aria-label="Fermer">${ico('x','ico--sm')}</button>
     </div>
     <div class="card-editor-body">
       <div class="editor-face-tabs">
@@ -1442,14 +1545,32 @@ function renRev(){
   if(State.review?.isQCM) { renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
-  const undoBtn = r.history.length ? `<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>` : '';
-  
-  v.innerHTML=`<div class="review-wrap">
-    <div class="progress-bar" style="width:${progress}%"></div>
-    <div class="review-top"><div style="display:flex;align-items:center">${undoBtn} ${r.mode==='multi'?'Multi • '+chap.title:chap.title}</div><div>${idx} / ${tot}</div></div>
-    <div class="review-card"><div class="review-scroller">${!r.flipped ? `<div class="term" data-face="${ff?'front':'back'}">${fT}</div>` : `<div class="stack"><div class="term" data-face="front">${fT}</div><div class="definition" data-face="back" style="margin-top:20px;padding-top:20px;border-top:1px dashed var(--border)">${bT}</div></div>`}</div></div>
-  </div>`;
-  
+  const undoBtn = r.history.length
+    ? `<button id="undoBtn" title="Annuler la dernière évaluation">${ico('rotate-ccw','ico--sm')}</button>` : '';
+  const chapLabel = r.mode === 'multi' ? 'Multi-chapitres · ' + chap.title : chap.title;
+
+  v.innerHTML = `
+    <div class="review-wrap">
+      <div class="progress-bar" style="width:${progress}%"></div>
+      <div class="review-top">
+        <div class="review-top__left">${undoBtn}<span class="chap">${chapLabel}</span></div>
+        <div class="review-count"><b>${idx}</b> / ${tot}</div>
+      </div>
+      <div class="review-card">
+        <div class="review-scroller">${!r.flipped
+          ? `<div class="term" data-face="${ff ? 'front' : 'back'}">${fT}</div>`
+          : `<div class="stack">
+               <div class="term" data-face="front">${fT}</div>
+               <div class="definition" data-face="back">${bT}</div>
+             </div>`}
+        </div>
+        <div class="review-hint">
+          <span><kbd>Espace</kbd> retourner</span>
+          <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>
+        </div>
+      </div>
+    </div>`;
+
   const finishSetup = async () => {
     await Media.resolve(v);
     const scroller = v.querySelector('.review-scroller');
@@ -1471,11 +1592,12 @@ function renRev(){
 
   const bar=$('#reviewActionsBar');
   if(!r.flipped){
-      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">Retourner</button>`;
+      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">${ico('eye','ico--sm')}<span>Afficher la réponse</span></button>`;
       $('#flipBtn').onclick=()=>{haptic('light');r.flipped=!0;renRev()}
   } else {
-      bar.innerHTML=`<div class="row-4">${['echec','difficile','bien','facile'].map(g=>`<button class="btn ${GB[g]}" id="g_${g}">${g}</button>`).join('')}</div>`;
-      ['echec','difficile','bien','facile'].forEach(g=>$('#g_'+g).onclick=()=>subG(g))
+      const GU = [['echec','circle-x','Échec','1'],['difficile','circle-alert','Difficile','2'],['bien','circle-check','Bien','3'],['facile','zap','Facile','4']];
+      bar.innerHTML=`<div class="row-4">${GU.map(([g,ic,lab,k])=>`<button class="btn ${GB[g]}" id="g_${g}" data-grade="${g}">${ico(ic,'ico--sm')}<span>${lab}</span><kbd class="grade-kbd">${k}</kbd></button>`).join('')}</div>`;
+      GU.forEach(([g])=>$('#g_'+g).onclick=()=>subG(g))
   }
 }
 
@@ -1527,7 +1649,25 @@ function subG(nxt){
 function goRecap(push=true){
   safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh(State.review.multiChaps[0]); setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
-  $('#view').innerHTML=`<div class="card recap" style="flex:1"><div><h2>Récapitulatif</h2><div class="subtitle">${c.title}</div></div><div class="grid2"><div class="stat"><div class="label">Moy. 7j</div><div class="val">${get7dAvg(c)}</div></div><div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div><div class="stat"><div class="label">Fait</div><div class="val">${getTod(c)}</div></div></div><div class="grid2"><div class="stat"><div class="label">Session</div><div class="val">${n}</div></div><div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div></div><div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">Continuer</button></div></div>`;
+  $('#view').innerHTML = `
+    <div class="card recap">
+      <div>
+        <h2>Session terminée</h2>
+        <div class="subtitle">${c.title}</div>
+      </div>
+      <div class="grid2">
+        <div class="stat"><div class="label">Réussite 7 j</div><div class="val">${get7dAvg(c)}</div></div>
+        <div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div>
+        <div class="stat"><div class="label">Cartes révisées</div><div class="val">${getTod(c)}</div></div>
+      </div>
+      <div class="grid2">
+        <div class="stat"><div class="label">Cette session</div><div class="val">${n}</div></div>
+        <div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div>
+      </div>
+      <div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">${ico('zap','ico--sm')}<span>Continuer la révision</span></button></div>
+      <button class="btn btn--ghost btn--sm" id="recapDeckBtn">${ico('layers','ico--sm')}<span>Revenir aux decks</span></button>
+    </div>`;
+  $('#recapDeckBtn').onclick = () => goDeck(false);
   $('#contBtn').onclick=()=>startRev(c.id,!1,true);
   if(window._pendingSync && typeof FireSync!=='undefined' && FireSync.isConnected){
     window._pendingSync=false;
@@ -1624,14 +1764,14 @@ function openSet(cid,push=true){
   v.innerHTML=`<div class="settings-page scroll-y" style="flex:1">
     <div class="settings-hero">Paramètres</div>
     ${sect('Chapitre',
-      sRow('rowTitle','✏️','Nom du chapitre',c.title,sChev,1)+
-      sRow('rowEmoji','😊','Emoji','',sVal(c.emoji||getEmoji(c.title)||'Aucun')+sChev,1)+
-      sRow('rowLang','🔄','Ordre des langues',c.settings.langSwap?'Verso → Recto':'Recto → Verso',sChev,1)
+      sRow('rowTitle','pencil','Nom du chapitre',c.title,sChev,1)+
+      sRow('rowEmoji','smile','Emoji','',sVal(c.emoji||getEmoji(c.title)||'Aucun')+sChev,1)+
+      sRow('rowLang','arrow-left-right','Ordre des langues',c.settings.langSwap?'Verso → Recto':'Recto → Verso',sChev,1)
     )}
     ${sect('Apparence',
-      sRow('rowTheme','🌓','Mode sombre','',sToggle(isDark),1)+
-      sRow('rowFocus','🎯','Mode Immersion (Zen)','Interface invisible en révision',sToggle(P.focusMode),1)+
-      sRow('','🎨','Couleur','',`<div class="swatches">${swatches}</div>`)
+      sRow('rowTheme','moon-star','Mode sombre','',sToggle(isDark),1)+
+      sRow('rowFocus','target','Mode Immersion (Zen)','Interface invisible en révision',sToggle(P.focusMode),1)+
+      sRow('','palette','Couleur','',`<div class="swatches">${swatches}</div>`)
     )}
     ${sect('Typographie (Aperçu direct)',
       `<div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div>`+
@@ -1639,19 +1779,19 @@ function openSet(cid,push=true){
       sRow('','Aa','Taille Verso','',sVal(P.fsDef+'px').replace('s-value','s-value" id="valD'))+sCtrl('sldD','subD','addD','valD',P.fsDef)
     )}
     ${sect('Session',
-      sRow('','📚','Taille session','Nombre de cartes par révision',sVal(c.settings.sessionSize).replace('s-value','s-value" id="valS'))+sCtrl('sldS','subS','addS','valS',c.settings.sessionSize)
+      sRow('','book-open','Taille session','Nombre de cartes par révision',sVal(c.settings.sessionSize).replace('s-value','s-value" id="valS'))+sCtrl('sldS','subS','addS','valS',c.settings.sessionSize)
     )}
      ${sect('Données',
-      sRow('rowExp','📤','Exporter','Sauvegarder toutes les données',sChev,1)+
-      sRow('rowImp','📥','Importer','Restaurer une sauvegarde',sChev,1)+
+      sRow('rowExp','download','Exporter','Sauvegarder toutes les données',sChev,1)+
+      sRow('rowImp','upload','Importer','Restaurer une sauvegarde',sChev,1)+
       '<input type="file" id="impF" class="hidden">'
     )}
     ${sect('Zone dangereuse',
-      sRow('rowRstC','🔄','Réinitialiser ce chapitre','Remettre toutes les cartes à "Non vu"','',1)+
-      sRow('rowDelC','🗑️','Supprimer ce chapitre','Supprime le chapitre et toutes ses cartes','',1)+
-      `<div class="settings-row" id="rowRstA"><div class="s-icon danger">💥</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données</div></div></div>`
+      sRow('rowRstC','rotate-ccw','Réinitialiser ce chapitre','Remettre toutes les cartes à "Non vu"','',1)+
+      sRow('rowDelC','trash','Supprimer ce chapitre','Supprime le chapitre et toutes ses cartes','',1)+
+      `<div class="settings-row" id="rowRstA"><div class="s-icon danger">${ico('alert-triangle')}</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données locales</div></div></div>`
     )}
-    <div class="settings-footer">Flashcards v${APP_VER}<br><span style="opacity:.7;font-size:.9em">JB. C</span></div></div>`;
+    <div class="settings-footer">Flashcards v${APP_VER} · JB. C</div></div>`;
 
   const preBox = v.querySelector('.preview-box');
   $('#preT').innerHTML = formatText(prev.f); $('#preD').innerHTML = formatText(prev.b); Media.resolve(preBox); tsLat(preBox);
@@ -1660,9 +1800,11 @@ function openSet(cid,push=true){
       const update = (v) => {
           v = parseInt(v); const min = parseInt(sld.min), max = parseInt(sld.max); if(v < min) v = min; if(v > max) v = max;
           obj[prop] = v; sld.value = v; val.textContent = v + suffix;
+          sld.style.setProperty('--fill', ((v - min) / Math.max(1, max - min) * 100).toFixed(1) + '%');
           if(cssVar) D.documentElement.style.setProperty(cssVar, v + 'px'); if(pre) pre.style.fontSize = v + 'px';
       };
       sld.oninput = () => update(sld.value); sld.onchange = () => { debouncedSave(); haptic('light'); };
+      update(sld.value);
       sub.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) - 1); debouncedSave(); haptic('light'); };
       add.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) + 1); debouncedSave(); haptic('light'); };
   };
@@ -1955,7 +2097,7 @@ function renQCM(){
   const v=$('#view'),r=State.review,{card,chap}=getCur();
   if(!card||!chap){goDeck(!1);return}
   const idx=r.index+1,tot=r.queue.length,{f,b}=getSides(card,chap),fT=formatText(f),progress=(r.index/tot)*100;
-  const undoBtn=r.history.length?'<button id="undoBtn" style="background:0 0;border:0;color:var(--muted);font-size:18px;padding:0 8px;cursor:pointer">↺</button>':'';
+  const undoBtn=r.history.length?`<button id="undoBtn" title="Annuler la dernière réponse">${ico('rotate-ccw','ico--sm')}</button>`:'';
   const cardId=r.mode==='multi'?r.queue[r.index].cardId:r.queue[r.index];
 
   if(!r.qcmOptions){
@@ -1978,7 +2120,10 @@ function renQCM(){
   const letters=['A','B','C','D'];
   v.innerHTML=`<div class="review-wrap">
     <div class="progress-bar" style="width:${progress}%"></div>
-    <div class="review-top"><div style="display:flex;align-items:center">${undoBtn} QCM • ${chap.title}</div><div>${idx} / ${tot}</div></div>
+    <div class="review-top">
+      <div class="review-top__left">${undoBtn}<span class="chap">QCM · ${chap.title}</span></div>
+      <div class="review-count"><b>${idx}</b> / ${tot}</div>
+    </div>
     <div class="review-card">
       <div class="review-scroller qcm-scroller">
         <div class="term qcm-question">${fT}</div>
