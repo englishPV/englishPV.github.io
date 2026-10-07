@@ -7,12 +7,12 @@ let selectionContext = null;
 
 const Nav = {
   stack:[], scrollPos: 0,
-  push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,expandedFolders:[...expandedFolders]})) },
+  push(){ this.scrollPos = $('#dL')?.scrollTop||0; this.stack.push(deepClone({view:State.view,chapterId:State.chapterId,review:State.review,dailyKey:State.dailyKey,scrollPos:this.scrollPos,cardsMode:State.cardsMode,expandedFolders:[...expandedFolders]})) },
   back(){ 
     if(!this.stack.length) return false; 
     const p=this.stack.pop(); 
     State.virtualChapter=null; 
-    State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; 
+    State.view=p.view; State.chapterId=p.chapterId; State.review=p.review; State.dailyKey=p.dailyKey; State.cardsMode=p.cardsMode||null; 
     expandedFolders = new Set(p.expandedFolders ||[]);
     const savedScroll = p.scrollPos || 0;
     this.scrollPos = savedScroll;
@@ -28,8 +28,21 @@ const Nav = {
   clear(){ this.stack=[]; this.scrollPos=0 }
 };
 
-const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey:null, virtualChapter:null };
-const _real = id => getChs().find(c=>c.id===id), getCh = id => (State.virtualChapter?.id===id) ? State.virtualChapter : _real(id);
+const State = { view:'deck', chapterId:null, review:null, cardsIndex:0, dailyKey:null, virtualChapter:null, cardsMode:null, setTab:null };
+/* _real() cherche d'abord dans la matière courante, puis dans TOUTES les
+   matières : indispensable pour les révisions multi-chapitres qui traversent
+   plusieurs matières (menu « Cartes » global, statistiques). */
+const _real = id => {
+  if(!id) return undefined;
+  const here = getChs().find(c => c.id === id);
+  if(here) return here;
+  for(const s of (data?.subjects || [])){
+    const c = (s.chapters || []).find(x => x.id === id);
+    if(c) return c;
+  }
+  return undefined;
+};
+const getCh = id => (State.virtualChapter?.id === id) ? State.virtualChapter : _real(id);
 
 function updFilt(ch,key){ let t=ch; if(ch.virtual&&ch._groupId){const g=findGrp(getSub(),ch._groupId);if(g){if(!g.filters)g.filters={grades:GRADE_FILTERS()};t=g}} togFilt(t,key); if(t!==ch)ch.filters=t.filters; saveData(); goChapter(ch.id,!1) }
 
@@ -158,6 +171,17 @@ backBtn.onclick = () => {
     } else if(t) goChapter(t,!1);
     else goDeck(!1);
   } else if(State.view==='review') {
+    // ✅ Révision rapide depuis les stats / la liste globale des cartes
+    if(State.review?.singleCardMode && State.review?.returnTo) {
+      const kind = State.review.returnTo.kind;
+      if(Nav.stack.length) Nav.stack.pop();
+      State.review = null;
+      $('#app').classList.remove('focus-mode');
+      if(kind === 'stats') goStats(false);
+      else if(kind === 'cards') goAllCards(false);
+      else goDeck(false);
+      return;
+    }
     // ✅ Révision rapide → retour immédiat sans confirmation
     if(State.review?.singleCardMode && State.review?.returnToCards) {
       const ret = State.review.returnToCards;
@@ -188,13 +212,13 @@ backBtn.onclick = () => {
   }
 };
 
-$('#cardsBtn').onclick = () => goCards(State.chapterId); 
+$('#cardsBtn').onclick = () => goAllCards(); 
 $('#settingsBtn').onclick = () => openSet(State.chapterId); 
 startBtn.onclick = () => startRev(State.chapterId);
 
 function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
 function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
-function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push) }
+function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.cardsMode==='all'?null:State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push,State.setTab); else if(State.view==='stats')goStats(push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push); else if(State.view==='dailyAll')goDayAll(State.dailyKey,push) }
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 /* --- SELECTION & GESTURES --- */
@@ -381,10 +405,12 @@ function goDeck(push=true){
             <div class="view-head__meta">${nbCh} chapitre${nbCh>1?'s':''} · ${nbCards} carte${nbCards>1?'s':''}</div>
           </div>
           <div class="view-head__actions">
+            <button class="btn btn--outline btn--sm" id="statsB">${ico('chart')}<span>Stats</span></button>
             <button class="btn ${selectionMode?'btn--primary':'btn--outline'} btn--sm" id="editModeBtn">
               ${ico(selectionMode?'check':'pencil')}<span>${selectionMode?'Terminer':'Éditer'}</span>
             </button>
             <button class="btn btn--outline btn--sm" id="impB">${ico('upload')}<span>Importer</span></button>
+            <button class="btn btn--outline btn--sm btn--icon" id="setB" title="Paramètres" aria-label="Paramètres">${ico('settings')}</button>
             <input id="impI" type="file" class="hidden" accept="*/*" multiple />
           </div>
         </div>
@@ -421,6 +447,8 @@ function goDeck(push=true){
   $('#editModeBtn').onclick = () => {
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
+  const statsB = $('#statsB'); if (statsB) statsB.onclick = () => goStats(true);
+  const setB = $('#setB'); if (setB) setB.onclick = () => openSet(State.chapterId, true, 'general');
   
     if(selectionMode) renderFABs();
   bindDeckNew();
@@ -1271,13 +1299,19 @@ function goChapter(id,push=true){
     updRevBar(c);
   };
 
-  botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId);
-  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId);$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
+  botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId,true,'general');
+  if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId,true,'general');$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
 }
 function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
 
-async function goCards(cid, push=true, savedSearch='', savedScroll=0, scrollToCardId=null){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.chapterId=cid; 
+/* Aiguillage : sans chapitre → navigateur de cartes global (menu « Cartes ») */
+function goCards(cid, push = true, ...rest){
+  if(!cid) return goAllCards(push, ...rest);
+  return goCardsChapter(cid, push, ...rest);
+}
+
+async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scrollToCardId=null){
+  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.cardsMode='chapter'; State.chapterId=cid; 
   $('#app').classList.remove('focus-mode');
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
@@ -1693,8 +1727,18 @@ function subG(nxt){
     /* Fin de session → push toujours effectué (jamais perdu) */
     if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud();
 
+    // ✅ Mode carte unique lancé depuis les stats / le menu Cartes global
+    if(r.singleCardMode && r.returnTo) {
+      const kind = r.returnTo.kind;
+      State.review = null;
+      $('#app').classList.remove('focus-mode');
+      if(Nav.stack.length) Nav.stack.pop();
+      if(kind === 'stats') goStats(false);
+      else if(kind === 'cards') goAllCards(false);
+      else goDeck(false);
+    }
     // ✅ Mode carte unique → retour direct au menu Cartes
-    if(r.singleCardMode && r.returnToCards) {
+    else if(r.singleCardMode && r.returnToCards) {
       const ret = r.returnToCards;
 
       // Reconstruire le chapitre virtuel pour qu'il reflète les grades à jour
@@ -1716,7 +1760,9 @@ function subG(nxt){
 }
 
 function goRecap(push=true){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh(State.review.multiChaps[0]); setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
+  safeCloseLB(); Media.revokeAll();
+  if(!State.review){ goDeck(!1); return }                 // aucune session en cours
+  if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh((State.review.multiChaps||[])[0])||{title:'Session',stats:mkStats(0)}; setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
   $('#view').innerHTML = `
     <div class="card recap">
@@ -1822,95 +1868,387 @@ function undoRev(){
 
 const getPreviewTxt=()=>{const s=data.subjects.find(s=>s.title.toLowerCase().includes('physique'))||data.subjects[0],a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>!c.front.includes('<img')&&!c.back.includes('<img'));if(!a.length)return{f:"La constante de Planck",b:"h = 6,626 x 10⁻³⁴ J.s"};const r=a[M.floor(M.random()*a.length)];return{f:r.front.replace(/<br>/g,' '),b:r.back.replace(/<br>/g,' ')}};
 
-function openSet(cid,push=true){
-  safeCloseLB(); Media.revokeAll(); if(!cid)cid=State.chapterId; const c=getCh(cid); if(!c)return; if(push)Nav.push(); State.view='settings'; setTop({title:'Paramètres'}); setBot({actions:!1}); hideRevAct(); const v=$('#view'), P=data.app.prefs;
-  const isDark = data.app.theme==='dark'; const prev = getPreviewTxt();
-  
-  const sCtrl=(sId,subId,addId,valId,val,sfx='')=>`<div class="s-control"><button class="step-btn" id="${subId}">-</button><div class="s-slider-container" style="margin:0 10px;flex:1"><input type="range" class="s-slider" id="${sId}" min="12" max="72" value="${val}"></div><button class="step-btn" id="${addId}">+</button></div>`;
-  const swatches=['indigo','blue','teal','emerald','rose','amber','violet'].map(x=>`<button class="swatch ${P.accent===x?'is-active':''}" data-accent="${x}" style="--sw:var(--${x==='indigo'?'primary':x})"></button>`).join('');
-  const sect=(t,body)=>`<div class="settings-section"><div class="section-title">${t}</div>${body}</div>`;
-  v.innerHTML=`<div class="settings-page scroll-y" style="flex:1">
-    <div class="settings-hero">Paramètres</div>
-    ${sect('Chapitre',
-      sRow('rowTitle','pencil','Nom du chapitre',c.title,sChev,1)+
-      sRow('rowEmoji','smile','Emoji','',sVal(c.emoji||getEmoji(c.title)||'Aucun')+sChev,1)+
-      sRow('rowLang','arrow-left-right','Ordre des langues',c.settings.langSwap?'Verso → Recto':'Recto → Verso',sChev,1)
-    )}
-    ${sect('Apparence',
-      sRow('rowTheme','moon-star','Mode sombre','',sToggle(isDark),1)+
-      sRow('rowFocus','target','Mode Immersion (Zen)','Interface invisible en révision',sToggle(P.focusMode),1)+
-      sRow('','palette','Couleur','',`<div class="swatches">${swatches}</div>`)
-    )}
-    ${sect('Typographie (Aperçu direct)',
-      `<div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div>`+
-      sRow('','Aa','Taille Recto','',sVal(P.fsTerm+'px').replace('s-value','s-value" id="valT'))+sCtrl('sldT','subT','addT','valT',P.fsTerm)+
-      sRow('','Aa','Taille Verso','',sVal(P.fsDef+'px').replace('s-value','s-value" id="valD'))+sCtrl('sldD','subD','addD','valD',P.fsDef)
-    )}
-    ${sect('Session',
-      sRow('','book-open','Taille session','Nombre de cartes par révision',sVal(c.settings.sessionSize).replace('s-value','s-value" id="valS'))+sCtrl('sldS','subS','addS','valS',c.settings.sessionSize)
-    )}
-     ${sect('Données',
-      sRow('rowExp','download','Exporter','Sauvegarder toutes les données',sChev,1)+
-      sRow('rowImp','upload','Importer','Restaurer une sauvegarde',sChev,1)+
-      '<input type="file" id="impF" class="hidden">'
-    )}
-    ${sect('Zone dangereuse',
-      sRow('rowRstC','rotate-ccw','Réinitialiser ce chapitre','Remettre toutes les cartes à "Non vu"','',1)+
-      sRow('rowDelC','trash','Supprimer ce chapitre','Supprime le chapitre et toutes ses cartes','',1)+
-      `<div class="settings-row" id="rowRstA"><div class="s-icon danger">${ico('alert-triangle')}</div><div class="s-label"><div class="s-title">Réinitialiser l'application</div><div class="s-sub">Supprimer toutes les données locales</div></div></div>`
-    )}
-    <div class="settings-footer">Flashcards v${APP_VER} · JB. C</div></div>`;
+/* ══════════════════════════════════════════════════════════════════════════
+   PARAMÈTRES
+   Une seule page, accessible À TOUT MOMENT — avec ou sans chapitre ouvert.
+   · Onglet « Application » : disponibles même sans chapitre sélectionné
+   · Onglet « Chapitre »    : visible dès qu'un chapitre est ouvert
+   Tout est appliqué immédiatement, puis sauvegardé (local + cloud).
+   ══════════════════════════════════════════════════════════════════════════ */
 
-  const preBox = v.querySelector('.preview-box');
-  $('#preT').innerHTML = formatText(prev.f); $('#preD').innerHTML = formatText(prev.b); Media.resolve(preBox); tsLat(preBox);
-  const setupControl = (sldId, subId, addId, valId, obj, prop, suffix = '', cssVar = null, fontPrev = null) => {
-      const sld = $(sldId), sub = $(subId), add = $(addId), val = $(valId), pre = fontPrev ? $(fontPrev) : null;
-      const update = (v) => {
-          v = parseInt(v); const min = parseInt(sld.min), max = parseInt(sld.max); if(v < min) v = min; if(v > max) v = max;
-          obj[prop] = v; sld.value = v; val.textContent = v + suffix;
-          sld.style.setProperty('--fill', ((v - min) / Math.max(1, max - min) * 100).toFixed(1) + '%');
-          if(cssVar) D.documentElement.style.setProperty(cssVar, v + 'px'); if(pre) pre.style.fontSize = v + 'px';
+const escTxt = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+const fmtBytes = n => {
+  n = n || 0;
+  if (n < 1024) return n + ' o';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' Ko';
+  if (n < 1024 * 1024 * 1024) return (n / 1048576).toFixed(1) + ' Mo';
+  return (n / 1073741824).toFixed(2) + ' Go';
+};
+
+function openSet(cid, push = true, tab = null){
+  safeCloseLB(); Media.revokeAll();
+  if(cid === undefined || cid === null) cid = State.chapterId || null;
+  let c = cid ? getCh(cid) : null;
+  if(!c) cid = null;
+
+  if(typeof stLeaveReviewGuard === 'function' && !stLeaveReviewGuard()) return;
+  if(typeof Drive !== 'undefined' && Drive.isOpen) Drive.close();   // sortir du Drive
+  if(push) Nav.push();
+  State.view = 'settings';
+  State.chapterId = cid;
+  State.setTab = tab || State.setTab || 'general';
+  if(!c && State.setTab === 'chapter') State.setTab = 'general';
+
+  setTop({ title: c ? `Paramètres • ${c.title}` : 'Paramètres' });
+  setBot({ actions: !1, revision: !1 }); hideRevAct();
+
+  const v = $('#view');
+  v.classList.remove('drive-open');
+  const P = data.app.prefs;
+
+  /* ── helpers locaux ──────────────────────────────────────────────────── */
+  const save = () => {
+    debouncedSave();
+    if(typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
+  };
+  const sect = (title, body, note = '') =>
+    `<div class="settings-section"><div class="section-title">${title}</div>${body}${note ? `<div class="set-note">${note}</div>` : ''}</div>`;
+  const bindRow = (id, fn) => { const el = $(id); if(el) el.onclick = fn; };
+
+  const slider = (id, obj, prop, { min, max, step = 1, suffix = '', fmt = null, hint = null, onChange = null } = {}) =>
+    sRow('', hint && hint.icon || 'filter', hint && hint.title || '', hint && hint.sub || '',
+         sVal('').replace('s-value', `s-value" id="${id}V`)) +
+    `<div class="s-control">
+       <button class="step-btn" type="button" id="${id}D" aria-label="Diminuer">−</button>
+       <div class="s-slider-container"><input type="range" class="s-slider" id="${id}" min="${min}" max="${max}" step="${step}" value="${obj[prop] ?? min}" aria-label="${hint ? escTxt(hint.title) : prop}"></div>
+       <button class="step-btn" type="button" id="${id}I" aria-label="Augmenter">+</button>
+     </div>`;
+
+  const bindSlider = (id, obj, prop, { min, max, step = 1, suffix = '', fmt = null, onChange = null, commit = true, cssVar = null, preview = null } = {}) => {
+    const sld = $(id), dec = $(id + 'D'), inc = $(id + 'I'), val = $(id + 'V');
+    if(!sld) return null;
+    const norm = raw => {
+      let n = step < 1 ? Math.round(raw / step) * step : Math.round(raw);
+      n = clamp(+n.toFixed(3), min, max);
+      return n;
+    };
+    const paint = (n, doCommit) => {
+      obj[prop] = n;
+      sld.value = n;
+      sld.style.setProperty('--fill', ((n - min) / Math.max(1e-6, max - min) * 100).toFixed(1) + '%');
+      if(val) val.textContent = fmt ? fmt(n) : n + suffix;
+      if(cssVar) D.documentElement.style.setProperty(cssVar, n + 'px');
+      if(preview){ const pe = $(preview); if(pe) pe.style.fontSize = n + 'px'; }
+      if(onChange) onChange(n);
+      if(doCommit && commit){ save(); haptic('light'); }
+    };
+    sld.oninput = () => paint(norm(+sld.value), false);
+    sld.onchange = () => paint(norm(+sld.value), true);
+    if(dec) dec.onclick = e => { e.stopPropagation(); paint(norm(+sld.value - step), true); };
+    if(inc) inc.onclick = e => { e.stopPropagation(); paint(norm(+sld.value + step), true); };
+    paint(norm(+sld.value), false);
+    return paint;
+  };
+
+  const gradeChips = (filters, onToggle) => `<div class="chip-row" id="setGrades">${GRADES.map(g =>
+      `<button type="button" class="chip ${filters[g] ? 'is-on' : ''}" data-grade="${g}"><span class="dot ${GC[g]}"></span>${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}</div>`;
+
+  /* ── coquille ────────────────────────────────────────────────────────── */
+  const tabs = [
+    { k:'general', label:'Application', icon:'settings' },
+    ...(c ? [{ k:'chapter', label:'Chapitre', icon: c.virtual ? 'folder' : 'book' }] : [])
+  ];
+  v.innerHTML = `
+    <div class="settings-page scroll-y">
+      <div class="settings-hero">
+        <div>
+          <h1>Paramètres</h1>
+          <p>${c ? `${escTxt(c.emoji || getEmoji(c.title) || '')} ${escTxt(c.title)} · ${c.cards.length} carte${c.cards.length > 1 ? 's' : ''}` : 'Réglages généraux — aucun chapitre ouvert'}</p>
+        </div>
+      </div>
+      ${tabs.length > 1 ? `<div class="seg" id="setTabs">${tabs.map(t =>
+        `<button type="button" class="seg__btn ${State.setTab === t.k ? 'is-active' : ''}" data-tab="${t.k}">${ico(t.icon, 'ico--xs')}<span>${t.label}</span></button>`).join('')}</div>` : ''}
+      <div id="setBody"></div>
+      <div class="settings-footer">Flashcards v${APP_VER} · JB. C</div>
+    </div>
+    <input type="file" id="impF" class="hidden" accept=".json,application/json">
+    <input type="file" id="impCardsF" class="hidden" accept="*/*" multiple>`;
+
+  $('#setTabs')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-tab]');
+    if(!b || b.dataset.tab === State.setTab) return;
+    openSet(cid, false, b.dataset.tab);
+    const el = $('.settings-page'); if(el) el.scrollTop = 0;
+  });
+
+  /* ══════════════════════ ONGLET APPLICATION ══════════════════════════ */
+  const paintGeneral = () => {
+    const isDark = data.app.theme !== 'light';
+    const prev = getPreviewTxt();
+    const swatches = ['indigo','blue','teal','emerald','rose','amber','violet']
+      .map(x => `<button type="button" class="swatch ${P.accent === x ? 'is-active' : ''}" data-accent="${x}" style="--sw:var(--${x === 'indigo' ? 'primary' : x})" aria-label="Accent ${x}"></button>`).join('');
+    const fs = (typeof FireSync !== 'undefined') ? FireSync : null;
+    const user = fs && fs.getUser ? fs.getUser() : null;
+    const connected = !!(fs && fs.isConnected);
+    const cloudOff = (typeof firebase === 'undefined');
+    const media = Media.stats();
+    const localSize = (() => { try { return (LS.getItem(KEY) || '').length + JSON.stringify(data).length; } catch { return 0; } })();
+
+    return `
+      ${sect('Apparence',
+        sRow('rowTheme','moon-star','Mode sombre', isDark ? 'Thème sombre activé' : 'Thème clair activé', sToggle(isDark), 1) +
+        sRow('rowFocus','target','Mode Zen (immersion)','Interface masquée pendant la révision', sToggle(!!P.focusMode), 1) +
+        sRow('','palette','Couleur d\'accent','Appliquer à toute l\'application', `<div class="swatches">${swatches}</div>`)
+      )}
+
+      ${sect('Typographie',
+        `<div class="preview-box"><div class="preview-recto" id="preT"></div><div class="preview-verso" id="preD"></div></div>` +
+        slider('sldT', P, 'fsTerm', { min:12, max:72, suffix:' px', hint:{ icon:'Aa', title:'Taille Recto', sub:'Question / terme affiché en grand' }, cssVar:'--fs-term', preview:'#preT' }) +
+        slider('sldD', P, 'fsDef', { min:12, max:72, suffix:' px', hint:{ icon:'Aa', title:'Taille Verso', sub:'Réponse / définition' }, cssVar:'--fs-def', preview:'#preD' }),
+        'Sur ordinateur, <b>Maj + molette</b> ajuste ces tailles directement en révision.')}
+
+      ${sect('Révision',
+        slider('sldDefSize', P, 'sessionSize', { min:5, max:60, suffix:' cartes', hint:{ icon:'book-open', title:'Taille de session par défaut', sub:'Utilisée pour la révision multi-chapitres et les nouveaux chapitres' } }) +
+        slider('sldGoal', P, 'dailyGoal', { min:5, max:200, step:5, suffix:' cartes', hint:{ icon:'target', title:'Objectif quotidien', sub:'But de cartes révisées par jour (progression affichée dans les stats)' } }) +
+        slider('sldRet', P, 'desiredRetention', { min:0.80, max:0.97, step:0.01, fmt:v => Math.round(v * 100) + ' %', hint:{ icon:'sparkles', title:'Rétention cible (FSRS)', sub:'Probabilité de se souvenir d\'une carte au moment de la révision' } }) +
+        sRow('rowMathDetail','sparkles','Résumé maths affiché d\'abord','Au verso, montre la version courte avant le détail', sToggle(!!P.mathDetail), 1),
+        'Une rétention plus haute = intervalles plus courts, donc plus de révisions par jour.')}
+
+      ${sect('Synchronisation',
+        connected
+          ? sRow('rowSyncNow','refresh','Synchroniser maintenant', escTxt(user?.email || 'Connecté'), sChev, 1) +
+            sRow('rowSyncPush','upload','Envoyer vers le cloud','Écraser la version distante', sChev, 1) +
+            sRow('rowSyncPull','download','Récupérer depuis le cloud','Remplacer les données locales', sChev, 1) +
+            sRow('rowSyncBackup','archive','Restaurer une sauvegarde','Récupérer la dernière sauvegarde cloud', sChev, 1) +
+            sRow('rowSyncOut','log-out','Se déconnecter','', '', 1)
+          : sRow('rowSyncIn','cloud','Se connecter (Google)','Synchroniser entre plusieurs appareils', sChev, 1),
+        cloudOff ? 'Firebase n\'a pas pu être chargé : l\'application fonctionne en mode 100 % local.' : (connected ? 'Les modifications sont envoyées automatiquement.' : 'Les données restent sur cet appareil tant que vous n\'êtes pas connecté.'))}
+
+      ${sect('Données',
+        sRow('rowExp','download','Exporter la sauvegarde','Fichier JSON de toutes les données', sChev, 1) +
+        sRow('rowImp','upload','Importer une sauvegarde','Remplace les données actuelles', sChev, 1) +
+        sRow('rowImpCards','package','Importer des cartes','Anki (.apkg), CSV / TSV, JSON', sChev, 1) +
+        sRow('rowMedia','image','Médias importés', media.count ? `${media.count} fichier${media.count > 1 ? 's' : ''} · ${fmtBytes(media.size)}` : 'Aucun média importé', sChev, 1),
+        `Données locales : <b>${fmtBytes(localSize)}</b> · chapitres : <b>${data.subjects.reduce((n, s) => n + s.chapters.length, 0)}</b> · cartes : <b>${data.subjects.reduce((n, s) => n + s.chapters.reduce((m, ch) => m + ch.cards.length, 0), 0)}</b>.`)}
+
+      ${sect('Zone dangereuse',
+        `<div class="set-actions">
+           <button type="button" class="btn btn--red btn--sm" id="rowRstA">${ico('alert-triangle','ico--sm')}<span>Réinitialiser l'application</span></button>
+           <button type="button" class="btn btn--outline btn--sm" id="rowWipeMedia">${ico('trash','ico--sm')}<span>Effacer les médias importés</span></button>
+         </div>`,
+        'La réinitialisation supprime <b>toutes</b> les données locales (progression, réglages, médias) après confirmation.')}`;
+  };
+
+  /* ══════════════════════ ONGLET CHAPITRE ═════════════════════════════ */
+  const paintChapter = () => {
+    const k = c.stats.gradeCounts || getLive(c);
+    const dailyCalc = getDailyGoalCalc(c);
+    const isMath = c.cards.some(x => x.cardType);
+    return `
+      ${sect('Identité',
+        sRow('rowTitle','pencil','Nom', escTxt(c.title), sChev, 1) +
+        sRow('rowEmoji','smile','Emoji', escTxt(c.emoji || getEmoji(c.title) || 'Aucun'), sChev, 1) +
+        (c.virtual ? sRow('rowFolder','folder','Dossier (chapitre virtuel)','Les réglages s\'appliquent au dossier entier', '') : '')
+      )}
+
+      ${sect('Progression',
+        `<div class="stats-grid set-grid">
+           <div class="stat-card"><div class="stat-val">${c.cards.length}</div><div class="stat-lbl">Cartes</div></div>
+           <div class="stat-card"><div class="stat-val">${k.unseen}</div><div class="stat-lbl">Non vues</div></div>
+           <div class="stat-card"><div class="stat-val">${cntAv(c)}</div><div class="stat-lbl">À réviser</div></div>
+           <div class="stat-card"><div class="stat-val">${getSucc(c)}%</div><div class="stat-lbl">Réussite</div></div>
+         </div>
+         <div class="section-title mt8">Filtre des niveaux</div>
+         ${gradeChips(c.filters.grades)}` +
+        (isMath ? `<div class="section-title mt8">Filtre des types (maths)</div>
+          <div class="chip-row" id="setTypes">${MATH_TYPES.map(t => `<button type="button" class="chip ${c.filters.types?.[t] ? 'is-on' : ''}" data-type="${t}"><span class="dot" style="background:${TYPE_COLORS[t]}"></span>${TYPE_LABELS[t]}</button>`).join('')}</div>` : ''),
+        'Les filtres déterminent les cartes proposées en révision (et le compteur « à réviser »).')}
+
+      ${sect('Révision du chapitre',
+        sRow('rowLang','arrow-left-right','Sens de lecture', c.settings.langSwap ? 'Verso → Recto' : 'Recto → Verso', sChev, 1) +
+        slider('sldS', c.settings, 'sessionSize', { min:5, max:60, suffix:' cartes', hint:{ icon:'book-open', title:'Taille de session', sub:'Nombre de cartes tirées à chaque révision' } }) +
+        (c.virtual ? '' : `<div class="s-row-inline">
+            <div class="s-inline-label">${ico('calendar','ico--sm')}<span>Date limite de révision</span></div>
+            <input type="date" id="deadlineInput" class="input" value="${c.deadline || ''}">
+          </div>
+          ${dailyCalc ? `<div class="goal-line" id="goalDisplay"><span>Objectif : <b>${dailyCalc.val}</b>/jour</span><span>Reste <b>${cntAv(c)}</b> cartes</span></div>` : ''}`)
+      )}
+
+      ${sect('Zone dangereuse',
+        `<div class="set-actions">
+           <button type="button" class="btn btn--outline btn--sm" id="rowRstC">${ico('rotate-ccw','ico--sm')}<span>Réinitialiser la progression</span></button>
+           <button type="button" class="btn btn--red btn--sm" id="rowDelC">${ico('trash','ico--sm')}<span>${c.virtual ? 'Supprimer le dossier' : 'Supprimer le chapitre'}</span></button>
+         </div>`,
+        c.virtual ? 'Le dossier sera dissocié : les chapitres qu\'il contient ne sont pas supprimés.' : 'La suppression est définitive pour ce chapitre et ses cartes.')}`;
+  };
+
+  /* ── rendu + liaisons ────────────────────────────────────────────────── */
+  const paintPanel = () => {
+    const body = $('#setBody');
+    if(!body) return;
+    body.innerHTML = State.setTab === 'chapter' && c ? paintChapter() : paintGeneral();
+
+    if(State.setTab === 'chapter' && c){
+      /* filtres */
+      $('#setGrades')?.addEventListener('click', e => {
+        const b = e.target.closest('[data-grade]'); if(!b) return;
+        const t = (c.virtual && c._groupId) ? (findGrp(getSub(), c._groupId) || c) : c;
+        if(!t.filters) t.filters = { grades: GRADE_FILTERS() };
+        togFilt(t, b.dataset.grade);
+        if(t !== c) c.filters = deepClone(t.filters);
+        save(); openSet(cid, false, 'chapter');
+      });
+      $('#setTypes')?.addEventListener('click', e => {
+        const b = e.target.closest('[data-type]'); if(!b) return;
+        const t = (c.virtual && c._groupId) ? (findGrp(getSub(), c._groupId) || c) : c;
+        if(!t.filters) t.filters = { grades: GRADE_FILTERS() };
+        if(!t.filters.types) t.filters.types = MATH_TYPE_FILTERS();
+        togTypeFilt(t, b.dataset.type);
+        if(t !== c) c.filters = deepClone(t.filters);
+        save(); openSet(cid, false, 'chapter');
+      });
+
+      bindRow('#rowLang', () => { c.settings.langSwap = !c.settings.langSwap; save(); openSet(cid, false, 'chapter'); });
+      bindSlider('#sldS', c.settings, 'sessionSize', { min:5, max:60 });
+      bindRow('#rowTitle', () => {
+        const t = prompt('Nouveau nom :', c.title);
+        if(t && t.trim()){
+          const nt = t.trim();
+          if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.title = nt; }
+          else { const real = _real(c.id); if(real) real.title = nt; }
+          c.title = nt; updChDesc(c); save(); openSet(cid, false, 'chapter');
+        }
+      });
+      bindRow('#rowEmoji', () => {
+        const e2 = prompt('Emoji (vide = aucun) :', c.emoji || getEmoji(c.title) || '');
+        if(e2 !== null){
+          const ne = e2.trim();
+          if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.emoji = ne; }
+          else { const real = _real(c.id); if(real) real.emoji = ne; }
+          c.emoji = ne; updChDesc(c); save(); openSet(cid, false, 'chapter');
+        }
+      });
+      const dl = $('#deadlineInput');
+      if(dl) dl.onchange = e => {
+        const val = e.target.value || null;
+        if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.deadline = val; }
+        else { const real = _real(c.id); if(real) real.deadline = val; c.deadline = val; }
+        delete c._goalCache;
+        save(); openSet(cid, false, 'chapter');
       };
-      sld.oninput = () => update(sld.value); sld.onchange = () => { debouncedSave(); haptic('light'); };
-      update(sld.value);
-      sub.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) - 1); debouncedSave(); haptic('light'); };
-      add.onclick = (e) => { e.stopPropagation(); update(parseInt(sld.value) + 1); debouncedSave(); haptic('light'); };
-  };
-
-  setupControl('#sldT', '#subT', '#addT', '#valT', P, 'fsTerm', 'px', '--fs-term', '#preT');
-  setupControl('#sldD', '#subD', '#addD', '#valD', P, 'fsDef', 'px', '--fs-def', '#preD');
-  setupControl('#sldS', '#subS', '#addS', '#valS', c.settings, 'sessionSize', '');
-
-  const cloudSave=()=>{if(typeof FireSync!=='undefined'&&FireSync.isConnected)FireSync.pushToCloud()};
-  $('#rowTitle').onclick=()=>{ const t=prompt('Nouveau titre:', c.title); if(t && t.trim()){ const newTitle = t.trim(); if(c.virtual && c._groupId){ const g = findGrp(getSub(), c._groupId); if(g) g.title = newTitle; c.title = newTitle; } else { const real = _real(c.id); if(real) real.title = newTitle; c.title = newTitle; } updChDesc(c); debouncedSave(); cloudSave(); openSet(cid, !1); } };
-  $('#rowEmoji').onclick=()=>{ const emojiActuel = c.emoji || getEmoji(c.title) || ''; const e = prompt('Emoji (laissez vide pour l\'émoji par défaut) :', emojiActuel); if (e !== null) { const newEmoji = e.trim(); if (c.virtual && c._groupId) { const g = findGrp(getSub(), c._groupId); if (g) g.emoji = newEmoji; c.emoji = newEmoji; } else { const real = _real(c.id); if (real) real.emoji = newEmoji; c.emoji = newEmoji; } updChDesc(c); debouncedSave(); cloudSave(); openSet(cid, !1); } };
-  $('#rowLang').onclick=()=>{c.settings.langSwap=!c.settings.langSwap;debouncedSave();cloudSave();openSet(cid,!1)};
-  $('#rowTheme').onclick=()=>{data.app.theme=isDark?'light':'dark';debouncedSave();cloudSave();applyTh();openSet(cid,!1)};
-  $('#rowFocus').onclick=()=>{P.focusMode=!P.focusMode;debouncedSave();cloudSave();openSet(cid,!1)};
-  $$('.swatch').forEach(b=>b.onclick=e=>{ e.stopPropagation(); P.accent=b.dataset.accent; debouncedSave(); applyUI(); $$('.swatch').forEach(x=>x.classList.toggle('is-active',x===b)); $$('.s-icon.dynamic').forEach(icon => { icon.style.background = `var(--primary)`; }); haptic('light'); });
-  $('#rowExp').onclick=()=>{const a=D.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download=`flashcards-${dateKey(new Date())}.json`;a.click()};
-  $('#rowImp').onclick=()=>$('#impF').click();
-  $('#impF').onchange=async e=>{if(confirm("Écraser toutes les données ?")){data=JSON.parse(await e.target.files[0].text());upgrade();applyTh();applyUI();saveData();goDeck(!1)}};
-  
-  $('#rowRstC').onclick=()=>{if(confirm('Réinitialiser ce chapitre ?')){c.cards.forEach(x=>Object.assign(x,{grade:'unseen',timesReviewed:0,ef:2.5,intervalDays:0,dueAt:0,streak:0}));c.stats=mkStats(c.cards.length);saveData();cloudSave();openSet(cid,!1)}};
-  $('#rowDelC').onclick=()=>{
-    if(!confirm('Supprimer "' + c.title + '" et toutes ses cartes ?')) return;
-    const sub = getSub();
-    const idx = sub.chapters.findIndex(x => x.id === c.id);
-    if(idx >= 0) {
-      ensGrps(sub).forEach(g => g.chapIds = g.chapIds.filter(x => x !== c.id));
-      valGrps(sub);
-      sub.chapters.splice(idx, 1);
-      saveData();
-      cloudSave();
-      goDeck(false);
-      toast('Chapitre supprimé', 'success');
+      bindRow('#rowRstC', () => {
+        if(!confirm(`Réinitialiser la progression de « ${c.title} » ?`)) return;
+        const targets = (c.virtual && c._ids) ? c._ids.map(_real).filter(Boolean) : [_real(c.id) || c];
+        targets.forEach(ch => {
+          ch.cards.forEach(x => Object.assign(x, { grade:'unseen', timesReviewed:0, lastReviewed:0, ef:2.5, intervalDays:0, dueAt:0, streak:0, stability:0, difficulty:0, successes:0, failures:0 }));
+          ch.stats = mkStats(ch.cards.length);
+        });
+        save(); toast('Progression réinitialisée', 'success'); openSet(cid, false, 'chapter');
+      });
+      bindRow('#rowDelC', () => {
+        if(c.virtual && c._groupId){
+          if(!confirm(`Supprimer le dossier « ${c.title} » ?`)) return;
+          delGrp(getSub(), c._groupId); State.virtualChapter = null; save();
+          toast('Dossier supprimé', 'success'); goDeck(false);
+          return;
+        }
+        if(!confirm(`Supprimer « ${c.title} » et ses ${c.cards.length} cartes ?`)) return;
+        const sub = getSub(), i = sub.chapters.findIndex(x => x.id === c.id);
+        if(i >= 0){
+          ensGrps(sub).forEach(g => g.chapIds = (g.chapIds || []).filter(x => x !== c.id));
+          valGrps(sub); sub.chapters.splice(i, 1); save();
+          toast('Chapitre supprimé', 'success'); State.chapterId = null; goDeck(false);
+        }
+      });
+      return;
     }
+
+    /* ── onglet application ── */
+    const preBox = body.querySelector('.preview-box');
+    if(preBox){
+      const pv = getPreviewTxt();
+      $('#preT').innerHTML = formatText(pv.f);
+      $('#preD').innerHTML = formatText(pv.b);
+      Media.resolve(preBox); tsLat(preBox);
+    }
+    bindSlider('#sldT', P, 'fsTerm', { min:12, max:72, cssVar:'--fs-term', preview:'#preT' });
+    bindSlider('#sldD', P, 'fsDef', { min:12, max:72, cssVar:'--fs-def', preview:'#preD' });
+    bindSlider('#sldDefSize', P, 'sessionSize', { min:5, max:60 });
+    bindSlider('#sldGoal', P, 'dailyGoal', { min:5, max:200, step:5 });
+    bindSlider('#sldRet', P, 'desiredRetention', { min:0.80, max:0.97, step:0.01 });
+
+    bindRow('#rowTheme', () => { data.app.theme = data.app.theme === 'light' ? 'dark' : 'light'; save(); applyTh(); openSet(cid, false, 'general'); });
+    bindRow('#rowFocus', () => { P.focusMode = !P.focusMode; save(); openSet(cid, false, 'general'); });
+    bindRow('#rowMathDetail', () => { P.mathDetail = !P.mathDetail; save(); openSet(cid, false, 'general'); });
+
+    $$('.swatch').forEach(b => b.onclick = e => {
+      e.stopPropagation();
+      P.accent = b.dataset.accent;
+      save(); applyUI();
+      $$('.swatch').forEach(x => x.classList.toggle('is-active', x === b));
+      haptic('light');
+    });
+
+    const fs = (typeof FireSync !== 'undefined') ? FireSync : null;
+    bindRow('#rowSyncIn', () => fs && fs.login());
+    bindRow('#rowSyncNow', () => { if(fs) { toast('Synchronisation…', 'info'); fs.syncNow(); } });
+    bindRow('#rowSyncPush', () => { if(fs && confirm('Envoyer les données locales vers le cloud ?')) fs.pushToCloud(); });
+    bindRow('#rowSyncPull', () => { if(fs && confirm('Remplacer les données locales par celles du cloud ?')) fs.pullFromCloud(); });
+    bindRow('#rowSyncBackup', () => { if(fs && confirm('Restaurer la dernière sauvegarde cloud ?')) fs.restoreFromBackup(); });
+    bindRow('#rowSyncOut', () => { if(fs && confirm('Se déconnecter du cloud ?')) fs.logout(); });
+
+    bindRow('#rowExp', () => {
+      const a = D.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type:'application/json' }));
+      a.download = `flashcards-${dateKey(new Date())}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    });
+    bindRow('#rowImp', () => $('#impF')?.click());
+    bindRow('#rowImpCards', () => $('#impCardsF')?.click());
+    bindRow('#rowMedia', () => { goStats(false, { subjectId:'', chapterId:'', tab:'media' }); });
+
+    const impF = $('#impF');
+    if(impF) impF.onchange = async e => {
+      const f = e.target.files?.[0];
+      if(!f) return;
+      if(confirm('Écraser toutes les données actuelles par cette sauvegarde ?')){
+        try {
+          const obj = JSON.parse(await f.text());
+          data = obj; upgrade(); applyTh(); applyUI(); saveData();
+          toast('Sauvegarde restaurée', 'success');
+          goDeck(false);
+        } catch(err){ toast('Fichier invalide', 'error'); }
+      }
+      e.target.value = '';
+    };
+    const impCF = $('#impCardsF');
+    if(impCF) impCF.onchange = async e => {
+      const files = [...(e.target.files || [])];
+      if(!files.length) return;
+      try { await importFiles(files); toast('Import terminé', 'success'); goDeck(false); }
+      catch(err){ console.error(err); toast('Import impossible', 'error'); }
+      e.target.value = '';
+    };
+
+    bindRow('#rowWipeMedia', async () => {
+      if(!confirm('Effacer tous les médias importés (images/documents des cartes importées) ?')) return;
+      await Media.clearAll(); save();
+      toast('Médias effacés', 'success'); openSet(cid, false, 'general');
+    });
+    bindRow('#rowRstA', async () => {
+      if(!confirm('⚠️ Supprimer TOUTES les données (progression, réglages, médias) ?')) return;
+      try { await Media.clearAll(); } catch {}
+      LS.removeItem(KEY);
+      location.reload();
+    });
   };
-  $('#rowRstA').onclick=async()=>{if(confirm('⚠️ Supprimer TOUTES les données ?')){await Media.clearAll();LS.removeItem(KEY);location.reload()}};
+
+  paintPanel();
 }
 
-function applyTh(){ D.documentElement.dataset.theme=data.app.theme }
+function applyTh(){ D.documentElement.dataset.theme = data.app.theme }
+
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
 function reconcile(){ 
   const c=buildCanon(), o=data.subjects||[], oMap=Object.fromEntries(o.map(s=>[s.title,s])); 
@@ -1932,10 +2270,17 @@ function reconcile(){
 function upgrade() {
   // 1. Initialisation des préférences de base
   if (!data.app) data.app = { theme: 'dark' };
-  data.app.prefs = { fsTerm: 22, fsDef: 24, accent: 'indigo', radius: 14, ...(data.app.prefs || {}) };
-  
+  data.app.prefs = {
+    fsTerm: 22, fsDef: 24, accent: 'indigo', radius: 14,
+    sessionSize: 10, dailyGoal: 20, desiredRetention: 0.9,
+    focusMode: false, mathDetail: false,
+    ...(data.app.prefs || {})
+  };
   if (data.app.prefs.mathDetail === undefined) data.app.prefs.mathDetail = false;
   if (!data.app.prefs.hasOwnProperty('mathDetail')) data.app.prefs.mathDetail = false;
+  if (typeof data.app.prefs.desiredRetention !== 'number' || data.app.prefs.desiredRetention <= 0 || data.app.prefs.desiredRetention > 1) data.app.prefs.desiredRetention = 0.9;
+  if (!(data.app.prefs.sessionSize > 0)) data.app.prefs.sessionSize = 10;
+  if (!(data.app.prefs.dailyGoal > 0)) data.app.prefs.dailyGoal = 20;
 
   // ── Migration SM-2 → FSRS (Le nouveau bloc à ajouter ici) ──
   if (!data.app._fsrsMigrated) {
