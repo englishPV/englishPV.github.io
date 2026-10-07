@@ -503,7 +503,7 @@ function renderDeckItem(item, s) {
       }
     }
 
-    return `<div class="deck-item${depthClass}${isExpanded ? ' is-open' : ''}" data-type="group" data-id="${g.id}">
+    return `<div class="deck-item${depthClass}${isExpanded ? ' is-open' : ''}" data-type="group" data-id="${g.id}" draggable="false">
       ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
       <div class="slide">
         <div class="deck-emoji">${emoji}</div>
@@ -538,7 +538,7 @@ function renderDeckItem(item, s) {
       selectBox = `<div class="sel-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle-select" data-cid="${c.id}"></div>`;
     }
 
-    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}">
+    return `<div class="deck-item${depthClass}" data-type="chapter" data-id="${c.id}" data-parent-gid="${item.parentGid||''}" draggable="false">
       ${tint ? `<div class="tint-bar" style="background:${tint}"></div>` : ''}
       ${c.imported?'<div class="right-action"><button class="btn btn--red btn--sm delCh" data-cid="'+c.id+'">Supprimer</button></div>':''}
       <div class="slide">
@@ -592,27 +592,63 @@ function bindDeckNew() {
   };
 
   let longPressTimer = null, startX = 0, startY = 0, pressedEl = null, didLongPress = false;
-  let dragging = false, dragData = null, dragGhost = null, dragStarted = false, currentDropTarget = null, dropMode = null; 
-  
+  let dragging = false, dragData = null, dragGhost = null, dragStarted = false, currentDropTarget = null, dropMode = null;
+  let activePointerId = null, autoScrolling = false, dndGuardsOn = false, startScrollTop = 0;
+
   function createGhost(item) {
     const ghost = D.createElement('div');
     ghost.className = 'drag-ghost';
+    ghost.setAttribute('aria-hidden', 'true');
     const titleEl = item.querySelector('.deck-title');
     const emoji = item.querySelector('.deck-emoji');
     ghost.textContent = (emoji ? emoji.textContent + ' ' : '') + (titleEl ? titleEl.textContent : 'Item');
     D.body.appendChild(ghost);
     return ghost;
   }
-  
+
   function updateGhost(x, y) {
     if(!dragGhost) return;
     dragGhost.style.transform = `translate(${x - 30}px, ${y - 20}px) scale(1.02)`;
   }
-  
+
   function removeGhost() {
     if(dragGhost) { dragGhost.remove(); dragGhost = null; }
+    $$('.drag-ghost').forEach(el => el.remove());
   }
-  
+
+  function preventDndDefault(e) { e.preventDefault(); }
+
+  function setDndGuards(on) {
+    if(on === dndGuardsOn) return;
+    dndGuardsOn = on;
+    D.documentElement.classList.toggle('is-dnd', on);
+    l.classList.toggle('scroll-lock', on);
+    if(on) {
+      D.addEventListener('touchmove', preventDndDefault, {passive: false, capture: true});
+      D.addEventListener('selectstart', preventDndDefault, true);
+      D.addEventListener('contextmenu', preventDndDefault, true);
+      try { W.getSelection()?.removeAllRanges(); } catch {}
+    } else {
+      D.removeEventListener('touchmove', preventDndDefault, true);
+      D.removeEventListener('selectstart', preventDndDefault, true);
+      D.removeEventListener('contextmenu', preventDndDefault, true);
+    }
+  }
+
+  function abortDrag() {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+    if(dragData?.el) dragData.el.classList.remove('dragging-origin');
+    clearDropTargets();
+    removeGhost();
+    setDndGuards(false);
+    if(pressedEl && activePointerId != null) {
+      try { pressedEl.releasePointerCapture(activePointerId); } catch {}
+    }
+    dragging = false; dragData = null; dragStarted = false;
+    pressedEl = null; didLongPress = false; activePointerId = null;
+  }
+
   function clearDropTargets() {
     $$('.drop-target, .drop-target-above, .drop-target-below, .drop-target-inside', l).forEach(el => {
       el.classList.remove('drop-target', 'drop-target-above', 'drop-target-below', 'drop-target-inside');
@@ -756,103 +792,104 @@ function bindDeckNew() {
   }
   
   const onPointerDown = e => {
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
     if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
     const item = e.target.closest('.deck-item');
     if(!item) return;
-    
+
+    abortDrag();
     pressedEl = item;
+    activePointerId = e.pointerId;
     startX = e.clientX;
     startY = e.clientY;
+    startScrollTop = l.scrollTop;
     didLongPress = false;
     dragging = false;
     dragStarted = false;
-    
-    clearTimeout(longPressTimer);
-    
+
     longPressTimer = setTimeout(() => {
+      if(!pressedEl || pressedEl !== item) return;
       didLongPress = true;
       haptic('medium');
-      
+      try { W.getSelection()?.removeAllRanges(); } catch {}
+
       dragging = true;
       dragData = { type: item.dataset.type, id: item.dataset.id, el: item };
       item.classList.add('dragging-origin');
       dragGhost = createGhost(item);
       updateGhost(startX, startY);
-      
-      l.classList.add('scroll-lock');
-    }, 400);
+      setDndGuards(true);
+      try { item.setPointerCapture(e.pointerId); } catch {}
+    }, 380);
   };
-  
+
   const onPointerMove = e => {
+    if(activePointerId != null && e.pointerId !== activePointerId) return;
     if(!pressedEl) return;
     const dx = e.clientX - startX, dy = e.clientY - startY;
     const dist = M.hypot(dx, dy);
-    
-    // ← CORRECTION : annuler long-press seulement si mouvement significatif
-    if(!dragging && dist > 20) { clearTimeout(longPressTimer); }
-    
+
+    if(!dragging && dist > 12) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+      return;
+    }
+
     if(dragging) {
-      e.preventDefault();
+      if(e.cancelable) e.preventDefault();
       dragStarted = true;
       updateGhost(e.clientX, e.clientY);
-      
+
       clearDropTargets();
       const info = getDropInfo(e.clientX, e.clientY);
       if(info) {
-        if(info.mode === 'root') { info.el.classList.add('drop-target'); } 
-        else if(info.mode === 'inside') { info.el.classList.add('drop-target-inside'); } 
-        else if(info.mode === 'above') { info.el.classList.add('drop-target-above'); } 
+        if(info.mode === 'root') { info.el.classList.add('drop-target'); }
+        else if(info.mode === 'inside') { info.el.classList.add('drop-target-inside'); }
+        else if(info.mode === 'above') { info.el.classList.add('drop-target-above'); }
         else if(info.mode === 'below') { info.el.classList.add('drop-target-below'); }
         currentDropTarget = info;
         dropMode = info.mode;
       }
-      
+
       const lRect = l.getBoundingClientRect();
       const edgeSize = 40;
-      if(e.clientY < lRect.top + edgeSize) { l.scrollTop -= 8; } 
+      autoScrolling = true;
+      if(e.clientY < lRect.top + edgeSize) { l.scrollTop -= 8; }
       else if(e.clientY > lRect.bottom - edgeSize) { l.scrollTop += 8; }
+      autoScrolling = false;
     }
   };
-  
+
   const onPointerUp = e => {
+    if(activePointerId != null && e.pointerId !== activePointerId) return;
     clearTimeout(longPressTimer);
-    
+    longPressTimer = null;
+
     if(dragging && dragStarted) {
       const dropInfo = getDropInfo(e.clientX, e.clientY);
       if(dropInfo && dragData) { executeDrop(dragData, dropInfo); }
-      
-      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
-      clearDropTargets();
-      removeGhost();
-      l.classList.remove('scroll-lock');
-      dragging = false; dragData = null; dragStarted = false; pressedEl = null;
-      
+      abortDrag();
       goDeckKeepScroll();
       return;
     }
-    
+
     if(dragging && !dragStarted) {
-      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
-      removeGhost();
-      l.classList.remove('scroll-lock');
-      dragging = false; dragData = null; pressedEl = null;
+      abortDrag();
       return;
     }
-    
-    if(!pressedEl || didLongPress) { pressedEl = null; didLongPress = false; return; }
-    
+
+    if(!pressedEl || didLongPress) { abortDrag(); return; }
+
     const item = pressedEl;
-    pressedEl = null;
-    
-    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
-    
-    // ← CORRECTION : seuil plus tolérant pour mobile (30px au lieu de 15px)
-    const dx = e.clientX - startX, dy = e.clientY - startY;
-    if(M.hypot(dx, dy) > 30) return;
-    
     const type = item.dataset.type;
     const id = item.dataset.id;
-    
+    abortDrag();
+
+    if(e.target.closest('button, .sel-checkbox, .remove-x')) return;
+
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if(M.hypot(dx, dy) > 30) return;
+
     if(selectionMode) {
       if(type === 'chapter') {
         if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
@@ -869,26 +906,49 @@ function bindDeckNew() {
       if(type === 'group') { openGrp(sub, id); } else { goChapter(id); }
     }
   };
-  
-  const onPointerCancel = () => {
-    clearTimeout(longPressTimer);
-    if(dragging) {
-      if(dragData?.el) dragData.el.classList.remove('dragging-origin');
-      clearDropTargets(); removeGhost(); l.classList.remove('scroll-lock');
-    }
-    dragging = false; dragData = null; dragStarted = false; pressedEl = null;
+
+  const onPointerCancel = e => {
+    if(activePointerId != null && e.pointerId !== activePointerId) return;
+    abortDrag();
   };
-  
+
+  const onNativeScroll = () => {
+    if(autoScrolling) return;
+    if(dragging || dragGhost) { abortDrag(); return; }
+    if(longPressTimer && Math.abs(l.scrollTop - startScrollTop) > 6) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  };
+
+  const onContextMenu = e => {
+    if(dragging || e.target.closest('.deck-item')) e.preventDefault();
+  };
+
+  const onVisibility = () => {
+    if(D.visibilityState !== 'visible') abortDrag();
+  };
+
+  abortDrag();
   l.addEventListener('pointerdown', onPointerDown);
-  l.addEventListener('pointermove', onPointerMove, {passive: false});
-  l.addEventListener('pointerup', onPointerUp);
-  l.addEventListener('pointercancel', onPointerCancel);
-  
+  D.addEventListener('pointermove', onPointerMove, {passive: true});
+  D.addEventListener('pointerup', onPointerUp);
+  D.addEventListener('pointercancel', onPointerCancel);
+  D.addEventListener('lostpointercapture', onPointerCancel);
+  l.addEventListener('scroll', onNativeScroll, {passive: true});
+  l.addEventListener('contextmenu', onContextMenu);
+  D.addEventListener('visibilitychange', onVisibility);
+
   bindDeckNew._cleanup = () => {
+    abortDrag();
     l.removeEventListener('pointerdown', onPointerDown);
-    l.removeEventListener('pointermove', onPointerMove);
-    l.removeEventListener('pointerup', onPointerUp);
-    l.removeEventListener('pointercancel', onPointerCancel);
+    D.removeEventListener('pointermove', onPointerMove);
+    D.removeEventListener('pointerup', onPointerUp);
+    D.removeEventListener('pointercancel', onPointerCancel);
+    D.removeEventListener('lostpointercapture', onPointerCancel);
+    l.removeEventListener('scroll', onNativeScroll);
+    l.removeEventListener('contextmenu', onContextMenu);
+    D.removeEventListener('visibilitychange', onVisibility);
   };
 }
 function bindGlobalSearch() {
@@ -1676,12 +1736,11 @@ function goRecap(push=true){
       <div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">${ico('zap','ico--sm')}<span>Continuer la révision</span></button></div>
       <button class="btn btn--ghost btn--sm" id="recapDeckBtn">${ico('layers','ico--sm')}<span>Revenir aux decks</span></button>
     </div>`;
-  $('#recapDeckBtn').onclick = () => goDeck(false);
+  $('#recapDeckBtn').onclick = () => {
+    if (typeof FireSync !== 'undefined' && FireSync.flushPending) FireSync.flushPending();
+    goDeck(false);
+  };
   $('#contBtn').onclick=()=>startRev(c.id,!1,true);
-  if(window._pendingSync && typeof FireSync!=='undefined' && FireSync.isConnected){
-    window._pendingSync=false;
-    FireSync.pullFromCloud(true);
-  }
 }
 
 function continueOrNew(cid,queue,mode,push,isCont,extras={}){
@@ -2206,7 +2265,7 @@ async function init() {
     if (data.app?.version !== APP_VER) {
       reconcile();
       data.app.version = APP_VER;
-      saveData();
+      saveData({ quiet: true });
     }
 
     // ✅ Reset maths one-shot : change le tag pour forcer un nouveau reset
@@ -2237,20 +2296,24 @@ async function init() {
 
     // ✅ Appel loadMathLazy supprimé
 
-    setInterval(saveData, 30000);
+    setInterval(() => saveData({ quiet: true }), 30000);
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        saveData();
+        saveData({ quiet: true });
         if (typeof FireSync !== 'undefined' && FireSync.isConnected) {
           FireSync.pushToCloud();
+        }
+      } else if (document.visibilityState === 'visible') {
+        if (typeof FireSync !== 'undefined' && FireSync.isConnected) {
+          FireSync.checkRemote();
         }
       }
     });
     /* pagehide : dernier effort avant la fermeture de l'onglet/app
        (couvre iOS quand visibilitychange ne suffit pas) */
     window.addEventListener('pagehide', () => {
-      try { saveData(); } catch (e) {}
+      try { saveData({ quiet: true }); } catch (e) {}
       if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     });
 
