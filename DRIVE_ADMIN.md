@@ -169,9 +169,22 @@ non publiées.
 
 ## 8. Tests automatisés
 
-Trois suites hors-ligne (Node) couvrent le compilateur LaTeX, le modèle/la publication et
-l'interface (jsdom + IndexedDB + API GitHub simulées) :
+Trois suites hors-ligne (Node ≥ 18) couvrent tout le Drive sans jamais toucher au dépôt :
+
+| Suite | Ce qu'elle vérifie |
+|---|---|
+| `tex_test.mjs` | le compilateur LaTeX : sommaire, sections numérotées, équations, `\notag`, `\ref`/`\eqref`, tableaux et légendes, théorèmes/preuves, verbatim, accents, macros, tikzpicture — **dont le vrai `fiche-revision.tex` publié** |
+| `store_test.mjs` | les droits (admin / lecteur), le CRUD, les pastilles bleues, l'encodage des URL (espaces, accents), IndexedDB, et une publication complète contre une API GitHub simulée |
+| `ui_test.mjs` | l'interface : lecteur **non-admin sur le contenu réellement publié dans `content/drive/`** (lecture seule, dates, rendu LaTeX, téléchargement, lightbox, retours), puis le parcours admin (onglet → dossier → éditeur LaTeX → import d'image → token → publication) |
+
+Elles vivent hors du dépôt (aucune dépendance ajoutée au site) :
 
 ```bash
-cd /chemin/hors-dépôt/_tests && node tex_test.mjs && node store_test.mjs && node ui_test.mjs
+cd /chemin/hors-dépôt/_tests
+npm install jsdom fake-indexeddb
+node tex_test.mjs && node store_test.mjs && node ui_test.mjs
+# ✅ 84 + 128 + 126 assertions
 ```
+
+Le serveur fictif des tests lit les fichiers **sur le disque** et décode les URL comme le
+ferait GitHub Pages : un chemin mal encodé y produit donc un vrai 404.

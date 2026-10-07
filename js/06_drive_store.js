@@ -299,7 +299,13 @@ const DriveStore = (() => {
 
   function rename(id, name) {
     const n = node(id); if (!n) return null;
-    const nm = String(name || '').trim(); if (!nm) return null;
+    let nm = String(name || '').trim(); if (!nm) return null;
+    // Fichiers texte : on garde l'extension si l'admin l'omet, sinon le type
+    // (latex/markdown/texte) — donc le rendu — serait perdu.
+    if (n.kind !== 'folder' && !extOf(nm)) {
+      const keep = extOf(n.name);
+      if (keep) nm += '.' + keep;
+    }
     n.name = uniqueName(n.driveId, n.parentId, nm, n.id);
     n.kind = n.kind === 'folder' ? 'folder' : kindOf(n.name, n.mime);
     n.updatedAt = now(); n.dirty = true;
@@ -340,8 +346,8 @@ const DriveStore = (() => {
   }
   const localText = async id => blobText(await IDB.get(id));
 
-  function pagesUrl(path) { return encodeURI(path).split('/').map(encodeURIComponent).join('/').replace(/%3A/g, ':'); }
-  function rawUrl(path) { return RAW_BASE + path.split('/').slice(CFG.dir.split('/').length).map(encodeURIComponent).join('/'); }
+  function pagesUrl(path) { return String(path).split('/').map(encodeURIComponent).join('/').replace(/%3A/g, ':'); }
+  function rawUrl(path) { return RAW_BASE + String(path).split('/').slice(CFG.dir.split('/').length).map(encodeURIComponent).join('/'); }
 
   async function fetchText(url, asJson) {
     const r = await fetch(url, { cache: 'no-store' });

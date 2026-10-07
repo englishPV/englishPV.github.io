@@ -979,7 +979,8 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
 
   function adminPanel() {
     if (!admin()) return;
-    const d = S.drive(cur.driveId);
+    // le Drive peut être fermé (cur === null) : on retombe sur le premier onglet
+    const d = (cur && S.drive(cur.driveId)) || S.drives().filter(x => !x.removed)[0] || null;
     const last = S.lastPublish();
     const pend = S.pending();
     openModal(`
@@ -1011,10 +1012,12 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
       (el, close) => {
         el.querySelector('[data-x="cancel"]').onclick = () => close();
         el.querySelector('[data-x="rename-drive"]').onclick = async () => {
+          if (!d) return notify('Aucun onglet à renommer', 'error');
           const r = await promptModal({ title: "Renommer l'onglet", fields: [{ key: 'title', label: 'Nom', value: d.title }, { key: 'emoji', label: 'Emoji', value: d.emoji || '' }], okLabel: 'Enregistrer' });
           if (r && r.title.trim()) { S.updateDrive(d.id, { title: r.title, emoji: r.emoji }); renderTabs(); paint(); notify('Onglet renommé', 'success'); }
         };
         el.querySelector('[data-x="del-drive"]').onclick = async () => {
+          if (!d) return notify('Aucun onglet à supprimer', 'error');
           close();
           const ok = await confirmModal('Supprimer cet onglet ?', `L’onglet « <strong>${esc(d.title)}</strong> » et tous ses fichiers seront supprimés après publication.`, 'Supprimer l’onglet');
           if (!ok) return;

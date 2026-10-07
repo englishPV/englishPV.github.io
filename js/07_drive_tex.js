@@ -79,7 +79,22 @@ const TexRender = (() => {
   const escHtml = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const escAttr = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const stripTags = s => String(s || '').replace(/<[^>]*>/g, '');
-  const sanitizeUrl = u => { const s = String(u || '').trim(); return /^(javascript|data):/i.test(s) ? '#' : s; };
+  // LaTeX → texte brut (titres, sommaire, barre de titre)
+  const detex = s => stripTags(String(s || ''))
+    .replace(/\\(?:emph|textbf|textit|texttt|textsc|textsf|textrm|mbox|MakeUppercase|MakeTextUppercase)\s*\{([^{}]*)\}/g, '$1')
+    .replace(/---/g, '—').replace(/--/g, '–')
+    .replace(/``/g, '« ').replace(/''/g, ' »')
+    .replace(/\\(?:ldots|dots)\b/g, '…')
+    .replace(/\\[a-zA-Z@]+\*?/g, ' ')
+    .replace(/[{}$~]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+  // URL sûre : bloque javascript:/data:, encode les espaces et accents sans double-encoder
+  const sanitizeUrl = u => {
+    const s = String(u || '').trim();
+    if (!s) return '#';
+    if (/^(javascript|data|vbscript|file):/i.test(s)) return '#';
+    try { return encodeURI(decodeURI(s)); } catch { try { return encodeURI(s); } catch { return '#'; } }
+  };
   const colorOf = c => {
     const map = { red: '#ef4444', blue: '#3b82f6', green: '#22c55e', black: '#111', white: '#fff', gray: '#6b7280', grey: '#6b7280', orange: '#f97316', purple: '#a855f7', cyan: '#06b6d4', magenta: '#d946ef', brown: '#92400e', violet: '#8b5cf6', yellow: '#ca8a04' };
     const k = String(c || '').trim().toLowerCase();
@@ -684,11 +699,14 @@ const TexRender = (() => {
       }
       case 'keywords': return `<div class="tex-keywords"><strong>Mots-clés :</strong> ${renderFragment(inner, ctx)}</div>`;
       case 'titlepage': return `<div class="tex-titlepage">${renderFragment(inner, ctx)}</div>`;
-      case 'proof': case 'preuve': case 'demonstration':
-        return `<div class="tex-thm tex-proof"><span class="tex-thm-name">${THEOREMS[base] || base}.</span> ${renderFragment(inner, ctx)}<span class="tex-qed">∎</span></div>`;
+      case 'proof': case 'preuve': case 'demonstration': {
+        const o = readOpt(inner, 0);
+        if (o) inner = inner.slice(o.end);
+        const nm = o && o.text.trim() ? inline(o.text, ctx) : (THEOREMS[base] || base);
+        return `<div class="tex-thm tex-proof"><span class="tex-thm-name">${nm}.</span> ${renderFragment(inner, ctx)}<span class="tex-qed">∎</span></div>`;
+      }
       default: {
         if (THEOREMS[base]) {
-          stripOpt();
           const o = readOpt(inner, 0);
           let extra = '';
           if (o) { extra = o.text; inner = inner.slice(o.end); }
@@ -791,7 +809,13 @@ const TexRender = (() => {
         // on découpe autour des blocs (équations, verbatim…) pour ne pas les mettre dans un <p>
         const segs = t.split(new RegExp(`(${PH}[A-Z]\\d+${PH})`));
         let run = '';
-        const flushRun = () => { if (run.trim()) out += `<p>${inline(run.trim(), ctx)}</p>`; run = ''; };
+        const flushRun = () => {
+          const t2 = run.trim(); run = '';
+          if (!t2) return;
+          // \centering, \small… ne produisent rien : pas de <p> vide
+          const rendered = inline(t2, ctx);
+          if (rendered.trim()) out += `<p>${rendered}</p>`;
+        };
         segs.forEach(seg => {
           const m = new RegExp(`^${PH}([A-Z])(\\d+)${PH}$`).exec(seg);
           if (m) {
@@ -956,7 +980,7 @@ const TexRender = (() => {
 
     return {
       html: `<div class="tex-doc${ctx.meta.documentclass === 'beamer' ? ' tex-beamer' : ''}">${html}</div>`,
-      title: stripTags(ctx.meta.title || ''),
+      title: detex(ctx.meta.title || ''),
       meta: ctx.meta, toc: ctx.toc, sections: ctx.sections,
       warnings: ctx.warnings, hasMath: /\\\(|\\\[/.test(html)
     };

@@ -376,6 +376,14 @@ textarea.dfield-input { resize: vertical; line-height: 1.5; font-family: inherit
   overflow-wrap: break-word;
 }
 .tex-doc p { margin: 0 0 .75em; text-align: justify; }
+.tex-doc p:empty { display: none; }
+/* présentation type beamer : chaque frame devient une diapositive */
+.tex-doc.tex-beamer { background: transparent; box-shadow: none; padding: 0; }
+.tex-beamer .tex-frame {
+  background: #fffdfd; box-shadow: 0 2px 14px rgba(0, 0, 0, .25);
+  border: 1px solid #e2ded5; border-radius: 12px;
+  padding: 20px 22px; margin: 14px 0; min-height: 90px;
+}
 .tex-doc a { color: #1d4ed8; text-decoration: underline; }
 .tex-titleblock { text-align: center; margin: 6px 0 22px; }
 .tex-title { font-size: 25px; font-weight: 700; margin: 0 0 8px; line-height: 1.25; }
@@ -394,7 +402,9 @@ textarea.dfield-input { resize: vertical; line-height: 1.5; font-family: inherit
 .tex-desc dt { font-weight: 700; margin-top: .5em; }
 .tex-desc dd { margin: 0 0 .3em 1.2em; }
 .tex-center { text-align: center; margin: .7em 0; }
-.tex-right { text-align: right; }
+div.tex-right { text-align: right; margin: .7em 0; }
+div.tex-left { text-align: left; margin: .7em 0; }
+.tex-url { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .93em; word-break: break-all; }
 .tex-quote { margin: .8em 1.4em; padding-left: 12px; border-left: 3px solid #cfc9bd; color: #333; font-size: .97em; }
 .tex-abstract { margin: 1em 2em; font-size: .93em; }
 .tex-abstract-title { font-weight: 700; text-align: center; margin-bottom: 6px; }
@@ -418,6 +428,8 @@ textarea.dfield-input { resize: vertical; line-height: 1.5; font-family: inherit
 
 /* tableaux */
 .tex-tabular-wrap { overflow-x: auto; margin: .8em 0; text-align: center; }
+.tex-tabular-wrap.tex-long { max-height: 70vh; overflow-y: auto; }
+.tex-tabular-wrap.tex-long .tex-tabular th { position: sticky; top: 0; z-index: 1; }
 .tex-tabular { border-collapse: collapse; margin: 0 auto; font-size: .95em; }
 .tex-tabular td, .tex-tabular th { padding: 4px 9px; border: 1px solid #b9b3a7; }
 .tex-tabular th { background: #f3f0e9; font-weight: 700; }
