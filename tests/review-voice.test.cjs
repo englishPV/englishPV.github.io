@@ -389,3 +389,91 @@ test('carte suivante : le bandeau reste « à l\'écoute » pendant la relance d
   assert.equal(h.Voice.state().resuming, false);
   assert.equal(h.Voice.state().wanted, true);
 });
+
+test('une réponse incomplète attend Entrée même après un long silence', () => {
+  const h = clockHarness(rec => {
+    rec.later(30, () => rec.onstart());
+    rec.later(100, () => rec.onresult({ resultIndex: 0,
+      results: [Object.assign([{ transcript: 'wrong' }], { isFinal: true })] }));
+  });
+  const commits = [];
+  h.Voice.attach({ onCommit: (...args) => commits.push(args) });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(30000);
+  assert.equal(commits.length, 0);
+  assert.equal(h.Voice.state().text, 'wrong', 'la première parole ne doit pas être ignorée');
+  assert.equal(h.Voice.submit(), true);
+  assert.equal(commits.length, 1);
+  assert.equal(commits[0][2], 'bad');
+  assert.equal(h.Voice.submit(), false);
+});
+
+test('une bonne réponse reste validée automatiquement', () => {
+  const h = clockHarness(rec => {
+    rec.later(30, () => rec.onstart());
+    rec.later(100, () => rec.onresult({ resultIndex: 0,
+      results: [Object.assign([{ transcript: 'soyabeans' }], { isFinal: true })] }));
+  });
+  const commits = [];
+  h.Voice.attach({ onCommit: (...args) => commits.push(args) });
+  h.Voice.setWanted(true, { silent: true });
+  assert.equal(h.Voice.submit(), false, 'Entrée sans transcription ne note rien');
+  h.clock.advance(1000);
+  assert.equal(commits.length, 1);
+  assert.equal(commits[0][2], 'ok');
+});
+
+test('erreur sans onend : pas de blocage ni de boucle du micro', () => {
+  const h = clockHarness(rec => {
+    rec.later(30, () => rec.onstart());
+    rec.later(100, () => rec.onerror({ error: 'network' }));
+  });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(20000);
+  assert.equal(h.starts.length, 2);
+  assert.equal(h.Voice.state().wanted, false);
+  assert.match(h.Voice.state().errorMsg, /réseau/);
+});
+
+test('sessions vides de plusieurs secondes : arrêt plutôt que redémarrage infini', () => {
+  const h = clockHarness(rec => {
+    rec.later(30, () => rec.onstart());
+    rec.later(3000, () => rec.onend());
+  });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(30000);
+  assert.equal(h.starts.length, 2);
+  assert.equal(h.Voice.state().wanted, false);
+});
+
+test('Entrée valide la dictée initiale et les nouvelles tentatives, sans passer à la suite', () => {
+  const { context: c, review: r } = reviewHarness();
+  let submits = 0, prevented = 0;
+  c.Voice.state = () => ({ wanted: true, supported: true, eligible: true });
+  c.Voice.submit = () => { submits++; };
+  const event = { key: 'Enter', preventDefault: () => prevented++ };
+  assert.equal(c.voiceKeyAction(event), true);
+  r.voiceResult = { ok: false }; r.voiceRetrying = true;
+  assert.equal(c.voiceKeyAction(event), true);
+  c.voiceKeyAction({ ...event, repeat: true });
+  assert.equal(submits, 2);
+  assert.equal(prevented, 3);
+  assert.equal(r.index, 0);
+});
+
+test('clic simple souris retourne la carte ; images, liens et sélection restent utilisables', () => {
+  let click, flips = 0, selection = '';
+  const r = { flipped: false };
+  const ctx = { r, Date, window: { getSelection: () => selection },
+    $: () => ({ addEventListener: (_, fn) => { click = fn; } }),
+    revealAnswer: () => { flips++; } };
+  vm.runInNewContext(appSource.slice(appSource.indexOf('  let lastTap = 0;'),
+    appSource.indexOf('  /* Branchement du moteur vocal')), ctx);
+  const event = { pointerType: 'mouse', target: { closest: () => null } };
+  click(event);
+  assert.equal(flips, 1);
+  click({ ...event, target: { closest: () => ({}) } });
+  selection = 'texte sélectionné'; click(event);
+  selection = ''; r.flipped = true; click(event);
+  assert.equal(flips, 1);
+});
