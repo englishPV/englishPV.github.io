@@ -17,6 +17,9 @@
 .voice-bar.is-ok    { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); background: color-mix(in srgb, var(--green) 12%, var(--surface-2)); color: var(--text); }
 .voice-bar.is-bad   { border-color: color-mix(in srgb, var(--red) 55%, var(--border)); background: color-mix(in srgb, var(--red) 12%, var(--surface-2)); color: var(--text); }
 .voice-bar.is-off   { opacity: .8; }
+/* Micro arrêté après des échecs du navigateur : le motif (et sa piste) doit rester lisible */
+.voice-bar.is-err   { border-color: color-mix(in srgb, var(--red) 60%, var(--border)); background: color-mix(in srgb, var(--red) 8%, var(--surface-2)); color: var(--text); }
+.voice-bar.is-err .voice-bar__text { white-space: normal; line-height: 1.4; }
 .voice-bar__text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .voice-bar__text b { color: var(--text); font-variant-numeric: tabular-nums; }
 .voice-bar__score { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--text); }

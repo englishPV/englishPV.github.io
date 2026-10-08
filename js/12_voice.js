@@ -334,13 +334,37 @@
   const GRACE_MS = 800;      // marge avant de valider un échec
   const CONFIRM_MS = 380;    // stabilité exigée avant de valider un succès
 
+  /* Garde-fou contre les boucles d'activation. Un navigateur dont le service de
+     reconnaissance échoue juste après le démarrage (réseau injoignable, micro occupé,
+     dictée désactivée…) ne doit pas faire clignoter le micro indéfiniment.
+     Une tentative est « ratée » si elle se termine par une erreur (hors silence normal),
+     ou si elle se termine vite sans rien entendre. Au bout de MAX_FAILS échecs de suite,
+     le micro s'arrête et le motif reste affiché ; un clic sur le micro relance l'essai. */
+  const MAX_FAILS = 2;
+  const QUICK_MS = 1500;     // une fin plus rapide que ça n'est pas une vraie session
+  const START_MS = 10000;    // ni onstart ni onend au bout de ce délai → tentative ratée
+  const RETRY_MS = 700;      // pause avant un nouvel essai
+  const FATAL_ERR = ['audio-capture', 'language-not-supported'];  // inutile de réessayer
+
+  /* Message affiché quand le micro s'arrête seul (bandeau, bouton, notification). */
+  function errorText(code) {
+    const c = code || '';
+    if (c === 'network') return 'Reconnaissance vocale injoignable : erreur réseau (« network »). Vérifiez la connexion, un VPN, un pare-feu ou un bloqueur de pubs, ou essayez Chrome ou Edge.';
+    if (c === 'audio-capture') return 'Micro introuvable ou occupé (erreur « audio-capture »). Vérifiez qu\'il est branché, choisi dans Windows et non utilisé par une autre application.';
+    if (c === 'language-not-supported') return 'Langue non prise en charge par ce navigateur. Essayez « Anglais (US) » dans les réglages du mode vocal.';
+    if (c === 'start-timeout') return 'Le navigateur ne démarre pas le micro. Autorisez le micro pour ce site (cadenas dans la barre d\'adresse), puis réactivez-le.';
+    if (!c) return 'Reconnaissance vocale interrompue dès son démarrage, sans message du navigateur. Vérifiez le micro et la connexion, ou essayez Chrome ou Edge.';
+    return `Reconnaissance vocale interrompue dès son démarrage (erreur « ${c} »). Réessayez, ou essayez un autre navigateur.`;
+  }
+
   const S = {
     wanted: false, listening: false, starting: false, blocked: false, error: null,
     rec: null, lang: null, key: null, listen: false, eligible: false,
     text: '', interim: '', full: '', live: null, result: null,
     scorer: null, locked: false,
     silenceT: null, graceT: null, confirmT: null, restartT: null, watchT: null,
-    fails: 0, hand: { onCommit: null, onLive: null, onState: null },
+    fails: 0, startedAt: 0, gotSpeech: false, errorMsg: '', resuming: false,
+    hand: { onCommit: null, onLive: null, onState: null },
     testing: false, readyAt: 0
   };
 
@@ -362,8 +386,22 @@
     rec.interimResults = true;
     rec.maxAlternatives = 1;
     rec.lang = S.lang || 'en-GB';
-    rec.onstart = () => { if (S.rec !== rec) return; S.listening = true; S.starting = false; S.fails = 0; S.error = null; emit(); };
-    rec.onend = () => { if (S.rec !== rec) return; S.listening = false; emit(); scheduleRestart(); };
+    /* onstart ne remet PAS le compteur d'échecs à zéro : un navigateur qui démarre puis
+       échoue aussitôt doit être compté comme un échec (c'était la cause de la boucle). */
+    rec.onstart = () => { if (S.rec !== rec) return; S.listening = true; S.starting = false; S.resuming = false; S.error = null; emit(); };
+    rec.onend = () => {
+      if (S.rec !== rec) return;
+      const code = S.error, dur = Date.now() - S.startedAt;
+      S.listening = false; S.starting = false;   // fin de tentative : on ne reste jamais « en démarrage »
+      /* Tentative ratée : une erreur (hors silence normal), ou une fin rapide sans parole */
+      const failed = code ? !(code === 'no-speech' && dur >= QUICK_MS) : (!S.gotSpeech && dur < QUICK_MS);
+      if (failed) return attemptFailed(code);
+      S.fails = 0;
+      /* Reprise normale : l'écran reste « à l'écoute » le temps du raccord, sans bascule */
+      S.resuming = shouldListen();
+      emit();
+      scheduleRestart();
+    };
     rec.onerror = e => {
       if (S.rec !== rec) return;
       const err = e && e.error;
@@ -387,7 +425,9 @@
     const rec = ensureRec();
     if (!rec) return;
     if (S.lang && rec.lang !== S.lang) rec.lang = S.lang;
-    try { S.starting = true; rec.start(); } catch (e) { S.starting = false; scheduleRestart(500); }
+    S.error = null; S.gotSpeech = false; S.startedAt = Date.now();   // nouvelle tentative
+    try { S.starting = true; rec.start(); }
+    catch (e) { S.starting = false; return attemptFailed('start-error'); }
     watch();
   }
 
@@ -399,29 +439,53 @@
     const rec = S.rec;
     S.rec = null; // invalide immédiatement les événements tardifs de cette instance
     if (rec) { try { rec.abort(); } catch (e) {} }
-    S.listening = false; S.starting = false;
+    S.listening = false; S.starting = false; S.resuming = false;
     if (!opts.quiet) emit();
   }
 
   function scheduleRestart(delay) {
     if (S.restartT) clearTimeout(S.restartT);
     if (!shouldListen()) return;
-    S.fails++;
-    const d = delay != null ? delay : (S.fails < 6 ? 260 : M.min(4000, 260 * S.fails));
+    const d = delay != null ? delay : 260;
     S.restartT = setTimeout(() => { S.restartT = null; if (shouldListen()) start(); }, d);
   }
 
-  /* Surveillance : le micro s'éteint dès qu'on quitte la révision. */
+  /* Une tentative a échoué : nouvel essai, ou abandon si le navigateur n'y arrive pas. */
+  function attemptFailed(code) {
+    S.fails++;
+    S.resuming = false;   // un échec affiche de nouveau l'activation, honnêtement
+    if (FATAL_ERR.includes(code) || S.fails >= MAX_FAILS) return giveUp(code);
+    emit();
+    scheduleRestart(RETRY_MS);
+  }
+
+  /* Abandon : le micro s'arrête et le motif reste affiché (un clic le relance). */
+  function giveUp(code) {
+    stop({ quiet: true });
+    S.wanted = false; S.fails = 0; S.error = code || null;
+    S.errorMsg = errorText(code);
+    const p = prefs(); p.voiceOn = false; persist();
+    emit();
+    if (typeof toast === 'function') toast(S.errorMsg, 'error', 7000);
+  }
+
+  /* Surveillance : le micro s'éteint dès qu'on quitte la révision. Une tentative qui ne
+     répond ni par onstart ni par onend au bout de START_MS est comptée comme un échec. */
   function watch() {
     if (S.watchT) return;
     S.watchT = setInterval(() => {
-      if (shouldListen()) { if (!S.listening && !S.starting && !S.restartT) start(); }
-      else stop({ quiet: true, keepWatchdog: false });
+      if (!shouldListen()) { stop({ quiet: true, keepWatchdog: false }); return; }
+      if (S.starting && !S.listening && Date.now() - S.startedAt > START_MS) {
+        stop({ quiet: true, keepWatchdog: true });
+        return attemptFailed('start-timeout');
+      }
+      if (!S.listening && !S.starting && !S.restartT) start();
     }, 1500);
   }
   function unwatch() { if (S.watchT) { clearInterval(S.watchT); S.watchT = null; } }
 
   function onResult(e) {
+    S.gotSpeech = true; S.fails = 0;   // le service répond : ce n'est pas un échec
     if (!shouldListen() || S.locked || !S.scorer || Date.now() < S.readyAt) return;
     let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -502,11 +566,13 @@
       return;
     }
     S.wanted = !!on;
+    S.errorMsg = ''; S.error = null; S.fails = 0;   // chaque activation repart de zéro
     if (typeof data !== 'undefined' && data && data.app) { prefs().voiceOn = S.wanted; if (!opts.silent) persist(); }
     if (!S.wanted) stop({ quiet: true });
     else { S.blocked = S.blocked && !opts.force; if (opts.force) S.blocked = false; start(); }
     emit();
-    if (!opts.silent && typeof toast === 'function') {
+    /* Si le navigateur a déjà abandonné pendant start(), son message prime sur l'annonce */
+    if (!opts.silent && typeof toast === 'function' && !S.errorMsg) {
       toast(S.wanted ? 'Micro activé — répondez à voix haute' : 'Micro désactivé', S.wanted ? 'success' : 'info', 1800);
     }
   }
@@ -524,7 +590,8 @@
 
   function setCard(ctx) {
     const key = ctx ? ctx.key : null;
-    if (key !== S.key) {
+    const changed = key !== S.key;
+    if (changed) {
       stop({ quiet: true }); // ne jamais réutiliser une reconnaissance de la carte précédente
       S.readyAt = Date.now() + 550; // laisse passer les résultats déjà en transit
       S.key = key; S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.result = null;
@@ -539,6 +606,8 @@
       if (S.rec) { try { S.rec.lang = lg; } catch (e) {} }
       if (S.listening || S.starting) { stop({ quiet: true }); S.blocked = false; }
     }
+    /* Carte suivante : le micro repart aussitôt, sans afficher « Activation du micro… » */
+    if (changed && S.wanted && S.listen) S.resuming = true;
     sync();
   }
 
@@ -607,21 +676,44 @@
   /* ══════════════════════ 5. Interface ══════════════════════ */
   function state() {
     return {
-      supported: SUPPORTED, wanted: S.wanted, listening: S.listening, starting: S.starting,
-      blocked: S.blocked, error: S.error, interim: S.interim, text: S.full, live: S.live,
+      supported: SUPPORTED, wanted: S.wanted, listening: S.listening, resuming: S.resuming, starting: S.starting,
+      blocked: S.blocked, error: S.error, errorMsg: S.errorMsg, interim: S.interim, text: S.full, live: S.live,
       eligible: S.eligible, locked: S.locked
     };
   }
 
+  /* État visible du micro : classe, icône et infobulle. Source unique pour le rendu
+     complet et pour la mise à jour en direct (sinon le bouton ne suit pas le micro). */
+  function micState(st) {
+    if (!st.supported) return { cls: ' is-blocked', icon: 'mic-off', title: 'Reconnaissance vocale non supportée par ce navigateur (Chrome, Edge ou Safari conseillé)' };
+    if (!st.wanted) {
+      if (S.errorMsg) return { cls: ' is-blocked', icon: 'mic-off', title: S.errorMsg };
+      return { cls: '', icon: 'mic-off', title: 'Réviser à la voix : appuyez pour activer le micro' };
+    }
+    if (st.blocked) return { cls: ' is-blocked', icon: 'mic-off', title: 'Micro bloqué : autorisez le microphone dans les réglages du navigateur' };
+    if (st.listening || st.resuming) return { cls: ' is-on', icon: 'mic', title: 'Micro actif — appuyez pour le couper' };
+    return { cls: ' is-starting', icon: 'mic', title: 'Activation du micro…' };
+  }
+
   function micHTML(size) {
-    const st = state();
-    let cls = 'voice-mic' + (size === 'lg' ? ' voice-mic--lg' : ''), icon = 'mic', title;
-    if (!st.supported) { cls += ' is-blocked'; icon = 'mic-off'; title = 'Reconnaissance vocale non supportée par ce navigateur (Chrome, Edge ou Safari conseillé)'; }
-    else if (!st.wanted) { icon = 'mic-off'; title = 'Réviser à la voix : appuyez pour activer le micro'; }
-    else if (st.blocked) { cls += ' is-blocked'; icon = 'mic-off'; title = 'Micro bloqué : autorisez le microphone dans les réglages du navigateur'; }
-    else if (st.listening) { cls += ' is-on'; title = 'Micro actif — appuyez pour le couper'; }
-    else { cls += ' is-starting'; title = 'Activation du micro…'; }
-    return `<button type="button" class="${cls}" id="voiceMicBtn" data-voice-mic="1" aria-pressed="${st.wanted ? 'true' : 'false'}" title="${esc(title)}" aria-label="${esc(title)}">${typeof ico === 'function' ? ico(icon) : ''}</button>`;
+    const st = state(), m = micState(st);
+    const cls = 'voice-mic' + (size === 'lg' ? ' voice-mic--lg' : '') + m.cls;
+    return `<button type="button" class="${cls}" id="voiceMicBtn" data-voice-mic="1" data-icon="${m.icon}" aria-pressed="${st.wanted ? 'true' : 'false'}" title="${esc(m.title)}" aria-label="${esc(m.title)}">${typeof ico === 'function' ? ico(m.icon) : ''}</button>`;
+  }
+
+  /* Met à jour le bouton déjà affiché (classe, icône, infobulle) sans le reconstruire. */
+  function refreshMic(root) {
+    const b = root && root.querySelector && root.querySelector('#voiceMicBtn');
+    if (!b) return;
+    const st = state(), m = micState(st);
+    const cls = 'voice-mic' + (b.classList.contains('voice-mic--lg') ? ' voice-mic--lg' : '') + m.cls;
+    if (b.className !== cls) b.className = cls;
+    b.setAttribute('aria-pressed', st.wanted ? 'true' : 'false');
+    b.title = m.title; b.setAttribute('aria-label', m.title);
+    if (b.getAttribute('data-icon') !== m.icon) {
+      b.setAttribute('data-icon', m.icon);
+      if (typeof ico === 'function') b.innerHTML = ico(m.icon);
+    }
   }
 
   function bindMic(root) {
@@ -682,18 +774,13 @@
     } else if (o.revealed) {
       cls += ' is-off';
       txt = `<span class="voice-bar__text">Réponse déjà affichée : micro indisponible sur cette carte. Évaluez avec 1–4.</span>`;
-    } else if (!st.wanted) {
-      cls += ' is-off';
-      txt = `<span class="voice-bar__text">Mode vocal prêt. ${o.eligible ? 'Appuyez sur le micro et dictez la réponse.' : ''}</span>`;
-    } else if (st.blocked) {
-      cls += ' is-off';
-      txt = `<span class="voice-bar__text">Micro bloqué par le navigateur — autorisez-le puis réactivez le mode vocal.</span>`;
+    } else if (!st.wanted || st.blocked) {
+      /* Micro coupé, bloqué ou arrêté après des échecs : le motif remplace l'écoute */
+      cls += S.errorMsg ? ' is-err' : ' is-off';
+      txt = offHTML(o.eligible);
     } else {
       cls += ' is-live';
-      const live = st.live;
-      const sc = live && live.total ? `<span class="voice-bar__score">${live.matched}/${live.total}</span>` : '';
-      const heard = st.interim || st.text;
-      txt = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
+      txt = liveHTML(st);
     }
     return `<div class="${cls}" id="voiceBar">
       ${micHTML()}
@@ -701,21 +788,42 @@
     </div>`;
   }
 
-  const dismissHTML = () => `<button type="button" class="voice-dismiss" data-voice-dismiss aria-label="Annuler la transcription" title="Annuler la transcription">${typeof ico === 'function' ? ico('x','ico--sm') : '×'}</button>`;
-
-  /* Mise à jour « légère » du bandeau (sans reconstruire la carte). */
-  function renderLive() {
-    const bar = D.getElementById('voiceBar');
-    if (!bar) return;
-    const t = bar.querySelector('#voiceBarText');
-    if (!t) return;
-    const st = state();
-    if (!st.wanted || st.locked || S.result) return;
+  /* Texte du bandeau micro coupé : motif de l'arrêt, blocage, ou invitation à activer. */
+  function offHTML(eligible) {
+    if (S.errorMsg) return `<span class="voice-bar__text">${esc(S.errorMsg)}</span>`;
+    if (S.blocked) return `<span class="voice-bar__text">Micro bloqué par le navigateur — autorisez-le puis réactivez le mode vocal.</span>`;
+    return `<span class="voice-bar__text">Mode vocal prêt. ${eligible ? 'Appuyez sur le micro et dictez la réponse.' : ''}</span>`;
+  }
+  /* Texte du bandeau pendant l'écoute : score provisoire, phrase entendue, ou attente. */
+  function liveHTML(st) {
     const live = st.live;
     const sc = live && live.total ? `<span class="voice-bar__score">${live.matched}/${live.total}</span>` : '';
     const heard = st.interim || st.text;
-    bar.classList.toggle('is-live', !!(st.wanted && !st.blocked));
-    t.innerHTML = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
+    return `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : ((st.listening || st.resuming) ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
+  }
+
+  const dismissHTML = () => `<button type="button" class="voice-dismiss" data-voice-dismiss aria-label="Annuler la transcription" title="Annuler la transcription">${typeof ico === 'function' ? ico('x','ico--sm') : '×'}</button>`;
+
+  /* Mise à jour « légère » du bouton et du bandeau (sans reconstruire la carte). */
+  function renderLive() {
+    const bar = D.getElementById('voiceBar');
+    if (!bar) return;
+    const st = state();
+    refreshMic(bar);
+    const t = bar.querySelector('#voiceBarText');
+    if (!t || st.locked || S.result) return;
+    if (!st.wanted || st.blocked) {
+      /* Rien à changer si le bandeau n'affichait pas l'écoute (ex. réponse déjà révélée) */
+      if (!S.errorMsg && !st.blocked && !bar.classList.contains('is-live')) return;
+      bar.classList.remove('is-live');
+      bar.classList.toggle('is-err', !!S.errorMsg);
+      bar.classList.toggle('is-off', !S.errorMsg);
+      t.innerHTML = offHTML(S.eligible);
+      return;
+    }
+    bar.classList.remove('is-off', 'is-err');
+    bar.classList.add('is-live');
+    t.innerHTML = liveHTML(st);
   }
 
   /* Barre d'action sous la carte, en mode vocal. */
@@ -746,6 +854,7 @@
       ${typeof sRow === 'function' ? sRow('rowVoice', 'mic', 'Mode vocal (micro)', 'Dicter la réponse : correction automatique, puis passage manuel (clic ou Espace)', sToggle(!!p.voiceOn), 1) : ''}
       ${!SUPPORTED ? `<div class="voice-settings-note">⚠️ Ce navigateur ne fournit pas la reconnaissance vocale. Utilisez Chrome, Edge ou Safari (mobile comme ordinateur).</div>` : ''}
       ${st.blocked ? `<div class="voice-settings-note">⚠️ Micro bloqué : autorisez le microphone dans les réglages du navigateur, puis réactivez le mode vocal.</div>` : ''}
+      ${st.errorMsg ? `<div class="voice-settings-note">⚠️ ${esc(st.errorMsg)}</div>` : ''}
       <div class="settings-row" style="cursor:default">
         <div class="s-icon dynamic">${typeof ico === 'function' ? ico('target') : ''}</div>
         <div class="s-label"><div class="s-title">Tolérance de prononciation</div><div class="s-sub">Souple accepte les homophones (blew / blue) · Stricte exige la prononciation exacte</div></div>

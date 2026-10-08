@@ -129,10 +129,13 @@ function chapterVoiceHTML(c){
   const st = Voice.state();
   const msg = !st.supported
     ? 'Reconnaissance vocale indisponible sur ce navigateur (Chrome, Edge ou Safari conseillé).'
-    : st.wanted
-      ? 'Mode vocal <b>activé</b> — le micro reste allumé pendant toute la révision, même après « Continuer la session ».'
-      : 'Réviser à la voix : dictez la réponse, elle est validée automatiquement.';
-  return `<div class="voice-bar ${st.wanted ? 'is-live' : 'is-off'}" id="chapVoiceBar" style="margin-top:10px">
+    : st.errorMsg
+      ? escTxt(st.errorMsg)   // le micro s'est arrêté seul : on dit pourquoi
+      : st.wanted
+        ? 'Mode vocal <b>activé</b> — le micro reste allumé pendant toute la révision, même après « Continuer la session ».'
+        : 'Réviser à la voix : dictez la réponse, elle est validée automatiquement.';
+  const cls = st.wanted ? 'is-live' : (st.errorMsg ? 'is-err' : 'is-off');
+  return `<div class="voice-bar ${cls}" id="chapVoiceBar" style="margin-top:10px">
       ${Voice.micHTML('lg')}
       <div class="voice-bar__text">${msg}</div>
     </div>`;
