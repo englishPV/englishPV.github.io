@@ -203,7 +203,7 @@ function stKpi(label, value, sub = '', cls = ''){
 function goStats(push = true, patch = null){
   if(!stLeaveReviewGuard()) return;
   safeCloseLB(); Media.revokeAll();
-  if(typeof Drive !== 'undefined' && Drive.isOpen) Drive.close();
+  exitDrive();
   if(patch) Object.assign(State.stats, patch);
   const st = State.stats;
   const fromChapter = State.view === 'chapter';
@@ -662,8 +662,7 @@ function stBind(body, chs, days, agg){
 
 /* ───────────────────────────── Détail d'une journée ──────────────────────── */
 function goDayAll(key, push = true){
-  safeCloseLB(); Media.revokeAll();
-  if(typeof Drive !== 'undefined' && Drive.isOpen) Drive.close();
+  exitDrive(); safeCloseLB(); Media.revokeAll();
   if(!key) key = todayKey();
   if(push) Nav.push();
   State.view = 'dailyAll'; State.dailyKey = key;
@@ -737,7 +736,7 @@ function goDayAll(key, push = true){
 function goAllCards(push = true, savedSearch = '', patch = null){
   if(!stLeaveReviewGuard()) return;
   safeCloseLB(); Media.revokeAll();
-  if(typeof Drive !== 'undefined' && Drive.isOpen) Drive.close();
+  exitDrive();
   if(patch) Object.assign(State.allCards, patch);
   if(push) Nav.push();
   State.view = 'cards';

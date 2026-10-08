@@ -17,6 +17,7 @@ Site : <https://englishpv.github.io> · Emploi du temps : <https://schedulepv.we
 | Hébergement | GitHub Pages (`main` = production, `.nojekyll`) |
 | Police | Inter variable, **auto-hébergée** (`fonts/`, 48 Ko, aucune requête tierce) |
 | Formules | MathJax 3 chargé à la demande |
+| PDF | **PDF.js 3.11 auto-hébergé** (`vendor/pdfjs/`), chargé à la demande — lecteur maison avec zoom |
 | Sync | Firebase Realtime Database + Google Auth (optionnel) |
 | Stockage local | `localStorage` (données) + IndexedDB (médias importés) |
 
@@ -32,6 +33,8 @@ js/00_icons.js                 jeu d'icônes SVG inline (aucune requête réseau
 js/01..08_*.js                 logique applicative (sync, données, SRS, UI, Drive)
 js/09_shell.js                 navigation latérale, tiroir mobile, raccourcis clavier
 js/10_insights.js              statistiques globales + navigateur de cartes multi-chapitres
+js/11_drive_pdf.js             lecteur PDF du Drive (ajustement largeur, zoom, rotation)
+vendor/pdfjs/                  PDF.js 3.11 (copie locale, chargée au premier PDF ouvert)
 fonts/                         Inter variable (woff2, subset latin)
 images/ · content/drive/       médias et documents publiés
 ```
@@ -79,7 +82,14 @@ directement le modèle FSRS (`stability`, `difficulty`, `dueAt`).
 | `Espace` / `Entrée` (révision) | Retourner la carte |
 | `1` `2` `3` `4` (révision) | Échec · Difficile · Bien · Facile |
 | `Maj` + molette | Agrandir / réduire la police (équivalent du pincement tactile) |
-| `Échap` | Fermer le tiroir, les menus et la visionneuse d'images |
+| `Ctrl` + molette (lecteur PDF) | Zoomer / dézoomer dans le PDF |
+| `+` `−` `W` `R` `F` (lecteur PDF) | Zoomer · dézoomer · ajuster à la largeur · pivoter · plein écran |
+| `PageUp` / `PageDown` (lecteur PDF) | Page précédente / suivante |
+| `Échap` | Fermer le tiroir, les menus, la visionneuse d'images et le plein écran du PDF |
+
+Sur téléphone, un PDF ouvert dans le Drive s'ajuste **à la largeur de l'écran** :
+plus besoin de glisser vers la droite. Le zoom se fait au pincement (deux doigts)
+ou par double-tap, et le bouton ⛶ bascule le lecteur en pleine fenêtre.
 
 Sur ordinateur, `Maj` + molette agit sur la face survolée en révision (recto ou verso)
 et sur les deux tailles ailleurs ; un petit indicateur affiche la valeur courante. La
