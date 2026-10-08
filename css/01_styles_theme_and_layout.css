@@ -404,9 +404,11 @@ main#view { grid-row: 3; }
   .sidebar.is-open { transform: none; }
 }
 
-/* Bouton menu (tiroir) : visible uniquement en dessous du palier desktop */
-.menu-btn { display: none; }
-@media (max-width: 999px) { .menu-btn { display: inline-grid; } }
+/* Bouton menu : tiroir sur mobile, et sur ordinateur il replie / déplie la barre latérale */
+.menu-btn { display: inline-grid; }
+@media (min-width: 1000px) {
+  .app-shell.is-nav-collapsed > .sidebar { display: none; }
+}
 
 /* ─────────────────────────  5. Barre supérieure  ─────────────────────── */
 .topbar {
