@@ -52,7 +52,16 @@ const Media = {
     }
     
     data.mediaIndex = data.mediaIndex || {};
-    data.mediaIndex[k] = { name: m.name || k, type: b.type, size: b.size };
+    data.mediaIndex[k] = { ...m, name: m.name || k, type: b.type, size: b.size, ts: Date.now() };
+    saveData();
+  },
+  /* Supprime définitivement un média (blob IndexedDB + index).
+     ⚠️ Les cartes qui l'utilisent afficheront une image cassée : c'est
+     MediaLib.remove() qui prévient l'utilisateur avant d'appeler ceci. */
+  async remove(k) {
+    this.invalidate(k);
+    try { const d = await this.open(); await new Promise(res => { const tx = d.transaction('files', 'readwrite'); tx.objectStore('files').delete(k); tx.oncomplete = res; tx.onerror = res; }); } catch {}
+    if (data.mediaIndex) delete data.mediaIndex[k];
     saveData();
   },
   invalidate(k) {
@@ -84,7 +93,20 @@ const Media = {
 
 /* --- IMPORTS --- */
 const ensureSQL = (()=>{ let p; return ()=>{ if(!p)p=initSqlJs({locateFile:f=>`https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}`}); return p } })();
-async function importFiles(fs){ for(const f of fs){ const n=f.name.toLowerCase(); if(n.endsWith('.apkg')) await impApkg(f); else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f); else if(n.endsWith('.json')) await impJSON(f) } }
+/* Aiguillage des fichiers importés.
+   JSON / PV / TXT passent par le moteur de format (js/15) qui gère aussi bien
+   le format « pv-import » que les anciens formats ; les images vont dans la
+   bibliothèque (js/14). */
+async function importFiles(fs){
+  for(const f of fs){
+    const n=(f.name||'').toLowerCase(), t=f.type||'';
+    if(n.endsWith('.apkg')) await impApkg(f);
+    else if(n.endsWith('.csv')||n.endsWith('.tsv')) await impDelim(f);
+    else if((n.endsWith('.json')||n.endsWith('.pv')||n.endsWith('.txt')) && typeof PVImport!=='undefined'){ await PVImport.importText(await f.text()); }
+    else if(n.endsWith('.json')) await impJSON(f);
+    else if(/^image\//i.test(t) && typeof MediaLib!=='undefined') await MediaLib.importFiles([f]);
+  }
+}
 
 async function impApkg(f){
   try {

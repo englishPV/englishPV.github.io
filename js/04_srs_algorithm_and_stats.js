@@ -34,8 +34,19 @@ function fsrsNextInterval(stability, desiredRetention) {
   return Math.max(1, Math.round(interval));
 }
 
+/* Interpolation linéaire des paramètres FSRS pour une note fractionnaire.
+   Les notes entières (1-4) gardent EXACTEMENT l'ancien comportement ;
+   une note à virgule (mode vocal : 2 formes sur 3 → 2,33) est interpolée. */
+function fsrsLerp(rating, vals) {
+  const r = clamp(Number(rating) || 1, 1, 4);
+  const lo = M.floor(r), hi = M.ceil(r), t = r - lo;
+  return vals[lo - 1] + (vals[hi - 1] - vals[lo - 1]) * t;
+}
+
 function fsrsInitialStability(rating) {
-  return FSRS_W[rating - 1];
+  const r = clamp(Number(rating) || 1, 1, 4);
+  if (r === M.round(r)) return FSRS_W[r - 1];
+  return fsrsLerp(r, FSRS_W.slice(0, 4));
 }
 
 function fsrsInitialDifficulty(rating) {
@@ -52,8 +63,9 @@ function fsrsNextDifficulty(d, rating) {
 }
 
 function fsrsNextStabilitySuccess(d, s, r, rating) {
-  const hardPenalty = (rating === 2) ? FSRS_W[15] : 1;
-  const easyBonus = (rating === 4) ? FSRS_W[16] : 1;
+  /* Note fractionnaire (mode vocal) : les bonus/malus sont interpolés. */
+  const hardPenalty = fsrsLerp(rating, [1, FSRS_W[15], 1, 1]);
+  const easyBonus = fsrsLerp(rating, [1, 1, 1, FSRS_W[16]]);
   const sinc = 1 +
     Math.exp(FSRS_W[8]) *
     (11 - d) *
@@ -82,8 +94,12 @@ function fsrsSameDayStability(s, rating) {
 //  FONCTION PRINCIPALE : schNx
 // ═══════════════════════════════════════════════════
 
-function schNx(card, grade, now) {
-  const rating = GRADE_TO_RATING[grade];
+function schNx(card, grade, now, ratingOverride) {
+  /* ratingOverride : note fractionnaire (mode vocal, ex. 2,33 pour 2 formes sur 3).
+     Sans override, comportement historique (note entière 1-4). */
+  const rating = (ratingOverride != null && ratingOverride > 0)
+    ? clamp(Number(ratingOverride), 1, 4)
+    : GRADE_TO_RATING[grade];
   if (!rating) return;
 
   const dr = data?.app?.prefs?.desiredRetention || DESIRED_RETENTION;

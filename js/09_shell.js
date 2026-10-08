@@ -44,6 +44,18 @@
       badge: () => (State.chapterId && typeof cntAv === 'function' ? cntAv(getCh(State.chapterId)) || 0 : 0)
     },
     {
+      key: 'images', icon: 'image', label: 'Images',
+      run: () => (typeof MediaLib !== 'undefined') && MediaLib.goImages(true),
+      enabled: () => typeof MediaLib !== 'undefined',
+      badge: () => 0
+    },
+    {
+      key: 'pdrive', icon: 'cloud', label: 'Mon Drive',
+      run: () => (typeof PDrive !== 'undefined') && PDrive.goView(true),
+      enabled: () => typeof PDrive !== 'undefined',
+      badge: () => 0
+    },
+    {
       key: 'stats', icon: 'chart', label: 'Statistiques',
       /* Toujours accessible : sans chapitre → tableau de bord global */
       run: () => goStats(true),
@@ -62,6 +74,8 @@
     if (State.view === 'cards') return 'cards';
     if (State.view === 'review' || State.view === 'recap') return 'review';
     if (State.view === 'settings') return 'settings';
+    if (State.view === 'images') return 'images';
+    if (State.view === 'pdrive') return 'pdrive';
     if (State.view === 'stats' || State.view === 'dailyAll') return 'stats';
     if (State.view === 'daily') return State.chapterId ? 'cards' : 'stats';
     return 'stats';
@@ -289,6 +303,9 @@
 
     /* Révision : Espace retourne la carte, 1–4 notent */
     if (State?.view === 'review') {
+      /* Mode vocal : tant qu'un retour est affiché, seule la suite compte
+         (Espace = carte suivante, R = réessayer) et 1–4 ne notent pas. */
+      if (typeof voiceKeyAction === 'function' && voiceKeyAction(e)) return;
       if (e.key === ' ' || e.key === 'Enter') {
         const flip = $('#flipBtn');
         if (flip) { e.preventDefault(); flip.click(); }
