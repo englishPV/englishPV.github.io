@@ -275,6 +275,18 @@
     if (e.key === '/' && !typing()) { e.preventDefault(); focusSearch(); return; }
     if (typing() || meta) return;
 
+    /* Fin de session (récapitulatif) : Entrée lance la suite, sans passer par la souris.
+       Un bouton déjà focalisé (ex. « Revenir aux decks ») garde son comportement natif. */
+    if (State?.view === 'recap') {
+      const ae = document.activeElement;
+      const onOtherButton = ae && ae.id !== 'contBtn' && (ae.tagName === 'BUTTON' || ae.tagName === 'A');
+      if (e.key === 'Enter' && !e.repeat && !onOtherButton) {
+        const cont = $('#contBtn');
+        if (cont) { e.preventDefault(); cont.click(); }
+      }
+      return;
+    }
+
     /* Révision : Espace retourne la carte, 1–4 notent */
     if (State?.view === 'review') {
       if (e.key === ' ' || e.key === 'Enter') {
