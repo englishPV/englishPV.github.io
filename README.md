@@ -101,6 +101,15 @@ d'une session à l'autre, y compris après « Continuer la révision ». Il ne
 s'éteint que si on réappuie dessus ou si on quitte la révision (et il se rallume
 tout seul en revenant).
 
+Exception : si le navigateur n'arrive pas à écouter (service de reconnaissance
+injoignable, micro absent ou occupé, micro qui ne démarre jamais), le micro ne
+boucle pas. Après **2 tentatives ratées de suite**, il s'arrête : le motif
+s'affiche sur le bandeau (révision et page du chapitre), sur le bouton et dans
+les réglages. Il reste éteint en revenant sur la révision, et un nouvel appui
+sur le micro relance l'essai. Un micro introuvable ou une langue non prise en
+charge arrêtent tout de suite. Un silence normal ne compte pas comme un échec, et
+une parole reconnue remet le compteur à zéro.
+
 | Étape | Comportement |
 | --- | --- |
 | Réponse dite juste | Carte validée automatiquement, réponse affichée en vert, passage à la suivante après le délai réglé (1,2 s par défaut, 0–3 s) |
