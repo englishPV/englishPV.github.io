@@ -206,7 +206,7 @@ button.st-row:hover { background: var(--btn-neutral-bg); }
 
 /* ── Navigateur de cartes global ── */
 .ac-page { gap: var(--sp-3); }
-.ac-search { padding: 0; }
+.ac-search { --search-x: 0px; --search-bottom: 0px; padding: 0; }
 .ac-list { display: flex; flex-direction: column; gap: var(--sp-2); }
 .ac-item {
   padding: 12px 14px;

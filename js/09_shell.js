@@ -428,8 +428,9 @@
     lastZoomStep = now;
 
     let face = 'both';
-    if (e.target.closest('.review-card')) {
-      face = e.target.closest('.term') ? 'term' : (e.target.closest('.definition') ? 'def' : 'both');
+    if (e.target.closest('.review-card, .card-block, .ac-item')) {
+      face = e.target.closest('.term, .ac-item__front') ? 'term'
+           : e.target.closest('.definition, .ac-item__back') ? 'def' : 'both';
     }
 
     const P = data?.app?.prefs;

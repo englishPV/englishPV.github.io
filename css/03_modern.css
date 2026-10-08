@@ -33,14 +33,18 @@ main#view > .card--flush { overflow: hidden; display: flex; flex-direction: colu
 .view-head__actions { display: flex; align-items: center; gap: 6px; flex: none; }
 .view-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--sp-4) var(--sp-4); }
 .view-body--list { padding: 0 6px var(--sp-3); }
-.deck-search { padding: 0 var(--sp-4) var(--sp-3); }
+.deck-search {
+  --search-x: var(--sp-4);
+  --search-bottom: var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-3);
+}
 .deck-scroll { flex: 1; min-height: 0; padding: 0 6px var(--sp-3); }
 .deck-list { display: flex; flex-direction: column; gap: 2px; }
 
 @media (max-width: 620px) {
   .view-head { flex-direction: column; align-items: stretch; gap: var(--sp-2); padding: var(--sp-3) var(--sp-3) 6px; }
   .view-head__actions { justify-content: flex-end; }
-  .deck-search { padding: 0 var(--sp-3) var(--sp-3); }
+  .deck-search { --search-x: var(--sp-3); padding: 0 var(--sp-3) var(--sp-3); }
 }
 
 /* ─────────────────────────────  2. Liste de decks  ───────────────────────────── */
@@ -267,7 +271,9 @@ html.is-dnd .deck-item { touch-action: none; }
 
 /* ───────────────────────────  3. Recherche globale  ─────────────────────────── */
 #globalSearchResults {
-  position: absolute; inset: auto 0 auto 0; top: calc(100% + 6px); z-index: 60;
+  position: absolute;
+  left: var(--search-x); right: var(--search-x);
+  top: calc(100% - var(--search-bottom) + 6px); z-index: 60;
   max-height: min(62vh, 460px); overflow-y: auto;
   padding: 6px;
   border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -410,11 +416,11 @@ canvas#gradeChart { width: 150px; height: 150px; }
   margin: auto 0; width: 100%; text-align: left; min-width: 0;
   overflow-wrap: break-word; word-break: break-word;
 }
-.card-block .term { font-size: 15px; font-weight: 600; line-height: 1.45; }
+.card-block .term { font-size: clamp(14px, calc(var(--fs-term) * .75), 26px); font-weight: 600; line-height: 1.45; }
 .card-block .definition {
   display: none; margin-top: 10px; padding-top: 10px;
   border-top: 1px solid var(--divider);
-  font-size: 13.5px; font-weight: 550; color: var(--muted); line-height: 1.5;
+  font-size: clamp(12.5px, calc(var(--fs-def) * .58), 22px); font-weight: 550; color: var(--muted); line-height: 1.5;
 }
 .card-block.flipped .definition { display: block; }
 .card-block.flipped { box-shadow: var(--shadow-2); }
