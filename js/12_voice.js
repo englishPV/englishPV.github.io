@@ -590,7 +590,8 @@
 
   function setCard(ctx) {
     const key = ctx ? ctx.key : null;
-    if (key !== S.key) {
+    const changed = key !== S.key;
+    if (changed) {
       stop({ quiet: true }); // ne jamais réutiliser une reconnaissance de la carte précédente
       S.readyAt = Date.now() + 550; // laisse passer les résultats déjà en transit
       S.key = key; S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.result = null;
@@ -605,6 +606,8 @@
       if (S.rec) { try { S.rec.lang = lg; } catch (e) {} }
       if (S.listening || S.starting) { stop({ quiet: true }); S.blocked = false; }
     }
+    /* Carte suivante : le micro repart aussitôt, sans afficher « Activation du micro… » */
+    if (changed && S.wanted && S.listen) S.resuming = true;
     sync();
   }
 

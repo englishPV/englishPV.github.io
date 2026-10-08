@@ -371,3 +371,21 @@ test('reprise qui échoue : l\'affichage repasse sur « Activation », sans faux
   assert.equal(h.Voice._internal.fails, 1);
   assert.match(h.Voice.barHTML({ english: true, eligible: true }), /Activation du micro/);
 });
+
+test('carte suivante : le bandeau reste « à l\'écoute » pendant la relance du micro', () => {
+  const h = clockHarness(quietSession);
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(100);
+  assert.equal(h.Voice.state().listening, true);
+  const next = { id: 'second', front: 'maïs', back: 'corn' };
+  h.Voice.setCard(h.Voice.cardContext(next, h.chapter));
+  assert.equal(h.starts.length, 2, 'le micro repart pour la nouvelle carte');
+  assert.equal(h.Voice.state().resuming, true);
+  const bar = h.Voice.barHTML({ english: true, eligible: true });
+  assert.match(bar, /Écoute…/);
+  assert.doesNotMatch(bar, /Activation du micro/);
+  h.clock.advance(50);                   // onstart de la nouvelle session
+  assert.equal(h.Voice.state().listening, true);
+  assert.equal(h.Voice.state().resuming, false);
+  assert.equal(h.Voice.state().wanted, true);
+});
