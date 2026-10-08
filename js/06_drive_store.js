@@ -364,19 +364,30 @@ const DriveStore = (() => {
   }
   function remoteFileUrl(path) { return pagesUrl(path); }     // pour <img>, <iframe>, <a download>
 
+  /* Empreinte de fraîcheur d'un fichier publié : elle change à chaque
+     republication, ce qui permet de profiter du cache HTTP (réouverture
+     instantanée, moins de données mobiles) sans jamais servir une version
+     périmée — contrairement à un simple « no-store » qui retéléchargeait
+     tout le PDF à chaque ouverture. */
+  function fileStamp(n) {
+    const v = (n && (n.publishedAt || n.updatedAt || n.addedAt)) || 0;
+    return v ? '?v=' + v : '';
+  }
+
   async function getContent(n) {
     if (!n) return null;
     // 1) copie locale non publiée (admin)
     const local = await IDB.get(n.id);
     if (local) return { blob: local, source: 'local' };
-    // 2) publié
+    // 2) publié (GitHub Pages, avec repli sur raw pendant le redéploiement)
     const p = n.path || n.publishedPath;
     if (!p) throw new Error('Fichier indisponible');
+    const stamp = fileStamp(n);
     try {
-      const r = await fetch(pagesUrl(p), { cache: 'no-store' });
+      const r = await fetch(pagesUrl(p) + stamp, { cache: 'default' });
       if (r.ok) return { blob: await r.blob(), source: 'pages' };
     } catch {}
-    const r2 = await fetch(rawUrl(p), { cache: 'no-store' });
+    const r2 = await fetch(rawUrl(p) + stamp, { cache: 'default' });
     if (!r2.ok) throw new Error('HTTP ' + r2.status);
     return { blob: await r2.blob(), source: 'raw' };
   }

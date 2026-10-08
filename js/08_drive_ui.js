@@ -30,6 +30,8 @@ const Drive = (() => {
   let query = '';
   let booted = false;
   let fileView = {};         // fileId -> 'render' | 'source'
+  let pdfViewer = null;      // lecteur PDF actif (js/11_drive_pdf.js)
+  let paintToken = 0;        // invalide les rendus de fichier en cours
   const objUrls = [];
 
   function fmtDate(ts) {
@@ -58,19 +60,31 @@ const Drive = (() => {
   function notify(msg, type) { try { toast(msg, type || 'info'); } catch { console.log(msg); } }
 
   /* ─────────── modales ─────────── */
+  const modals = new Set();          // modales ouvertes (pour pouvoir les fermer d'un coup)
   function openModal(html, onMount, opts = {}) {
     const root = D.createElement('div');
     root.className = 'dmodal-root';
     root.innerHTML = `<div class="dmodal-backdrop"></div><div class="dmodal ${opts.wide ? 'dmodal-wide' : ''}">${html}</div>`;
     D.body.appendChild(root);
-    const close = () => { root.classList.add('closing'); setTimeout(() => root.remove(), 160); D.removeEventListener('keydown', onKey); };
+    const me = { root, el: root.querySelector('.dmodal'), locked: !!opts.locked, close: () => {} };
+    modals.add(me);
+    const close = () => {
+      if (!modals.has(me)) return;
+      modals.delete(me);
+      root.classList.add('closing'); setTimeout(() => root.remove(), 160); D.removeEventListener('keydown', onKey);
+    };
+    me.close = close;
     const onKey = e => { if (e.key === 'Escape' && !opts.locked) close(); };
     D.addEventListener('keydown', onKey);
     root.querySelector('.dmodal-backdrop').onclick = () => { if (!opts.locked) close(); };
     onMount && onMount(root.querySelector('.dmodal'), close, root);
     requestAnimationFrame(() => root.classList.add('open'));
-    return { root, el: root.querySelector('.dmodal'), close };
+    return me;
   }
+  /* Ferme toutes les modales du Drive — utilisé avant d'ouvrir le menu
+     latéral, pour qu'un calque ne reste pas au-dessus de l'écran.
+     Les modales « locked » (import en cours) sont préservées. */
+  function closeModals() { [...modals].forEach(m => { try { if (!m.locked) m.close(); } catch {} }); }
   const btnRow = (id, label, cls = '') => `<button class="btn ${cls}" data-x="${id}">${label}</button>`;
 
   function promptModal({ title, fields = [], okLabel = 'Valider', danger = false }) {
@@ -184,15 +198,17 @@ const Drive = (() => {
     stack = [];
     show({ screen: 'root', driveId });
   }
-  function close() {
-    if (!isOpen) { try { goDeck(false); } catch {} return; }
+  function close(opts) {
+    const silent = !!(opts && opts.silent);      // silent : on sort sans repeindre (une vue va le faire)
+    if (!isOpen) { if (!silent) { try { goDeck(false); } catch {} } return; }
     isOpen = false; cur = null; stack = []; query = '';
+    destroyPdf();
     const v = D.getElementById('view');
     if (v) v.classList.remove('drive-open');
     try {
       setBot({ actions: false, revision: false });
       hideRevAct();
-      goDeck(false);
+      if (!silent) goDeck(false);
     } catch (e) { console.warn(e); }
     renderTabs();
   }
@@ -214,6 +230,8 @@ const Drive = (() => {
   function paint() {
     const v = D.getElementById('view');
     if (!v || !cur) return;
+    paintToken++;                 // annule les chargements de fichier en cours
+    destroyPdf();                 // libère le lecteur PDF (canvas, worker, écouteurs)
     v.classList.add('drive-open');
     try { setBot({ actions: false, revision: false }); hideRevAct(); } catch {}
     D.getElementById('reviewActionsBar').style.display = 'none';
@@ -424,6 +442,7 @@ const Drive = (() => {
     const n = S.node(cur.fileId);
     if (!n) return back();
     const d = S.drive(n.driveId);
+    const my = paintToken;        // si l'utilisateur navigue pendant un chargement, on abandonne
     setTopBar(`${icon(n)} ${n.name}`, '· Drive');
 
     const mode = fileView[n.id] || (n.kind === 'latex' || n.kind === 'markdown' ? 'render' : 'render');
@@ -478,6 +497,7 @@ const Drive = (() => {
     // chargement du contenu
     try {
       const text = S.isTextKind(n.kind) ? await S.getTextContent(n) : null;
+      if (my !== paintToken) return;                 // l'utilisateur est parti ailleurs
       if (n.kind === 'latex') {
         if (mode === 'source') body.innerHTML = `<pre class="dsrc"><code>${esc(text)}</code></pre>`;
         else await renderLatex(body, text, n);
@@ -492,22 +512,21 @@ const Drive = (() => {
           <div class="dimg-tip">Touche l'image pour l'agrandir</div>`;
         body.querySelector('img').onclick = e => { try { openLB(e.target, body); } catch { W.open(u, '_blank'); } };
       } else if (n.kind === 'pdf') {
+        /* Lecteur maison (js/11_drive_pdf.js) : la page s'ajuste à la largeur
+           de l'écran, avec zoom, pincement, rotation et plein écran.
+           Repli automatique sur l'aperçu natif si PDF.js ne démarre pas. */
         const p = n.path || n.publishedPath;
         body.classList.add('dfile-body--pdf');
-        body.innerHTML = `
-          <div class="dpdf-zone">
-            <iframe class="dpdf" src="${esc(S.pagesUrl(p))}#toolbar=1" title="${esc(n.name)}" loading="eager"></iframe>
-            <button class="dpdf-fs" data-act="fs" title="Plein écran" aria-label="Plein écran">${ico('maximize','ico--sm')}</button>
-          </div>
-          <div class="dimg-tip dimg-tip--pdf">Si l'aperçu ne s'affiche pas, utilise « Télécharger » ou « Nouvel onglet ».</div>`;
-        const fsBtn = body.querySelector('.dpdf-fs');
-        if (fsBtn) fsBtn.onclick = () => {
-          const zone = body.querySelector('.dpdf-zone');
-          if (!zone) return;
-          const req = zone.requestFullscreen || zone.webkitRequestFullscreen || zone.msRequestFullscreen;
-          if (req) { try { const r = req.call(zone); if (r && r.catch) r.catch(() => {}); } catch { W.open(S.pagesUrl(p), '_blank', 'noopener'); } }
-          else W.open(S.pagesUrl(p), '_blank', 'noopener');
-        };
+        body.innerHTML = `<div class="dloading"><div class="dspinner"></div>Chargement du PDF…</div>`;
+        // PDF.js commence à se charger pendant le téléchargement du fichier
+        try { if (W.DrivePdf && W.DrivePdf.loadPdfJs) W.DrivePdf.loadPdfJs().catch(() => {}); } catch {}
+        const c = await S.getContent(n);
+        if (my !== paintToken) return;               // plus affiché : on ne monte rien
+        if (!c || !c.blob) throw new Error('Contenu indisponible');
+        body.innerHTML = '';
+        // URL de repli : fichier publié (Pages) ou copie locale pas encore publiée
+        const url = p ? S.pagesUrl(p) : trackUrl(URL.createObjectURL(c.blob));
+        pdfViewer = mountPdf(body, n, c.blob, url);
       } else if (n.kind === 'audio') {
         const u = await objectUrlFor(n);
         body.innerHTML = `<div class="dmedia"><audio controls src="${esc(u)}"></audio></div>`;
@@ -532,6 +551,38 @@ const Drive = (() => {
     const c = await S.getContent(n);
     if (!c) throw new Error('Contenu indisponible');
     return trackUrl(URL.createObjectURL(c.blob));
+  }
+
+  /* ─────────── Lecteur PDF ───────────
+     Rendu maison (PDF.js, js/11_drive_pdf.js) : la page s'ajuste à la
+     largeur de l'écran — plus besoin de glisser vers la droite sur
+     téléphone — avec zoom, pincement, rotation et plein écran.
+     Repli sur l'aperçu natif du navigateur en cas de problème. */
+  function mountPdf(host, n, blob, url) {
+    if (W.DrivePdf && typeof W.DrivePdf.mount === 'function') {
+      try {
+        return W.DrivePdf.mount({
+          host, blob, name: n.name, url,
+          onFallback: () => { pdfViewer = null; }
+        });
+      } catch (e) { console.warn('[Drive] lecteur PDF', e); }
+    }
+    nativePdf(host, n, url, 'Aperçu simplifié');
+    return null;
+  }
+
+  function nativePdf(host, n, url, reason) {
+    host.innerHTML = `
+      <div class="dpdf-zone dpdf-zone--native">
+        <iframe class="dpdf" src="${esc(url)}#toolbar=1&navpanes=0&view=FitH" title="${esc(n.name)}" loading="eager"></iframe>
+      </div>
+      <div class="dimg-tip dimg-tip--pdf">${esc(reason || '')} — si l'aperçu ne s'affiche pas, utilise « Télécharger » ou « Nouvel onglet ».</div>`;
+  }
+
+  function destroyPdf() {
+    if (!pdfViewer) return;
+    try { pdfViewer.destroy(); } catch (e) { /* déjà détruit */ }
+    pdfViewer = null;
   }
 
   function resolveAssetFrom(node, name) {
@@ -1147,7 +1198,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
     init, renderTabs, openDrive, close, back, goRoot, paint,
     get isOpen() { return isOpen; },
     get current() { return cur; },
-    publishModal, adminPanel, refreshNow, addDriveModal,
+    publishModal, adminPanel, refreshNow, addDriveModal, closeModals,
     Store: S
   };
 })();
