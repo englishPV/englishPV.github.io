@@ -670,21 +670,39 @@ input[type='range'] { min-height: auto; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field-label { font-size: 12px; font-weight: 650; color: var(--muted); }
 
-.search-field { position: relative; display: flex; align-items: center; }
+/* Les barres avec padding (deck-search) alignent leurs accessoires sur le
+   CHAMP, et non sur le conteneur qui comprend aussi un padding inférieur. */
+.search-field {
+  --search-x: 0px;
+  --search-bottom: 0px;
+  position: relative; display: flex; align-items: center;
+}
+.search-field > .ico,
+.search-field > .search-kbd,
+.search-field > .clear-btn {
+  position: absolute;
+  top: calc((100% - var(--search-bottom)) / 2);
+  transform: translateY(-50%);
+}
 .search-field > .ico {
-  position: absolute; left: 12px; color: var(--faint); pointer-events: none;
+  left: calc(var(--search-x) + 12px);
+  color: var(--faint); pointer-events: none;
 }
 .search-field > input { padding-left: 38px; padding-right: 38px; border-radius: var(--radius-lg); }
-.search-kbd {
-  position: absolute; right: 10px;
-  display: inline-flex; gap: 3px;
+.search-field > input#globalSearch { padding-right: 82px; }
+.search-field > .search-kbd {
+  right: calc(var(--search-x) + 10px);
+  display: inline-flex; align-items: center; gap: 3px;
   pointer-events: none; opacity: .85;
 }
 .search-field.has-query .search-kbd { display: none; }
-@media (max-width: 640px) { .search-kbd { display: none; } }
+@media (max-width: 640px) {
+  .search-field > .search-kbd { display: none; }
+  .search-field > input#globalSearch { padding-right: 38px; }
+}
 
 .search-field > .clear-btn {
-  position: absolute; right: 8px;
+  right: calc(var(--search-x) + 8px);
   display: grid; place-items: center;
   width: 26px; height: 26px; border: 0; border-radius: var(--radius-full);
   background: transparent; color: var(--faint);

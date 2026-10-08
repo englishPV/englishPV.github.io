@@ -69,14 +69,6 @@
 /* ───────────────────────────── Barre d'actions ───────────────────────────── */
 #reviewActionsBar .voice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 #reviewActionsBar .voice-row--one { grid-template-columns: 1fr; }
-.voice-next { position: relative; overflow: hidden; }
-.voice-next__fill {
-  position: absolute; inset: 0 auto 0 0; width: 0;
-  background: color-mix(in srgb, #fff 26%, transparent);
-  pointer-events: none;
-}
-.voice-next span, .voice-next .ico { position: relative; z-index: 1; }
-
 /* ─────────────────────────── Réglages : aperçu micro ─────────────────────────── */
 .voice-settings-note { padding: 0 16px 12px; font-size: 12px; color: var(--muted); }
 .voice-test-out {
@@ -95,3 +87,13 @@
 
 /* ────────────────── Immersion : le micro reste toujours visible ────────────────── */
 .focus-mode .voice-bar { opacity: 1; }
+
+/* Annulation d'une transcription en cours, avant validation. */
+#voiceBarText { display: flex; align-items: center; gap: 6px; }
+.voice-dismiss {
+  flex: none; display: inline-grid; place-items: center;
+  width: 26px; height: 26px; border: 1px solid var(--border);
+  border-radius: var(--radius-full); background: var(--surface);
+  color: var(--muted); cursor: pointer;
+}
+.voice-dismiss:hover, .voice-dismiss:focus-visible { color: var(--red); border-color: var(--red); }

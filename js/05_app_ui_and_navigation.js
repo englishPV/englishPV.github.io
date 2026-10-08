@@ -454,11 +454,9 @@ function goDeck(push=true){
             <div class="view-head__meta">${nbCh} chapitre${nbCh>1?'s':''} · ${nbCards} carte${nbCards>1?'s':''}</div>
           </div>
           <div class="view-head__actions">
-            <button class="btn btn--outline btn--sm" id="statsB">${ico('chart')}<span>Stats</span></button>
             <button class="btn ${selectionMode?'btn--primary':'btn--outline'} btn--sm" id="editModeBtn">
               ${ico(selectionMode?'check':'pencil')}<span>${selectionMode?'Terminer':'Éditer'}</span>
             </button>
-            <button class="btn btn--outline btn--sm" id="imgB">${ico('image')}<span>Images</span></button>
             <button class="btn btn--outline btn--sm" id="impB">${ico('upload')}<span>Importer</span></button>
             <button class="btn btn--outline btn--sm btn--icon" id="setB" title="Paramètres" aria-label="Paramètres">${ico('settings')}</button>
             <input id="impI" type="file" class="hidden" accept="*/*" multiple />
@@ -497,13 +495,10 @@ function goDeck(push=true){
     else if (impInput) impInput.click();
   };
   if (impInput) impInput.onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
-  const imgBtn = $('#imgB');
-  if (imgBtn) imgBtn.onclick = () => { if (typeof MediaLib !== 'undefined') MediaLib.goImages(true); };
   
   $('#editModeBtn').onclick = () => {
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
   };
-  const statsB = $('#statsB'); if (statsB) statsB.onclick = () => goStats(true);
   const setB = $('#setB'); if (setB) setB.onclick = () => openSet(State.chapterId, true, 'general');
   
     if(selectionMode) renderFABs();
@@ -1799,7 +1794,7 @@ function renRev(){
   if(State.review?.isQCM) { renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
   const ms=getMathSimple(card), fT=formatText(f), bT=(!data.app.prefs.mathDetail&&ms)?formatText(ms):formatText(b), progress=((r.index)/tot)*100;
-  const undoBtn = r.history.length
+  const undoBtn = r.history.length && !r.history[r.history.length-1].voice
     ? `<button id="undoBtn" title="Annuler la dernière évaluation">${ico('rotate-ccw','ico--sm')}</button>` : '';
   const chapLabel = r.mode === 'multi' ? 'Multi-chapitres · ' + chap.title : chap.title;
 
@@ -1807,11 +1802,12 @@ function renRev(){
   const vctx = voiceCtxOf(card, chap);
   const voiceChapter = !!vctx;
   const voiceWanted = voiceActive();
-  const vres = r.voiceResult || null;
-  const voiceEval = !!(vctx && vctx.eligible && voiceWanted);       // dictée active
+  const vres = r.voiceRetrying ? null : (r.voicePracticeResult || r.voiceResult || null);
+  const voiceEval = !!(vctx && vctx.eligible && voiceWanted && !r.revealedWithoutVoice);       // dictée active
   const answerHTML = (vres && !vres.manual) ? Voice.answerHTML(b, vres) : bT;
   const voiceBar = voiceChapter
-    ? Voice.barHTML({ english:true, eligible:vctx.eligible, result:vres, delayMs:Voice.prefs().voiceDelay })
+    ? Voice.barHTML({ english:true, eligible:vctx.eligible, result:vres, practice:!!r.voicePracticeResult,
+        revealed:!!r.revealedWithoutVoice })
     : '';
 
   v.innerHTML = `
@@ -1830,9 +1826,8 @@ function renRev(){
              </div>`}
         </div>
         <div class="review-hint">
-          <span><kbd>Espace</kbd> ${voiceEval ? 'je ne sais pas' : 'retourner'}</span>
-          ${voiceEval ? (vres ? '<span><kbd>Espace</kbd> carte suivante</span>' : '<span>ou dictez la réponse</span>')
-                      : '<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>'}
+          <span><kbd>Espace</kbd> ${vres ? 'carte suivante' : voiceEval ? 'je ne sais pas' : 'retourner'}</span>
+          ${!vres && !voiceEval ? '<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>' : ''}
         </div>
       </div>
       ${voiceBar}
@@ -1851,7 +1846,7 @@ function renRev(){
   /* Retourner = « je ne sais pas » en mode vocal (la note est posée par le micro) */
   const revealAnswer = () => {
     if(voiceEval && !r.flipped){ haptic('light'); voiceDontKnow(); return; }
-    haptic('light'); r.flipped = true; renRev();
+    haptic('light'); r.revealedWithoutVoice = true; r.flipped = true; renRev();
   };
 
   let lastTap = 0;
@@ -1866,20 +1861,18 @@ function renRev(){
   /* Branchement du moteur vocal sur la carte courante */
   if(voiceChapter){
     Voice.attach({
-      onState: () => Voice.renderLive(),
+      onState: () => {
+        Voice.renderLive();
+        if(r.voiceRetrying && !Voice.state().wanted){
+          r.voiceRetrying=false;
+          renRev(); // couper le micro ne déverrouille pas la notation manuelle
+        }
+      },
       onCommit: (text, res, kind) => voiceCommit(res, kind)
     });
     Voice.setCard(vctx);
     Voice.bindMic(v);
-    if(vres) Voice.lock();                     // retour affiché → dictée figée
-    if(vres && vres.ok){
-      const fill = $('#voiceNextFill');
-      const d = Voice.prefs().voiceDelay;
-      if(fill && d > 0){
-        fill.style.transition = 'none'; fill.style.width = '0%';
-        requestAnimationFrame(() => { fill.style.transition = `width ${d}ms linear`; fill.style.width = '100%'; });
-      }
-    }
+    if(r.voiceResult && !r.voiceRetrying) Voice.lock(); // note déjà enregistrée
   } else if(typeof Voice!=='undefined'){
     Voice.setCard(null);
   }
@@ -1907,7 +1900,8 @@ function renRev(){
 function applyGrade(nxt, ratingOverride){
   const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return null}
 
-  r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length });
+  r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length,
+    voice: !!r.voiceGrading, revealed: !!r.revealedWithoutVoice });
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
   card.grade=nxt; syncG(chap); card.perfEma=(1-.3)*(card.perfEma??.5)+.3*(nxt==='facile'?1:nxt==='bien'?0.75:nxt==='difficile'?0.35:0);
   schNx(card,nxt,now,ratingOverride); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
@@ -1919,11 +1913,20 @@ function applyGrade(nxt, ratingOverride){
   return {card, chap};
 }
 
+/* Notation manuelle : utilisée aussi par les raccourcis clavier et le QCM. */
+function subG(grade){
+  const r=State.review;
+  if(!r || r.voiceResult || (!r.isQCM && !r.flipped) || !GRADES.includes(grade)) return;
+  applyGrade(grade);
+  advanceReview();
+}
+
 /* Passage à la carte suivante (ou fin de session). */
 function advanceReview(){
   const r=State.review; if(!r) return;
-  r.voiceResult=null; r.voiceSpoken=null;
-  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
+  r.voiceResult=null; r.voiceSpoken=null; r.voicePracticeResult=null;
+  r.voiceRetrying=false; r.revealedWithoutVoice=false;
+  if(typeof Voice!=='undefined') Voice.stop({quiet:true});
 
   if(r.index<r.queue.length-1){
     r.index++;r.flipped=!1;r.cardStart=Date.now();
@@ -2004,7 +2007,7 @@ function goRecap(push=true){
 }
 
 function continueOrNew(cid,queue,mode,push,isCont,extras={}){
-  if(isCont&&State.review){State.review.queue.push(...queue);State.review.index++;State.review.flipped=!1;State.review.cardStart=Date.now();State.review.end=null}
+  if(isCont&&State.review){State.review.queue.push(...queue);State.review.index++;State.review.flipped=!1;State.review.cardStart=Date.now();State.review.end=null;State.review.voiceResult=null;State.review.voiceRetrying=false;State.review.voicePracticeResult=null;State.review.revealedWithoutVoice=false}
   else State.review={chapterId:cid,queue,index:0,flipped:!1,answers:[],history:[],start:Date.now(),end:null,cardStart:Date.now(),...extras};
   goReview(push)
 }
@@ -2033,7 +2036,7 @@ function startRev(cid,push=true,isCont=false){
 /* Les fonctions ci-dessous ne font que brancher le module js/12_voice.js sur
    la session en cours. Le micro reste actif tant qu'on est en révision et que
    l'utilisateur ne l'a pas coupé (voir Voice.setWanted). */
-function voiceActive(){ return typeof Voice!=='undefined' && Voice.state().wanted; }
+function voiceActive(){ return typeof Voice!=='undefined' && Voice.state().supported && Voice.state().wanted; }
 
 /* Retourne le contexte vocal de la carte courante (ou null). */
 function voiceCtxOf(card, chap){
@@ -2046,7 +2049,7 @@ function voiceCtxOf(card, chap){
 /* L'utilisateur avoue ne pas savoir : réponse affichée + carte notée « Échec ». */
 function voiceDontKnow(){
   const r=State.review, {card,chap}=getCur(); if(!r||!card||!chap) return;
-  if(r.voiceResult) return;
+  if(r.voiceResult && !r.voiceRetrying) return;
   const ctx = voiceCtxOf(card,chap);
   const res = (ctx && ctx.expected)
     ? Voice.scoreAnswer('', ctx.expected, { tolerance: Voice.prefs().voiceTolerance, forms: ctx.forms })
@@ -2058,37 +2061,43 @@ function voiceDontKnow(){
 
 /* Applique la note (fractionnaire) de la dictée. */
 function voiceCommit(res, kind){
-  const r=State.review; if(!r || r.voiceResult || !res) return;
+  const r=State.review; if(!r || (r.voiceResult && !r.voiceRetrying) || !res) return;
+  if(r.voiceRetrying){
+    // Exercice de prononciation uniquement : la première note et les stats restent intactes.
+    r.voiceRetrying=false; r.voicePracticeResult=res; r.flipped=true;
+    renRev(); return;
+  }
+  if(r.revealedWithoutVoice || !voiceActive()) return;
   r.voiceResult = res;
   r.voiceSpoken = res.spoken || '';
   r.flipped = true;
+  r.voiceGrading=true;
   applyGrade(res.grade, res.rating);   // note à virgule → FSRS l'interpole
+  r.voiceGrading=false;
   renRev();
-  /* Bonne réponse → on laisse la carte verte le temps réglé, puis on avance. */
-  if(res.ok){
-    const delay = (typeof Voice!=='undefined') ? Voice.prefs().voiceDelay : 1200;
-    const go = () => { if(State.review===r && r.voiceResult && r.voiceResult.ok) voiceAdvance(); };
-    if(delay > 0) Voice.armAuto(delay, go);
-    else setTimeout(go, 90);
-  }
+  // On attend toujours une action explicite pour passer à la carte suivante.
 }
 
 function voiceAdvance(){
-  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
   advanceReview();
 }
 
 function voiceRetry(){
   const r=State.review; if(!r || !r.voiceResult) return;
-  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
-  r.voiceResult = null; r.voiceSpoken = null;
-  undoRev();                     // restaure carte + stats, remet le recto
+  if(r.voiceResult.ok) return;
+  if(!voiceActive()) { toast('Réactivez le micro pour vous entraîner, ou passez à la carte suivante', 'info'); return; }
+  r.voiceRetrying=true; r.voicePracticeResult=null; r.flipped=false;
+  Voice.restartCard();           // conserve la note initiale ; nouvelle écoute sans restauration des stats
+  renRev();
 }
 
 /* Raccourcis clavier pendant un retour vocal (appelé par js/09_shell.js). */
 function voiceKeyAction(e){
   const r=State.review;
   if(!r || !r.voiceResult) return false;
+  if(r.voiceRetrying && (e.key===' ' || e.key==='Enter')){
+    e.preventDefault(); voiceAdvance(); return true;
+  }
   if(e.key===' ' || e.key==='Enter'){
     const b=$('#voiceNextBtn'); if(b){ e.preventDefault(); b.click(); }
     return true;
@@ -2100,6 +2109,8 @@ function voiceKeyAction(e){
   return true;                    // pas d'auto-évaluation 1-4 pendant le retour
 }
 window.voiceKeyAction = voiceKeyAction;
+// Révéler le verso en mode manuel ferme définitivement l'option micro sur cette carte.
+window.voiceMayEnable = () => !(State.view==='review' && State.review?.revealedWithoutVoice);
 
 function startSingleCardReview(chapterId, cardId, searchQuery, scrollPos) {
   const c = getCh(chapterId);
@@ -2156,17 +2167,24 @@ function startRevMulti(ids,vid,flt,push=true,isCont=false){
 function getCur(){ const r=State.review; if(!r||r.index<0||r.index>=r.queue.length)return{card:null,chap:null}; if(r.mode==='multi'){const i=r.queue[r.index];if(!i)return{card:null,chap:null};const ch=_real(i.chapId);if(!ch)return{card:null,chap:null};return{card:ch.cards.find(x=>x.id===i.cardId)||null,chap:ch}}else{const ch=getCh(r.chapterId);if(!ch)return{card:null,chap:null};return{card:ch.cards.find(x=>x.id===r.queue[r.index])||null,chap:ch}} }
 
 function undoRev(){
-  const r = State.review; if(!r.history.length) return;
+  const r = State.review; if(!r || !r.history.length || r.history[r.history.length-1].voice) return;
   const snap = r.history.pop(); r.index = snap.idx;
   const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState;
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
   r.flipped = false; 
-  r.voiceResult = null; r.voiceSpoken = null;
-  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
+  r.voiceResult = null; r.voiceSpoken = null; r.voiceRetrying=false; r.voicePracticeResult=null;
+  r.revealedWithoutVoice=!!snap.revealed; // un recto déjà révélé ne redevient pas éligible au micro
+  if(typeof Voice!=='undefined') Voice.reset();
   saveData(); renRev();
 }
 
-const getPreviewTxt=()=>{const s=data.subjects.find(s=>s.title.toLowerCase().includes('physique'))||data.subjects[0],a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>!c.front.includes('<img')&&!c.back.includes('<img'));if(!a.length)return{f:"La constante de Planck",b:"h = 6,626 x 10⁻³⁴ J.s"};const r=a[M.floor(M.random()*a.length)];return{f:r.front.replace(/<br>/g,' '),b:r.back.replace(/<br>/g,' ')}};
+const getPreviewTxt=()=>{
+  const s=data.subjects.find(s=>s.id==='anglais' || /anglais|english/i.test(s.title||''));
+  const a=(s?.chapters||[]).flatMap(c=>c.cards).filter(c=>c.front && c.back && !/<img|\[IMAGE_ID|\$|\\/.test(c.front+c.back));
+  if(!a.length) return {f:'soja',b:'soyabeans'};
+  const r=a[M.floor(M.random()*a.length)];
+  return {f:r.front.replace(/<br\s*\/?>/gi,' '),b:r.back.replace(/<br\s*\/?>/gi,' ')};
+};
 
 /* ══════════════════════════════════════════════════════════════════════════
    PARAMÈTRES
@@ -2284,7 +2302,6 @@ function openSet(cid, push = true, tab = null){
   /* ══════════════════════ ONGLET APPLICATION ══════════════════════════ */
   const paintGeneral = () => {
     const isDark = data.app.theme !== 'light';
-    const prev = getPreviewTxt();
     const swatches = ['indigo','blue','teal','emerald','rose','amber','violet']
       .map(x => `<button type="button" class="swatch ${P.accent === x ? 'is-active' : ''}" data-accent="${x}" style="--sw:var(--${x === 'indigo' ? 'primary' : x})" aria-label="Accent ${x}"></button>`).join('');
     const fs = (typeof FireSync !== 'undefined') ? FireSync : null;
@@ -2332,7 +2349,6 @@ function openSet(cid, push = true, tab = null){
         sRow('rowExp','download','Exporter la sauvegarde','Fichier JSON de toutes les données', sChev, 1) +
         sRow('rowImp','upload','Importer une sauvegarde','Remplace les données actuelles', sChev, 1) +
         sRow('rowImpCards','package','Importer des cartes','Anki (.apkg), CSV / TSV, JSON, texte « pv-import »', sChev, 1) +
-        sRow('rowImages','image','Bibliothèque d\'images', (typeof MediaLib !== 'undefined' ? `${MediaLib.images().length} image${MediaLib.images().length > 1 ? 's' : ''}` : '') + ` · voir / importer / qui les utilise`, sChev, 1) +
         sRow('rowMedia','package','Médias importés', media.count ? `${media.count} fichier${media.count > 1 ? 's' : ''} · ${fmtBytes(media.size)}` : 'Aucun média importé', sChev, 1),
         `Données locales : <b>${fmtBytes(localSize)}</b> · chapitres : <b>${data.subjects.reduce((n, s) => n + s.chapters.length, 0)}</b> · cartes : <b>${data.subjects.reduce((n, s) => n + s.chapters.reduce((m, ch) => m + ch.cards.length, 0), 0)}</b>.`)}
 
@@ -2525,7 +2541,6 @@ function openSet(cid, push = true, tab = null){
       if (typeof PVImport !== 'undefined') PVImport.openWizard();
       else $('#impCardsF')?.click();
     });
-    bindRow('#rowImages', () => { if (typeof MediaLib !== 'undefined') MediaLib.goImages(true); });
     bindRow('#rowMedia', () => { goStats(false, { subjectId:'', chapterId:'', tab:'media' }); });
 
     /* Réglages de « Mon Drive » (connexion Google personnelle) */
@@ -2969,6 +2984,7 @@ async function init() {
     upgrade();
     applyTh();
     applyUI();
+    if(typeof Voice!=='undefined') Voice.setWanted(!!Voice.prefs().voiceOn, {silent:true});
     Nav.clear();
     goDeck(false);
 

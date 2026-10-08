@@ -33,7 +33,6 @@
   /* ══════════════════════ 1. Préférences ══════════════════════ */
   const PREF_DEFAULTS = {
     voiceOn: false,        // micro activé (mémorisé : il le reste d'une session à l'autre)
-    voiceDelay: 1200,      // délai avant la carte suivante quand la réponse est bonne
     voiceTolerance: 'normal',
     voiceLang: 'auto',
     voiceShowSpoken: true
@@ -53,7 +52,6 @@
     for (const k of Object.keys(PREF_DEFAULTS)) if (p[k] === undefined) p[k] = PREF_DEFAULTS[k];
     if (!TOL[p.voiceTolerance]) p.voiceTolerance = 'normal';
     if (!LANGS[p.voiceLang]) p.voiceLang = 'auto';
-    p.voiceDelay = M.max(0, M.min(5000, M.round(Number(p.voiceDelay) || 0)));
     return p;
   }
   function persist() {
@@ -248,7 +246,18 @@
     const parsed = parseExpected(expected);
     const slots = buildSlots(parsed, !!opts.forms);
     const spokenToks = tokenize(spoken);
-    const spokenClean = spokenToks.map(t => t.clean).filter(Boolean);
+    const spokenClean = spokenToks.map(t => t.clean);
+    // Le moteur anglais transcrit parfois « soyabeans » en « soldier bean(s) ».
+    // Variantes locales à ce mot seulement : aucun assouplissement des autres cartes.
+    const soya = parsed.toks.find(t => /^soyabeans?$|^soybeans?$/.test(t.clean));
+    if (soya) {
+      const canonical = soya.clean.endsWith('s') ? 'soyabeans' : 'soyabean';
+      spokenClean.forEach((w, i) => {
+        if (/^(soya|soldier)$/.test(w) && /^beans?$/.test(spokenClean[i + 1] || '')) {
+          spokenClean[i] = canonical; spokenClean[i + 1] = '';
+        } else if (/^soybeans?$/.test(w)) spokenClean[i] = canonical;
+      });
+    }
 
     const req = [];
     parsed.toks.forEach(t => { if (t.exigible) { t.qi = req.length; req.push(t); } });
@@ -290,7 +299,7 @@
       spoken: String(spoken || '').trim(),
       expected: parsed.raw,
       tolerance: opts.tolerance || 'normal',
-      empty: spokenClean.length === 0
+      empty: !spokenClean.some(Boolean)
     };
   }
 
@@ -330,13 +339,13 @@
     rec: null, lang: null, key: null, listen: false, eligible: false,
     text: '', interim: '', full: '', live: null, result: null,
     scorer: null, locked: false,
-    silenceT: null, graceT: null, confirmT: null, restartT: null, watchT: null, autoT: null,
+    silenceT: null, graceT: null, confirmT: null, restartT: null, watchT: null,
     fails: 0, hand: { onCommit: null, onLive: null, onState: null },
-    testing: false
+    testing: false, readyAt: 0
   };
 
   const isReviewView = () => typeof State !== 'undefined' && State.view === 'review' && State.review && !State.review.end;
-  const shouldListen = () => S.wanted && S.listen && isReviewView() && !S.blocked && SUPPORTED;
+  const shouldListen = () => S.wanted && S.listen && !S.locked && isReviewView() && !S.blocked && SUPPORTED;
 
   function clearTimers() {
     ['silenceT', 'graceT', 'confirmT'].forEach(k => { if (S[k]) { clearTimeout(S[k]); S[k] = null; } });
@@ -353,9 +362,10 @@
     rec.interimResults = true;
     rec.maxAlternatives = 1;
     rec.lang = S.lang || 'en-GB';
-    rec.onstart = () => { S.listening = true; S.starting = false; S.fails = 0; S.error = null; emit(); };
-    rec.onend = () => { S.listening = false; emit(); scheduleRestart(); };
+    rec.onstart = () => { if (S.rec !== rec) return; S.listening = true; S.starting = false; S.fails = 0; S.error = null; emit(); };
+    rec.onend = () => { if (S.rec !== rec) return; S.listening = false; emit(); scheduleRestart(); };
     rec.onerror = e => {
+      if (S.rec !== rec) return;
       const err = e && e.error;
       S.error = err || 'error';
       S.starting = false;
@@ -366,7 +376,7 @@
       }
       emit();
     };
-    rec.onresult = onResult;
+    rec.onresult = e => { if (S.rec === rec) onResult(e); };
     S.rec = rec;
     return rec;
   }
@@ -384,10 +394,10 @@
   function stop(opts) {
     opts = opts || {};
     clearTimers();
-    clearAuto();
     if (S.restartT) { clearTimeout(S.restartT); S.restartT = null; }
     if (!opts.keepWatchdog) unwatch();
     const rec = S.rec;
+    S.rec = null; // invalide immédiatement les événements tardifs de cette instance
     if (rec) { try { rec.abort(); } catch (e) {} }
     S.listening = false; S.starting = false;
     if (!opts.quiet) emit();
@@ -412,6 +422,7 @@
   function unwatch() { if (S.watchT) { clearInterval(S.watchT); S.watchT = null; } }
 
   function onResult(e) {
+    if (!shouldListen() || S.locked || !S.scorer || Date.now() < S.readyAt) return;
     let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i];
@@ -486,6 +497,10 @@
   /* ── API cycle de vie ── */
   function setWanted(on, opts) {
     opts = opts || {};
+    if (on && !S.wanted && typeof window.voiceMayEnable === 'function' && !window.voiceMayEnable()) {
+      if (typeof toast === 'function') toast('Réponse déjà affichée : activez le micro sur la prochaine carte', 'info');
+      return;
+    }
     S.wanted = !!on;
     if (typeof data !== 'undefined' && data && data.app) { prefs().voiceOn = S.wanted; if (!opts.silent) persist(); }
     if (!S.wanted) stop({ quiet: true });
@@ -510,6 +525,8 @@
   function setCard(ctx) {
     const key = ctx ? ctx.key : null;
     if (key !== S.key) {
+      stop({ quiet: true }); // ne jamais réutiliser une reconnaissance de la carte précédente
+      S.readyAt = Date.now() + 550; // laisse passer les résultats déjà en transit
       S.key = key; S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.result = null;
       S.locked = false; clearTimers();
     }
@@ -527,21 +544,22 @@
 
   function reset() {
     stop({ quiet: true });
-    S.key = null; S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.result = null;
+    S.key = null; S.readyAt = 0; S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.result = null;
     S.locked = false; S.eligible = false; S.listen = false; S.scorer = null;
   }
 
   function consume() { S.text = ''; S.interim = ''; S.full = ''; S.live = null; S.locked = false; clearTimers(); }
-  /* Verrouille l'évaluation : le retour est affiché, on attend le clic. */
-  function lock() { S.locked = true; clearTimers(); }
-
-  /* ── minuterie de passage automatique ── */
-  function armAuto(ms, fn) {
-    clearAuto();
-    if (!ms || ms <= 0) return;
-    S.autoT = setTimeout(() => { S.autoT = null; try { fn(); } catch (e) {} }, ms);
+  function restartCard() {
+    stop({quiet:true}); consume(); S.result = null;
+    S.readyAt = Date.now() + 550;
+    sync(); emit();
   }
-  function clearAuto() { if (S.autoT) { clearTimeout(S.autoT); S.autoT = null; } }
+  function dismiss() {
+    if (S.locked) return;
+    restartCard(); // annule les timers ET la transcription en attente
+  }
+  /* Verrouille l'évaluation : le retour est affiché, on attend le clic. */
+  function lock() { S.locked = true; stop({quiet:true}); }
 
   /* ══════════════════════ 4. Contexte de carte ══════════════════════ */
 
@@ -577,10 +595,11 @@
     const forms = isVerbChapter(chap) || (looksLikeForms(expected) && !parallelLists(front, expected));
     const eligible = isSpeakable(expected) && (looksLikeForms(expected) || true);
     const r = (typeof State !== 'undefined' && State.review) || {};
-    const key = [r.chapterId || '', r.start || '', card.id, r.index, r.flipped ? 'v' : 'r'].join('|');
+    const key = [r.chapterId || '', r.start || '', card.id, r.index].join('|');
     const tol = p.voiceTolerance;
     return {
-      key, card, chap, front, expected, lang, english, eligible, listen: english, forms,
+      key, card, chap, front, expected, lang, english, eligible,
+      listen: english && !r.revealedWithoutVoice && (!r.voiceResult || r.voiceRetrying), forms,
       scorer: eligible ? (txt => scoreAnswer(txt, expected, { tolerance: tol, forms })) : null
     };
   }
@@ -606,6 +625,11 @@
   }
 
   function bindMic(root) {
+    (root || D).querySelectorAll('#voiceBar').forEach(bar => {
+      bar.addEventListener('click', e => {
+        if (e.target.closest('[data-voice-dismiss]')) { e.preventDefault(); dismiss(); }
+      });
+    });
     (root || D).querySelectorAll('[data-voice-mic]').forEach(b => {
       if (b._vBound) return;
       b._vBound = true;
@@ -618,7 +642,6 @@
     });
   }
 
-  const fmtDelay = ms => ms <= 0 ? 'Immédiat' : (ms < 1000 ? ms + ' ms' : (M.round(ms / 100) / 10).toFixed(1).replace('.', ',') + ' s');
   /* Message d'écoute adapté à la langue reconnue sur la carte courante. */
   const listenHint = () => S.lang === 'fr-FR' ? 'Écoute… dictez la réponse en français.'
                        : /^en/.test(S.lang || '') ? 'Écoute… dictez la réponse en anglais.'
@@ -645,17 +668,20 @@
     } else if (res && res.ok) {
       cls += ' is-ok';
       txt = `<span class="voice-bar__score">✓ ${res.matched}/${res.total}</span>
-             <span class="voice-bar__text">Bien joué ! <span class="voice-bar__hint">carte validée${o.delayMs > 0 ? ' — suite dans ' + fmtDelay(o.delayMs) : ''}</span></span>`;
+             <span class="voice-bar__text">${o.practice ? 'Entraînement réussi — note initiale conservée.' : 'Bien joué ! Carte validée.'} Cliquez ou appuyez sur Espace pour continuer.</span>`;
     } else if (res && !res.ok) {
       cls += ' is-bad';
       if (res.manual) {
         txt = `<span class="voice-bar__score">✗ non sue</span>
-               <span class="voice-bar__text">Réponse affichée — la carte repart en révision (note 1).</span>`;
+               <span class="voice-bar__text">${o.practice ? 'Entraînement terminé — note initiale conservée.' : 'Réponse affichée — la carte repart en révision (note 1).'}</span>`;
       } else {
         const detail = res.total > 1 ? `${res.matched}/${res.total} formes · note ${frNum(res.rating)}` : 'réponse incomplète';
         txt = `<span class="voice-bar__score">✗ ${detail}</span>
-               <span class="voice-bar__text">${p.voiceShowSpoken && res.spoken ? `Vous avez dit : <span class="voice-spoken">${spokenHTML(res)}</span>` : 'Corrigez puis passez à la suite.'}</span>`;
+               <span class="voice-bar__text">${o.practice ? 'Entraînement uniquement · note initiale conservée. ' : ''}${p.voiceShowSpoken && res.spoken ? `Vous avez dit : <span class="voice-spoken">${spokenHTML(res)}</span>` : 'Corrigez puis passez à la suite.'}</span>`;
       }
+    } else if (o.revealed) {
+      cls += ' is-off';
+      txt = `<span class="voice-bar__text">Réponse déjà affichée : micro indisponible sur cette carte. Évaluez avec 1–4.</span>`;
     } else if (!st.wanted) {
       cls += ' is-off';
       txt = `<span class="voice-bar__text">Mode vocal prêt. ${o.eligible ? 'Appuyez sur le micro et dictez la réponse.' : ''}</span>`;
@@ -667,13 +693,15 @@
       const live = st.live;
       const sc = live && live.total ? `<span class="voice-bar__score">${live.matched}/${live.total}</span>` : '';
       const heard = st.interim || st.text;
-      txt = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>`;
+      txt = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
     }
     return `<div class="${cls}" id="voiceBar">
       ${micHTML()}
       <div class="voice-bar__text" id="voiceBarText">${txt}</div>
     </div>`;
   }
+
+  const dismissHTML = () => `<button type="button" class="voice-dismiss" data-voice-dismiss aria-label="Annuler la transcription" title="Annuler la transcription">${typeof ico === 'function' ? ico('x','ico--sm') : '×'}</button>`;
 
   /* Mise à jour « légère » du bandeau (sans reconstruire la carte). */
   function renderLive() {
@@ -687,7 +715,7 @@
     const sc = live && live.total ? `<span class="voice-bar__score">${live.matched}/${live.total}</span>` : '';
     const heard = st.interim || st.text;
     bar.classList.toggle('is-live', !!(st.wanted && !st.blocked));
-    t.innerHTML = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>`;
+    t.innerHTML = `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span>` : (st.listening ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
   }
 
   /* Barre d'action sous la carte, en mode vocal. */
@@ -695,9 +723,7 @@
     o = o || {};
     const res = o.result || null;
     if (res && res.ok) {
-      return `<button class="btn btn--solid btn--green voice-next" id="voiceNextBtn">
-                <span class="voice-next__fill" id="voiceNextFill"></span>
-                <span>Carte suivante</span></button>`;
+      return `<button class="btn btn--solid btn--green voice-next" id="voiceNextBtn"><span>Carte suivante</span></button>`;
     }
     if (res && !res.ok) {
       return `<div class="voice-row">
@@ -709,15 +735,6 @@
   }
 
   /* ══════════════════════ 6. Réglages ══════════════════════ */
-  function sliderHTML(id, val, min, max, step, label) {
-    const pct = ((val - min) / M.max(1e-6, max - min) * 100).toFixed(1);
-    return `<div class="s-control">
-      <button class="step-btn" type="button" id="${id}D" aria-label="Diminuer">−</button>
-      <div class="s-slider-container"><input type="range" class="s-slider" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" style="--fill:${pct}%" aria-label="${esc(label)}"></div>
-      <button class="step-btn" type="button" id="${id}I" aria-label="Augmenter">+</button>
-    </div>`;
-  }
-
   function settingsHTML() {
     const p = prefs();
     const st = state();
@@ -726,11 +743,9 @@
     return `
     <div class="settings-section" id="voiceSection">
       <div class="section-title">Révision à la voix</div>
-      ${typeof sRow === 'function' ? sRow('rowVoice', 'mic', 'Mode vocal (micro)', 'Dicter la réponse : validation automatique, correction en rouge', sToggle(!!p.voiceOn), 1) : ''}
+      ${typeof sRow === 'function' ? sRow('rowVoice', 'mic', 'Mode vocal (micro)', 'Dicter la réponse : correction automatique, puis passage manuel (clic ou Espace)', sToggle(!!p.voiceOn), 1) : ''}
       ${!SUPPORTED ? `<div class="voice-settings-note">⚠️ Ce navigateur ne fournit pas la reconnaissance vocale. Utilisez Chrome, Edge ou Safari (mobile comme ordinateur).</div>` : ''}
       ${st.blocked ? `<div class="voice-settings-note">⚠️ Micro bloqué : autorisez le microphone dans les réglages du navigateur, puis réactivez le mode vocal.</div>` : ''}
-      ${typeof sRow === 'function' ? sRow('', 'clock', 'Passer à la carte suivante après', 'Temps d\'affichage de la réponse en vert quand la carte est réussie', `<div class="s-value" id="vslDelayV">${fmtDelay(p.voiceDelay)}</div>`) : ''}
-      ${sliderHTML('vslDelay', p.voiceDelay, 0, 3000, 250, 'Délai avant la carte suivante')}
       <div class="settings-row" style="cursor:default">
         <div class="s-icon dynamic">${typeof ico === 'function' ? ico('target') : ''}</div>
         <div class="s-label"><div class="s-title">Tolérance de prononciation</div><div class="s-sub">Souple accepte les homophones (blew / blue) · Stricte exige la prononciation exacte</div></div>
@@ -760,31 +775,11 @@
 
     const rowVoice = box.querySelector('#rowVoice');
     if (rowVoice) rowVoice.onclick = () => {
-      p.voiceOn = !p.voiceOn;
-      S.wanted = p.voiceOn;
-      S.blocked = false;
-      if (p.voiceOn) start(); else stop({ quiet: true });
-      onChange(); emit(); rerender();
+      setWanted(!S.wanted, {force:true});
+      onChange(); rerender();
     };
     const rowSpoken = box.querySelector('#rowVoiceSpoken');
     if (rowSpoken) rowSpoken.onclick = () => { p.voiceShowSpoken = !p.voiceShowSpoken; onChange(); rerender(); };
-
-    /* curseur du délai */
-    const sl = box.querySelector('#vslDelay'), out = box.querySelector('#vslDelayV');
-    if (sl) {
-      const paint = (v, commit) => {
-        p.voiceDelay = v;
-        sl.value = v;
-        sl.style.setProperty('--fill', ((v - 0) / 3000 * 100).toFixed(1) + '%');
-        if (out) out.textContent = fmtDelay(v);
-        if (commit) onChange();
-      };
-      sl.oninput = () => paint(M.max(0, M.min(3000, M.round(+sl.value))), false);
-      sl.onchange = () => paint(M.max(0, M.min(3000, M.round(+sl.value))), true);
-      const dec = box.querySelector('#vslDelayD'), inc = box.querySelector('#vslDelayI');
-      if (dec) dec.onclick = e => { e.stopPropagation(); paint(M.max(0, p.voiceDelay - 250), true); };
-      if (inc) inc.onclick = e => { e.stopPropagation(); paint(M.min(3000, p.voiceDelay + 250), true); };
-    }
 
     const chips = (id, prop) => {
       const c = box.querySelector('#' + id);
@@ -840,13 +835,12 @@
     looksLikeForms, buildSlots, parseExpected, cardContext, isSpeakable, isEnglishChapter, isVerbChapter,
     /* cycle de vie */
     setWanted, toggle, setCard, sync, syncView, reset, consume, stop, start, lock,
-    armAuto, clearAuto,
+    restartCard, dismiss,
     attach(handlers) { S.hand = Object.assign(S.hand, handlers || {}); },
     /* interface */
     state, micHTML, bindMic, barHTML, actionsHTML, renderLive,
     settingsHTML, bindSettings,
     prefs: prefs,
-    fmtDelay,
     _internal: S
   };
   window.Voice = api;
