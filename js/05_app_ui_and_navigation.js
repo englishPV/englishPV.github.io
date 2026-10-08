@@ -1830,6 +1830,7 @@ function renRev(){
         </div>
         <div class="review-hint">
           <span><kbd>Espace</kbd> ${vres ? 'carte suivante' : voiceEval ? 'je ne sais pas' : 'retourner'}</span>
+          ${!vres && voiceEval ? '<span><kbd>Entrée</kbd> valider ma réponse</span>' : ''}
           ${!vres && !voiceEval ? '<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>' : ''}
         </div>
       </div>
@@ -1855,9 +1856,11 @@ function renRev(){
   let lastTap = 0;
   const scrollerEl = $('.review-scroller');
   if(scrollerEl) scrollerEl.addEventListener('click', e => {
-    if(e.target.closest('img')) return;
+    if(e.target.closest('img, a, button, input, textarea, select')) return;
+    if(window.getSelection?.().toString()) return;
     const now = Date.now();
-    if(now - lastTap < 300 && !r.flipped) revealAnswer();
+    const touch = e.pointerType === 'touch' || e.sourceCapabilities?.firesTouchEvents;
+    if((!touch || now - lastTap < 300) && !r.flipped) revealAnswer();
     lastTap = now;
   });
 
@@ -2097,7 +2100,15 @@ function voiceRetry(){
 /* Raccourcis clavier pendant un retour vocal (appelé par js/09_shell.js). */
 function voiceKeyAction(e){
   const r=State.review;
-  if(!r || !r.voiceResult) return false;
+  if(!r) return false;
+  if(e.key === 'Enter' && voiceActive() && !r.revealedWithoutVoice &&
+      (!r.voiceResult || r.voiceRetrying) && Voice.state().eligible){
+    e.preventDefault();
+    if(!e.repeat) Voice.submit();
+    return true;
+  }
+  if(!r.voiceResult) return false;
+  if(e.repeat){ e.preventDefault(); return true; }
   if(r.voiceRetrying && (e.key===' ' || e.key==='Enter')){
     e.preventDefault(); voiceAdvance(); return true;
   }
