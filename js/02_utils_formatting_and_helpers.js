@@ -236,6 +236,14 @@ function ensureLB(){
 function openLB(img,sc){ ensureLB(); const l=[...sc.querySelectorAll('img')]; LB.imgs=l.map(i=>({src:i.currentSrc||i.src,alt:i.alt||'',w:i.naturalWidth||800,h:i.naturalHeight||600})); LB.idx=M.max(0,l.indexOf(img)); LB.el.classList.add('open'); D.body.dataset._ov=D.body.style.overflow||''; D.body.style.overflow='hidden'; LB.el.focus?.(); showLB(LB.idx,!0) }
 function closeLB(){ LB.el.classList.remove('open'); LB.imgs=[]; LB.idx=0; D.body.style.overflow=D.body.dataset._ov||'' }
 function safeCloseLB(){ try{if(LB?.el?.classList.contains('open'))closeLB()}catch(e){} }
+/* Sortir proprement du Drive. Indispensable aux vues flashcards : tant que le
+   Drive est ouvert, goDeck() est détourné par Drive (hookBackButton) pour ne
+   pas écraser son affichage → sans cet appel, un clic sur « Mes decks » dans
+   le menu latéral ne faisait rien et laissait la mise en page drive-open. */
+function exitDrive(){ try{ if(typeof Drive!=='undefined' && Drive && Drive.isOpen) Drive.close({silent:!0}) }catch(e){} try{ const v=D.getElementById('view'); if(v) v.classList.remove('drive-open') }catch(e){} }
+/* Ferme les calques qui pourraient recouvrir le menu latéral (lightbox, modales
+   du Drive, menu des matières) : sinon l'écran s'assombrit « pour rien ». */
+function closeOverlays(){ safeCloseLB(); try{ if(typeof Drive!=='undefined' && Drive.closeModals) Drive.closeModals() }catch(e){} try{ const m=D.getElementById('subjectMenu'); if(m) m.style.display='none' }catch(e){} }
 function showLB(i,init=!1){ if(!LB.imgs.length)return; LB.idx=(i+LB.imgs.length)%LB.imgs.length; const t=LB.imgs[LB.idx]; LB.img.src=t.src; LB.img.alt=t.alt; LB.bw=t.w; LB.bh=t.h; if(LB.cnt)LB.cnt.textContent=`${LB.idx+1}/${LB.imgs.length}`; refitLB(init) }
 function refitLB(init=!1){ const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight, fit=M.min(sw/LB.bw,sh/LB.bh); LB.mnS=fit; if(init){LB.s=fit;LB.x=(sw-LB.s*LB.bw)/2;LB.y=(sh-LB.s*LB.bh)/2;applyLB()}else setLBScale(fit,!0) }
 function applyLB(){ const sw=LB.stage.clientWidth, sh=LB.stage.clientHeight, w=LB.s*LB.bw, h=LB.s*LB.bh; LB.x=w<=sw?(sw-w)/2:clamp(LB.x,sw-w,0); LB.y=h<=sh?(sh-h)/2:clamp(LB.y,sh-h,0); LB.cnv.style.width=LB.bw+'px'; LB.cnv.style.height=LB.bh+'px'; LB.cnv.style.transform=`translate(${LB.x}px,${LB.y}px) scale(${LB.s})` }

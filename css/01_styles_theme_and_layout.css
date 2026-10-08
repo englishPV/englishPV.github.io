@@ -374,19 +374,24 @@ main#view { grid-row: 3; }
 .bottom-actions { grid-row: 4; }
 .revision-bar, .review-actions-bar { grid-row: 5; }
 
-/* Tiroir mobile (sidebar) */
+/* Tiroir mobile (sidebar)
+   z-index au-dessus de TOUS les calques (lightbox 10000, modales Drive 11000) :
+   le menu doit toujours apparaître quand on appuie sur le bouton ☰, sinon
+   l'écran s'assombit et « rien ne se passe ». */
 .drawer-scrim {
-  position: fixed; inset: 0; z-index: 900;
+  position: fixed; inset: 0; z-index: 11998;
   background: rgb(4 6 12 / .55);
   backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
   opacity: 0; pointer-events: none; transition: opacity var(--t-base) var(--ease);
 }
 .drawer-scrim.is-open { opacity: 1; pointer-events: auto; }
+/* Sur ordinateur la barre est déjà visible : jamais de voile noir orphan. */
+@media (min-width: 1000px) { .drawer-scrim { display: none; } }
 
 @media (max-width: 999px) {
   .sidebar {
     display: flex; flex-direction: column; gap: var(--sp-2);
-    position: fixed; z-index: 901; inset: 0 auto 0 0;
+    position: fixed; z-index: 11999; inset: 0 auto 0 0;
     width: min(84vw, 320px);
     padding: calc(14px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
     border-right: 1px solid var(--border);

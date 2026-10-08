@@ -388,7 +388,7 @@ function bindSz() {
 
 /* --- VIEWS --- */
 function goDeck(push=true){
-  safeCloseLB(); Media.revokeAll(); clearMathCache();
+  exitDrive(); safeCloseLB(); Media.revokeAll(); clearMathCache();
   if(push) Nav.push(); State.view='deck'; State.chapterId=null; 
   const s=getSub(); setTop({title:`Deck • ${s.emoji?s.emoji+' ':''}${s.title}`, showBack: selectionMode || expandedFolders.size > 0}); setBot({actions:!1, revision:!1}); hideRevAct();
   let needsSave = false; if (checkExpiredDates(ensGrps(s))) needsSave = true; if (checkExpiredDates(s.chapters)) needsSave = true; if (needsSave) debouncedSave();
@@ -1193,7 +1193,7 @@ function openGrp(s, gid) {
 }
 
 function goChapter(id,push=true){
-  safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
+  exitDrive(); safeCloseLB(); Media.revokeAll(); clearMathCache(); if(push)Nav.push(); State.view='chapter'; State.chapterId=id; const c=getCh(id); if(!c){Nav.back();return} setTop({title:c.title}); updRevBar(c); hideRevAct(); const k=c.stats.gradeCounts||getLive(c), sel=c.filters.grades, v=$('#view');
   const dailyCalc = getDailyGoalCalc(c);
   const last7=getLastN(c,7), lbls7=getLbls(7), max7=M.max(1,...last7);
 
@@ -1311,7 +1311,7 @@ function goCards(cid, push = true, ...rest){
 }
 
 async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scrollToCardId=null){
-  safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.cardsMode='chapter'; State.chapterId=cid; 
+  exitDrive(); safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='cards'; State.cardsMode='chapter'; State.chapterId=cid; 
   $('#app').classList.remove('focus-mode');
   const c=getCh(cid), pool=c.cards.filter(x=>cardPassesFilter(x,c.filters)), v=$('#view'); 
   setTop({title:`${c.title} • Cartes`}); setBot({actions:!1,revision:!1}); hideRevAct();
@@ -1637,7 +1637,7 @@ function openCardEditor(chapter, existingCard, onSave) {
 }
 function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.find(c=>c.id===cid);return(ch?.stats?.dailyLog?.[k]||[]).map(e=>({...e,_chapId:cid}))}) }
 
-function goReview(push=true){ safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; $('#app').classList.toggle('focus-mode', data.app.prefs.focusMode); renRev() }
+function goReview(push=true){ exitDrive(); safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; $('#app').classList.toggle('focus-mode', data.app.prefs.focusMode); renRev() }
 
 function renRev(){
   if(State.review?.isQCM) { renQCM(); return; }
@@ -1760,7 +1760,7 @@ function subG(nxt){
 }
 
 function goRecap(push=true){
-  safeCloseLB(); Media.revokeAll();
+  exitDrive(); safeCloseLB(); Media.revokeAll();
   if(!State.review){ goDeck(!1); return }                 // aucune session en cours
   if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh((State.review.multiChaps||[])[0])||{title:'Session',stats:mkStats(0)}; setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
@@ -1796,7 +1796,7 @@ function continueOrNew(cid,queue,mode,push,isCont,extras={}){
 }
 
 function startRev(cid,push=true,isCont=false){
-  if(!cid)return;const c=getCh(cid);
+  if(!cid)return;exitDrive();const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
   let sessionSize = c.settings.sessionSize;
   if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}} sessionSize=c._goalCache.size}
@@ -1838,6 +1838,7 @@ function startSingleCardReview(chapterId, cardId, searchQuery, scrollPos) {
   goReview(false);
 }
 function startRevMulti(ids,vid,flt,push=true,isCont=false){
+  exitDrive();
   const all=ids.map(_real).filter(Boolean),pool=[];
   const seen=isCont&&State.review?new Set(State.review.queue.map(i=>i.cardId)):new Set();
   // ✅ Filtrage par type dans le mode multi
@@ -1892,7 +1893,7 @@ function openSet(cid, push = true, tab = null){
   if(!c) cid = null;
 
   if(typeof stLeaveReviewGuard === 'function' && !stLeaveReviewGuard()) return;
-  if(typeof Drive !== 'undefined' && Drive.isOpen) Drive.close();   // sortir du Drive
+  exitDrive();   // sortir du Drive
   if(push) Nav.push();
   State.view = 'settings';
   State.chapterId = cid;

@@ -12,6 +12,7 @@
 
   const sidebar = $('#sidebar');
   const scrim = $('#drawerScrim');
+  const menuBtn = $('#menuBtn');
   const navEl = $('#sidebarNav');
   const subjEl = $('#sidebarSubjects');
   const brandSub = $('#brandSub');
@@ -94,6 +95,9 @@
           closeDrawer();
           return;
         }
+        /* Quitter le Drive d'abord : ses écrans détournent goDeck() et le clic
+           semblerait sans effet. */
+        try { exitDrive(); } catch {}
         try {
           it.run();
         } catch (e) {
@@ -126,6 +130,7 @@
     $$('.subj-item', subjEl).forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.sub;
+        try { exitDrive(); } catch {}
         if (id !== data.app.currentSubjectId && typeof setSub === 'function') setSub(id);
         goDeck(false);
         closeDrawer();
@@ -137,6 +142,7 @@
       const title = prompt('Nom de la matière :');
       if (!title || !title.trim()) return;
       const emoji = prompt('Emoji (optionnel) :', '') || '';
+      try { exitDrive(); } catch {}
       const newSub = {
         id: 'sub-' + slugify(title) + '-' + Date.now(),
         title: title.trim(), emoji: emoji.trim(), chapters: [], groups: []
@@ -173,20 +179,33 @@
   /* ──────────────────────────────── Tiroir ──────────────────────────────── */
   function openDrawer() {
     if (!sidebar) return;
+    /* Le tiroir doit passer au-dessus de tout : on ferme d'abord les calques
+       (lightbox, modales du Drive, menu des matières) qui pourraient le masquer
+       et donner l'impression que le bouton ne fait rien. */
+    try { closeOverlays(); } catch { /* tant pis, on ouvre quand même */ }
     try { syncShell(); } catch { /* le tiroir doit s'ouvrir quoi qu'il arrive */ }
     sidebar.classList.add('is-open');
-    if (scrim) { scrim.hidden = false; requestAnimationFrame(() => scrim.classList.add('is-open')); }
+    /* Le voile n'a de sens qu'en mode tiroir : sur ordinateur la barre est
+       déjà visible, l'assombrir donnerait un écran « cassé » sans raison. */
+    const asDrawer = mob();
+    if (scrim) {
+      if (asDrawer) { scrim.hidden = false; requestAnimationFrame(() => scrim.classList.add('is-open')); }
+      else { scrim.classList.remove('is-open'); scrim.hidden = true; }
+    }
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
     if (typeof haptic === 'function') haptic('light');
   }
   function closeDrawer() {
     sidebar?.classList.remove('is-open');
     if (scrim) { scrim.classList.remove('is-open'); setTimeout(() => { if (!scrim.classList.contains('is-open')) scrim.hidden = true; }, 220); }
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
   }
   function toggleDrawer() {
     sidebar?.classList.contains('is-open') ? closeDrawer() : openDrawer();
   }
 
-  const menuBtn = $('#menuBtn');
+  menuBtn?.setAttribute('aria-expanded', 'false');
+  menuBtn?.setAttribute('aria-controls', 'sidebar');
   menuBtn?.addEventListener('click', e => { e.stopPropagation(); toggleDrawer(); });
   scrim?.addEventListener('click', closeDrawer);
 
@@ -239,6 +258,7 @@
      Appelée par les barres « 7 derniers jours » (goChapter). */
   window.goDaily = function (cid, key, push = true) {
     if (typeof safeCloseLB === 'function') safeCloseLB();
+    try { exitDrive(); } catch {}
     if (push) Nav.push();
     State.view = 'daily'; State.chapterId = cid; State.dailyKey = key;
     const c = typeof getCh === 'function' ? getCh(cid) : null;
