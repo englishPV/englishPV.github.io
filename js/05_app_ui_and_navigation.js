@@ -98,6 +98,11 @@ function checkExpiredDates(list) {
     return changed;
 }
 
+/* Objectif du jour lié à une date limite.
+   `goal`   = ce qu'il y avait à faire aujourd'hui (immuable dans la journée)
+   `val`    = ce qu'il RESTE à faire : on retire les cartes déjà révisées
+              aujourd'hui → si l'objectif était de 23 cartes et que 10 sont
+              faites, l'affichage passe à 13 restantes (et non 23). */
 function getDailyGoalCalc(ch) {
     if(!ch.deadline) return null;
     const now = new Date(); now.setHours(0,0,0,0);
@@ -108,8 +113,47 @@ function getDailyGoalCalc(ch) {
     if (days <= 0) days = 1;
     const k = ch.stats.gradeCounts || getLive(ch);
     let pool = k.unseen + k.echec + k.difficile, label = "cartes (Mauvaises)";
-    if (pool === 0) { pool = k.bien; label = "cartes (Bien)"; if (pool === 0) return { val: 0, text: "Objectif atteint !", pool: 0 }; }
-    return { val: Math.ceil(pool / days), text: `${label} / jour`, pool: pool };
+    if (pool === 0) {
+      pool = k.bien; label = "cartes (Bien)";
+      if (pool === 0) return { val: 0, goal: 0, done: 0, text: "Objectif atteint !", pool: 0, days };
+    }
+    const goal = Math.ceil(pool / days);
+    const done = getTod(ch);                       // cartes révisées aujourd'hui
+    const remain = M.max(0, goal - done);
+    return { val: remain, goal, done, text: `${label} / jour`, pool: pool, days: days };
+}
+
+/* Bandeau « révision à la voix » : visible sur les chapitres d'anglais. */
+function chapterVoiceHTML(c){
+  if(typeof Voice==='undefined' || !c || !Voice.isEnglishChapter(c)) return '';
+  const st = Voice.state();
+  const msg = !st.supported
+    ? 'Reconnaissance vocale indisponible sur ce navigateur (Chrome, Edge ou Safari conseillé).'
+    : st.wanted
+      ? 'Mode vocal <b>activé</b> — le micro reste allumé pendant toute la révision, même après « Continuer la session ».'
+      : 'Réviser à la voix : dictez la réponse, elle est validée automatiquement.';
+  return `<div class="voice-bar ${st.wanted ? 'is-live' : 'is-off'}" id="chapVoiceBar" style="margin-top:10px">
+      ${Voice.micHTML('lg')}
+      <div class="voice-bar__text">${msg}</div>
+    </div>`;
+}
+function bindChapterVoice(root, cid){
+  if(typeof Voice==='undefined' || !root || !root.querySelector) return;
+  Voice.bindMic(root);
+  const b = root.querySelector('#voiceMicBtn');
+  if(b && !b._vRe){
+    b._vRe = true;
+    b.addEventListener('click', () => setTimeout(() => { if(State.view==='chapter') goChapter(cid, false); }, 160));
+  }
+}
+
+/* Ligne d'objectif affichée dans le chapitre et dans les réglages. */
+function goalLineHTML(calc, avail){
+  if(!calc) return '';
+  const main = calc.val > 0
+    ? `Objectif du jour : <b>${calc.val}</b> restante${calc.val > 1 ? 's' : ''} <span class="goal-of">/ ${calc.goal}</span>`
+    : `Objectif atteint <b>✓</b> <span class="goal-of">(${calc.goal} carte${calc.goal > 1 ? 's' : ''} aujourd'hui)</span>`;
+  return `<span>${main}</span><span>Reste <b>${avail}</b> cartes</span>`;
 }
 
 const backBtn=$('#backBtn'), titleEl=$('#title'), botAct=$('#bottomActions'), revBar=$('#revisionBar'), startBtn=$('#startReviewBtn');
@@ -216,9 +260,14 @@ $('#cardsBtn').onclick = () => goAllCards();
 $('#settingsBtn').onclick = () => openSet(State.chapterId); 
 startBtn.onclick = () => startRev(State.chapterId);
 
-function setTop({title,showBack}){ backBtn.classList.toggle('hidden',showBack===!1); if(title)titleEl.textContent=title }
+function setTop({title,showBack}){
+  backBtn.classList.toggle('hidden',showBack===!1);
+  if(title)titleEl.textContent=title;
+  /* Point de passage de toutes les vues : coupe le micro hors révision. */
+  if(typeof Voice!=='undefined') Voice.syncView(State.view);
+}
 function setBot({actions,revision,sz=10,en=true,av=null,cid=null}){ botAct.style.display=actions?'grid':'none'; revBar.style.display=revision?'block':'none'; $('#app').style.setProperty('--row-actions',actions?'52px':'0px'); $('#app').style.setProperty('--row-rev',revision?'64px':'0px'); if(av==null&&cid){const c=getCh(cid);av=c?cntAv(c):0} startBtn.textContent=`Révision • ${av>0?M.min(sz,av):sz} cartes${revision&&(av>0)?` • ${av} dispo`:''}`; startBtn.disabled=!en||(av||0)<=0 }
-function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.cardsMode==='all'?null:State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push,State.setTab); else if(State.view==='stats')goStats(push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push); else if(State.view==='dailyAll')goDayAll(State.dailyKey,push) }
+function render(push=true){ if(State.view==='deck')goDeck(push); else if(State.view==='chapter')goChapter(State.chapterId,push); else if(State.view==='cards')goCards(State.cardsMode==='all'?null:State.chapterId,push); else if(State.view==='review')goReview(push); else if(State.view==='recap')goRecap(push); else if(State.view==='settings')openSet(State.chapterId,push,State.setTab); else if(State.view==='stats')goStats(push); else if(State.view==='daily')goDaily(State.chapterId,State.dailyKey,push); else if(State.view==='dailyAll')goDayAll(State.dailyKey,push); else if(State.view==='images'&&typeof MediaLib!=='undefined')MediaLib.view(); else if(State.view==='pdrive'&&typeof PDrive!=='undefined')PDrive.view() }
 const hideRevAct = () => { $('#reviewActionsBar').style.display='none' };
 
 /* --- SELECTION & GESTURES --- */
@@ -409,6 +458,7 @@ function goDeck(push=true){
             <button class="btn ${selectionMode?'btn--primary':'btn--outline'} btn--sm" id="editModeBtn">
               ${ico(selectionMode?'check':'pencil')}<span>${selectionMode?'Terminer':'Éditer'}</span>
             </button>
+            <button class="btn btn--outline btn--sm" id="imgB">${ico('image')}<span>Images</span></button>
             <button class="btn btn--outline btn--sm" id="impB">${ico('upload')}<span>Importer</span></button>
             <button class="btn btn--outline btn--sm btn--icon" id="setB" title="Paramètres" aria-label="Paramètres">${ico('settings')}</button>
             <input id="impI" type="file" class="hidden" accept="*/*" multiple />
@@ -441,8 +491,14 @@ function goDeck(push=true){
   };
   const impBtn = $('#impB');
   const impInput = $('#impI');
-  if (impBtn && impInput) { impBtn.onclick = () => impInput.click(); }
-  $('#impI').onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
+  /* « Importer » ouvre l'assistant : fichier (Anki/CSV/JSON/images) OU texte écrit. */
+  if (impBtn) impBtn.onclick = () => {
+    if (typeof PVImport !== 'undefined') PVImport.openWizard();
+    else if (impInput) impInput.click();
+  };
+  if (impInput) impInput.onchange = async e => { try { await importFiles([...e.target.files]); toast('Import terminé !', 'success'); goDeck(!1); } catch(x) { toast('Erreur import', 'error'); } finally { e.target.value=''; } };
+  const imgBtn = $('#imgB');
+  if (imgBtn) imgBtn.onclick = () => { if (typeof MediaLib !== 'undefined') MediaLib.goImages(true); };
   
   $('#editModeBtn').onclick = () => {
     if(selectionMode) { exitSelectionMode(); } else { selectionMode = true; selectedIds.clear(); goDeckKeepScroll(); }
@@ -453,6 +509,42 @@ function goDeck(push=true){
     if(selectionMode) renderFABs();
   bindDeckNew();
   bindGlobalSearch();
+}
+
+/* ══════════════ TRI DES DECKS : dernière activité en premier ══════════════
+   Un chapitre « remonte tout en haut » dès qu'on le révise (lastUsed) ou, à
+   défaut, dès qu'une de ses cartes a été révisée. Le journal des révisions sert
+   de dernier repli : l'ordre reste donc juste même sur une sauvegarde ancienne
+   où lastUsed/lastReviewed auraient été perdus. */
+function chapLastActivity(c, memo){
+  if(!c) return 0;
+  if(memo && memo.has(c.id)) return memo.get(c.id);
+  let t = c.lastUsed || 0;
+  const cards = c.cards || [];
+  for(let i = 0; i < cards.length; i++){ const r = cards[i].lastReviewed || 0; if(r > t) t = r; }
+  const log = c.stats && c.stats.dailyLog;
+  if(log){
+    const days = Object.keys(log).sort().reverse();     // clés ISO → tri = chronologie
+    for(const d of days){
+      const day = log[d];
+      if(!day || !day.length) continue;
+      for(let i = 0; i < day.length; i++){ const ts = day[i].ts || 0; if(ts > t) t = ts; }
+      break;                                            // le jour le plus récent suffit
+    }
+  }
+  if(memo) memo.set(c.id, t);
+  return t;
+}
+function grpLastActivity(s, g, memo){
+  if(!g) return 0;
+  const key = 'g:' + g.id;
+  if(memo && memo.has(key)) return memo.get(key);
+  let t = g.lastUsed || 0;
+  if(memo) memo.set(key, t);                            // garde-fou (dossiers imbriqués)
+  (g.chapIds || []).forEach(id => { const v = chapLastActivity(s.chapters.find(c => c.id === id), memo); if(v > t) t = v; });
+  (g.childGroupIds || []).forEach(id => { const v = grpLastActivity(s, findGrp(s, id), memo); if(v > t) t = v; });
+  if(memo) memo.set(key, t);
+  return t;
 }
 
 function buildDeckItems(s, parentGid, depth) {
@@ -481,19 +573,20 @@ function buildDeckItems(s, parentGid, depth) {
     levelChapters = parentG ? parentG.chapIds.map(id => s.chapters.find(c=>c.id===id)).filter(Boolean) :[];
   }
   
-  const sorter = (a, b) => { 
+  const memo = new Map();
+  const sorter = (a, b, ta, tb) => { 
     const aDeadline = a.deadline || null;
     const bDeadline = b.deadline || null;
     if (aDeadline && !bDeadline) return -1; if (!aDeadline && bDeadline) return 1; 
     if (aDeadline && bDeadline) { const diff = new Date(aDeadline) - new Date(bDeadline); if (diff !== 0) return diff; }
-    return (b.lastUsed || 0) - (a.lastUsed || 0); 
+    return (tb || 0) - (ta || 0);                       // modifié/révisé le plus récemment en haut
   };
   
-  const groupItems = levelGroups.map(g => ({type:'group', group:g, depth}));
-  const chapItems = levelChapters.map(c => ({type:'chapter', chapter:c, depth, parentGid}));
+  const groupItems = levelGroups.map(g => ({type:'group', group:g, depth, _t: grpLastActivity(s, g, memo)}));
+  const chapItems = levelChapters.map(c => ({type:'chapter', chapter:c, depth, parentGid, _t: chapLastActivity(c, memo)}));
   
-  groupItems.sort((a,b) => sorter(a.group, b.group));
-  chapItems.sort((a,b) => sorter(a.chapter, b.chapter));
+  groupItems.sort((a,b) => sorter(a.group, b.group, a._t, b._t));
+  chapItems.sort((a,b) => sorter(a.chapter, b.chapter, a._t, b._t));
   
   for(const gi of groupItems) {
     items.push(gi);
@@ -1250,7 +1343,8 @@ function goChapter(id,push=true){
           <label class="field-label" for="deadlineInput">Date limite de révision</label>
           <input type="date" id="deadlineInput" class="input" value="${c.deadline||''}">
         </div>
-        ${dailyCalc?`<div class="goal-line" id="goalDisplay"><span>Objectif : <b>${c._goalCache?.size||dailyCalc.val}</b>/jour</span><span>Reste <b>${cntAv(c)}</b> cartes disponibles</span></div>`:''}
+        ${dailyCalc?`<div class="goal-line" id="goalDisplay">${goalLineHTML(dailyCalc, cntAv(c))}</div>`:''}
+        ${chapterVoiceHTML(c)}
       </div>
     </div>`;
 
@@ -1278,18 +1372,17 @@ function goChapter(id,push=true){
     if (typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     const newCalc = getDailyGoalCalc(c);
     const goalEl = $('#goalDisplay');
-    if (newCalc && newCalc.val > 0) {
-      const html = `<span>Objectif fixé: <b>${newCalc.val}</b>/jour</span><span>Reste: <b>${cntAv(c)}</b> dispo</span>`;
+    const gHtml = goalLineHTML(newCalc, cntAv(c));
+    if (newCalc && gHtml) {
       if (goalEl) {
-        goalEl.innerHTML = html;
+        goalEl.innerHTML = gHtml;
       } else {
         const container = e.target.closest('.mt8');
         if (container) {
           const div = D.createElement('div');
-          div.className = 'mt6';
+          div.className = 'goal-line';
           div.id = 'goalDisplay';
-          div.style.cssText = 'font-size:13px;color:var(--primary);display:flex;justify-content:space-between';
-          div.innerHTML = html;
+          div.innerHTML = gHtml;
           container.appendChild(div);
         }
       }
@@ -1299,10 +1392,17 @@ function goChapter(id,push=true){
     updRevBar(c);
   };
 
+  bindChapterVoice(v, id);
   botAct.style.gridTemplateColumns=''; botAct.innerHTML=`<button class="action btn" id="cardsBtn">Cartes</button><button class="action btn" id="settingsBtn">Paramètres</button>`; $('#cardsBtn').onclick=()=>goCards(State.chapterId); $('#settingsBtn').onclick=()=>openSet(State.chapterId,true,'general');
   if(isMathChapter()){const det=data.app.prefs.mathDetail;botAct.innerHTML=`<button class="action btn" id="cb2">Cartes</button><button class="action btn ${det?'btn--primary':''}" id="db2">${det?'✓ ':''}Détail</button><button class="action btn" id="sb2">Paramètres</button>`;botAct.style.gridTemplateColumns='1fr 1fr 1fr';$('#cb2').onclick=()=>goCards(State.chapterId);$('#sb2').onclick=()=>openSet(State.chapterId,true,'general');$('#db2').onclick=()=>{data.app.prefs.mathDetail=!data.app.prefs.mathDetail;saveData();goChapter(c.id,false)};}
 }
-function updRevBar(c){ const n=cntAv(c); setBot({actions:!0,revision:!0,sz:c.settings.sessionSize,en:c.cards.length>0,av:n,cid:c.id}) }
+function updRevBar(c){
+  const n=cntAv(c);
+  /* Avec une date limite, le bouton annonce ce qu'il RESTE à faire aujourd'hui. */
+  let sz=c.settings.sessionSize;
+  if(c.deadline){ const g=getDailyGoalCalc(c); if(g && g.val>0) sz=g.val; }
+  setBot({actions:!0,revision:!0,sz,en:c.cards.length>0,av:n,cid:c.id})
+}
 
 /* Aiguillage : sans chapitre → navigateur de cartes global (menu « Cartes ») */
 function goCards(cid, push = true, ...rest){
@@ -1359,7 +1459,8 @@ async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scr
           const {f,b} = getSides(x,c), el = D.createElement('div');
           el.className = `card-block grade-${x.grade||'unseen'}`; el.dataset.id = x.id;
           const msC=getMathSimple(x), bContent=(!data.app.prefs.mathDetail&&msC)?formatText(msC):formatText(b);
-          el.innerHTML = `<div class="term">${formatText(f)}</div><div class="definition">${bContent}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
+          el.innerHTML = `<button class="cb-edit" type="button" title="Modifier la carte" aria-label="Modifier la carte">${ico('pencil','ico--xs')}</button>
+            <div class="term">${formatText(f)}</div><div class="definition">${bContent}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
           grid.appendChild(el);
        });
     }
@@ -1387,7 +1488,7 @@ async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scr
 
   cg.addEventListener('pointerdown', e => {
     const block = e.target.closest('.card-block');
-    if(!block || e.target.closest('img')) return;
+    if(!block || e.target.closest('img') || e.target.closest('.cb-edit')) return;
     lpX = e.clientX; lpY = e.clientY; lpDid = false;
     lpTimer = setTimeout(() => {
       lpDid = true;
@@ -1408,6 +1509,14 @@ async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scr
 
   // Click → flip (bloqué après un appui long)
   cg.onclick = e => {
+    /* Crayon → édition complète de la carte (texte + images) */
+    const edit = e.target.closest('.cb-edit');
+    if(edit) {
+      const block = edit.closest('.card-block');
+      const card = c.cards.find(x => x.id === block?.dataset.id);
+      if(card) openCardEditor(c, card, () => goCardsChapter(cid, false, $('#cardSearch')?.value || '', cg.scrollTop || 0));
+      return;
+    }
     if(lpDid) { lpDid = false; return; }
     const b = e.target.closest('.card-block');
     if(b) {
@@ -1510,6 +1619,13 @@ function openCardEditor(chapter, existingCard, onSave) {
         <div class="card-editor-preview" id="ceBackPreview"></div>
       </div>
       
+      <div class="ce-img-actions">
+        <button class="btn btn--outline btn--sm" id="ceImgBtn">${ico('image','ico--sm')}<span>Image</span></button>
+        <span class="ce-img-hint">Insère une image au curseur : bibliothèque, import, ou Mon Drive.</span>
+      </div>
+      <div class="ce-imgs" id="ceFrontImgs"></div>
+      <div class="ce-imgs" id="ceBackImgs"></div>
+
       <div class="latex-toolbar">${toolbarHTML}</div>
     </div>
     <div class="card-editor-footer">
@@ -1590,6 +1706,45 @@ function openCardEditor(chapter, existingCard, onSave) {
   backTA.oninput = updatePreview;
   if(isEdit) updatePreview();
 
+  /* ── Images de la carte (recto / verso) ─────────────────────────────
+     « Image » ouvre le sélecteur (bibliothèque, import, Mon Drive) et
+     insère <img src="media://clé"> au curseur. Les vignettes sous chaque
+     zone permettent de retirer une image en un clic. */
+  const frontImgs = $('#ceFrontImgs'), backImgs = $('#ceBackImgs');
+  function insertAtCursor(ta, snippet) {
+    const start = ta.selectionStart ?? ta.value.length, end = ta.selectionEnd ?? start;
+    ta.value = ta.value.slice(0, start) + snippet + ta.value.slice(end);
+    ta.focus();
+    const pos = start + snippet.length;
+    ta.setSelectionRange(pos, pos);
+    updatePreview(); refreshImgs();
+  }
+  function refreshImgs() {
+    if (typeof MediaLib === 'undefined') { frontImgs.innerHTML = backImgs.innerHTML = ''; return; }
+    [['front', frontImgs, frontTA], ['back', backImgs, backTA]].forEach(([face, box, ta]) => {
+      const refs = MediaLib.refsIn(ta.value);
+      box.innerHTML = refs.map(r =>
+        `<div class="ce-img" data-key="${r.key}" data-face="${face}" title="${r.known ? '' : 'média manquant : '}${r.name}">
+           ${r.known ? `<img src="media://${r.key}" alt="${r.name}">` : `<div class="ce-img__miss">?</div>`}
+           <button type="button" title="Retirer cette image">×</button>
+         </div>`).join('');
+      box.onclick = e => {
+        const b = e.target.closest('.ce-img button'); if (!b) return;
+        const tile = b.closest('.ce-img');
+        ta.value = MediaLib.removeRefFrom(ta.value, tile.dataset.key);
+        updatePreview(); refreshImgs();
+      };
+    });
+    Media.resolve(overlay);
+  }
+  refreshImgs();
+  $('#ceImgBtn').onclick = async () => {
+    if (typeof MediaLib === 'undefined') { toast('Bibliothèque indisponible', 'error'); return; }
+    const pick = await MediaLib.pickImage();
+    if (!pick) return;
+    insertAtCursor(activeTA, `<img src="media://${pick.key}" alt="${String(pick.name || '').replace(/"/g, '')}">`);
+  };
+
   // Close
   const close = () => overlay.remove();
   $('#ceClose').onclick = close;
@@ -1626,6 +1781,7 @@ function openCardEditor(chapter, existingCard, onSave) {
     }
 
     syncG(chapter);
+    chapter.lastUsed = Date.now();      // carte ajoutée/modifiée → le chapitre remonte en haut du deck
     saveData();
     if(typeof FireSync !== 'undefined' && FireSync.isConnected) FireSync.pushToCloud();
     close();
@@ -1647,6 +1803,17 @@ function renRev(){
     ? `<button id="undoBtn" title="Annuler la dernière évaluation">${ico('rotate-ccw','ico--sm')}</button>` : '';
   const chapLabel = r.mode === 'multi' ? 'Multi-chapitres · ' + chap.title : chap.title;
 
+  /* ── Mode vocal (chapitres d'anglais) ── */
+  const vctx = voiceCtxOf(card, chap);
+  const voiceChapter = !!vctx;
+  const voiceWanted = voiceActive();
+  const vres = r.voiceResult || null;
+  const voiceEval = !!(vctx && vctx.eligible && voiceWanted);       // dictée active
+  const answerHTML = (vres && !vres.manual) ? Voice.answerHTML(b, vres) : bT;
+  const voiceBar = voiceChapter
+    ? Voice.barHTML({ english:true, eligible:vctx.eligible, result:vres, delayMs:Voice.prefs().voiceDelay })
+    : '';
+
   v.innerHTML = `
     <div class="review-wrap">
       <div class="progress-bar" style="width:${progress}%"></div>
@@ -1659,14 +1826,16 @@ function renRev(){
           ? `<div class="term" data-face="${ff ? 'front' : 'back'}">${fT}</div>`
           : `<div class="stack">
                <div class="term" data-face="front">${fT}</div>
-               <div class="definition" data-face="back">${bT}</div>
+               <div class="definition" data-face="back">${answerHTML}</div>
              </div>`}
         </div>
         <div class="review-hint">
-          <span><kbd>Espace</kbd> retourner</span>
-          <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>
+          <span><kbd>Espace</kbd> ${voiceEval ? 'je ne sais pas' : 'retourner'}</span>
+          ${voiceEval ? (vres ? '<span><kbd>Espace</kbd> carte suivante</span>' : '<span>ou dictez la réponse</span>')
+                      : '<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>'}
         </div>
       </div>
+      ${voiceBar}
     </div>`;
 
   const finishSetup = async () => {
@@ -1679,19 +1848,52 @@ function renRev(){
   finishSetup();
   if(r.history.length && $('#undoBtn')) $('#undoBtn').onclick = undoRev; 
   
+  /* Retourner = « je ne sais pas » en mode vocal (la note est posée par le micro) */
+  const revealAnswer = () => {
+    if(voiceEval && !r.flipped){ haptic('light'); voiceDontKnow(); return; }
+    haptic('light'); r.flipped = true; renRev();
+  };
+
   let lastTap = 0;
   const scrollerEl = $('.review-scroller');
   if(scrollerEl) scrollerEl.addEventListener('click', e => {
     if(e.target.closest('img')) return;
     const now = Date.now();
-    if(now - lastTap < 300 && !r.flipped) { haptic('light'); r.flipped = true; renRev(); }
+    if(now - lastTap < 300 && !r.flipped) revealAnswer();
     lastTap = now;
   });
 
+  /* Branchement du moteur vocal sur la carte courante */
+  if(voiceChapter){
+    Voice.attach({
+      onState: () => Voice.renderLive(),
+      onCommit: (text, res, kind) => voiceCommit(res, kind)
+    });
+    Voice.setCard(vctx);
+    Voice.bindMic(v);
+    if(vres) Voice.lock();                     // retour affiché → dictée figée
+    if(vres && vres.ok){
+      const fill = $('#voiceNextFill');
+      const d = Voice.prefs().voiceDelay;
+      if(fill && d > 0){
+        fill.style.transition = 'none'; fill.style.width = '0%';
+        requestAnimationFrame(() => { fill.style.transition = `width ${d}ms linear`; fill.style.width = '100%'; });
+      }
+    }
+  } else if(typeof Voice!=='undefined'){
+    Voice.setCard(null);
+  }
+
   const bar=$('#reviewActionsBar');
-  if(!r.flipped){
-      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">${ico('eye','ico--sm')}<span>Afficher la réponse</span></button>`;
-      $('#flipBtn').onclick=()=>{haptic('light');r.flipped=!0;renRev()}
+  if(vres){
+    /* Retour vocal : pas d'auto-évaluation, on clique pour continuer. */
+    bar.innerHTML = Voice.actionsHTML({ result:vres });
+    const nb = $('#voiceNextBtn'); if(nb) nb.onclick = () => voiceAdvance();
+    const rb = $('#voiceRetryBtn'); if(rb) rb.onclick = () => voiceRetry();
+  } else if(!r.flipped){
+      const label = voiceEval ? 'Je ne sais pas — voir la réponse' : 'Afficher la réponse';
+      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">${ico(voiceEval?'mic-off':'eye','ico--sm')}<span>${label}</span></button>`;
+      $('#flipBtn').onclick = revealAnswer;
   } else {
       const GU = [['echec','circle-x','Échec','1'],['difficile','circle-alert','Difficile','2'],['bien','circle-check','Bien','3'],['facile','zap','Facile','4']];
       bar.innerHTML=`<div class="row-4">${GU.map(([g,ic,lab,k])=>`<button class="btn ${GB[g]}" id="g_${g}" data-grade="${g}">${ico(ic,'ico--sm')}<span>${lab}</span><kbd class="grade-kbd">${k}</kbd></button>`).join('')}</div>`;
@@ -1699,19 +1901,29 @@ function renRev(){
   }
 }
 
-function subG(nxt){
-  const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return}
-  haptic(nxt === 'facile' ? 'success' : nxt === 'echec' ? 'error' : 'light'); 
+/* Enregistre une évaluation (mêmes effets que l'ancien subG) SANS passer à la
+   carte suivante : indispensable au mode vocal (retour affiché, carte bloquée
+   jusqu'au clic « Carte suivante »). ratingOverride = note fractionnaire FSRS. */
+function applyGrade(nxt, ratingOverride){
+  const r=State.review, now=Date.now(), {card,chap}=getCur(); if(!card||!chap){goDeck(!1);return null}
 
   r.history.push({ idx: r.index, cardState: deepClone(card), statsState: deepClone(chap.stats), ansIdx: r.answers.length });
   const ms=M.max(0,now-(r.cardStart||now)), prev=card.grade||'unseen', wZ=!chap.stats.gradeCounts[nxt];
   card.grade=nxt; syncG(chap); card.perfEma=(1-.3)*(card.perfEma??.5)+.3*(nxt==='facile'?1:nxt==='bien'?0.75:nxt==='difficile'?0.35:0);
-  schNx(card,nxt,now); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
+  schNx(card,nxt,now,ratingOverride); card.lastReviewed=now; card.lastMs=ms; card.avgMs=card.avgMs?M.round(card.avgMs*.7+ms*.3):ms; card.timesReviewed++;
   if(isSucc(nxt))card.successes++;else card.failures++; chap.stats.totalReviews++; const k=todayKey();
   chap.stats.dailyReviews[k]=(chap.stats.dailyReviews[k]||0)+1; chap.stats.dailyDurMs[k]=(chap.stats.dailyDurMs[k]||0)+ms; chap.stats.dailyDurCount[k]=(chap.stats.dailyDurCount[k]||0)+1;
   const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
   (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
-  r.answers.push({cardId:card.id,prev,next:nxt,ms});
+  r.answers.push({cardId:card.id,prev,next:nxt,ms,rating: ratingOverride != null ? ratingOverride : GRADE_TO_RATING[nxt]});
+  return {card, chap};
+}
+
+/* Passage à la carte suivante (ou fin de session). */
+function advanceReview(){
+  const r=State.review; if(!r) return;
+  r.voiceResult=null; r.voiceSpoken=null;
+  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
 
   if(r.index<r.queue.length-1){
     r.index++;r.flipped=!1;r.cardStart=Date.now();
@@ -1801,7 +2013,14 @@ function startRev(cid,push=true,isCont=false){
   if(!cid)return;exitDrive();const c=getCh(cid);
   if(c.virtual&&c._ids)return startRevMulti(c._ids,c.id,c.filters,push,isCont);
   let sessionSize = c.settings.sessionSize;
-  if(c.deadline){const ds=getDayStart();if(!c._goalCache||c._goalCache.day!==ds){const calc=getDailyGoalCalc(c);c._goalCache={day:ds,size:calc?.val||10,pool:calc?.pool||0}} sessionSize=c._goalCache.size}
+  if(c.deadline){
+    /* Objectif du jour recalculé à chaque lancement : la session propose
+       exactement ce qu'il RESTE à réviser aujourd'hui (23 → 13 après 10 cartes). */
+    const calc = getDailyGoalCalc(c);
+    const size = (calc && calc.val > 0) ? calc.val : c.settings.sessionSize;
+    c._goalCache = { day: getDayStart(), size, pool: calc ? calc.pool : 0, goal: calc ? calc.goal : 0 };
+    sessionSize = size;
+  }
   // ✅ Filtrage par type
   let pool=c.cards.filter(x=>cardPassesFilter(x,c.filters));
   if(isCont&&State.review?.queue){const seen=new Set(State.review.queue);pool=pool.filter(x=>!seen.has(x.id))}
@@ -1809,11 +2028,87 @@ function startRev(cid,push=true,isCont=false){
   c.lastUsed=Date.now();saveData();
   continueOrNew(cid,bldQ(c,pool,sessionSize).map(x=>x.id),null,push,isCont)
 }
+
+/* ══════════════════ MODE VOCAL : évaluation & enchaînement ══════════════════ */
+/* Les fonctions ci-dessous ne font que brancher le module js/12_voice.js sur
+   la session en cours. Le micro reste actif tant qu'on est en révision et que
+   l'utilisateur ne l'a pas coupé (voir Voice.setWanted). */
+function voiceActive(){ return typeof Voice!=='undefined' && Voice.state().wanted; }
+
+/* Retourne le contexte vocal de la carte courante (ou null). */
+function voiceCtxOf(card, chap){
+  if(typeof Voice==='undefined' || !card || !chap) return null;
+  if(State.review && State.review.isQCM) return null;
+  const ctx = Voice.cardContext(card, chap);
+  return ctx.english ? ctx : null;
+}
+
+/* L'utilisateur avoue ne pas savoir : réponse affichée + carte notée « Échec ». */
+function voiceDontKnow(){
+  const r=State.review, {card,chap}=getCur(); if(!r||!card||!chap) return;
+  if(r.voiceResult) return;
+  const ctx = voiceCtxOf(card,chap);
+  const res = (ctx && ctx.expected)
+    ? Voice.scoreAnswer('', ctx.expected, { tolerance: Voice.prefs().voiceTolerance, forms: ctx.forms })
+    : null;
+  const out = res || { ok:false, ratio:0, rating:1, grade:'echec', matched:0, total:0, tokens:[], spokenToks:[], spokenOk:[], spoken:'', expected:ctx?ctx.expected:'', manual:true };
+  out.manual = true;              // réponse affichée telle quelle (pas de rouge partout)
+  voiceCommit(out, 'bad');
+}
+
+/* Applique la note (fractionnaire) de la dictée. */
+function voiceCommit(res, kind){
+  const r=State.review; if(!r || r.voiceResult || !res) return;
+  r.voiceResult = res;
+  r.voiceSpoken = res.spoken || '';
+  r.flipped = true;
+  applyGrade(res.grade, res.rating);   // note à virgule → FSRS l'interpole
+  renRev();
+  /* Bonne réponse → on laisse la carte verte le temps réglé, puis on avance. */
+  if(res.ok){
+    const delay = (typeof Voice!=='undefined') ? Voice.prefs().voiceDelay : 1200;
+    const go = () => { if(State.review===r && r.voiceResult && r.voiceResult.ok) voiceAdvance(); };
+    if(delay > 0) Voice.armAuto(delay, go);
+    else setTimeout(go, 90);
+  }
+}
+
+function voiceAdvance(){
+  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
+  advanceReview();
+}
+
+function voiceRetry(){
+  const r=State.review; if(!r || !r.voiceResult) return;
+  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
+  r.voiceResult = null; r.voiceSpoken = null;
+  undoRev();                     // restaure carte + stats, remet le recto
+}
+
+/* Raccourcis clavier pendant un retour vocal (appelé par js/09_shell.js). */
+function voiceKeyAction(e){
+  const r=State.review;
+  if(!r || !r.voiceResult) return false;
+  if(e.key===' ' || e.key==='Enter'){
+    const b=$('#voiceNextBtn'); if(b){ e.preventDefault(); b.click(); }
+    return true;
+  }
+  if(e.key==='r' || e.key==='R'){
+    const b=$('#voiceRetryBtn'); if(b){ e.preventDefault(); b.click(); }
+    return true;
+  }
+  return true;                    // pas d'auto-évaluation 1-4 pendant le retour
+}
+window.voiceKeyAction = voiceKeyAction;
+
 function startSingleCardReview(chapterId, cardId, searchQuery, scrollPos) {
   const c = getCh(chapterId);
   if(!c) return;
   const card = c.cards.find(x => x.id === cardId);
   if(!card) return;
+
+  /* Réviser une carte compte comme une activité : le chapitre remonte en haut. */
+  if(!c.virtual){ c.lastUsed = Date.now(); saveData(); }
 
   Nav.push();
   const returnInfo = { chapterId, cardId, searchQuery, scrollPos };
@@ -1866,6 +2161,8 @@ function undoRev(){
   const {card, chap} = getCur(); Object.assign(card, snap.cardState); chap.stats = snap.statsState;
   if(r.answers.length > snap.ansIdx) r.answers.splice(snap.ansIdx);
   r.flipped = false; 
+  r.voiceResult = null; r.voiceSpoken = null;
+  if(typeof Voice!=='undefined'){ Voice.clearAuto(); Voice.consume(); }
   saveData(); renRev();
 }
 
@@ -2017,6 +2314,10 @@ function openSet(cid, push = true, tab = null){
         sRow('rowMathDetail','sparkles','Résumé maths affiché d\'abord','Au verso, montre la version courte avant le détail', sToggle(!!P.mathDetail), 1),
         'Une rétention plus haute = intervalles plus courts, donc plus de révisions par jour.')}
 
+      ${(typeof Voice !== 'undefined') ? Voice.settingsHTML() : ''}
+
+      ${(typeof PDrive !== 'undefined') ? PDrive.settingsHTML() : ''}
+
       ${sect('Synchronisation',
         connected
           ? sRow('rowSyncNow','refresh','Synchroniser maintenant', escTxt(user?.email || 'Connecté'), sChev, 1) +
@@ -2030,8 +2331,9 @@ function openSet(cid, push = true, tab = null){
       ${sect('Données',
         sRow('rowExp','download','Exporter la sauvegarde','Fichier JSON de toutes les données', sChev, 1) +
         sRow('rowImp','upload','Importer une sauvegarde','Remplace les données actuelles', sChev, 1) +
-        sRow('rowImpCards','package','Importer des cartes','Anki (.apkg), CSV / TSV, JSON', sChev, 1) +
-        sRow('rowMedia','image','Médias importés', media.count ? `${media.count} fichier${media.count > 1 ? 's' : ''} · ${fmtBytes(media.size)}` : 'Aucun média importé', sChev, 1),
+        sRow('rowImpCards','package','Importer des cartes','Anki (.apkg), CSV / TSV, JSON, texte « pv-import »', sChev, 1) +
+        sRow('rowImages','image','Bibliothèque d\'images', (typeof MediaLib !== 'undefined' ? `${MediaLib.images().length} image${MediaLib.images().length > 1 ? 's' : ''}` : '') + ` · voir / importer / qui les utilise`, sChev, 1) +
+        sRow('rowMedia','package','Médias importés', media.count ? `${media.count} fichier${media.count > 1 ? 's' : ''} · ${fmtBytes(media.size)}` : 'Aucun média importé', sChev, 1),
         `Données locales : <b>${fmtBytes(localSize)}</b> · chapitres : <b>${data.subjects.reduce((n, s) => n + s.chapters.length, 0)}</b> · cartes : <b>${data.subjects.reduce((n, s) => n + s.chapters.reduce((m, ch) => m + ch.cards.length, 0), 0)}</b>.`)}
 
       ${sect('Zone dangereuse',
@@ -2074,7 +2376,9 @@ function openSet(cid, push = true, tab = null){
             <div class="s-inline-label">${ico('calendar','ico--sm')}<span>Date limite de révision</span></div>
             <input type="date" id="deadlineInput" class="input" value="${c.deadline || ''}">
           </div>
-          ${dailyCalc ? `<div class="goal-line" id="goalDisplay"><span>Objectif : <b>${dailyCalc.val}</b>/jour</span><span>Reste <b>${cntAv(c)}</b> cartes</span></div>` : ''}`)
+          ${dailyCalc ? `<div class="goal-line" id="goalDisplay">${goalLineHTML(dailyCalc, cntAv(c))}</div>` : ''}`) +
+
+      ((typeof Voice !== 'undefined' && Voice.isEnglishChapter(c)) ? Voice.settingsHTML() : '')
       )}
 
       ${sect('Zone dangereuse',
@@ -2090,6 +2394,14 @@ function openSet(cid, push = true, tab = null){
     const body = $('#setBody');
     if(!body) return;
     body.innerHTML = State.setTab === 'chapter' && c ? paintChapter() : paintGeneral();
+
+    /* Réglages du mode vocal (section partagée par les deux onglets) */
+    if(typeof Voice !== 'undefined'){
+      Voice.bindSettings(body, {
+        onChange: save,
+        rerender: () => openSet(cid, false, State.setTab)
+      });
+    }
 
     if(State.setTab === 'chapter' && c){
       /* filtres */
@@ -2208,8 +2520,18 @@ function openSet(cid, push = true, tab = null){
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     });
     bindRow('#rowImp', () => $('#impF')?.click());
-    bindRow('#rowImpCards', () => $('#impCardsF')?.click());
+    /* « Importer des cartes » → assistant (fichier ou texte écrit à la main) */
+    bindRow('#rowImpCards', () => {
+      if (typeof PVImport !== 'undefined') PVImport.openWizard();
+      else $('#impCardsF')?.click();
+    });
+    bindRow('#rowImages', () => { if (typeof MediaLib !== 'undefined') MediaLib.goImages(true); });
     bindRow('#rowMedia', () => { goStats(false, { subjectId:'', chapterId:'', tab:'media' }); });
+
+    /* Réglages de « Mon Drive » (connexion Google personnelle) */
+    if (typeof PDrive !== 'undefined') {
+      PDrive.bindSettings(body, { onChange: () => openSet(cid, false, State.setTab) });
+    }
 
     const impF = $('#impF');
     if(impF) impF.onchange = async e => {
@@ -2253,19 +2575,36 @@ function openSet(cid, push = true, tab = null){
 function applyTh(){ D.documentElement.dataset.theme = data.app.theme }
 
 function applyUI(){ const p=data.app.prefs; D.documentElement.style.setProperty('--fs-term',p.fsTerm+'px'); D.documentElement.style.setProperty('--fs-def',p.fsDef+'px'); const pl={indigo:['#6366f1','#5457e6'],blue:['#3b82f6','#2563eb'],teal:['#14b8a6','#0d9488'],emerald:['#10b981','#059669'],rose:['#f43f5e','#e11d48'],amber:['#f59e0b','#d97706'],violet:['#8b5cf6','#7c3aed']}, c=pl[p.accent]||pl.indigo; D.documentElement.style.setProperty('--primary',c[0]); D.documentElement.style.setProperty('--primary-600',c[1]) }
+/* Champs d'apprentissage conservés lors d'une reconstruction des chapitres
+   (reconcile) : sans eux, un simple rechargement ou une synchro remettait
+   toutes les cartes à zéro et faisait retomber les chapitres au milieu. */
+const CH_KEEP = ['lastUsed','deadline','settings','filters','emoji','description','imported'];
+const CARD_KEEP = ['grade','ef','intervalDays','dueAt','stability','difficulty','lastReviewed','lastMs','avgMs','perfEma','timesReviewed','streak','successes','failures'];
+const mergeCardState = (cd, oldC) => { if(!oldC) return cd; const m = {...cd}; CARD_KEEP.forEach(k => { if(oldC[k] !== undefined) m[k] = oldC[k] }); return m };
+
 function reconcile(){ 
   const c=buildCanon(), o=data.subjects||[], oMap=Object.fromEntries(o.map(s=>[s.title,s])); 
   data.subjects=c.map(x=>{
     const old=oMap[x.title]||{}, ocMap=Object.fromEntries((old.chapters||[]).map(c=>[c.title,c])); 
     const chs=x.chapters.map(nc=>{
       const oc=ocMap[nc.title]; if(!oc)return nc; 
-      const cardMap=Object.fromEntries(oc.cards.map(c=>[extractId(c.id),c])); 
-      return{...nc,stats:{...oc.stats},cards:nc.cards.map(cd=>{const oldC=cardMap[extractId(cd.id)]; return oldC?{...cd,grade:oldC.grade,ef:oldC.ef,intervalDays:oldC.intervalDays,dueAt:oldC.dueAt}:cd})}
+      const cardMap=Object.fromEntries((oc.cards||[]).map(c=>[extractId(c.id),c])); 
+      const merged={...nc, cards:nc.cards.map(cd=>mergeCardState(cd, cardMap[extractId(cd.id)]))};
+      if(oc.stats) merged.stats={...oc.stats};
+      /* Réglages, date limite, dernière utilisation… : on garde ceux du chapitre */
+      CH_KEEP.forEach(k=>{ if(oc[k]!==undefined) merged[k]=oc[k] });
+      return merged;
     }); 
     // ✅ Conserver les chapitres créés manuellement (pas dans le canon)
     const canonTitles = new Set(x.chapters.map(nc => nc.title));
     const userChapters = (old.chapters||[]).filter(oc => !canonTitles.has(oc.title));
-    return{...x,chapters:[...chs, ...userChapters],groups:old.groups||[]}
+    // ✅ Conserver l'ordre déjà connu des chapitres (les nouveaux se rangent à la fin)
+    const knownRank = new Map((old.chapters||[]).map((oc,i)=>[oc.title,i]));
+    const ordered = [...chs, ...userChapters]
+      .map((ch,i)=>({ch, i, rank: knownRank.has(ch.title) ? knownRank.get(ch.title) : 1e9}))
+      .sort((a,b)=>(a.rank - b.rank) || (a.i - b.i))
+      .map(z=>z.ch);
+    return{...x, chapters:ordered, groups:old.groups||[], ...(old.emoji!==undefined?{emoji:old.emoji}:{}), ...(old.imported?{imported:!0}:{})}
   }); 
   o.forEach(x=>{if(!data.subjects.find(z=>z.id===x.id))data.subjects.push(x)}); 
   if(!data.subjects.find(x=>x.id===data.app.currentSubjectId))data.app.currentSubjectId=data.subjects[0].id 
