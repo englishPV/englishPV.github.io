@@ -99,7 +99,7 @@
     const pending = new Set();
     const visible = new Set();
     let pumping = false, token = 0;
-    let io = null, rafScroll = 0, resizeTimer = 0, hintTimer = 0, tlTimer = 0;
+    let io = null, ro = null, rafScroll = 0, resizeTimer = 0, hintTimer = 0, tlTimer = 0;
     const tlQueue = new Set();               // couche texte : rendue après la fin des gestes
     let maxMode = false;                       // repli CSS (iPhone)
     let zooming = false, zoomTimer = 0;        // pendant un geste : on étire l'image, on redessine à la fin
@@ -257,7 +257,9 @@
     function applyScale(next, anchor, force) {
       next = clamp(next, MIN_SCALE, MAX_SCALE);
       if (!numPages) { scale = next; syncBar(); return; }
-      if (!force && Math.abs(next - scale) < 1e-4) return;
+      const same = Math.abs(next - scale) < 1e-4;
+      if (same && !force) return;
+      if (same) { layout(); requeue(); syncBar(); return; }   // cadrage forcé, même échelle
       const ref = pages[current] || pages[0];
       const sr = scrollEl.getBoundingClientRect();
       const ax = anchor ? anchor.x : sr.left + sr.width / 2;
@@ -324,7 +326,8 @@
       const swap = rotation % 180 !== 0;
       baseW = swap ? pageH0 : pageW0;
       baseH = swap ? pageW0 : pageH0;
-      pages.forEach(p => { p.wpt = baseW; p.hpt = baseH; });
+      token++; cancelTasks(); resetText();
+      pages.forEach(p => { p.wpt = baseW; p.hpt = baseH; p.rendered = false; });
       applyScale(fit === 'custom' ? scale : fitScale(), null, true);
     }
 
@@ -576,19 +579,25 @@
       return clamp(lo, 0, Math.max(0, numPages - 1));
     }
 
+    let lastTop = 0;
     function onScroll() {
       if (rafScroll) return;
       rafScroll = requestAnimationFrame(() => {
         rafScroll = 0;
         if (destroyed || !numPages) return;
-        const i = pageAt(scrollEl.scrollTop + scrollEl.clientHeight * 0.35);
+        const top = scrollEl.scrollTop;
+        const dy = top - lastTop; lastTop = top;
+        if (dy && typeof opts.onScroll === 'function') {
+          try { opts.onScroll({ dir: dy > 0 ? 1 : -1, dy: Math.abs(dy), top }); } catch {}
+        }
+        const i = pageAt(top + scrollEl.clientHeight * 0.35);
         if (i !== current) { current = i; prune(false); }
         if (!W.IntersectionObserver) {                 // repli : visibilité calculée à la main
-          const top = scrollEl.scrollTop - scrollEl.clientHeight * .8;
-          const bot = scrollEl.scrollTop + scrollEl.clientHeight * 1.8;
+          const vTop = top - scrollEl.clientHeight * .8;
+          const vBot = top + scrollEl.clientHeight * 1.8;
           for (const p of pages) {
             const t = offsets[p.i] || 0, b = t + (p.h || 0);
-            if (b >= top && t <= bot) { if (!visible.has(p.i)) { visible.add(p.i); pending.add(p.i); } }
+            if (b >= vTop && t <= vBot) { if (!visible.has(p.i)) { visible.add(p.i); pending.add(p.i); } }
             else visible.delete(p.i);
           }
           pump();
@@ -753,6 +762,7 @@
     function teardown() {
       cancelTasks();
       if (io) { try { io.disconnect(); } catch {} io = null; }
+      if (ro) { try { ro.disconnect(); } catch {} ro = null; }
       clearTimeout(resizeTimer); clearTimeout(hintTimer); clearTimeout(tlTimer); clearTimeout(zoomTimer);
       if (rafScroll) { cancelAnimationFrame(rafScroll); rafScroll = 0; }
       winListeners.forEach(([ev, fn, o]) => { try { W.removeEventListener(ev, fn, o); } catch {} });
@@ -840,6 +850,15 @@
 
     /* ── branchements ── */
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
+    /* Redimensionnement réel de la zone de lecture (menu latéral, clavier
+       mobile, en-tête du fichier qui s'efface…) : le seul 'resize' de la
+       fenêtre ne le voit pas. Sans changement d'échelle, applyScale(force)
+       ne re-dessine rien — le rappel initial de l'observateur ne coûte donc
+       rien, et il recadre utilement un conteneur monté sans taille. */
+    if (W.ResizeObserver) {
+      ro = new W.ResizeObserver(() => refitLater());
+      try { ro.observe(root); } catch {}
+    }
     onWin('resize', refitLater, { passive: true });
     onWin('orientationchange', refitLater, { passive: true });
     onWin('fullscreenchange', onFsChange);

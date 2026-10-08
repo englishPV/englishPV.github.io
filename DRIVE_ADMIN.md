@@ -148,6 +148,7 @@ l'aperçu natif du navigateur dans une `<iframe>`.
 | Sur ordinateur, le menu ⋮ de l'aperçu natif ouvrait des options sans effet dans une iframe | Barre d'outils du site : `Ctrl + molette` pour zoomer, `R` pour pivoter, `F` pour le plein écran |
 | Impossible de passer en plein écran au doigt | Bouton **⛶** : plein écran natif, avec repli « fenêtre maximisée » sur iPhone (où l'API plein écran n'existe pas pour un simple conteneur) |
 | L'aperçu cassait pendant la minute de redéploiement GitHub Pages | Le fichier est téléchargé par le Drive (Pages → `raw.githubusercontent.com` en repli), avec **cache HTTP** : la réouverture est instantanée |
+| L'en-tête du fichier (nom, date, taille, auteur, chemin) et les boutons *Télécharger* / *Nouvel onglet* mangeaient le tiers d'un écran de téléphone, sans moyen de les faire disparaître | Ils se **replient** d'un chevron ▸ et **s'effacent dès qu'on fait défiler** le document — un geste vers le haut, ou le retour en haut de page, les fait revenir |
 
 Détails utiles :
 
@@ -163,6 +164,12 @@ Détails utiles :
 * **Texte sélectionnable** sur ordinateur (couche texte) → `Ctrl + F` fonctionne
   dans le document. Elle est désactivée sur téléphone pour ne pas accrocher les
   gestes.
+* **Toute la place à la page** — sur téléphone (≤ 900 px ou écran tactile), les
+  informations du fichier sont repliées par défaut (chevron ▸ pour les rouvrir ;
+  le choix est mémorisé dans `pv_drive_fileinfo`) et l'en-tête, ses boutons et la
+  barre d'onglets du Drive s'effacent pendant le défilement (classe `chrome-min`
+  sur `#app`). Le lecteur se **réajuste tout seul** quand l'espace change
+  (`ResizeObserver`) — sans re-dessiner les pages si l'échelle ne bouge pas.
 * **PDF protégé** — un champ mot de passe apparaît dans le lecteur.
 * **Poids** — PDF.js (build *legacy* 3.11.174, `vendor/pdfjs/`, ~1,5 Mo) n'est
   téléchargé **qu'au premier PDF ouvert**, jamais au démarrage du site.
@@ -212,14 +219,16 @@ non publiées.
 
 ## 9. Tests automatisés
 
-Trois suites hors-ligne (Node ≥ 18) couvrent tout le Drive sans jamais toucher au dépôt :
+Quatre suites hors-ligne (Node ≥ 18) couvrent tout le Drive sans jamais toucher au dépôt :
 
 | Suite | Ce qu'elle vérifie |
 |---|---|
 | `tex_test.mjs` | le compilateur LaTeX : sommaire, sections numérotées, équations, `\notag`, `\ref`/`\eqref`, tableaux et légendes, théorèmes/preuves, verbatim, accents, macros, tikzpicture — **dont le vrai `fiche-revision.tex` publié** |
 | `store_test.mjs` | les droits (admin / lecteur), le CRUD, les pastilles bleues, l'encodage des URL (espaces, accents), IndexedDB, et une publication complète contre une API GitHub simulée |
 | `ui_test.mjs` | l'interface : lecteur **non-admin sur le contenu réellement publié dans `content/drive/`** (lecture seule, dates, rendu LaTeX, téléchargement, lightbox, retours), puis le parcours admin (onglet → dossier → éditeur LaTeX → import d'image → token → publication) |
-| `pdf_test.mjs` | le lecteur PDF : ajustement **largeur** par défaut, zoom `+`/`−` borné, cycles *Largeur → Page entière → 100 %*, rotation, navigation (boutons, champ de page, `PageUp/Down`, `Home/End`), raccourcis clavier, `Ctrl` + molette, **pincement** et **double-tap** simulés, couche texte selon le pointeur, rendu paresseux et offsets de défilement, mot de passe, repli `<iframe>`, libération à la destruction — plus le **décodage des vrais PDF publiés** par le PDF.js du dépôt et le câblage du menu latéral (`exitDrive`, z-index du tiroir) |
+| `pdf_test.mjs` | le lecteur PDF : ajustement **largeur** par défaut, zoom `+`/`−` borné, cycles *Largeur → Page entière → 100 %*, rotation, navigation (boutons, champ de page, `PageUp/Down`, `Home/End`), raccourcis clavier, `Ctrl` + molette, **pincement** et **double-tap** simulés, couche texte selon le pointeur, rendu paresseux et offsets de défilement, mot de passe, repli `<iframe>`, libération à la destruction, contrat `onScroll`/`ResizeObserver`
+  avec le Drive (en-tête qui s'efface, recadrage sans rendu superflu) et les règles CSS/JS
+  du repli de l'en-tête — plus le **décodage des vrais PDF publiés** par le PDF.js du dépôt et le câblage du menu latéral (`exitDrive`, z-index du tiroir) |
 
 Elles vivent hors du dépôt (aucune dépendance ajoutée au site) :
 
@@ -227,7 +236,7 @@ Elles vivent hors du dépôt (aucune dépendance ajoutée au site) :
 cd /chemin/hors-dépôt/_tests
 npm install jsdom fake-indexeddb
 node tex_test.mjs && node store_test.mjs && node ui_test.mjs && node pdf_test.mjs
-# ✅ 84 + 128 + 126 + 135 assertions
+# ✅ 84 + 128 + 126 + 157 assertions
 ```
 
 Le serveur fictif des tests lit les fichiers **sur le disque** et décode les URL comme le

@@ -214,7 +214,14 @@
 }
 
 /* ─────────── 4. Lecteur de fichier ─────────── */
-.dfile-head { display: flex; gap: 10px; align-items: flex-start; padding: 2px; }
+.dfile-head {
+  display: flex; gap: 10px; align-items: flex-start; padding: 2px;
+  /* borne haute pour l'animation de repli : assez large pour ne jamais
+     rogner un nom de fichier long (le contenu réel décide de la hauteur) */
+  max-height: 22rem; overflow: hidden;
+  transition: max-height var(--t-base) var(--ease), opacity var(--t-fast) var(--ease),
+              padding var(--t-base) var(--ease);
+}
 .dfile-ico {
   width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; font-size: 22px;
   display: flex; align-items: center; justify-content: center;
@@ -222,9 +229,55 @@
 }
 .dfile-info { flex: 1; min-width: 0; }
 .dfile-name { font-weight: 900; font-size: 15.5px; word-break: break-word; display: flex; gap: 6px; align-items: center; }
+.dfile-name-t { min-width: 0; }
 .dfile-meta { display: flex; flex-wrap: wrap; gap: 2px 5px; font-size: 11px; color: var(--muted); margin-top: 3px; }
 .dfile-path { font-size: 10.5px; color: var(--muted); opacity: .75; margin-top: 2px; word-break: break-all; }
-.dfile-actions { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; flex-shrink: 0; }
+.dfile-actions {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; flex-shrink: 0;
+  max-height: 6rem;
+  transition: max-height var(--t-base) var(--ease), opacity var(--t-fast) var(--ease),
+              padding var(--t-base) var(--ease);
+}
+
+/* ── En-tête repliable : sur téléphone, les métadonnées (date, taille,
+      auteur, chemin) ne doivent pas manger l'écran de lecture ── */
+.dfile-chev {
+  appearance: none; flex: none; cursor: pointer;
+  width: 30px; height: 30px; border-radius: 9px;
+  display: none; place-items: center;
+  border: 1px solid var(--border); background: var(--btn-neutral-bg); color: var(--muted);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.dfile-chev:hover { color: var(--text); border-color: var(--primary); }
+.dfile-chev .ico { transition: transform var(--t-base) var(--ease); }
+.dfile-head:not(.is-collapsed) .dfile-chev .ico { transform: rotate(180deg); }
+@media (max-width: 900px), (pointer: coarse) { .dfile-chev { display: grid; } }
+.dfile-head.is-collapsed { align-items: center; }
+.dfile-head.is-collapsed .dfile-meta, .dfile-head.is-collapsed .dfile-path { display: none; }
+.dfile-head.is-collapsed .dfile-ico { width: 30px; height: 30px; font-size: 15px; border-radius: 9px; }
+.dfile-head.is-collapsed .dfile-name {
+  font-size: 14px; white-space: nowrap; flex-wrap: nowrap;
+}
+.dfile-head.is-collapsed .dfile-name-t { overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Lecture « plein cadre » : l'en-tête, ses boutons et la barre d'onglets
+      s'effacent dès qu'on fait défiler le document, et reviennent en
+      remontant (js/08_drive_ui.js → chromeOnScroll) ── */
+.drive-wrap { transition: gap var(--t-base) var(--ease); }
+#app.chrome-min .drive-wrap { gap: 0; }
+#app.chrome-min .dfile-head, #app.chrome-min .dfile-actions {
+  max-height: 0; opacity: 0; margin: 0; padding-top: 0; padding-bottom: 0;
+  overflow: hidden; pointer-events: none;
+}
+/* la barre d'onglets Drive est pilotée par --row-tabs (posé en inline par
+   renderTabs) : il faut !important pour reprendre la main */
+#app.chrome-min { --row-tabs: 0px !important; }
+#app.chrome-min #driveTabs { opacity: 0; pointer-events: none; }
+#app.chrome-min #view.drive-open { padding-top: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .dfile-head, .dfile-actions, .drive-wrap, .dfile-chev .ico { transition: none; }
+}
 .dfile-actions::-webkit-scrollbar { display: none; }
 .dfile-actions .btn { width: auto; }
 .dseg { display: inline-flex; border: 1px solid var(--border); border-radius: 11px; overflow: hidden; flex-shrink: 0; }
@@ -563,6 +616,7 @@ textarea.dfield-input { resize: vertical; line-height: 1.5; font-family: inherit
   .drive-topmeta { font-size: 10.5px; }
   .dfile-head { gap: 8px; padding: 0; }
   .dfile-ico { width: 34px; height: 34px; font-size: 17px; border-radius: 10px; }
+  .dfile-head.is-collapsed .dfile-ico { width: 28px; height: 28px; font-size: 14px; }
   .dfile-name { font-size: 14.5px; }
   .dfile-meta { margin-top: 1px; font-size: 10px; gap: 1px 4px; }
   .dfile-path { display: none; }

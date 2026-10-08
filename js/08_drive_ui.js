@@ -203,6 +203,7 @@ const Drive = (() => {
     if (!isOpen) { if (!silent) { try { goDeck(false); } catch {} } return; }
     isOpen = false; cur = null; stack = []; query = '';
     destroyPdf();
+    setChromeMin(false);
     const v = D.getElementById('view');
     if (v) v.classList.remove('drive-open');
     try {
@@ -232,6 +233,7 @@ const Drive = (() => {
     if (!v || !cur) return;
     paintToken++;                 // annule les chargements de fichier en cours
     destroyPdf();                 // libère le lecteur PDF (canvas, worker, écouteurs)
+    setChromeMin(false);          // l'en-tête revient à chaque changement d'écran
     v.classList.add('drive-open');
     try { setBot({ actions: false, revision: false }); hideRevAct(); } catch {}
     D.getElementById('reviewActionsBar').style.display = 'none';
@@ -446,12 +448,17 @@ const Drive = (() => {
     setTopBar(`${icon(n)} ${n.name}`, '· Drive');
 
     const mode = fileView[n.id] || (n.kind === 'latex' || n.kind === 'markdown' ? 'render' : 'render');
+    /* En-tête repliable : sur téléphone la place manque, les métadonnées
+       (date, taille, auteur, chemin) sont masquées par défaut et un chevron
+       permet de les retrouver. Le choix est mémorisé. */
+    const infoPref = LSget('pv_drive_fileinfo', null);
+    const infoOpen = infoPref == null ? !compactUI() : !!infoPref;
     v.innerHTML = `
       <div class="drive-wrap">
-        <div class="dfile-head">
+        <div class="dfile-head ${infoOpen ? '' : 'is-collapsed'}" id="dfileHead">
           <div class="dfile-ico">${icon(n)}</div>
           <div class="dfile-info">
-            <div class="dfile-name">${esc(n.name)}${S.isUnread(n) ? '<i class="dnew"></i>' : ''}</div>
+            <div class="dfile-name"><span class="dfile-name-t">${esc(n.name)}</span>${S.isUnread(n) ? '<i class="dnew"></i>' : ''}</div>
             <div class="dfile-meta">
               <span>${ico('clock','ico--xs')} Ajouté le <strong>${fmtDate(n.addedAt)}</strong></span>
               ${n.updatedAt > n.addedAt + 60000 ? `<span>· modifié le ${fmtDate(n.updatedAt)}</span>` : ''}
@@ -460,6 +467,9 @@ const Drive = (() => {
             </div>
             <div class="dfile-path">${esc(S.fullPath(n))}</div>
           </div>
+          <button class="dfile-chev" data-act="toggle-info" aria-expanded="${infoOpen}"
+                  title="Informations du fichier"
+                  aria-label="${infoOpen ? 'Masquer' : 'Afficher'} les informations du fichier">${ico('chevron-down','ico--sm')}</button>
         </div>
 
         <div class="dfile-actions">
@@ -486,6 +496,15 @@ const Drive = (() => {
       e.stopPropagation();
       const act = b.dataset.act;
       if (act === 'download') return downloadNode(n);
+      if (act === 'toggle-info') {
+        const head = v.querySelector('#dfileHead');
+        if (!head) return;
+        const open = !head.classList.toggle('is-collapsed');
+        LSset('pv_drive_fileinfo', open);
+        b.setAttribute('aria-expanded', String(open));
+        b.setAttribute('aria-label', (open ? 'Masquer' : 'Afficher') + ' les informations du fichier');
+        return;
+      }
       if (act === 'view-render') { fileView[n.id] = 'render'; paint(); return; }
       if (act === 'view-source') { fileView[n.id] = 'source'; paint(); return; }
       if (act === 'edit') return editorModal(n);
@@ -563,7 +582,8 @@ const Drive = (() => {
       try {
         return W.DrivePdf.mount({
           host, blob, name: n.name, url,
-          onFallback: () => { pdfViewer = null; }
+          onFallback: () => { pdfViewer = null; },
+          onScroll: chromeOnScroll
         });
       } catch (e) { console.warn('[Drive] lecteur PDF', e); }
     }
@@ -577,6 +597,31 @@ const Drive = (() => {
         <iframe class="dpdf" src="${esc(url)}#toolbar=1&navpanes=0&view=FitH" title="${esc(n.name)}" loading="eager"></iframe>
       </div>
       <div class="dimg-tip dimg-tip--pdf">${esc(reason || '')} — si l'aperçu ne s'affiche pas, utilise « Télécharger » ou « Nouvel onglet ».</div>`;
+  }
+
+  /* ─────────── Lecture « plein cadre » (téléphone) ───────────
+     L'en-tête du fichier, ses boutons et la barre d'onglets prennent de la
+     place inutile pendant la lecture : ils s'effacent dès qu'on fait défiler
+     le document vers le bas, et reviennent dès qu'on remonte (ou en haut de
+     page). Un chevron permet aussi de replier les informations à la main. */
+  function compactUI() {
+    try {
+      return W.matchMedia('(max-width: 900px)').matches || !W.matchMedia('(pointer: fine)').matches;
+    } catch { return false; }
+  }
+  let chromeMin = false;
+  function setChromeMin(on) {
+    on = !!on;
+    if (chromeMin === on) return;
+    chromeMin = on;
+    const app = D.getElementById('app');
+    if (app) app.classList.toggle('chrome-min', on);
+  }
+  function chromeOnScroll(info) {
+    if (!info || !compactUI()) return;
+    if (info.top <= 4) return setChromeMin(false);          // haut du document : tout revient
+    if (info.dir > 0 && info.dy > 18) return setChromeMin(true);
+    if (info.dir < 0 && info.dy > 6) return setChromeMin(false);
   }
 
   function destroyPdf() {

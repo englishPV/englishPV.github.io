@@ -240,7 +240,7 @@ function safeCloseLB(){ try{if(LB?.el?.classList.contains('open'))closeLB()}catc
    Drive est ouvert, goDeck() est détourné par Drive (hookBackButton) pour ne
    pas écraser son affichage → sans cet appel, un clic sur « Mes decks » dans
    le menu latéral ne faisait rien et laissait la mise en page drive-open. */
-function exitDrive(){ try{ if(typeof Drive!=='undefined' && Drive && Drive.isOpen) Drive.close({silent:!0}) }catch(e){} try{ const v=D.getElementById('view'); if(v) v.classList.remove('drive-open') }catch(e){} }
+function exitDrive(){ try{ if(typeof Drive!=='undefined' && Drive && Drive.isOpen) Drive.close({silent:!0}) }catch(e){} try{ const v=D.getElementById('view'); if(v) v.classList.remove('drive-open') }catch(e){} try{ const a=D.getElementById('app'); if(a) a.classList.remove('chrome-min') }catch(e){} }
 /* Ferme les calques qui pourraient recouvrir le menu latéral (lightbox, modales
    du Drive, menu des matières) : sinon l'écran s'assombrit « pour rien ». */
 function closeOverlays(){ safeCloseLB(); try{ if(typeof Drive!=='undefined' && Drive.closeModals) Drive.closeModals() }catch(e){} try{ const m=D.getElementById('subjectMenu'); if(m) m.style.display='none' }catch(e){} }
