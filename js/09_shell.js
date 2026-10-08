@@ -198,18 +198,54 @@
   function closeDrawer() {
     sidebar?.classList.remove('is-open');
     if (scrim) { scrim.classList.remove('is-open'); setTimeout(() => { if (!scrim.classList.contains('is-open')) scrim.hidden = true; }, 220); }
-    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+    syncMenuBtn();
   }
+
+  /* ─────────────── Ordinateur : replier / déplier la barre latérale ───────────────
+     Sur PC la barre est visible par défaut ; le bouton ☰ la cache ou l'affiche. */
+  const shell = sidebar?.parentElement || null;
+  const navCollapsed = () => !!shell && shell.classList.contains('is-nav-collapsed');
+  function setNavCollapsed(on) {
+    shell?.classList.toggle('is-nav-collapsed', !!on);
+    syncMenuBtn();
+  }
+  /* État ARIA du bouton ☰ selon le mode courant (tiroir mobile ou barre desktop) */
+  function syncMenuBtn() {
+    if (!menuBtn) return;
+    if (mob()) {
+      menuBtn.setAttribute('aria-expanded', String(!!sidebar?.classList.contains('is-open')));
+      menuBtn.setAttribute('aria-label', 'Ouvrir le menu');
+      menuBtn.title = 'Menu';
+    } else {
+      const shown = !navCollapsed();
+      menuBtn.setAttribute('aria-expanded', String(shown));
+      menuBtn.setAttribute('aria-label', shown ? 'Masquer le menu' : 'Afficher le menu');
+      menuBtn.title = shown ? 'Masquer le menu' : 'Afficher le menu';
+    }
+  }
+
   function toggleDrawer() {
+    if (!mob()) { setNavCollapsed(!navCollapsed()); return; }
     sidebar?.classList.contains('is-open') ? closeDrawer() : openDrawer();
   }
 
-  menuBtn?.setAttribute('aria-expanded', 'false');
   menuBtn?.setAttribute('aria-controls', 'sidebar');
   menuBtn?.addEventListener('click', e => { e.stopPropagation(); toggleDrawer(); });
   scrim?.addEventListener('click', closeDrawer);
+  syncMenuBtn();
 
   /* ─────────────────────────── Raccourcis clavier ─────────────────────────── */
+
+  /* Notation 1–4 : fonctionne quelle que soit la disposition du clavier.
+     · Chiffres (rangée du haut ou pavé numérique) → via la touche physique (e.code)
+     · Sur AZERTY, les chiffres 1 à 4 sont aussi les touches « & é " ' » (sans Maj) */
+  const GRADE_CODES = { Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Numpad1: '1', Numpad2: '2', Numpad3: '3', Numpad4: '4' };
+  const GRADE_CHARS = { '&': '1', 'é': '2', 'É': '2', '"': '3', "'": '4' };
+  function gradeFromKey(e) {
+    if (/^[1-4]$/.test(e.key)) return e.key;
+    if (GRADE_CODES[e.code]) return GRADE_CODES[e.code];
+    return GRADE_CHARS[e.key] || null;
+  }
   const typing = () => {
     const el = document.activeElement;
     return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
@@ -239,6 +275,18 @@
     if (e.key === '/' && !typing()) { e.preventDefault(); focusSearch(); return; }
     if (typing() || meta) return;
 
+    /* Fin de session (récapitulatif) : Entrée lance la suite, sans passer par la souris.
+       Un bouton déjà focalisé (ex. « Revenir aux decks ») garde son comportement natif. */
+    if (State?.view === 'recap') {
+      const ae = document.activeElement;
+      const onOtherButton = ae && ae.id !== 'contBtn' && (ae.tagName === 'BUTTON' || ae.tagName === 'A');
+      if (e.key === 'Enter' && !e.repeat && !onOtherButton) {
+        const cont = $('#contBtn');
+        if (cont) { e.preventDefault(); cont.click(); }
+      }
+      return;
+    }
+
     /* Révision : Espace retourne la carte, 1–4 notent */
     if (State?.view === 'review') {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -247,8 +295,9 @@
         return;
       }
       const map = { '1': 'echec', '2': 'difficile', '3': 'bien', '4': 'facile' };
-      if (map[e.key]) {
-        const b = $('#g_' + map[e.key]);
+      const grade = gradeFromKey(e);
+      if (grade && map[grade]) {
+        const b = $('#g_' + map[grade]);
         if (b) { e.preventDefault(); b.click(); }
       }
     }
@@ -390,7 +439,7 @@
   if (titleEl) {
     new MutationObserver(queueSync).observe(titleEl, { childList: true, characterData: true, subtree: true });
   }
-  window.addEventListener('resize', () => { if (!mob()) closeDrawer(); }, { passive: true });
+  window.addEventListener('resize', () => { if (!mob()) closeDrawer(); syncMenuBtn(); }, { passive: true });
   window.addEventListener('popstate', queueSync);
 
   const baseSetTop = window.setTop;

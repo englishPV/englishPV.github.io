@@ -1762,6 +1762,8 @@ function subG(nxt){
 function goRecap(push=true){
   exitDrive(); safeCloseLB(); Media.revokeAll();
   if(!State.review){ goDeck(!1); return }                 // aucune session en cours
+  /* La fin de session ne doit pas garder le mode concentration (barre du haut atténuée) */
+  $('#app').classList.remove('focus-mode');
   if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh((State.review.multiChaps||[])[0])||{title:'Session',stats:mkStats(0)}; setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
   $('#view').innerHTML = `
@@ -1770,7 +1772,7 @@ function goRecap(push=true){
         <h2>Session terminée</h2>
         <div class="subtitle">${c.title}</div>
       </div>
-      <div class="grid2">
+      <div class="grid2 grid-3">
         <div class="stat"><div class="label">Réussite 7 j</div><div class="val">${get7dAvg(c)}</div></div>
         <div class="stat"><div class="label">Changement</div><div class="val">${getTodCh(c).total>0?M.round(getTodCh(c).changed/getTodCh(c).total*100):0}%</div></div>
         <div class="stat"><div class="label">Cartes révisées</div><div class="val">${getTod(c)}</div></div>

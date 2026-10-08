@@ -585,6 +585,7 @@ canvas#gradeChart { width: 150px; height: 150px; }
 .card.recap h2 { font-size: 1.35rem; font-weight: 700; }
 .card.recap .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 .card.recap .grid2 { gap: var(--sp-2); }
+.card.recap .grid2.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .card.recap .stat {
   padding: 12px 10px;
   border: 1px solid var(--hairline); border-radius: var(--radius-md);
