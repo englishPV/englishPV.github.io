@@ -689,6 +689,8 @@
     if (st.blocked) return { cls: ' is-blocked', icon: 'mic-off', title: 'Micro bloqué : autorisez le microphone dans les réglages du navigateur' };
     /* Carte sans réponse dictable : le micro reste en veille sur cette carte */
     if (isReviewView() && !st.eligible) return { cls: '', icon: 'mic', title: 'Carte non dictable (image ou formule)' };
+    /* Carte déjà notée : le micro reste réglé pour la suivante, mais n'écoute pas sur celle-ci */
+    if (isReviewView() && st.locked) return { cls: '', icon: 'mic', title: 'Micro en pause sur cette carte' };
     if (st.listening || st.resuming) return { cls: ' is-on', icon: 'mic', title: 'Micro actif — appuyez pour le couper' };
     return { cls: ' is-starting', icon: 'mic', title: 'Activation du micro…' };
   }

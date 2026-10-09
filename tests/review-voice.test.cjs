@@ -618,3 +618,14 @@ test('page du chapitre : libellé court, sans phrase d\'explication', () => {
   assert.match(on({ id: 'x' }), /Mode vocal <b>activé<\/b>/);
   assert.doesNotMatch(on({ id: 'x' }), /Continuer la session/);
 });
+
+test('après un résultat, le micro est en pause sur cette carte : pas de « Activation du micro… »', () => {
+  const h = clockHarness(() => {});
+  h.Voice.setWanted(true, { silent: true });
+  h.Voice.setCard(h.Voice.cardContext(h.card, h.chapter));
+  h.Voice.lock();                                       // renRev verrouille une carte déjà notée
+  const cls = h.Voice.micHTML().match(/class="([^"]*)"/)[1];
+  assert.equal(cls, 'voice-mic', 'pas d\'état « en démarrage » ni « actif » sur une carte notée');
+  h.Voice.setCard(h.Voice.cardContext({ id: 'next', front: 'arbre', back: 'tree' }, h.chapter));
+  assert.match(h.Voice.micHTML(), /is-on/, 'le micro reprend à la carte suivante');
+});
