@@ -1,4 +1,4 @@
-// js/voice-whisper-shim.js  (v2)
+// js/voice-whisper-shim.js  (v3)
 // Dans Brave, remplace la dictee Google (bloquee) par Whisper 100 % local.
 (function () {
   'use strict';
@@ -74,7 +74,10 @@
     var job = queue.then(async function () {
       var audio = await decode16k(blob);
       var t = await loadModel();
-      var out = await t(audio, { language: langOf(lang), task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 });
+      var forced = localStorage.getItem('voice.lang');
+      var opts = { task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 };
+      if (forced !== 'auto') opts.language = forced || langOf(lang);
+      var out = await t(audio, opts);
       return (out && out.text) || '';
     });
     queue = job.catch(function () {});
@@ -133,6 +136,7 @@
 
     _deliver(s, raw) {
       if (s.aborted) return;
+      console.log('[whisper] entendu :', JSON.stringify(raw));
       var text = clean(raw);
       if (!text) { this._emit('nomatch', { resultIndex: s.results.length, results: list(s.results) }); return; }
       var res = [{ transcript: (s.results.length ? ' ' : '') + text, confidence: 0.9 }];
