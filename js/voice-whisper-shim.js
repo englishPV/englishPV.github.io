@@ -1,4 +1,4 @@
-// js/voice-whisper-shim.js  (v3)
+// js/voice-whisper-shim.js  (v4)
 // Dans Brave, remplace la dictee Google (bloquee) par Whisper 100 % local.
 (function () {
   'use strict';
@@ -17,7 +17,7 @@
   // ---------- Message a l'ecran ----------
   var box = null, boxTimer = null;
   function toast(msg, ms) {
-    console.log('[whisper]', msg);
+    if (msg) console.log('[whisper]', msg);
     if (!box) {
       box = document.createElement('div');
       box.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:9px 15px;border-radius:10px;font:13px system-ui,sans-serif;z-index:99999;box-shadow:0 4px 16px #0006;max-width:90vw;text-align:center;pointer-events:none';
@@ -55,7 +55,7 @@
     })();
     modelP.then(
       function () { ready = true; localStorage.setItem('voice.whisper.cached', '1'); toast('Modele vocal pret', 1500); },
-      function (e) { modelP = null; console.error('[whisper]', e); }
+      function (e) { modelP = null; toast(''); console.error('[whisper]', e); }   // masque le pourcentage resté affiché
     );
     return modelP;
   }

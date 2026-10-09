@@ -38,8 +38,8 @@ function fakePipeline(env, task, model, options) {
   env.pipelineCalls.push({ task, model, options });
   return (async () => {
     if (options.device === 'webgpu' && env.webgpuFails) throw new Error('WebGPU indisponible');
-    if (env.modelFailing) throw new Error('modèle injoignable');
     if (env.modelGate) await env.modelGate;
+    if (env.modelFailing) throw new Error('modèle injoignable');
     return async function transcriber(audio, opts) {
       env.transcribeCalls.push({ audioLen: audio.length, opts: Object.assign({}, opts) });
       if (audio.length === 16000) return { text: '' };          // échauffement du modèle (1 s de silence)
@@ -596,4 +596,19 @@ test('deux phrases à la suite : journal et résultats dans l\'ordre', async () 
     .filter(l => l.startsWith('[whisper] entendu :'))
     .map(l => JSON.parse(l.slice('[whisper] entendu : '.length)));
   assert.deepEqual(entendu, ['soy beans', 'tree']);
+});
+
+test('échec du chargement en arrière-plan : le message de progression disparaît', async () => {
+  const env = makeEnv({ brave: true, storage: { 'voice.whisper.cached': '1' } });
+  let release;
+  env.modelGate = new Promise(resolve => { release = resolve; });
+  runTimeouts(env, 3000);
+  await until(() => env.pipelineCalls.length > 0, 'chargement en cours');
+  env.pipelineCalls[0].options.progress_callback({ status: 'progress', file: 'onnx/encoder_model.onnx', progress: 40 });
+  const box = env.elements[0];
+  assert.equal(box.style.display, 'block', 'le pourcentage est affiché pendant le téléchargement');
+  env.modelFailing = true;
+  release();
+  await until(() => env.logs.some(l => l.startsWith('error: [whisper]')), 'échec du chargement');
+  assert.equal(box.style.display, 'none', 'le message ne reste pas figé à 40 %');
 });
