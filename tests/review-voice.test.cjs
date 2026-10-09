@@ -477,3 +477,155 @@ test('clic simple souris retourne la carte ; images, liens et sélection restent
   selection = ''; r.flipped = true; click(event);
   assert.equal(flips, 1);
 });
+
+/* ══ Bandeau allégé : plus de consignes répétées à chaque carte ══
+   On compare le texte visible du bandeau (sans les attributs du bouton micro). */
+const barText = html => {
+  const key = 'id="voiceBarText">';
+  const a = html.indexOf(key) + key.length;
+  return html.slice(a, html.indexOf('</div>', a));
+};
+const plain = html => barText(html).replace(/<[^>]+>/g, '').trim();
+
+test('bandeau : rien à écrire quand le micro est coupé ou la carte déjà révélée', () => {
+  const h = clockHarness(() => {});
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true })), '');
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true, revealed: true })), '');
+});
+
+test('bandeau : un résultat n\'affiche que son score, le bouton « Carte suivante » reste', () => {
+  const h = clockHarness(() => {});
+  const ok = { ok: true, matched: 3, total: 3 };
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true, result: ok })), '✓ 3/3');
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true, result: { ok: false, manual: true } })), '✗ non sue');
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true,
+    result: { ok: false, matched: 1, total: 3, rating: 1.67, spoken: '' } })), '✗ 1/3 formes · note 1,67');
+  assert.match(h.Voice.actionsHTML({ result: ok }), /Carte suivante/);
+});
+
+test('bandeau : une réponse ratée garde la phrase entendue, sans « Corrigez puis passez »', () => {
+  const h = clockHarness(() => {});
+  const res = h.Voice.scoreAnswer('soldier beans', 'tree');
+  const text = plain(h.Voice.barHTML({ english: true, eligible: true, result: res }));
+  assert.match(text, /Vous avez dit : soldier beans/);
+  assert.doesNotMatch(text, /Corrigez/);
+  h.ctx.data.app.prefs.voiceShowSpoken = false;       // réglage « Afficher ma phrase reconnue » coupé
+  const quiet = plain(h.Voice.barHTML({ english: true, eligible: true, result: res }));
+  assert.equal(quiet, '✗ réponse incomplète');        // une seule forme attendue : seul le score reste
+  assert.doesNotMatch(quiet, /Corrigez|Vous avez dit/);
+});
+
+test('bandeau : un entraînement se signale par un seul mot', () => {
+  const h = clockHarness(() => {});
+  const html = h.Voice.barHTML({ english: true, eligible: true, practice: true, result: { ok: true, matched: 3, total: 3 } });
+  assert.match(html, /Entraînement/);
+  assert.doesNotMatch(html, /note initiale/);
+});
+
+test('bandeau : pendant l\'écoute, un simple « Écoute… »', () => {
+  const h = clockHarness(rec => { rec.later(30, () => rec.onstart && rec.onstart()); });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(100);
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: true })), 'Écoute…');
+});
+
+test('« Entrée pour valider » ne s\'affiche que sur la première carte', () => {
+  const h = clockHarness(rec => {
+    rec.later(30, () => rec.onstart && rec.onstart());
+    rec.later(100, () => rec.onresult && rec.onresult({ resultIndex: 0,
+      results: [Object.assign([{ transcript: 'soy' }], { isFinal: false })] }));
+  });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(200);
+  h.ctx.State.review.voiceHintIdx = h.ctx.State.review.index;   // renRev pose ce repère à la 1re carte où le micro sert
+  assert.match(plain(h.Voice.barHTML({ english: true, eligible: true })), /soy · Entrée pour valider/);
+  h.ctx.State.review.index = 1;                       // carte suivante de la même session
+  const later = plain(h.Voice.barHTML({ english: true, eligible: true }));
+  assert.match(later, /soy/);
+  assert.doesNotMatch(later, /Entrée/);
+});
+
+test('carte non dictable (image, formule) : pas de micro, bouton gris, bandeau vide', () => {
+  const h = clockHarness(rec => { rec.later(30, () => rec.onstart && rec.onstart()); });
+  h.Voice.setWanted(true, { silent: true });
+  h.clock.advance(100);
+  const before = h.starts.length;
+  h.Voice.setCard(h.Voice.cardContext({ id: 'img', front: 'schéma', back: '[IMAGE_ID:3]' }, h.chapter));
+  h.clock.advance(5000);
+  assert.equal(h.Voice.state().eligible, false);
+  assert.equal(h.Voice.state().listening, false);
+  assert.equal(h.starts.length, before, 'le navigateur n\'ouvre pas le micro pour cette carte');
+  assert.doesNotMatch(h.Voice.micHTML(), /is-on|is-starting/, 'le bouton ne fait pas croire à une écoute');
+  assert.equal(plain(h.Voice.barHTML({ english: true, eligible: false })), '');
+});
+
+test('activer ou couper le micro ne lance plus de toast de confirmation', () => {
+  const h = clockHarness(() => {});
+  h.Voice.setWanted(true);
+  h.Voice.setWanted(false);
+  assert.deepEqual(h.toasts, []);
+});
+
+function hintHarness() {
+  const ctx = {};
+  vm.runInNewContext(appSource.slice(appSource.indexOf('function voiceHintsHere('), appSource.indexOf('function renRev(')), ctx);
+  return ctx;
+}
+
+test('indications clavier du mode vocal : seulement sur la première carte où le micro sert', () => {
+  const { reviewHintHTML: hint } = hintHarness();
+  assert.match(hint(true, null, true), /je ne sais pas/);
+  assert.match(hint(true, null, true), /valider ma réponse/);
+  assert.equal(hint(false, null, true), '');
+  assert.match(hint(true, { ok: true }, false), /carte suivante/);
+  assert.equal(hint(false, { ok: true }, false), '');
+});
+
+test('repère des indications : posé à la première carte où le micro sert, puis figé', () => {
+  const { voiceHintsHere } = hintHarness();
+  const r = { index: 0 };
+  assert.equal(voiceHintsHere(r, false, null), false, 'carte sans micro : rien à poser');
+  r.index = 1;
+  assert.equal(voiceHintsHere(r, true, null), true, 'premier usage du micro : indications ici');
+  assert.equal(voiceHintsHere(r, true, null), true, 'nouveau rendu de la même carte : toujours ici');
+  r.index = 2;
+  assert.equal(voiceHintsHere(r, true, null), false, 'carte suivante : plus d\'indications');
+  assert.equal(voiceHintsHere(r, false, { ok: true }), false);
+});
+
+test('révision classique : les indications « retourner » et 1–4 restent sur chaque carte', () => {
+  const { reviewHintHTML: hint } = hintHarness();
+  for (const first of [true, false]) {
+    assert.match(hint(first, null, false), /retourner/);
+    assert.match(hint(first, null, false), /<kbd>1<\/kbd><kbd>2<\/kbd><kbd>3<\/kbd><kbd>4<\/kbd> évaluer/);
+  }
+});
+
+function chapterVoiceHarness(state) {
+  const ctx = {
+    Voice: { isEnglishChapter: () => true, state: () => state, micHTML: () => '<button class="voice-mic"></button>' },
+    escTxt: s => s
+  };
+  vm.runInNewContext(appSource.slice(appSource.indexOf('function chapterVoiceHTML('), appSource.indexOf('function bindChapterVoice(')), ctx);
+  return ctx.chapterVoiceHTML;
+}
+
+test('page du chapitre : libellé court, sans phrase d\'explication', () => {
+  const off = chapterVoiceHarness({ supported: true, wanted: false, errorMsg: '' });
+  assert.match(off({ id: 'x' }), /Révision à la voix/);
+  assert.doesNotMatch(off({ id: 'x' }), /dictez/);
+  const on = chapterVoiceHarness({ supported: true, wanted: true, errorMsg: '' });
+  assert.match(on({ id: 'x' }), /Mode vocal <b>activé<\/b>/);
+  assert.doesNotMatch(on({ id: 'x' }), /Continuer la session/);
+});
+
+test('après un résultat, le micro est en pause sur cette carte : pas de « Activation du micro… »', () => {
+  const h = clockHarness(() => {});
+  h.Voice.setWanted(true, { silent: true });
+  h.Voice.setCard(h.Voice.cardContext(h.card, h.chapter));
+  h.Voice.lock();                                       // renRev verrouille une carte déjà notée
+  const cls = h.Voice.micHTML().match(/class="([^"]*)"/)[1];
+  assert.equal(cls, 'voice-mic', 'pas d\'état « en démarrage » ni « actif » sur une carte notée');
+  h.Voice.setCard(h.Voice.cardContext({ id: 'next', front: 'arbre', back: 'tree' }, h.chapter));
+  assert.match(h.Voice.micHTML(), /is-on/, 'le micro reprend à la carte suivante');
+});

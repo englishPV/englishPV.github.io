@@ -561,7 +561,7 @@
   function setWanted(on, opts) {
     opts = opts || {};
     if (on && !S.wanted && typeof window.voiceMayEnable === 'function' && !window.voiceMayEnable()) {
-      if (typeof toast === 'function') toast('Réponse déjà affichée : activez le micro sur la prochaine carte', 'info');
+      if (typeof toast === 'function') toast('Micro indisponible sur cette carte', 'info');
       return;
     }
     S.wanted = !!on;
@@ -569,11 +569,7 @@
     if (typeof data !== 'undefined' && data && data.app) { prefs().voiceOn = S.wanted; if (!opts.silent) persist(); }
     if (!S.wanted) stop({ quiet: true });
     else { S.blocked = S.blocked && !opts.force; if (opts.force) S.blocked = false; start(); }
-    emit();
-    /* Si le navigateur a déjà abandonné pendant start(), son message prime sur l'annonce */
-    if (!opts.silent && typeof toast === 'function' && !S.errorMsg) {
-      toast(S.wanted ? 'Micro activé — répondez à voix haute' : 'Micro désactivé', S.wanted ? 'success' : 'info', 1800);
-    }
+    emit();   // pas de toast « Micro activé » : le bouton change déjà d'état
   }
   function toggle() { setWanted(!S.wanted, { force: true }); }
 
@@ -667,7 +663,8 @@
     const tol = p.voiceTolerance;
     return {
       key, card, chap, front, expected, lang, english, eligible,
-      listen: english && !r.revealedWithoutVoice && (!r.voiceResult || r.voiceRetrying), forms,
+      /* Carte non dictable (image, formule) : pas de micro, il ne servirait à rien */
+      listen: eligible && english && !r.revealedWithoutVoice && (!r.voiceResult || r.voiceRetrying), forms,
       scorer: eligible ? (txt => scoreAnswer(txt, expected, { tolerance: tol, forms })) : null
     };
   }
@@ -690,6 +687,10 @@
       return { cls: '', icon: 'mic-off', title: 'Réviser à la voix : appuyez pour activer le micro' };
     }
     if (st.blocked) return { cls: ' is-blocked', icon: 'mic-off', title: 'Micro bloqué : autorisez le microphone dans les réglages du navigateur' };
+    /* Carte sans réponse dictable : le micro reste en veille sur cette carte */
+    if (isReviewView() && !st.eligible) return { cls: '', icon: 'mic', title: 'Carte non dictable (image ou formule)' };
+    /* Carte déjà notée : le micro reste réglé pour la suivante, mais n'écoute pas sur celle-ci */
+    if (isReviewView() && st.locked) return { cls: '', icon: 'mic', title: 'Micro en pause sur cette carte' };
     if (st.listening || st.resuming) return { cls: ' is-on', icon: 'mic', title: 'Micro actif — appuyez pour le couper' };
     return { cls: ' is-starting', icon: 'mic', title: 'Activation du micro…' };
   }
@@ -733,14 +734,14 @@
     });
   }
 
-  /* Message d'écoute adapté à la langue reconnue sur la carte courante. */
-  const listenHint = () => S.lang === 'fr-FR' ? 'Écoute… dictez la réponse en français.'
-                       : /^en/.test(S.lang || '') ? 'Écoute… dictez la réponse en anglais.'
-                       : 'Écoute… dictez la réponse.';
+  /* Les indications clavier ne se répètent pas à chaque carte : elles ne sont posées (renRev)
+     que sur la première carte de la session où le micro sert. */
+  const tipsHere = () => typeof State !== 'undefined' && !!State.review && State.review.voiceHintIdx === State.review.index;
 
   /**
-   * Bandeau sous la carte de révision.
-   * @param {object} o { english, eligible, result, delayMs, spoken }
+   * Bandeau sous la carte de révision. Il n'écrit que ce qui change quelque chose :
+   * le score, le motif d'un arrêt, la phrase entendue. Le bouton micro montre le reste.
+   * @param {object} o { english, eligible, result, practice, revealed }
    */
   function barHTML(o) {
     o = o || {};
@@ -748,35 +749,26 @@
     const st = state();
     const p = prefs();
     const res = o.result || null;
+    const practice = o.practice ? '<span class="voice-bar__text">Entraînement</span>' : '';
     let cls = 'voice-bar', txt = '';
 
-    if (!SUPPORTED) {
-      cls += ' is-off';
-      txt = `<span class="voice-bar__text">Reconnaissance vocale indisponible sur ce navigateur — Chrome, Edge ou Safari requis.</span>`;
-    } else if (!o.eligible) {
-      cls += ' is-off';
-      txt = `<span class="voice-bar__text">Carte non dictable (image ou formule) — répondez normalement.</span>`;
-    } else if (res && res.ok) {
+    if (res && res.ok) {
       cls += ' is-ok';
-      txt = `<span class="voice-bar__score">✓ ${res.matched}/${res.total}</span>
-             <span class="voice-bar__text">${o.practice ? 'Entraînement réussi — note initiale conservée.' : 'Bien joué ! Carte validée.'} Cliquez ou appuyez sur Espace pour continuer.</span>`;
+      txt = `<span class="voice-bar__score">✓ ${res.matched}/${res.total}</span>${practice}`;
     } else if (res && !res.ok) {
       cls += ' is-bad';
       if (res.manual) {
-        txt = `<span class="voice-bar__score">✗ non sue</span>
-               <span class="voice-bar__text">${o.practice ? 'Entraînement terminé — note initiale conservée.' : 'Réponse affichée — la carte repart en révision (note 1).'}</span>`;
+        txt = `<span class="voice-bar__score">✗ non sue</span>${practice}`;
       } else {
         const detail = res.total > 1 ? `${res.matched}/${res.total} formes · note ${frNum(res.rating)}` : 'réponse incomplète';
-        txt = `<span class="voice-bar__score">✗ ${detail}</span>
-               <span class="voice-bar__text">${o.practice ? 'Entraînement uniquement · note initiale conservée. ' : ''}${p.voiceShowSpoken && res.spoken ? `Vous avez dit : <span class="voice-spoken">${spokenHTML(res)}</span>` : 'Corrigez puis passez à la suite.'}</span>`;
+        const heard = p.voiceShowSpoken && res.spoken ? `<span class="voice-bar__text">Vous avez dit : <span class="voice-spoken">${spokenHTML(res)}</span></span>` : '';
+        txt = `<span class="voice-bar__score">✗ ${detail}</span>${practice}${heard}`;
       }
-    } else if (o.revealed) {
-      cls += ' is-off';
-      txt = `<span class="voice-bar__text">Réponse déjà affichée : micro indisponible sur cette carte. Évaluez avec 1–4.</span>`;
-    } else if (!st.wanted || st.blocked) {
-      /* Micro coupé, bloqué ou arrêté après des échecs : le motif remplace l'écoute */
+    } else if (!SUPPORTED || !o.eligible || o.revealed || !st.wanted || st.blocked) {
+      /* Micro indisponible sur cette carte, coupé, bloqué ou arrêté après des échecs :
+         seul le motif (erreur, blocage) est écrit ; l'état se lit sur le bouton micro. */
       cls += S.errorMsg ? ' is-err' : ' is-off';
-      txt = offHTML(o.eligible);
+      txt = offHTML();
     } else {
       cls += ' is-live';
       txt = liveHTML(st);
@@ -787,18 +779,22 @@
     </div>`;
   }
 
-  /* Texte du bandeau micro coupé : motif de l'arrêt, blocage, ou invitation à activer. */
-  function offHTML(eligible) {
+  /* Texte du bandeau micro coupé : seulement le motif de l'arrêt ou du blocage. */
+  function offHTML() {
     if (S.errorMsg) return `<span class="voice-bar__text">${esc(S.errorMsg)}</span>`;
     if (S.blocked) return `<span class="voice-bar__text">Micro bloqué par le navigateur — autorisez-le puis réactivez le mode vocal.</span>`;
-    return `<span class="voice-bar__text">Mode vocal prêt. ${eligible ? 'Appuyez sur le micro et dictez la réponse.' : ''}</span>`;
+    return '';
   }
   /* Texte du bandeau pendant l'écoute : score provisoire, phrase entendue, ou attente. */
   function liveHTML(st) {
     const live = st.live;
     const sc = live && live.total ? `<span class="voice-bar__score">${live.matched}/${live.total}</span>` : '';
     const heard = st.interim || st.text;
-    return `${sc}<span class="voice-bar__text">${heard ? `<span class="voice-live">${esc(heard)}</span> · Entrée pour valider` : ((st.listening || st.resuming) ? listenHint() : 'Activation du micro…')}</span>${heard ? dismissHTML() : ''}`;
+    const tip = tipsHere() ? ' · Entrée pour valider' : '';
+    const body = heard
+      ? `<span class="voice-live">${esc(heard)}</span>${tip}`
+      : ((st.listening || st.resuming) ? 'Écoute…' : 'Activation du micro…');
+    return `${sc}<span class="voice-bar__text">${body}</span>${heard ? dismissHTML() : ''}`;
   }
 
   const dismissHTML = () => `<button type="button" class="voice-dismiss" data-voice-dismiss aria-label="Annuler la transcription" title="Annuler la transcription">${typeof ico === 'function' ? ico('x','ico--sm') : '×'}</button>`;
@@ -811,13 +807,13 @@
     refreshMic(bar);
     const t = bar.querySelector('#voiceBarText');
     if (!t || st.locked || S.result) return;
-    if (!st.wanted || st.blocked) {
+    if (!st.wanted || st.blocked || !st.eligible) {
       /* Rien à changer si le bandeau n'affichait pas l'écoute (ex. réponse déjà révélée) */
       if (!S.errorMsg && !st.blocked && !bar.classList.contains('is-live')) return;
       bar.classList.remove('is-live');
       bar.classList.toggle('is-err', !!S.errorMsg);
       bar.classList.toggle('is-off', !S.errorMsg);
-      t.innerHTML = offHTML(S.eligible);
+      t.innerHTML = offHTML();
       return;
     }
     bar.classList.remove('is-off', 'is-err');

@@ -1,4 +1,4 @@
-// js/voice-whisper-shim.js  (v2)
+// js/voice-whisper-shim.js  (v4)
 // Dans Brave, remplace la dictee Google (bloquee) par Whisper 100 % local.
 (function () {
   'use strict';
@@ -17,7 +17,7 @@
   // ---------- Message a l'ecran ----------
   var box = null, boxTimer = null;
   function toast(msg, ms) {
-    console.log('[whisper]', msg);
+    if (msg) console.log('[whisper]', msg);
     if (!box) {
       box = document.createElement('div');
       box.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:9px 15px;border-radius:10px;font:13px system-ui,sans-serif;z-index:99999;box-shadow:0 4px 16px #0006;max-width:90vw;text-align:center;pointer-events:none';
@@ -55,7 +55,7 @@
     })();
     modelP.then(
       function () { ready = true; localStorage.setItem('voice.whisper.cached', '1'); toast('Modele vocal pret', 1500); },
-      function (e) { modelP = null; console.error('[whisper]', e); }
+      function (e) { modelP = null; toast(''); console.error('[whisper]', e); }   // masque le pourcentage resté affiché
     );
     return modelP;
   }
@@ -74,7 +74,10 @@
     var job = queue.then(async function () {
       var audio = await decode16k(blob);
       var t = await loadModel();
-      var out = await t(audio, { language: langOf(lang), task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 });
+      var forced = localStorage.getItem('voice.lang');
+      var opts = { task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 };
+      if (forced !== 'auto') opts.language = forced || langOf(lang);
+      var out = await t(audio, opts);
       return (out && out.text) || '';
     });
     queue = job.catch(function () {});
@@ -133,6 +136,7 @@
 
     _deliver(s, raw) {
       if (s.aborted) return;
+      console.log('[whisper] entendu :', JSON.stringify(raw));
       var text = clean(raw);
       if (!text) { this._emit('nomatch', { resultIndex: s.results.length, results: list(s.results) }); return; }
       var res = [{ transcript: (s.results.length ? ' ' : '') + text, confidence: 0.9 }];

@@ -132,8 +132,8 @@ function chapterVoiceHTML(c){
     : st.errorMsg
       ? escTxt(st.errorMsg)   // le micro s'est arrêté seul : on dit pourquoi
       : st.wanted
-        ? 'Mode vocal <b>activé</b> — le micro reste allumé pendant toute la révision, même après « Continuer la session ».'
-        : 'Réviser à la voix : dictez la réponse, elle est validée automatiquement.';
+        ? 'Mode vocal <b>activé</b>'
+        : 'Révision à la voix';
   const cls = st.wanted ? 'is-live' : (st.errorMsg ? 'is-err' : 'is-off');
   return `<div class="voice-bar ${cls}" id="chapVoiceBar" style="margin-top:10px">
       ${Voice.micHTML('lg')}
@@ -1793,6 +1793,21 @@ function getLogGrp(s,g,k){ return g.chapIds.flatMap(cid=>{const ch=s.chapters.fi
 
 function goReview(push=true){ exitDrive(); safeCloseLB(); Media.revokeAll(); if(push)Nav.push(); State.view='review'; setTop({title:'Révision'}); setBot({actions:!1,revision:!0}); $('#revisionBar').style.display='none'; $('#reviewActionsBar').style.display='block'; $('#app').classList.toggle('focus-mode', data.app.prefs.focusMode); renRev() }
 
+/* Indications du mode vocal : écrites une seule fois par session, sur la première carte
+   où le micro sert (r.voiceHintIdx). Sur les cartes suivantes, l'utilisateur connaît les touches. */
+function voiceHintsHere(r, voiceEval, vres){
+  if((voiceEval || vres) && r.voiceHintIdx === undefined) r.voiceHintIdx = r.index;
+  return r.voiceHintIdx === r.index;
+}
+
+/* Indications clavier sous la carte (grand écran seulement, voir CSS .review-hint).
+   La révision classique (retourner, 1–4) n'est pas touchée. */
+function reviewHintHTML(hintsHere, vres, voiceEval){
+  if(vres) return hintsHere ? '<span><kbd>Espace</kbd> carte suivante</span>' : '';
+  if(voiceEval) return hintsHere ? '<span><kbd>Espace</kbd> je ne sais pas</span><span><kbd>Entrée</kbd> valider ma réponse</span>' : '';
+  return '<span><kbd>Espace</kbd> retourner</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>';
+}
+
 function renRev(){
   if(State.review?.isQCM) { renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
@@ -1807,6 +1822,7 @@ function renRev(){
   const voiceWanted = voiceActive();
   const vres = r.voiceRetrying ? null : (r.voicePracticeResult || r.voiceResult || null);
   const voiceEval = !!(vctx && vctx.eligible && voiceWanted && !r.revealedWithoutVoice);       // dictée active
+  const hintsHere = voiceHintsHere(r, voiceEval, vres);   // indications clavier : sur cette carte ?
   const answerHTML = (vres && !vres.manual) ? Voice.answerHTML(b, vres) : bT;
   const voiceBar = voiceChapter
     ? Voice.barHTML({ english:true, eligible:vctx.eligible, result:vres, practice:!!r.voicePracticeResult,
@@ -1828,11 +1844,7 @@ function renRev(){
                <div class="definition" data-face="back">${answerHTML}</div>
              </div>`}
         </div>
-        <div class="review-hint">
-          <span><kbd>Espace</kbd> ${vres ? 'carte suivante' : voiceEval ? 'je ne sais pas' : 'retourner'}</span>
-          ${!vres && voiceEval ? '<span><kbd>Entrée</kbd> valider ma réponse</span>' : ''}
-          ${!vres && !voiceEval ? '<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>' : ''}
-        </div>
+        <div class="review-hint">${reviewHintHTML(hintsHere, vres, voiceEval)}</div>
       </div>
       ${voiceBar}
     </div>`;
@@ -1879,6 +1891,7 @@ function renRev(){
     Voice.setCard(vctx);
     Voice.bindMic(v);
     if(r.voiceResult && !r.voiceRetrying) Voice.lock(); // note déjà enregistrée
+    Voice.renderLive();   // bouton recalé sur CETTE carte (sinon il garde l'état de la précédente)
   } else if(typeof Voice!=='undefined'){
     Voice.setCard(null);
   }
@@ -2091,7 +2104,7 @@ function voiceAdvance(){
 function voiceRetry(){
   const r=State.review; if(!r || !r.voiceResult) return;
   if(r.voiceResult.ok) return;
-  if(!voiceActive()) { toast('Réactivez le micro pour vous entraîner, ou passez à la carte suivante', 'info'); return; }
+  if(!voiceActive()) { toast('Réactivez le micro pour vous entraîner', 'info'); return; }
   r.voiceRetrying=true; r.voicePracticeResult=null; r.flipped=false;
   Voice.restartCard();           // conserve la note initiale ; nouvelle écoute sans restauration des stats
   renRev();

@@ -121,7 +121,7 @@ const PDrive = (() => {
             try {
               const me = await fetchEmail();
               const st = stored();
-              if (st && st.email && st.email !== me) { st.files = []; st.folderId = ''; }   // autre compte → autre espace
+              if (st && st.email && st.email !== me) { st.files = []; st.folderId = ''; st.syncedAt = 0; }   // autre compte → autre espace
               if (st) { st.email = me; save(); }
               email = me;
               res(me);
@@ -372,8 +372,8 @@ const PDrive = (() => {
             puis les fichiers seront rangés dans un dossier <b>${esc(CFG.folderName)}</b> de ton Drive (visible par toi seul).</div>` : ''}
         <div id="pdScroll" class="scroll-y deck-scroll">
           <div class="pd-list" id="pdList">${list_.length ? '' : `<div class="empty">${ico('cloud','ico--lg')}
-            <div class="empty__title">${connected ? 'Ton Drive est vide ici' : 'Rien à afficher'}</div>
-            <div class="empty__sub">${connected ? 'Dépose tes premiers fichiers : ils resteront dans ton compte Google.' : 'Connecte ton compte Google pour retrouver tes fichiers sur tous tes appareils.'}</div></div>`}</div>
+            <div class="empty__title">${connected ? (prof.syncedAt ? 'Ton Drive est vide ici' : 'Liste non chargée') : 'Rien à afficher'}</div>
+            <div class="empty__sub">${connected ? (prof.syncedAt ? 'Dépose tes premiers fichiers : ils resteront dans ton compte Google.' : 'Fichiers non encore affichés sur cet appareil.') : 'Connecte ton compte Google pour retrouver tes fichiers sur tous tes appareils.'}</div></div>`}</div>
         </div>
       </div>`;
 

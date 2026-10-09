@@ -1,7 +1,7 @@
 # Flashcards · Physique & Maths
 
 Application web de révision par répétition espacée (algorithme **FSRS**) : plus de
-1 000 flashcards de physique et de mathématiques, support **LaTeX** complet (MathJax),
+2 600 flashcards de physique, de mathématiques et d'anglais, support **LaTeX** complet (MathJax),
 tableau de bord statistique global, synchronisation cloud optionnelle et « Drive » de
 documents publiés depuis GitHub.
 
@@ -15,7 +15,7 @@ Site : <https://englishpv.github.io> · Emploi du temps : <https://schedulepv.we
 | --- | --- |
 | Type | Site statique (HTML + CSS + JavaScript vanilla, aucune étape de build) |
 | Hébergement | GitHub Pages (`main` = production, `.nojekyll`) |
-| Police | Inter variable, **auto-hébergée** (`fonts/`, 48 Ko, aucune requête tierce) |
+| Police | Inter variable, **auto-hébergée** (`fonts/`, ≈ 100 Ko : romain et italique ; aucune requête tierce) |
 | Formules | MathJax 3 chargé à la demande |
 | PDF | **PDF.js 3.11 auto-hébergé** (`vendor/pdfjs/`), chargé à la demande — lecteur maison avec zoom |
 | Sync | Firebase Realtime Database + Google Auth (optionnel) |
@@ -26,6 +26,7 @@ Site : <https://englishpv.github.io> · Emploi du temps : <https://schedulepv.we
 
 ```
 index.html                     coquille de l'application (barre latérale + barre d'app)
+data.js                        cartes livrées : physique, mathématiques, anglais (converties en cartes par l'application)
 css/01_styles_theme_and_layout.css   design tokens, reset, coquille, primitives UI
 css/02_drive.css               module Drive (onglets, listes, lecteur, éditeur)
 css/03_modern.css              composants applicatifs (listes, stats, révision, QCM, réglages)
@@ -44,6 +45,7 @@ css/06_library.css             images, Mon Drive, assistant d'import
 vendor/pdfjs/                  PDF.js 3.11 (copie locale, chargée au premier PDF ouvert)
 fonts/                         Inter variable (woff2, subset latin)
 images/ · content/drive/       médias et documents publiés
+tests/                         tests automatisés : `node --test tests/*.cjs`
 ```
 
 ## Vues
@@ -69,19 +71,21 @@ La liste des chapitres et des dossiers est triée automatiquement :
 2. puis la **dernière activité** : réviser un chapitre (ou une de ses cartes), ou y
    ajouter/modifier une carte, le fait **remonter tout en haut** du deck.
 
-L'horodatage vit dans le chapitre (`lastUsed`) ; s'il manque (sauvegarde ancienne ou
-poussée depuis un autre appareil), l'ordre est reconstruit depuis `lastReviewed` des
-cartes puis depuis le journal de révisions (`stats.dailyLog`). `reconcile()` conserve
+L'horodatage vit dans le chapitre (`lastUsed`). L'activité retenue est la plus récente
+entre `lastUsed`, le `lastReviewed` des cartes et le dernier jour du journal de révisions
+(`stats.dailyLog`) : l'ordre reste juste après une sauvegarde ancienne ou une synchronisation
+depuis un autre appareil. `reconcile()` conserve
 désormais ces champs — réglages de chapitre, date limite, `lastUsed` et **état FSRS
 des cartes** — au lieu de les réinitialiser, ce qui remettait les decks au milieu
 après un rechargement ou une synchronisation.
 
 ## Design system
 
-Les jetons sont définis une seule fois dans `:root` (`css/01_…css`) et se déclinent en
-thème sombre (défaut) et clair via `[data-theme="light"]` :
+Les jetons sont définis dans `:root` (`css/01_…css`) et se déclinent en thème sombre
+(défaut) et clair via `[data-theme="light"]` (la mise en page d'impression, `@media print`
+dans `css/03_…`, les redéfinit aussi) :
 
-- **Couleurs** — `--bg`, `--surface` (1/2/3), `--border`, `--text`, `--muted`, `--faint`
+- **Couleurs** — `--bg`, `--surface`, `--surface-2`, `--surface-3`, `--border`, `--text`, `--muted`, `--faint`
 - **Accent** — `--primary` (+ `-soft`, `-line`, `--on-primary`), personnalisable dans les réglages
 - **Typographie** — `--font-sans`, `--fs-term`, `--fs-def`, chiffres tabulaires pour les stats
 - **Espacements** — échelle `--sp-1 … --sp-8` (4 → 40 px)
@@ -99,7 +103,8 @@ Un bouton **micro** apparaît sur les chapitres d'anglais (page du chapitre et
 pendant la révision). Une fois activé, il reste allumé : d'une carte à l'autre,
 d'une session à l'autre, y compris après « Continuer la révision ». Il ne
 s'éteint que si on réappuie dessus ou si on quitte la révision (et il se rallume
-tout seul en revenant).
+tout seul en revenant). Sur une carte déjà notée, il est seulement en pause : le bouton reste
+gris (« Micro en pause sur cette carte ») et reprend à la carte suivante.
 
 Exception : si le navigateur n'arrive pas à écouter (service de reconnaissance
 injoignable, micro absent ou occupé, micro qui ne démarre jamais), le micro ne
@@ -112,14 +117,14 @@ une parole reconnue remet le compteur à zéro.
 
 | Étape | Comportement |
 | --- | --- |
-| Réponse dite juste | Carte validée automatiquement, réponse affichée en vert, passage à la suivante après le délai réglé (1,2 s par défaut, 0–3 s) |
-| Réponse fausse | La carte se retourne : les mots corrects restent normaux, **les mots manquants ou faux passent en rouge**, avec « ce que le micro a entendu » mot à mot |
+| Réponse dite juste | Carte validée automatiquement, réponse affichée en vert. Le passage à la carte suivante attend une action : bouton **Carte suivante**, Espace ou Entrée |
+| Réponse fausse | La carte se retourne : les mots corrects restent normaux, **les mots manquants ou faux passent en rouge**, avec « Vous avez dit » mot à mot (réglage *Afficher ma phrase reconnue*) |
 | Notation | Aucune auto-évaluation : la note est calculée sur le nombre de formes justes (2 formes sur 3 → **note 2,33**) puis transmise à FSRS, qui interpole la note fractionnaire |
-| Continuer | Mauvaise carte → **Réessayer** (aucune note conservée) ou **Carte suivante**. Bonne carte → clic ou fin du décompte |
+| Continuer | Mauvaise carte → **Réessayer** (entraînement : la note initiale et les statistiques ne changent pas) ou **Carte suivante**. Bonne carte → **Carte suivante** (bouton, Espace ou Entrée) |
 
 Le moteur est la **Web Speech API** du navigateur (Chrome/Edge : moteur Google ;
 Safari : dictée Apple ; Firefox : non supporté, l'interface se désactive proprement).
-Aucun modèle à télécharger, aucune clé API, aucun serveur.
+Aucun modèle à télécharger, aucune clé API, aucun serveur (sauf le repli Whisper sur Brave, décrit plus bas).
 
 L'évaluation (`js/12_voice.js`) est indépendante de la reconnaissance :
 
@@ -134,13 +139,26 @@ L'évaluation (`js/12_voice.js`) est indépendante de la reconnaissance :
   (automatique, anglais UK/US ou français pour les chapitres en sens inverse).
 
 Réglages : *Paramètres → Application* (et onglet *Chapitre* des chapitres
-d'anglais) · délai avant la carte suivante, tolérance, langue, affichage de la
-phrase reconnue, bouton **Tester le micro**.
+d'anglais) · tolérance, langue, affichage de la phrase reconnue, bouton
+**Tester le micro**.
+
+**Brave** bloque la dictée Google : la page utilise alors Whisper
+(`js/voice-whisper-shim.js`), un modèle qui tourne dans le navigateur. La
+bibliothèque (Transformers.js 3.0.2) vient de jsDelivr, le modèle de Hugging
+Face ; le navigateur les garde en cache après le premier téléchargement.
+
+Réglages de diagnostic, à saisir dans la console (F12), puis recharger la page :
+
+- `localStorage.setItem('voice.whisper', '1')` force Whisper hors Brave, `'0'` le désactive ;
+- `localStorage.setItem('voice.model', 'onnx-community/whisper-small')` change de modèle (défaut : `whisper-base`) ;
+- `localStorage.setItem('voice.lang', 'english')` impose la langue transmise à Whisper (`'french'`, ou `'auto'` pour qu'il la détecte). Retirez-la ensuite avec `localStorage.removeItem('voice.lang')`, sinon les cartes en français seront transcrites en anglais.
+
+La console affiche chaque phrase reçue : `[whisper] entendu : "…"`.
 
 ## Importer : fichiers ou texte écrit (format « pv-import »)
 
-Le bouton **Importer** (deck, menu latéral *Cartes* ou *Paramètres → Données*) ouvre un
-assistant à trois onglets :
+Le bouton **Importer** (vue *Mes decks*, ou *Paramètres → Données* : « Importer des cartes »)
+ouvre un assistant à trois onglets :
 
 | Onglet | Contenu |
 | --- | --- |
@@ -154,7 +172,8 @@ assistant à trois onglets :
   réutilisée ; sinon elle est créée (et devient la matière courante).
 - Un **chapitre** du même titre existe déjà dans cette matière → les cartes **s'y ajoutent** ;
   sinon le chapitre est créé (emoji et date limite appliqués).
-- Rien n'est jamais écrasé : l'import **ajoute** seulement. L'option « Ignorer les doublons »
+- Aucune carte n'est écrasée : l'import **ajoute** seulement. Sur un chapitre existant, seuls
+  l'emoji et la date limite sont mis à jour, si le fichier les fournit. L'option « Ignorer les doublons »
   (cochée par défaut) évite d'ajouter deux fois la même carte (même recto **et** même verso).
 - Les chapitres ainsi créés sont marqués *importés* : ils se suppriment d'un bloc depuis le deck.
 
@@ -206,7 +225,7 @@ assistant à trois onglets :
 | `imageVerso` | `versoImage`, `imageArriere` | image ajoutée au verso |
 
 **Raccourcis de carte** : `"recto | verso"` (chaîne) ou `["recto", "verso"]` (liste) remplacent
-l'objet. Dans une chaîne JSON, `\n` passe à la ligne et `\|` écrit un « | » littéral.
+l'objet. Dans une chaîne JSON, `\n` passe à la ligne. Le premier `|` sépare recto et verso (les suivants restent dans le verso) ; pour un « | » dans le recto, utilisez la forme objet ou la liste `["recto", "verso"]`.
 
 ### 3. Format « PV-Lignes » (à taper à la main)
 
@@ -229,7 +248,7 @@ dérivée de x² | 2x
 
 - `@matiere Nom` — ouvre ou crée la matière. Sans cette ligne (ou avant), les cartes vont dans « Import ».
 - `@chapitre Titre {emoji: 💂, date: 2026-12-31}` — ouvre ou crée le chapitre ; les options entre accolades sont facultatives.
-- `recto | verso` — une carte par ligne. Le recto peut contenir une image (§4).
+- `recto | verso` — une carte par ligne. Le recto peut contenir une image (§4). Pour un « | » littéral, écrivez `\|`.
 - `@fin` — referme la matière courante. Le format est détecté automatiquement (le texte commence par `{` ou `[` → JSON, sinon PV-Lignes).
 
 ### 4. Images
@@ -251,17 +270,18 @@ dans l'onglet **Images** puis de relancer l'import).
 ### 5. Erreurs et avertissements
 
 - **Erreurs** (bloquent l'import, listées avec le numéro de ligne) : JSON invalide, carte sans
-  recto/verso, ligne sans « | », directive `@…` inconnue, matière ou chapitre sans nom.
-- **Avertissements** (n'empêchent pas l'import) : date mal formée (ignorée), chapitre vide,
-  image introuvable, aucune matière déclarée (repli sur « Import »).
+  recto (PV-Lignes) ou sans recto ni verso (JSON), ligne sans « | », directive `@…` inconnue,
+  matière ou chapitre sans nom.
+- **Avertissements** (n'empêchent pas l'import) : date mal formée (ignorée), chapitre sans carte
+  (JSON), image introuvable, chapitre déclaré avant toute `@matiere` (repli sur « Import »).
 
 ## Images
 
-Onglet **Images** (menu latéral, bouton *Images* du deck, ou *Paramètres → Bibliothèque d'images*) :
+Onglet **Images** (menu latéral *Images*) :
 
 - **galerie** de toutes les images importées, triées de la plus récente à la plus ancienne, avec
   recherche par nom, poids et **nombre de cartes qui utilisent chaque image** ;
-- **clic sur une image** → aperçu + liste des cartes utilisatrices (matière, chapitre, recto/verso) ;
+- **clic sur une image** → aperçu + liste des cartes utilisatrices (chapitre, recto/verso) ;
   un clic sur une ligne ouvre **l'éditeur de cette carte** ;
 - **Importer** : un ou plusieurs fichiers image (glisser-déposer possible) ; si *Mon Drive* est
   connecté, les images sont aussi copiées dans le dossier personnel du Drive ;
@@ -288,8 +308,8 @@ appareils, et **strictement privé** (l'application n'utilise que la portée
 - Le **jeton d'accès reste en mémoire** du navigateur (jamais écrit sur le disque) ; seule la
   liste des fichiers (nom, taille, date) est enregistrée dans les données, donc synchronisée
   entre appareils comme le reste.
-- Hors connexion, la liste en cache reste consultable ; les fichiers se rechargent au prochain
-  clic sur *Connecter*.
+- Hors connexion, la liste en cache reste consultable. Le bouton *Synchroniser* (vue *Mon Drive*,
+  connecté) recharge la liste depuis Drive.
 
 ### Configuration (une fois, ~5 minutes)
 
@@ -316,12 +336,12 @@ procédure) — le reste de l'application fonctionne normalement.
 Les statistiques sont recalculées localement (aucun serveur) à partir des compteurs
 `dailyReviews`, `dailyDurMs`, `dailyChanges` et des journaux `dailyLog` conservés
 180 jours par `pruneStats()`. La rétention moyenne et les prévisions utilisent
-directement le modèle FSRS (`stability`, `difficulty`, `dueAt`).
+directement le modèle FSRS (`stability`, `dueAt`).
 
 | Touche | Action |
 | --- | --- |
 | `⌘/Ctrl` + `K` ou `/` | Rechercher une carte |
-| `Espace` / `Entrée` (révision) | Retourner la carte (mode vocal : « je ne sais pas », puis carte suivante) |
+| `Espace` / `Entrée` (révision) | Retourner la carte. Mode vocal : `Espace` = « je ne sais pas » ; `Entrée` valide la réponse dictée ; une fois le retour affiché, `Espace` ou `Entrée` = carte suivante |
 | `R` (mode vocal, correction affichée) | Réessayer la carte |
 | `1` `2` `3` `4` (révision) | Échec · Difficile · Bien · Facile |
 | `Maj` + molette | Agrandir / réduire la police (équivalent du pincement tactile) |
@@ -347,15 +367,23 @@ python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
+Tests (Node, sans dépendance), depuis la racine du dépôt :
+
+```bash
+node --test tests/*.cjs
+```
+
+(`node --test tests/` ne fonctionne pas avec Node 22 : il faut le motif de fichiers.)
+
 ## Publication
 
 1. Les modifications de contenu peuvent être publiées directement depuis l'app
-   (onglet Drive → **Publier**, voir `DRIVE_ADMIN.md`).
+   (onglet Drive → **Publier**).
 2. Les modifications de code se font par commit sur `main` : GitHub Pages redéploie
    automatiquement. Les feuilles de style et scripts sont versionnés (`?v=`) pour
    forcer la mise à jour du cache.
 
 ## Sécurité
 
-Voir `SECURITY.md`. Le jeton GitHub du Drive est stocké localement dans le navigateur
-de l'administrateur et n'est jamais commité.
+Le jeton GitHub du Drive est stocké localement dans le navigateur de
+l'administrateur et n'est jamais commité.
