@@ -112,10 +112,10 @@ une parole reconnue remet le compteur à zéro.
 
 | Étape | Comportement |
 | --- | --- |
-| Réponse dite juste | Carte validée automatiquement, réponse affichée en vert, passage à la suivante après le délai réglé (1,2 s par défaut, 0–3 s) |
-| Réponse fausse | La carte se retourne : les mots corrects restent normaux, **les mots manquants ou faux passent en rouge**, avec « ce que le micro a entendu » mot à mot |
+| Réponse dite juste | Carte validée automatiquement, réponse affichée en vert. Le passage à la carte suivante attend une action : bouton **Carte suivante**, Espace ou Entrée |
+| Réponse fausse | La carte se retourne : les mots corrects restent normaux, **les mots manquants ou faux passent en rouge**, avec « Vous avez dit » mot à mot (réglage *Afficher ma phrase reconnue*) |
 | Notation | Aucune auto-évaluation : la note est calculée sur le nombre de formes justes (2 formes sur 3 → **note 2,33**) puis transmise à FSRS, qui interpole la note fractionnaire |
-| Continuer | Mauvaise carte → **Réessayer** (aucune note conservée) ou **Carte suivante**. Bonne carte → clic ou fin du décompte |
+| Continuer | Mauvaise carte → **Réessayer** (entraînement : la note initiale et les statistiques ne changent pas) ou **Carte suivante**. Bonne carte → **Carte suivante** (bouton, Espace ou Entrée) |
 
 Le moteur est la **Web Speech API** du navigateur (Chrome/Edge : moteur Google ;
 Safari : dictée Apple ; Firefox : non supporté, l'interface se désactive proprement).
@@ -134,8 +134,21 @@ L'évaluation (`js/12_voice.js`) est indépendante de la reconnaissance :
   (automatique, anglais UK/US ou français pour les chapitres en sens inverse).
 
 Réglages : *Paramètres → Application* (et onglet *Chapitre* des chapitres
-d'anglais) · délai avant la carte suivante, tolérance, langue, affichage de la
-phrase reconnue, bouton **Tester le micro**.
+d'anglais) · tolérance, langue, affichage de la phrase reconnue, bouton
+**Tester le micro**.
+
+**Brave** bloque la dictée Google : la page utilise alors Whisper
+(`js/voice-whisper-shim.js`), un modèle qui tourne dans le navigateur. La
+bibliothèque (Transformers.js 3.0.2) vient de jsDelivr, le modèle de Hugging
+Face ; le navigateur les garde en cache après le premier téléchargement.
+
+Réglages de diagnostic, à saisir dans la console (F12), puis recharger la page :
+
+- `localStorage.setItem('voice.whisper', '1')` force Whisper hors Brave, `'0'` le désactive ;
+- `localStorage.setItem('voice.model', 'onnx-community/whisper-small')` change de modèle (défaut : `whisper-base`) ;
+- `localStorage.setItem('voice.lang', 'english')` impose la langue transmise à Whisper (`'french'`, ou `'auto'` pour qu'il la détecte). Retirez-la ensuite avec `localStorage.removeItem('voice.lang')`, sinon les cartes en français seront transcrites en anglais.
+
+La console affiche chaque phrase reçue : `[whisper] entendu : "…"`.
 
 ## Importer : fichiers ou texte écrit (format « pv-import »)
 
@@ -347,15 +360,23 @@ python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
+Tests (Node, sans dépendance), depuis la racine du dépôt :
+
+```bash
+node --test tests/*.cjs
+```
+
+(`node --test tests/` ne fonctionne pas avec Node 22 : il faut le motif de fichiers.)
+
 ## Publication
 
 1. Les modifications de contenu peuvent être publiées directement depuis l'app
-   (onglet Drive → **Publier**, voir `DRIVE_ADMIN.md`).
+   (onglet Drive → **Publier**).
 2. Les modifications de code se font par commit sur `main` : GitHub Pages redéploie
    automatiquement. Les feuilles de style et scripts sont versionnés (`?v=`) pour
    forcer la mise à jour du cache.
 
 ## Sécurité
 
-Voir `SECURITY.md`. Le jeton GitHub du Drive est stocké localement dans le navigateur
-de l'administrateur et n'est jamais commité.
+Le jeton GitHub du Drive est stocké localement dans le navigateur de
+l'administrateur et n'est jamais commité.
