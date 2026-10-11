@@ -246,3 +246,84 @@ button.st-row:hover { background: var(--btn-neutral-bg); }
   .ac-list { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
   .ac-more { grid-column: 1 / -1; }
 }
+
+/* ═══════════════════════ Onglet « Évolution » (stats) ═══════════════════════ */
+@keyframes stFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.st-evo-anim { animation: stFadeUp .45s var(--ease-out) both; }
+@media (prefers-reduced-motion: reduce) { .st-evo-anim { animation: none; } }
+
+/* Lecteur temporel : bouton lecture + date + slider */
+.st-evo-player { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: 12px; }
+.st-evo-player .btn { flex: none; }
+.st-evo-date { flex: 1; min-width: 0; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+.st-evo-span { font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st-evo-slider { margin: 0 0 6px; }
+.st-evo-donut { margin-top: 12px; }
+
+/* Courbes */
+.st-evo-charts { display: grid; gap: var(--sp-3); }
+@media (min-width: 980px) {
+  .st-evo-charts { grid-template-columns: 1fr 1fr; }
+  .st-evo-charts .st-card:last-child { grid-column: 1 / -1; }
+}
+.st-chart__title { font-size: 12.5px; font-weight: 650; color: var(--muted); margin-bottom: 8px; }
+.st-chart__box { position: relative; aspect-ratio: 16 / 7; min-height: 118px; }
+.st-chart__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.st-chart__yl {
+  position: absolute; left: 0; width: 11.5%; text-align: right;
+  font-size: 9.5px; color: var(--faint); transform: translateY(-50%);
+  font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.st-chart__xl {
+  position: absolute; bottom: -4px; font-size: 9.5px; color: var(--faint);
+  transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.st-chart__xl.is-end { transform: translateX(-100%); }
+.st-chart__cursor {
+  position: absolute; top: 10%; bottom: 14%; width: 0;
+  border-left: 1.5px dashed color-mix(in srgb, var(--primary) 60%, transparent);
+  transform: translateX(-50%); pointer-events: none;
+}
+.st-chart__dot {
+  position: absolute; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--surface);
+  box-shadow: var(--shadow-1); transform: translate(-50%, -50%); pointer-events: none;
+  transition: opacity var(--t-fast) var(--ease);
+}
+.st-chart__bubble {
+  position: absolute; padding: 2px 7px; border-radius: var(--radius-sm);
+  background: var(--text); color: var(--surface);
+  font-size: 10.5px; font-weight: 700; white-space: nowrap;
+  transform: translate(-50%, -135%); pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--t-fast) var(--ease);
+}
+
+/* Bilan « progresse-t-on ? » */
+.st-bilan__verdict {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px; border-radius: var(--radius-md);
+  background: var(--surface-2); margin-bottom: 12px;
+  font-size: 13px; line-height: 1.4;
+}
+.st-bilan__verdict b { font-size: 14px; flex: none; color: var(--muted); }
+.st-bilan__verdict.up { background: color-mix(in srgb, var(--green) 13%, transparent); }
+.st-bilan__verdict.up b { color: var(--green); }
+.st-bilan__verdict.down { background: color-mix(in srgb, var(--red) 13%, transparent); }
+.st-bilan__verdict.down b { color: var(--red); }
+.st-bilan__rows { display: flex; flex-direction: column; gap: 7px; }
+.st-bilan__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto minmax(58px, auto);
+  gap: 8px; align-items: baseline; font-size: 12.5px;
+}
+.st-bilan__row > span {
+  color: var(--muted); font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.st-bilan__row b { font-variant-numeric: tabular-nums; font-weight: 700; }
+.st-bilan__arrow { color: var(--faint); font-style: normal; }
+.st-delta { font-style: normal; font-weight: 700; font-size: 11.5px; text-align: right; font-variant-numeric: tabular-nums; }
+.st-delta.up { color: var(--green); }
+.st-delta.down { color: var(--red); }
+.st-delta.flat { color: var(--faint); }

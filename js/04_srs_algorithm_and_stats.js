@@ -148,22 +148,30 @@ function schNx(card, grade, now, ratingOverride) {
 // ═══════════════════════════════════════════════════
 
 function bldQ(c, pool, sz) {
-  const sh = a => {
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = M.floor(M.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
-
+  /* Ordre de la file (style Anki) :
+       0. cartes en échec  →  1. cartes « difficiles »  →  2. cartes dues
+       (r ≤ rétention cible, la plus urgente d'abord)  →  3. nouvelles cartes
+       →  4. cartes pas encore dues (révision avancée, en remplissage).
+     Avec une date limite, l'objectif du jour prime : les nouvelles cartes
+     passent avant les révisions banales (2.) et le plafond de nouvelles
+     cartes est inactif. Les nouvelles cartes au-delà du plafond quotidien
+     sont repoussées en toute fin de file (5.).                              */
   const now = Date.now();
   const dr = data?.app?.prefs?.desiredRetention || DESIRED_RETENTION;
+  const goalDriven = !!(c && c.deadline);
+  /* Nouvelles cartes déjà introduites aujourd'hui (journal du jour). */
+  let newSeen = 0;
+  const tLog = (c && c.stats && c.stats.dailyLog && c.stats.dailyLog[todayKey()]) || [];
+  for (const e of tLog) if ((e.prev || 'unseen') === 'unseen') newSeen++;
+  const limit = (!goalDriven && data?.app?.prefs?.newCardLimit > 0)
+    ? data.app.prefs.newCardLimit : 0;
+  const newCapped = limit > 0 && newSeen >= limit;
 
   const scored = pool.map(card => {
     const g = card.grade || 'unseen';
 
     if (g === 'unseen') {
-      return { card, priority: 0, score: Math.random() * 0.1 };
+      return { card, priority: newCapped ? 5 : (goalDriven ? 2 : 3), score: Math.random() };
     }
 
     const s = card.stability || 1;
@@ -173,15 +181,19 @@ function bldQ(c, pool, sz) {
     const r = fsrsRetrievability(elapsedDays, s);
 
     if (g === 'echec') {
-      return { card, priority: 1, score: -r + Math.random() * 0.05 };
+      return { card, priority: 0, score: -r + Math.random() * 0.05 };
     }
 
     if (g === 'difficile') {
-      return { card, priority: 2, score: -r + Math.random() * 0.05 };
+      return { card, priority: 1, score: -r + Math.random() * 0.05 };
+    }
+
+    if (goalDriven) {
+      return { card, priority: r <= dr ? 3 : 4, score: r + Math.random() * 0.02 };
     }
 
     if (r <= dr) {
-      return { card, priority: 3, score: r + Math.random() * 0.02 };
+      return { card, priority: 2, score: r + Math.random() * 0.02 };
     }
 
     return { card, priority: 4, score: r + Math.random() * 0.02 };

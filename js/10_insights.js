@@ -148,6 +148,102 @@ function stChapterStats(chs, days){
   }).sort((a, b) => b.rev - a.rev || b.due - a.due || a.ch.title.localeCompare(b.ch.title));
 }
 
+/* ─────────────────────── Évolution dans le temps ───────────────────────────
+   Le journal des révisions (ch.stats.dailyLog : {cardId, prev, next, ms, ts})
+   enregistre CHAQUE changement de niveau : en partant de l'état actuel et en
+   remontant le journal à rebours, on reconstitue la répartition des niveaux en
+   fin de chaque journée, puis on en déduit les courbes (réussite glissante,
+   révisions cumulées, cartes vues…). Journal conservé 180 jours (pruneStats). */
+function stTimeline(chs, days){
+  const n = days.length;
+  const daySet = new Set(days);
+  /* État actuel (vérité terrain), puis recul jour par jour. */
+  const gradeNow = new Map();
+  const valid = new Set();
+  chs.forEach(({ ch }) => (ch.cards || []).forEach(c => {
+    const k = ch.id + '|' + c.id;
+    valid.add(k);
+    gradeNow.set(k, c.grade || 'unseen');
+  }));
+  /* Événements du journal, groupés par jour, triés par heure décroissante. */
+  const evByDay = new Map();
+  let evTotal = 0;
+  chs.forEach(({ ch }) => {
+    const log = (ch.stats && ch.stats.dailyLog) || {};
+    Object.keys(log).forEach(d => {
+      if(!daySet.has(d)) return;
+      const evs = (log[d] || [])
+        .filter(e => e && valid.has(ch.id + '|' + e.cardId))
+        .map(e => ({
+          ts: +e.ts || 0,
+          key: ch.id + '|' + e.cardId,
+          prev: e.prev || 'unseen',
+          succ: isSucc(e.next),
+          fresh: (e.prev || 'unseen') === 'unseen'
+        }))
+        .sort((a, b) => b.ts - a.ts);
+      if(evs.length){ evByDay.set(d, evs); evTotal += evs.length; }
+    });
+  });
+  /* Compteurs journaliers : révisions/durées agrégées + décisions du journal. */
+  const rev = new Array(n).fill(0), ok = new Array(n).fill(0), ko = new Array(n).fill(0),
+        durMs = new Array(n).fill(0), durN = new Array(n).fill(0), fresh = new Array(n).fill(0);
+  chs.forEach(({ ch }) => {
+    const st = ch.stats || {};
+    days.forEach((d, i) => {
+      rev[i] += (st.dailyReviews && st.dailyReviews[d]) || 0;
+      durMs[i] += (st.dailyDurMs && st.dailyDurMs[d]) || 0;
+      durN[i] += (st.dailyDurCount && st.dailyDurCount[d]) || 0;
+    });
+  });
+  /* Recul : photo de la répartition en FIN de journée, puis on applique les
+     événements du jour à rebours (chaque entrée ramène le niveau précédent). */
+  const grades = new Array(n);
+  for(let i = n - 1; i >= 0; i--){
+    const snap = GRADE_INIT();
+    gradeNow.forEach(g => { snap[g] = (snap[g] || 0) + 1; });
+    grades[i] = snap;
+    const evs = evByDay.get(days[i]);
+    if(evs) evs.forEach(e => {
+      if(e.succ) ok[i]++; else ko[i]++;
+      if(e.fresh) fresh[i]++;
+      gradeNow.set(e.key, e.prev);
+    });
+  }
+  /* Séries dérivées, du plus ancien jour au plus récent. */
+  const cumRev = new Array(n), succ7 = new Array(n), avgS7 = new Array(n), seen = new Array(n);
+  let cum = 0;
+  const seenSet = new Set();
+  for(let i = 0; i < n; i++){
+    cum += rev[i];
+    cumRev[i] = cum;
+    const evs = evByDay.get(days[i]);
+    if(evs) evs.forEach(e => seenSet.add(e.key));
+    seen[i] = seenSet.size;
+    /* Moyennes glissantes 7 jours : taux de réussite, temps moyen par carte. */
+    let o = 0, k = 0, ms = 0, nn = 0;
+    for(let j = Math.max(0, i - 6); j <= i; j++){ o += ok[j]; k += ko[j]; ms += durMs[j]; nn += durN[j]; }
+    succ7[i] = (o + k) ? Math.round(o / (o + k) * 100) : null;
+    avgS7[i] = nn ? ms / nn / 1000 : null;
+  }
+  /* Bilan : première moitié de la période contre seconde moitié. */
+  const mid = Math.floor(n / 2);
+  const half = (a, b) => {
+    let o = 0, k = 0, r = 0, act = 0, nw = 0;
+    for(let i = a; i < b; i++){
+      o += ok[i]; k += ko[i]; r += rev[i];
+      if(rev[i] > 0) act++;
+      nw += fresh[i];
+    }
+    return { ok:o, ko:k, rev:r, activeDays:act, newCards:nw,
+             succ:(o + k) ? Math.round(o / (o + k) * 100) : null };
+  };
+  let anyRev = false;
+  for(let i = 0; i < n; i++) if(rev[i] > 0){ anyRev = true; break; }
+  return { days, n, total:gradeNow.size, grades, rev, ok, ko, cumRev, succ7, avgS7, seen, fresh,
+           evTotal, hasData: evTotal > 0 || anyRev, halves:{ a:half(0, mid), b:half(mid, n) } };
+}
+
 /* ───────────────────────────── Composants SVG/DOM ─────────────────────────── */
 const ST_COLORS = { unseen:'#9ca3af', echec:'#ef4444', difficile:'#f59e0b', bien:'#3b82f6', facile:'#22c55e' };
 const ST_LABELS = { unseen:'Non vues', echec:'Échec', difficile:'Difficile', bien:'Bien', facile:'Facile' };
@@ -228,6 +324,7 @@ function goStats(push = true, patch = null){
   const periods = [{ k:7, l:'7 j' }, { k:30, l:'30 j' }, { k:90, l:'90 j' }, { k:365, l:'1 an' }];
   const tabs = [
     { k:'overview', l:'Vue d\'ensemble', i:'chart' },
+    { k:'evolution', l:'Évolution', i:'history' },
     { k:'chapters', l:'Chapitres', i:'layers' },
     { k:'cards', l:'Cartes', i:'grid' },
     { k:'media', l:'Médias', i:'image' }
@@ -277,11 +374,18 @@ function goStats(push = true, patch = null){
   });
 
   const body = $('#stBody');
-  body.innerHTML = st.tab === 'chapters' ? stPanelChapters(chs, days, agg)
-                : st.tab === 'cards'    ? stPanelCards(chs, days, agg)
-                : st.tab === 'media'    ? stPanelMedia(chs, agg)
-                : stPanelOverview(chs, days, agg);
-  stBind(body, chs, days, agg);
+  stEvoStop();   // annule l'animation (rAF) de l'onglet Évolution avant re-rendu
+  if(st.tab === 'evolution'){
+    const tl = stTimeline(chs, days);
+    body.innerHTML = stPanelEvolution(tl, agg);
+    stBindEvolution(body, tl);
+  } else {
+    body.innerHTML = st.tab === 'chapters' ? stPanelChapters(chs, days, agg)
+                  : st.tab === 'cards'    ? stPanelCards(chs, days, agg)
+                  : st.tab === 'media'    ? stPanelMedia(chs, agg)
+                  : stPanelOverview(chs, days, agg);
+    stBind(body, chs, days, agg);
+  }
   tsLat(body);
 }
 
@@ -424,6 +528,310 @@ function stHeatmap(chs, weeks = 26){
     return `<button type="button" class="hm-cell lvl-${lvl}" data-day="${k}" title="${stEv(stDayLabel(k))} · ${n} révision${n > 1 ? 's' : ''}" aria-label="${n} révisions"></button>`;
   }).join('');
   return { cells, active, total:sum, max, weeks };
+}
+
+/* ══════════════════════ ONGLET « ÉVOLUTION » ═════════════════════════════
+   Un curseur temporel continu (0 → 1) pilote tout : le camembert morph en
+   interpolant les tranches entre deux jours, les compteurs/KPI glissent,
+   les courbes se révèlent par un clip animé et leur curseur suit.            */
+
+let stEvoGen = 0;
+/* Incrémente la génération : annule les animations (rAF) de l'onglet Évolution
+   quand la vue est re-rendue (changement d'onglet, de période, de périmètre…). */
+function stEvoStop(){ stEvoGen++; }
+
+const stCompact = n => n >= 1000 ? (Math.round(n / 100) / 10 + 'k').replace('.0k', 'k') : String(n);
+
+/* Courbe SVG (aire + trait) avec révélation progressive : un clip rect dont la
+   largeur est animée par stBindEvolution. Coordonnées en % d'une viewBox 100×100
+   (preserveAspectRatio="none") : les libellés passent en HTML par-dessus.     */
+function stLineChart(id, values, opts){
+  opts = opts || {};
+  const n = values.length;
+  const L = 13, R = 97, T = 10, B = 86;
+  const max = opts.yMax != null ? opts.yMax : Math.max(1, ...values.map(v => +v || 0));
+  const xi = i => n > 1 ? L + (R - L) * i / (n - 1) : (L + R) / 2;
+  const yv = v => B - (B - T) * (Math.min(v, max) / max);
+  /* Tracé : les jours sans donnée prolongent la dernière valeur connue. */
+  let d = '', pen = false, last = null, firstI = 0;
+  for(let i = 0; i < n; i++){
+    if(values[i] != null){ last = values[i]; if(!pen) firstI = i; }
+    if(last == null) continue;
+    d += (pen ? 'L' : 'M') + xi(i).toFixed(2) + ' ' + yv(last).toFixed(2);
+    pen = true;
+  }
+  const area = d ? d + `L${xi(n - 1).toFixed(2)} ${B} L${xi(firstI).toFixed(2)} ${B} Z` : '';
+  const yLbl = opts.yLbl || ['0', stCompact(Math.round(max / 2)), stCompact(Math.round(max))];
+  const days = opts.days || [];
+  const imid = Math.floor((n - 1) / 2);
+  const xLbl = [
+    { i:0,     t: days.length ? stShortDay(days[0]) : '' },
+    { i:imid,  t: days.length ? stShortDay(days[imid]) : '' },
+    { i:n - 1, t: days.length ? (days[n - 1] === todayKey() ? 'Auj.' : stShortDay(days[n - 1])) : '' }
+  ];
+  const gridY = [T, (T + B) / 2, B];
+  const line = dd => dd
+    ? `<path d="${dd}" fill="none" style="stroke:${opts.color}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/>`
+    : '';
+  return `<div class="st-chart" data-chart="${id}">
+    <div class="st-chart__title">${stEv(opts.title || '')}</div>
+    <div class="st-chart__box">
+      <svg class="st-chart__svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="stGrad-${id}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-opacity=".25" style="stop-color:${opts.color}"/>
+          <stop offset="1" stop-opacity="0" style="stop-color:${opts.color}"/>
+        </linearGradient></defs>
+        ${gridY.map(y => `<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" style="stroke:var(--divider)" stroke-width="1" vector-effect="non-scaling-stroke"${y === (T + B) / 2 ? ' stroke-dasharray="3 3"' : ''}/>`).join('')}
+        <g clip-path="url(#stClip-${id})">
+          ${area ? `<path d="${area}" style="fill:url(#stGrad-${id})"/>` : ''}
+          ${line(d)}
+        </g>
+        <g style="opacity:.18">${line(d)}</g>
+        <clipPath id="stClip-${id}"><rect x="0" y="0" width="0" height="100"/></clipPath>
+      </svg>
+      ${yLbl.map((t, i) => `<span class="st-chart__yl" style="top:${gridY[i]}%">${stEv(t)}</span>`).join('')}
+      ${xLbl.map((x, i) => `<span class="st-chart__xl${i === 2 ? ' is-end' : ''}" style="left:${xi(x.i)}%">${stEv(x.t)}</span>`).join('')}
+      <div class="st-chart__cursor" id="stCur-${id}"></div>
+      <div class="st-chart__dot" id="stDot-${id}"></div>
+      <div class="st-chart__bubble" id="stBub-${id}"></div>
+    </div>
+  </div>`;
+}
+
+/* ── Panneau : évolution dans le temps ────────────────────────────────────── */
+function stPanelEvolution(tl, agg){
+  const n = tl.n, days = tl.days;
+  if(!tl.hasData){
+    return `<div class="section-title">Évolution dans le temps</div>
+      <div class="st-card"><div class="empty">${ico('history', 'ico--lg')}
+        <div class="empty__title">Pas encore d'historique</div>
+        <div class="empty__sub">Révise quelques cartes : la répartition des niveaux et les courbes apparaîtront ici, jour après jour.</div>
+      </div></div>`;
+  }
+  const seg = GRADES.map(g => ({ key:g, label:ST_LABELS[g], color:ST_COLORS[g] }));
+  const CIRC = (2 * Math.PI * 54).toFixed(2);
+  const lastLbl = days[n - 1] === todayKey() ? 'Auj.' : stShortDay(days[n - 1]);
+  return `
+    <div class="section-title st-evo-anim">Le camembert au fil du temps</div>
+    <div class="st-card st-evo st-evo-anim" style="animation-delay:.05s">
+      <div class="st-evo-player">
+        <button type="button" class="btn btn--solid btn--primary btn--sm" id="stEvoPlay" aria-label="Lire l'évolution dans le temps">${ico('play', 'ico--sm')}</button>
+        <div class="st-evo-date" id="stEvoDate">${stEv(stDayLabel(days[n - 1]))}</div>
+        <span class="st-evo-span">${stShortDay(days[0])} → ${lastLbl}</span>
+      </div>
+      <input type="range" class="s-slider st-evo-slider" id="stEvoSlider" min="0" max="${n - 1}" step="1" value="${n - 1}" aria-label="Parcourir la période jour par jour">
+      <div class="dn-wrap st-evo-donut">
+        <svg class="dn" viewBox="0 0 120 120" role="img" aria-label="Répartition des cartes au fil du temps">
+          <circle cx="60" cy="60" r="54" fill="none" style="stroke:var(--surface-3)" stroke-width="17"/>
+          ${seg.map(s => `<circle class="dn-seg st-evo-seg" data-g="${s.key}" cx="60" cy="60" r="54" fill="none" stroke="${s.color}" stroke-width="17" stroke-dasharray="0 ${CIRC}" stroke-dashoffset="0" transform="rotate(-90 60 60)"><title>${stEv(s.label)}</title></circle>`).join('')}
+          <text x="60" y="57" class="dn-val" id="stEvoPct">0 %</text>
+          <text x="60" y="72" class="dn-cap">déjà vues</text>
+        </svg>
+        <div class="dn-legend" id="stEvoLegend">
+          ${seg.map(s => `<div class="dn-legend__row" data-g="${s.key}"><span class="dot" style="background:${s.color}"></span><span class="dn-legend__lbl">${stEv(s.label)}</span><b data-cnt="${s.key}">0</b><i data-pct="${s.key}">0 %</i></div>`).join('')}
+        </div>
+      </div>
+      <div class="st-note">Répartition reconstituée à partir du journal des révisions (conservé 180 jours). Glisse le curseur ou appuie sur lecture pour voir le camembert évoluer.</div>
+    </div>
+
+    <div class="section-title mt8 st-evo-anim" style="animation-delay:.1s">Indicateurs au fil du temps</div>
+    <div class="stats-grid st-kpis st-evo-anim" style="animation-delay:.12s">
+      ${stKpi('Cartes vues', '<span id="stEvoKSeen">0</span>', 'cumul depuis le début de la période')}
+      ${stKpi('Révisions', '<span id="stEvoKRev">0</span>', 'cumul depuis le début de la période')}
+      ${stKpi('Réussite (7 j)', '<span id="stEvoKSucc">—</span>', 'moyenne glissante sur 7 jours')}
+      ${stKpi('Temps / carte (7 j)', '<span id="stEvoKMs">—</span>', 'moyenne glissante sur 7 jours')}
+    </div>
+
+    <div class="section-title mt8 st-evo-anim" style="animation-delay:.15s">Courbes</div>
+    <div class="st-evo-charts">
+      <div class="st-card st-evo-chart st-evo-anim" style="animation-delay:.18s">${stLineChart('succ', tl.succ7, { title:'Taux de réussite (moy. glissante 7 j)', color:'var(--green)', yMax:100, yLbl:['0 %', '50 %', '100 %'], fmt:v => Math.round(v) + ' %', days })}</div>
+      <div class="st-card st-evo-chart st-evo-anim" style="animation-delay:.21s">${stLineChart('rev', tl.cumRev, { title:'Révisions cumulées', color:'var(--primary)', fmt:v => stFmt(Math.round(v)), days })}</div>
+      <div class="st-card st-evo-chart st-evo-anim" style="animation-delay:.24s">${stLineChart('seen', tl.seen, { title:'Cartes vues (cumul)', color:'var(--blue)', fmt:v => stFmt(Math.round(v)), days })}</div>
+    </div>
+
+    <div class="section-title mt8 st-evo-anim" style="animation-delay:.27s">Bilan sur la période</div>
+    <div class="st-card st-bilan st-evo-anim" style="animation-delay:.3s">${stBilanHTML(tl)}</div>`;
+}
+
+/* Bilan « progresse-t-on ? » : première moitié de la période contre seconde. */
+function stBilanHTML(tl){
+  const { a, b } = tl.halves;
+  const revDay = h => h.activeDays ? Math.round(h.rev / h.activeDays * 10) / 10 : null;
+  const row = (label, va, vb, unit) => {
+    unit = unit || '';
+    const delta = (va == null || vb == null) ? null : vb - va;
+    const cls = delta == null ? 'flat' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const arrow = delta == null ? '' : delta > 0 ? '▲' : delta < 0 ? '▼' : '►';
+    const dtxt = delta == null ? '—' : `${arrow} ${delta > 0 ? '+' : ''}${delta}${unit}`;
+    return `<div class="st-bilan__row"><span>${stEv(label)}</span><b>${va == null ? '—' : va + unit}</b><i class="st-bilan__arrow">→</i><b>${vb == null ? '—' : vb + unit}</b><em class="st-delta ${cls}">${dtxt}</em></div>`;
+  };
+  const dSucc = (a.succ != null && b.succ != null) ? b.succ - a.succ : null;
+  const verdict = dSucc == null ? 'flat' : dSucc > 2 ? 'up' : dSucc < -2 ? 'down' : 'flat';
+  const vTxt = verdict === 'up'
+    ? 'Tu progresses : ta réussite grimpe sur la fin de la période.'
+    : verdict === 'down'
+      ? 'Ta réussite recule : revois d\'abord tes cartes en échec.'
+      : dSucc == null
+        ? 'Pas assez de décisions enregistrées pour conclure — continue à réviser !'
+        : 'Ta réussite est stable sur la période.';
+  return `<div class="st-bilan__verdict ${verdict}"><b>${verdict === 'up' ? '▲' : verdict === 'down' ? '▼' : '►'}</b><span>${vTxt}</span></div>
+    <div class="st-bilan__rows">
+      ${row('Taux de réussite', a.succ, b.succ, ' %')}
+      ${row('Révisions / jour actif', revDay(a), revDay(b))}
+      ${row('Nouvelles cartes vues', a.newCards, b.newCards)}
+    </div>
+    <div class="st-note">Première moitié de la période → seconde moitié. « Réussite » = décisions bien/facile contre échec/difficile enregistrées dans le journal.</div>`;
+}
+
+/* Moteur d'animation : un seul curseur continu (0 → 1) pilote le camembert
+   (interpolation des tranches entre deux jours), les KPI et les courbes.      */
+function stBindEvolution(body, tl){
+  const n = tl.n, days = tl.days;
+  const slider = body.querySelector('#stEvoSlider');
+  const playBtn = body.querySelector('#stEvoPlay');
+  if(!slider || !playBtn) return;
+  const dateEl = body.querySelector('#stEvoDate');
+  const pctEl = body.querySelector('#stEvoPct');
+  const C = 2 * Math.PI * 54;
+  const segByG = {}, cntByG = {}, pctByG = {};
+  body.querySelectorAll('.st-evo-seg').forEach(el => segByG[el.dataset.g] = el);
+  body.querySelectorAll('[data-cnt]').forEach(el => cntByG[el.dataset.cnt] = el);
+  body.querySelectorAll('[data-pct]').forEach(el => pctByG[el.dataset.pct] = el);
+  const kSeen = body.querySelector('#stEvoKSeen'), kRev = body.querySelector('#stEvoKRev'),
+        kSucc = body.querySelector('#stEvoKSucc'), kMs = body.querySelector('#stEvoKMs');
+  const chartDefs = [
+    { id:'succ', values:tl.succ7,  max:100,  color:'var(--green)',   fmt:v => Math.round(v) + ' %' },
+    { id:'rev',  values:tl.cumRev, max:null, color:'var(--primary)', fmt:v => stFmt(Math.round(v)) },
+    { id:'seen', values:tl.seen,   max:null, color:'var(--blue)',    fmt:v => stFmt(Math.round(v)) }
+  ];
+  const charts = chartDefs.map(cd => {
+    const max = cd.max != null ? cd.max : Math.max(1, ...cd.values.map(v => +v || 0));
+    return {
+      ...cd, max,
+      clip: body.querySelector('#stClip-' + cd.id),
+      cur: body.querySelector('#stCur-' + cd.id),
+      dot: body.querySelector('#stDot-' + cd.id),
+      bub: body.querySelector('#stBub-' + cd.id)
+    };
+  }).filter(c => c.clip && c.cur && c.dot && c.bub);
+  charts.forEach(c => { c.dot.style.background = c.color; });
+  const tot = tl.total || 1;
+  const gen = ++stEvoGen;
+  const denom = Math.max(1, n - 1);
+  let prog = 0, playing = false, raf = null, tweenRaf = null, lastTs = 0;
+  const PLAY_MS = 14000;
+  const alive = () => gen === stEvoGen && slider.isConnected;
+  const setPlayIcon = on => { playBtn.innerHTML = on ? ico('pause', 'ico--sm') : ico('play', 'ico--sm'); };
+
+  function render(){
+    const pos = prog * denom;
+    const i0 = Math.min(n - 1, Math.floor(pos)), i1 = Math.min(n - 1, i0 + 1), f = pos - i0;
+    const lbl = stDayLabel(days[i0]);
+    if(dateEl.textContent !== lbl) dateEl.textContent = lbl;
+    slider.value = i0;
+    slider.style.setProperty('--fill', (prog * 100).toFixed(1) + '%');
+    /* Camembert : interpolation linéaire entre les deux jours encadrants. */
+    const g0 = tl.grades[i0], g1 = tl.grades[i1];
+    let acc = 0;
+    GRADES.forEach(g => {
+      const v = g0[g] + (g1[g] - g0[g]) * f;
+      const len = v / tot * C;
+      const el = segByG[g];
+      if(el){
+        el.style.strokeDasharray = `${len.toFixed(2)} ${(C - len).toFixed(2)}`;
+        el.style.strokeDashoffset = (-acc / tot * C).toFixed(2);
+      }
+      acc += v;
+      if(cntByG[g]) cntByG[g].textContent = stFmt(Math.round(v));
+      if(pctByG[g]) pctByG[g].textContent = Math.round(v / tot * 100) + ' %';
+    });
+    const seenNow = tot - (g0.unseen + (g1.unseen - g0.unseen) * f);
+    if(pctEl) pctEl.textContent = Math.round(seenNow / tot * 100) + ' %';
+    /* KPI (interpolés eux aussi entre les deux jours). */
+    const lerp = (a, b) => a + (b - a) * f;
+    if(kSeen) kSeen.textContent = stFmt(Math.round(lerp(tl.seen[i0], tl.seen[i1])));
+    if(kRev) kRev.textContent = stFmt(Math.round(lerp(tl.cumRev[i0], tl.cumRev[i1])));
+    if(kSucc){
+      const s0 = tl.succ7[i0], s1 = tl.succ7[i1];
+      kSucc.textContent = (s0 == null && s1 == null) ? '—' : Math.round(lerp(s0 ?? s1, s1 ?? s0)) + ' %';
+    }
+    if(kMs){
+      const m0 = tl.avgS7[i0], m1 = tl.avgS7[i1];
+      kMs.textContent = (m0 == null && m1 == null) ? '—' : lerp(m0 ?? m1, m1 ?? m0).toFixed(1) + ' s';
+    }
+    /* Courbes : révélation continue + curseur sur la valeur interpolée. */
+    charts.forEach(ch => {
+      ch.clip.setAttribute('width', (13 + 84 * prog).toFixed(2));
+      const xPct = 13 + 84 * prog;
+      ch.cur.style.left = xPct + '%';
+      const v0 = ch.values[i0], v1 = ch.values[i1];
+      const v = (v0 == null && v1 == null) ? null : lerp(v0 ?? v1, v1 ?? v0);
+      if(v == null){
+        ch.dot.style.opacity = '0';
+        ch.bub.style.opacity = '0';
+      } else {
+        const yPct = 86 - 76 * (Math.min(v, ch.max) / ch.max);
+        ch.dot.style.left = xPct + '%';
+        ch.dot.style.top = yPct + '%';
+        ch.dot.style.opacity = '1';
+        ch.bub.style.left = Math.min(82, Math.max(18, xPct)) + '%';
+        ch.bub.style.top = yPct + '%';
+        ch.bub.textContent = ch.fmt(v);
+        ch.bub.style.opacity = '1';
+      }
+    });
+  }
+
+  function frame(ts){
+    raf = null;
+    if(!alive()){ playing = false; return; }
+    const dt = lastTs ? Math.min(100, ts - lastTs) : 16;
+    lastTs = ts;
+    prog = Math.min(1, prog + dt / PLAY_MS);
+    render();
+    if(prog >= 1){ playing = false; setPlayIcon(false); lastTs = 0; return; }
+    raf = requestAnimationFrame(frame);
+  }
+  function play(){
+    if(playing || !alive()) return;
+    if(prog >= 1) prog = 0;
+    playing = true; lastTs = 0;
+    setPlayIcon(true);
+    raf = requestAnimationFrame(frame);
+  }
+  function pause(){
+    playing = false;
+    if(raf){ cancelAnimationFrame(raf); raf = null; }
+    setPlayIcon(false);
+  }
+  function tweenTo(target, dur){
+    if(tweenRaf) cancelAnimationFrame(tweenRaf);
+    const from = prog, t0 = performance.now();
+    const step = ts => {
+      tweenRaf = null;
+      if(!alive()) return;
+      const k = Math.min(1, (ts - t0) / dur);
+      const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      prog = from + (target - from) * e;
+      render();
+      if(k < 1) tweenRaf = requestAnimationFrame(step);
+    };
+    tweenRaf = requestAnimationFrame(step);
+  }
+
+  playBtn.onclick = () => { playing ? pause() : play(); };
+  slider.addEventListener('input', () => {
+    pause();
+    prog = (+slider.value) / denom;
+    render();
+  });
+
+  /* Ouverture : la courbe se dessine de gauche à droite (sauf mouvement réduit). */
+  const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  render();
+  if(reduced) prog = 1;
+  else tweenTo(1, 1500);
+  render();
 }
 
 /* ── Panneau : chapitres ───────────────────────────────────────────────────── */
@@ -940,7 +1348,8 @@ function stQuickReview(chapId, cardId, back = 'cards'){
 function startReviewSelection(items, label = ''){
   const pool = items.filter(x => x && x.c && x.ch);
   if(!pool.length){ toast('Aucune carte à réviser', 'info'); return; }
-  const wt = { unseen:6, echec:5, difficile:3.5, bien:2, facile:1 };
+  /* Erreurs d'abord (style Anki), puis les nouvelles cartes, puis le reste. */
+  const wt = { echec:8, difficile:6, unseen:4, bien:2, facile:1 };
   const now = Date.now();
   const ranked = pool.map(i => {
     const g = i.c.grade || 'unseen', base = wt[g] || 1;

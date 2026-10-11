@@ -557,6 +557,19 @@
     try { S.hand.onCommit && S.hand.onCommit(text, res, 'bad'); } catch (e) {}
   }
 
+  /* « Parler puis couper le micro » reste une validation : si la réponse est
+     complète et reconnue, on la valide avant d'éteindre. Ce n'est pas de la
+     triche (la phrase a vraiment été dite, la carte n'est pas retournée) —
+     et couper le micro ne doit jamais figer l'interface. */
+  function commitPending() {
+    if (S.locked || !S.scorer || !S.live || S.live.ratio < 0.999) return;
+    const cur = (S.full || '').trim();
+    if (!cur) return;
+    let res = null;
+    try { res = S.scorer(cur); } catch (e) { return; }
+    if (res && res.ratio >= 0.999) commitSuccess(cur, res);
+  }
+
   /* ── API cycle de vie ── */
   function setWanted(on, opts) {
     opts = opts || {};
@@ -564,6 +577,7 @@
       if (typeof toast === 'function') toast('Micro indisponible sur cette carte', 'info');
       return;
     }
+    if (!on && S.wanted) commitPending();   // valider une réponse complète avant de couper
     S.wanted = !!on;
     S.errorMsg = ''; S.error = null; S.fails = 0;   // chaque activation repart de zéro
     if (typeof data !== 'undefined' && data && data.app) { prefs().voiceOn = S.wanted; if (!opts.silent) persist(); }
