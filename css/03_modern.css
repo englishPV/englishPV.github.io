@@ -434,6 +434,14 @@ canvas#gradeChart { width: 150px; height: 150px; }
 .card-block.grade-bien { border-left-color: var(--blue); }
 .card-block.grade-facile { border-left-color: var(--green); }
 .card-block.just-graded { animation: grade-pulse 1.2s var(--ease-out); }
+/* Leech (sangsue) : 8 échecs ou plus — liseré rouge + badge */
+.card-block.is-leech { border-color: color-mix(in srgb, var(--red) 40%, var(--hairline)); }
+.cb-leech {
+  position: absolute; left: 10px; top: 8px;
+  padding: 1px 7px; border-radius: var(--radius-full);
+  background: var(--bad-bg); color: var(--bad-fg);
+  font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
 @keyframes grade-pulse {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 55%, transparent); border-color: var(--primary); }
   100% { box-shadow: 0 0 0 14px transparent; }

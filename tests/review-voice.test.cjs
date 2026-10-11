@@ -127,6 +127,76 @@ test('notation manuelle quand le micro est coupé', () => {
   assert.equal(chapter.stats.totalReviews, 1);
 });
 
+test('une carte manquée revient une fois en fin de session (relearning)', () => {
+  const { context: c, review: r, card } = reviewHarness();
+  r.flipped = true;
+  c.subG('echec');
+  assert.deepEqual(r.queue, [card.id, card.id], 'la carte manquée est remise en fin de file');
+  c.advanceReview();
+  assert.equal(r.index, 1);
+  r.flipped = true;
+  c.subG('echec');
+  assert.equal(r.queue.length, 2, 'pas de remise en file en double pour la même carte');
+});
+
+/* ══ « Je ne sais pas » relu au clic + barre d'actions rafraîchie ══
+   Bug corrigé : couper le micro en cours de carte ne fige plus le bouton
+   (l'état du micro est relu à l'instant du clic, pas au rendu). */
+function reviewUIHarness(micOn) {
+  const r = { flipped: false, revealedWithoutVoice: false, voiceResult: null,
+    voicePracticeResult: null, voiceRetrying: false, isQCM: false };
+  const els = {};
+  const mkEl = () => ({ innerHTML: '', onclick: null, style: {} });
+  const ctx = {
+    State: { view: 'review', review: r },
+    getCur: () => ({ card: { id: 'c1' }, chap: { id: 'ch1' } }),
+    voiceCtxOf: () => ({ eligible: true }),
+    voiceActive: () => micOn,
+    haptic: () => {},
+    renRev: () => { r._renRev = (r._renRev || 0) + 1; },
+    voiceDontKnow: () => { r._dontKnow = (r._dontKnow || 0) + 1; },
+    $: sel => { els[sel] = els[sel] || mkEl(); return els[sel]; },
+    ico: () => '<svg/>',
+    GB: { echec: 'r', difficile: 'a', bien: 'b', facile: 'g' },
+    subG: () => {}, voiceAdvance: () => {}, voiceRetry: () => {},
+    Voice: { actionsHTML: () => '<div>voice-actions</div>' }
+  };
+  ctx.window = ctx;
+  const src = appSource.slice(appSource.indexOf('function revealReviewAnswer('),
+    appSource.indexOf('function renRev('));
+  vm.runInNewContext(src, ctx);
+  return { ctx, r, els };
+}
+
+test('« Je ne sais pas » : micro actif → la carte est notée Échec (anti-triche)', () => {
+  const { ctx, r } = reviewUIHarness(true);
+  ctx.revealReviewAnswer();
+  assert.equal(r._dontKnow, 1, 'dictée active : le retournement note « Échec »');
+  assert.equal(r.flipped, false, 'pas de retournement classique');
+});
+
+test('« Je ne sais pas » : micro coupé → retournement classique, comme d\'habitude', () => {
+  const { ctx, r } = reviewUIHarness(false);
+  ctx.revealReviewAnswer();
+  assert.equal(r._dontKnow || 0, 0, 'pas de note vocale');
+  assert.equal(r.revealedWithoutVoice, true);
+  assert.equal(r.flipped, true);
+  assert.equal(r._renRev, 1, 'la carte se retourne (les notes 1-4 suivent)');
+});
+
+test('barre d\'actions : le libellé suit l\'état du micro, même en cours de carte', () => {
+  const on = reviewUIHarness(true);
+  on.ctx.paintReviewActions();
+  assert.match(on.els['#reviewActionsBar'].innerHTML, /Je ne sais pas — voir la réponse/);
+  const off = reviewUIHarness(false);
+  off.ctx.paintReviewActions();
+  assert.match(off.els['#reviewActionsBar'].innerHTML, /Afficher la réponse/);
+  assert.doesNotMatch(off.els['#reviewActionsBar'].innerHTML, /Je ne sais pas/);
+  off.r.flipped = true;
+  off.ctx.paintReviewActions();
+  assert.match(off.els['#reviewActionsBar'].innerHTML, /row-4/, 'carte retournée : les 4 notes 1-4');
+});
+
 test('succès vocal attend explicitement la carte suivante', () => {
   const { context: c, review: r, card } = reviewHarness();
   c.voiceCommit({ ok: true, grade: 'bien', rating: 3, spoken: 'soyabeans' }, 'ok');

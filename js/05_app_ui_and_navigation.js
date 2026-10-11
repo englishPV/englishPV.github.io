@@ -1455,9 +1455,12 @@ async function goCardsChapter(cid, push=true, savedSearch='', savedScroll=0, scr
     else {
        filtered.forEach(x => {
           const {f,b} = getSides(x,c), el = D.createElement('div');
-          el.className = `card-block grade-${x.grade||'unseen'}`; el.dataset.id = x.id;
+          /* Leech (sangsue) : 8 échecs ou plus — à retravailler en priorité (style Anki). */
+          const isLeech = (x.failures||0) >= 8;
+          el.className = `card-block grade-${x.grade||'unseen'}${isLeech?' is-leech':''}`; el.dataset.id = x.id;
           const msC=getMathSimple(x), bContent=(!data.app.prefs.mathDetail&&msC)?formatText(msC):formatText(b);
           el.innerHTML = `<button class="cb-edit" type="button" title="Modifier la carte" aria-label="Modifier la carte">${ico('pencil','ico--xs')}</button>
+            ${isLeech?`<span class="cb-leech" title="Carte sangsue : ${x.failures} échecs — à retravailler en priorité">🪲 ${x.failures}</span>`:''}
             <div class="term">${formatText(f)}</div><div class="definition">${bContent}</div>${x.avgMs?`<div class="cb-time">${fmtDur(x.avgMs)}</div>`:''}`;
           grid.appendChild(el);
        });
@@ -1808,6 +1811,49 @@ function reviewHintHTML(hintsHere, vres, voiceEval){
   return '<span><kbd>Espace</kbd> retourner</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> évaluer</span>';
 }
 
+/* Retourner la carte. En dictée (micro actif), retourner = « je ne sais pas » :
+   la carte est notée « Échec » — anti-triche : on ne peut pas voir la réponse
+   puis la dicter pour la valider. Micro coupé ou carte non dictable : retournement
+   classique, puis auto-évaluation 1-4. L'état du micro est RELU au clic : couper
+   le micro en cours de carte ne doit pas figer le bouton (bug « Je ne sais pas
+   qui ne fait plus rien »). */
+function revealReviewAnswer(){
+  const r = State.review; if(!r) return;
+  const { card, chap } = getCur(); if(!card || !chap) return;
+  const vctx = voiceCtxOf(card, chap);
+  const dictating = !!(vctx && vctx.eligible && voiceActive() && !r.revealedWithoutVoice);
+  if(dictating && !r.flipped){ haptic('light'); voiceDontKnow(); return; }
+  haptic('light'); r.revealedWithoutVoice = true; r.flipped = true; renRev();
+}
+
+/* Barre d'actions sous la carte (retourner / notes 1-4 / actions vocales).
+   Extraite de renRev pour être rafraîchie quand le micro est coupé ou rallumé
+   en cours de carte : le libellé « Je ne sais pas / Afficher la réponse » suit. */
+function paintReviewActions(){
+  const r = State.review; if(!r || r.isQCM) return;
+  const bar = $('#reviewActionsBar'); if(!bar) return;
+  const vres = r.voiceRetrying ? null : (r.voicePracticeResult || r.voiceResult || null);
+  if(vres && typeof Voice !== 'undefined'){
+    /* Retour vocal : pas d'auto-évaluation, on clique pour continuer. */
+    bar.innerHTML = Voice.actionsHTML({ result:vres });
+    const nb = $('#voiceNextBtn'); if(nb) nb.onclick = () => voiceAdvance();
+    const rb = $('#voiceRetryBtn'); if(rb) rb.onclick = () => voiceRetry();
+    return;
+  }
+  if(!r.flipped){
+    const { card, chap } = getCur();
+    const vctx = voiceCtxOf(card, chap);
+    const voiceEval = !!(vctx && vctx.eligible && voiceActive() && !r.revealedWithoutVoice);
+    const label = voiceEval ? 'Je ne sais pas — voir la réponse' : 'Afficher la réponse';
+    bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">${ico(voiceEval?'mic-off':'eye','ico--sm')}<span>${label}</span></button>`;
+    $('#flipBtn').onclick = revealReviewAnswer;
+    return;
+  }
+  const GU = [['echec','circle-x','Échec','1'],['difficile','circle-alert','Difficile','2'],['bien','circle-check','Bien','3'],['facile','zap','Facile','4']];
+  bar.innerHTML=`<div class="row-4">${GU.map(([g,ic,lab,k])=>`<button class="btn ${GB[g]}" id="g_${g}" data-grade="${g}">${ico(ic,'ico--sm')}<span>${lab}</span><kbd class="grade-kbd">${k}</kbd></button>`).join('')}</div>`;
+  GU.forEach(([g])=>$('#g_'+g).onclick=()=>subG(g));
+}
+
 function renRev(){
   if(State.review?.isQCM) { renQCM(); return; }
   const v=$('#view'), r=State.review, {card,chap}=getCur(), idx=r.index+1, tot=r.queue.length, {f,b}=getSides(card,chap), ff=chap.settings.reviewOrder!=='back-first';
@@ -1859,11 +1905,9 @@ function renRev(){
   finishSetup();
   if(r.history.length && $('#undoBtn')) $('#undoBtn').onclick = undoRev; 
   
-  /* Retourner = « je ne sais pas » en mode vocal (la note est posée par le micro) */
-  const revealAnswer = () => {
-    if(voiceEval && !r.flipped){ haptic('light'); voiceDontKnow(); return; }
-    haptic('light'); r.revealedWithoutVoice = true; r.flipped = true; renRev();
-  };
+  /* Retourner = « je ne sais pas » en mode vocal (la note est posée par le micro).
+     Alias global : le clic relit l'état du micro à l'instant du clic. */
+  const revealAnswer = revealReviewAnswer;
 
   let lastTap = 0;
   const scrollerEl = $('.review-scroller');
@@ -1878,13 +1922,24 @@ function renRev(){
 
   /* Branchement du moteur vocal sur la carte courante */
   if(voiceChapter){
+    let micWasOn = voiceActive();
     Voice.attach({
       onState: () => {
         Voice.renderLive();
-        if(r.voiceRetrying && !Voice.state().wanted){
+        /* Révision finie ou écran quitté : ne rien toucher (pas de re-rendu
+           fantôme depuis un handler resté accroché à la session précédente). */
+        if(State.view !== 'review' || !State.review || State.review.end) return;
+        const micOn = voiceActive();
+        if(micOn === micWasOn) return;
+        micWasOn = micOn;
+        if(r.voiceRetrying && !micOn){
           r.voiceRetrying=false;
           renRev(); // couper le micro ne déverrouille pas la notation manuelle
+          return;
         }
+        /* Le libellé du bouton (« Je ne sais pas » / « Afficher la réponse »)
+           suit l'état du micro, même en cours de carte. */
+        if(!r.flipped && !r.voiceResult && !r.voicePracticeResult) paintReviewActions();
       },
       onCommit: (text, res, kind) => voiceCommit(res, kind)
     });
@@ -1896,21 +1951,7 @@ function renRev(){
     Voice.setCard(null);
   }
 
-  const bar=$('#reviewActionsBar');
-  if(vres){
-    /* Retour vocal : pas d'auto-évaluation, on clique pour continuer. */
-    bar.innerHTML = Voice.actionsHTML({ result:vres });
-    const nb = $('#voiceNextBtn'); if(nb) nb.onclick = () => voiceAdvance();
-    const rb = $('#voiceRetryBtn'); if(rb) rb.onclick = () => voiceRetry();
-  } else if(!r.flipped){
-      const label = voiceEval ? 'Je ne sais pas — voir la réponse' : 'Afficher la réponse';
-      bar.innerHTML=`<button class="btn btn--solid btn--primary" id="flipBtn">${ico(voiceEval?'mic-off':'eye','ico--sm')}<span>${label}</span></button>`;
-      $('#flipBtn').onclick = revealAnswer;
-  } else {
-      const GU = [['echec','circle-x','Échec','1'],['difficile','circle-alert','Difficile','2'],['bien','circle-check','Bien','3'],['facile','zap','Facile','4']];
-      bar.innerHTML=`<div class="row-4">${GU.map(([g,ic,lab,k])=>`<button class="btn ${GB[g]}" id="g_${g}" data-grade="${g}">${ico(ic,'ico--sm')}<span>${lab}</span><kbd class="grade-kbd">${k}</kbd></button>`).join('')}</div>`;
-      GU.forEach(([g])=>$('#g_'+g).onclick=()=>subG(g))
-  }
+  paintReviewActions();
 }
 
 /* Enregistre une évaluation (mêmes effets que l'ancien subG) SANS passer à la
@@ -1929,6 +1970,16 @@ function applyGrade(nxt, ratingOverride){
   const dc=chap.stats.dailyChanges[k]||{changed:0,total:0}; dc.total++; if(prev!==nxt)dc.changed++; chap.stats.dailyChanges[k]=dc;
   (chap.stats.dailyLog[k]=chap.stats.dailyLog[k]||[]).push({cardId:card.id,prev,next:nxt,ms,ts:now}); if(wZ&&nxt!=='unseen')chap.filters.grades[nxt]=!0;
   r.answers.push({cardId:card.id,prev,next:nxt,ms,rating: ratingOverride != null ? ratingOverride : GRADE_TO_RATING[nxt]});
+  /* Carte manquée : elle revient UNE FOIS en fin de session (relearning Anki) —
+     l'erreur est retravaillée tout de suite, sans être agressive. */
+  if(nxt === 'echec' && r && !r.singleCardMode && !r.isQCM){
+    r._requeue = r._requeue || new Set();
+    const rk = (r.mode === 'multi' ? chap.id + '|' : '') + card.id;
+    if(!r._requeue.has(rk) && r.queue.length < 500){
+      r._requeue.add(rk);
+      r.queue.push(r.mode === 'multi' ? { chapId:chap.id, cardId:card.id } : card.id);
+    }
+  }
   return {card, chap};
 }
 
@@ -2000,6 +2051,35 @@ function goRecap(push=true){
   $('#app').classList.remove('focus-mode');
   if(push)Nav.push(); State.view='recap'; const c=getCh(State.review.chapterId)||State.virtualChapter||getCh((State.review.multiChaps||[])[0])||{title:'Session',stats:mkStats(0)}; setTop({title:'Récapitulatif'}); setBot({actions:!1,revision:!1}); hideRevAct();
   const dur=(State.review.answers||[]).reduce((s,a)=>s+(a.ms||0),0), n=State.review.answers.length;
+  /* Cartes manquées pendant la session : proposées en révision prioritaire
+     (style Anki/Duolingo, sans agressivité : une liste + une seule action). */
+  const missedAns = (State.review.answers||[]).filter(a => !isSucc(a.next));
+  let missedHTML = '', missedCards = [];
+  if(missedAns.length){
+    const byId = new Map();
+    data.subjects.forEach(s => (s.chapters||[]).forEach(ch => ch.cards.forEach(crd => {
+      if(!byId.has(crd.id)) byId.set(crd.id, { c:crd, ch });
+    })));
+    const seenM = new Set();
+    missedAns.forEach(a => {
+      const found = byId.get(a.cardId);
+      if(found && !seenM.has(a.cardId)){ seenM.add(a.cardId); missedCards.push(found); }
+    });
+    if(missedCards.length){
+      missedHTML = `
+      <div class="section-title mt8">Cartes manquées (${missedCards.length})</div>
+      <div class="st-card st-card--list">
+        ${missedCards.slice(0, 10).map(({ c:crd, ch }) => `<div class="st-row st-row--static">
+          <span class="st-row__emoji">${stEv(ch.emoji || getEmoji(ch.title) || '📄')}</span>
+          <span class="st-row__main"><span class="st-row__title">${stEv(stTrunc(getSides(crd, ch).f, 110))}</span>
+          <span class="st-row__meta">${stEv(ch.title)}</span></span>
+          <span class="st-row__side"><span class="grade-tag ${crd.grade || 'unseen'}">${crd.grade || 'unseen'}</span></span>
+        </div>`).join('')}
+        ${missedCards.length > 10 ? `<div class="st-row st-row--static"><span class="st-row__main"><span class="st-row__meta">… et ${missedCards.length - 10} autre${missedCards.length > 11 ? 's' : ''}</span></span></div>` : ''}
+      </div>
+      <div class="cta"><button class="btn btn--solid btn--primary" id="recapMissedBtn">${ico('rotate-ccw','ico--sm')}<span>Revoir ces ${missedCards.length} carte${missedCards.length > 1 ? 's' : ''}</span></button></div>`;
+    }
+  }
   $('#view').innerHTML = `
     <div class="card recap">
       <div>
@@ -2015,6 +2095,7 @@ function goRecap(push=true){
         <div class="stat"><div class="label">Cette session</div><div class="val">${n}</div></div>
         <div class="stat"><div class="label">Durée</div><div class="val">${fmtDur(dur)}</div></div>
       </div>
+      ${missedHTML}
       <div class="cta"><button class="btn btn--solid btn--primary" id="contBtn">${ico('zap','ico--sm')}<span>Continuer la révision</span></button></div>
       <button class="btn btn--ghost btn--sm" id="recapDeckBtn">${ico('layers','ico--sm')}<span>Revenir aux decks</span></button>
     </div>`;
@@ -2023,6 +2104,8 @@ function goRecap(push=true){
     goDeck(false);
   };
   $('#contBtn').onclick=()=>startRev(c.id,!1,true);
+  const missedBtn = $('#recapMissedBtn');
+  if(missedBtn) missedBtn.onclick = () => startReviewSelection(missedCards, 'Cartes manquées');
 }
 
 function continueOrNew(cid,queue,mode,push,isCont,extras={}){
@@ -2086,7 +2169,9 @@ function voiceCommit(res, kind){
     r.voiceRetrying=false; r.voicePracticeResult=res; r.flipped=true;
     renRev(); return;
   }
-  if(r.revealedWithoutVoice || !voiceActive()) return;
+  /* Défense en profondeur : jamais de validation vocale sur une carte déjà
+     retournée (anti-triche « retourner la carte puis dicter la réponse vue »). */
+  if(r.revealedWithoutVoice || r.flipped || !voiceActive()) return;
   r.voiceResult = res;
   r.voiceSpoken = res.spoken || '';
   r.flipped = true;
@@ -2184,7 +2269,8 @@ function startRevMulti(ids,vid,flt,push=true,isCont=false){
       pool.push({chapId:ch.id,card:c});
   }));
   if(!pool.length){alert('Plus de cartes disponibles.');return}
-  const wt={unseen:6,echec:5,difficile:3.5,bien:2,facile:1};
+  /* Erreurs d'abord (style Anki), puis les nouvelles cartes, puis le reste. */
+  const wt={echec:8,difficile:6,unseen:4,bien:2,facile:1};
   const scored=pool.map(i=>{const g=i.card.grade||'unseen',base=wt[g]||1,due=i.card.dueAt>0?(Date.now()-i.card.dueAt>0?1+M.min(3,(Date.now()-i.card.dueAt)/864e5):.85):1.15;return{chapId:i.chapId,cardId:i.card.id,w:base*due*(1+(1-(i.card.perfEma||.5))*1.6)*(1+M.min(2,(i.card.avgMs||0)/3000))*(.9+M.random()*.2)}}).sort((a,b)=>b.w-a.w);
   const sz=M.round(all.reduce((s,c)=>s+(c.settings.sessionSize||10),0)/all.length)||10;
   if(vid.startsWith('group-')){const g=findGrp(getSub(),vid.replace('group-',''));if(g){g.lastUsed=Date.now();saveData()}}
@@ -2354,6 +2440,7 @@ function openSet(cid, push = true, tab = null){
       ${sect('Révision',
         slider('sldDefSize', P, 'sessionSize', { min:5, max:60, suffix:' cartes', hint:{ icon:'book-open', title:'Taille de session par défaut', sub:'Utilisée pour la révision multi-chapitres et les nouveaux chapitres' } }) +
         slider('sldGoal', P, 'dailyGoal', { min:5, max:200, step:5, suffix:' cartes', hint:{ icon:'target', title:'Objectif quotidien', sub:'But de cartes révisées par jour (progression affichée dans les stats)' } }) +
+        slider('sldNew', P, 'newCardLimit', { min:0, max:100, step:5, fmt:v => v === 0 ? 'Illimité' : v + ' cartes', hint:{ icon:'file-plus', title:'Nouvelles cartes par jour', sub:'Plafond de cartes jamais vues introduites chaque jour (0 = illimité) — tes cartes dues passent avant' } }) +
         slider('sldRet', P, 'desiredRetention', { min:0.80, max:0.97, step:0.01, fmt:v => Math.round(v * 100) + ' %', hint:{ icon:'sparkles', title:'Rétention cible (FSRS)', sub:'Probabilité de se souvenir d\'une carte au moment de la révision' } }) +
         sRow('rowMathDetail','sparkles','Résumé maths affiché d\'abord','Au verso, montre la version courte avant le détail', sToggle(!!P.mathDetail), 1),
         'Une rétention plus haute = intervalles plus courts, donc plus de révisions par jour.')}
@@ -2533,6 +2620,7 @@ function openSet(cid, push = true, tab = null){
     bindSlider('#sldD', P, 'fsDef', { min:12, max:72, cssVar:'--fs-def', preview:'#preD' });
     bindSlider('#sldDefSize', P, 'sessionSize', { min:5, max:60 });
     bindSlider('#sldGoal', P, 'dailyGoal', { min:5, max:200, step:5 });
+    bindSlider('#sldNew', P, 'newCardLimit', { min:0, max:100, step:5 });
     bindSlider('#sldRet', P, 'desiredRetention', { min:0.80, max:0.97, step:0.01 });
 
     bindRow('#rowTheme', () => { data.app.theme = data.app.theme === 'light' ? 'dark' : 'light'; save(); applyTh(); openSet(cid, false, 'general'); });
@@ -2656,7 +2744,7 @@ function upgrade() {
   if (!data.app) data.app = { theme: 'dark' };
   data.app.prefs = {
     fsTerm: 22, fsDef: 24, accent: 'indigo', radius: 14,
-    sessionSize: 10, dailyGoal: 20, desiredRetention: 0.9,
+    sessionSize: 10, dailyGoal: 20, desiredRetention: 0.9, newCardLimit: 20,
     focusMode: false, mathDetail: false,
     ...(data.app.prefs || {})
   };
@@ -2665,6 +2753,7 @@ function upgrade() {
   if (typeof data.app.prefs.desiredRetention !== 'number' || data.app.prefs.desiredRetention <= 0 || data.app.prefs.desiredRetention > 1) data.app.prefs.desiredRetention = 0.9;
   if (!(data.app.prefs.sessionSize > 0)) data.app.prefs.sessionSize = 10;
   if (!(data.app.prefs.dailyGoal > 0)) data.app.prefs.dailyGoal = 20;
+  if (typeof data.app.prefs.newCardLimit !== 'number' || data.app.prefs.newCardLimit < 0) data.app.prefs.newCardLimit = 20;
 
   // ── Migration SM-2 → FSRS (Le nouveau bloc à ajouter ici) ──
   if (!data.app._fsrsMigrated) {
