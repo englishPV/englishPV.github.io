@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test de vocabulaire — QCM interactif</title>
+<style>
+  :root { --ink:#1e293b; --muted:#64748b; --line:#e2e8f0; --accent:#2563eb; --accent-soft:#dbeafe; --good:#16a34a; --good-soft:#dcfce7; --bad:#dc2626; --bad-soft:#fee2e2; --bg:#f8fafc; }
+  * { box-sizing:border-box; }
+  body { font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:24px 16px 48px; line-height:1.55; }
+  .sheet { max-width:780px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:16px; padding:30px 28px; }
+  h1 { font-size:23px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:13.5px; margin:0 0 6px; }
+  .hint { color:var(--muted); font-size:12px; margin:0 0 20px; }
+  fieldset { border:1px solid var(--line); border-radius:12px; margin:0 0 14px; padding:14px 16px 10px; }
+  fieldset.answered-ok { border-color:var(--good); background:var(--good-soft); }
+  fieldset.answered-ko { border-color:var(--bad); background:var(--bad-soft); }
+  legend { font-weight:600; font-size:14.5px; padding:0 6px; }
+  .opts { list-style:none; margin:8px 0 6px; padding:0; }
+  .opts li { margin:2px 0; }
+  label { display:flex; gap:8px; align-items:baseline; padding:5px 8px; border-radius:8px; cursor:pointer; font-size:14px; }
+  label:hover { background:rgba(37,99,235,.06); }
+  input[type=radio] { accent-color:var(--accent); }
+  .fb { font-size:12.5px; margin:2px 0 4px 8px; min-height:1em; }
+  .fb.ok { color:var(--good); font-weight:600; }
+  .fb.ko { color:var(--bad); font-weight:600; }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 2px 4px; }
+  button { font:inherit; font-size:14px; border-radius:10px; border:1px solid var(--line); background:#fff; padding:9px 18px; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.primary:hover { background:#1d4ed8; }
+  .score { font-size:15px; font-weight:700; }
+  .foot { color:var(--muted); font-size:11.5px; margin-top:22px; text-align:center; }
+  @media print {
+    .sheet { border:0; padding:0; }
+    fieldset { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>🇬🇧 Test de vocabulaire — QCM interactif</h1>
+  <p class="sub">Anglais · 10 questions à choix multiple · réponds puis clique sur « Vérifier mes réponses ».</p>
+  <p class="hint">Astuce : en téléchargeant ce test, tu obtiens un PDF figé (version papier à imprimer).</p>
+
+  <form id="qcm">
+    <fieldset>
+      <legend>1. « To give up » veut dire…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q1" value="a"> donner à quelqu’un</label></li>
+        <li><label><input type="radio" name="q1" value="b"> abandonner, arrêter</label></li>
+        <li><label><input type="radio" name="q1" value="c"> prêter</label></li>
+      </ul>
+      <div class="fb" id="fb1"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. « Reliable » se traduit par…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q2" value="a"> fiable</label></li>
+        <li><label><input type="radio" name="q2" value="b"> rapide</label></li>
+        <li><label><input type="radio" name="q2" value="c"> dangereux</label></li>
+      </ul>
+      <div class="fb" id="fb2"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. « A deadline » est…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q3" value="a"> une réunion</label></li>
+        <li><label><input type="radio" name="q3" value="b"> une ligne droite</label></li>
+        <li><label><input type="radio" name="q3" value="c"> une date limite</label></li>
+      </ul>
+      <div class="fb" id="fb3"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>4. « Eventually » signifie…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q4" value="a"> finalement, à la fin</label></li>
+        <li><label><input type="radio" name="q4" value="b"> rarement</label></li>
+        <li><label><input type="radio" name="q4" value="c"> soudainement</label></li>
+      </ul>
+      <div class="fb" id="fb4"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>5. « An achievement » est…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q5" value="a"> une réussite</label></li>
+        <li><label><input type="radio" name="q5" value="b"> un avertissement</label></li>
+        <li><label><input type="radio" name="q5" value="c"> une échelle</label></li>
+      </ul>
+      <div class="fb" id="fb5"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>6. « To look forward to » signifie…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q6" value="a"> regarder devant soi</label></li>
+        <li><label><input type="radio" name="q6" value="b"> avoir hâte de</label></li>
+        <li><label><input type="radio" name="q6" value="c"> dépendre de</label></li>
+      </ul>
+      <div class="fb" id="fb6"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>7. « Although » est un synonyme de…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q7" value="a"> because</label></li>
+        <li><label><input type="radio" name="q7" value="b"> however</label></li>
+        <li><label><input type="radio" name="q7" value="c"> even though</label></li>
+      </ul>
+      <div class="fb" id="fb7"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>8. « Accurate » veut dire…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q8" value="a"> précis, exact</label></li>
+        <li><label><input type="radio" name="q8" value="b"> accidentel</label></li>
+        <li><label><input type="radio" name="q8" value="c"> ancien</label></li>
+      </ul>
+      <div class="fb" id="fb8"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>9. « A shortcut » est…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q9" value="a"> un raccourci</label></li>
+        <li><label><input type="radio" name="q9" value="b"> une coupure de courant</label></li>
+        <li><label><input type="radio" name="q9" value="c"> une chemise courte</label></li>
+      </ul>
+      <div class="fb" id="fb9"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>10. « To be about to » signifie…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q10" value="a"> être sur le point de</label></li>
+        <li><label><input type="radio" name="q10" value="b"> être à propos de</label></li>
+        <li><label><input type="radio" name="q10" value="c"> être opposé à</label></li>
+      </ul>
+      <div class="fb" id="fb10"></div>
+    </fieldset>
+  </form>
+
+  <div class="toolbar">
+    <button type="button" class="primary pv-no-print" id="check">Vérifier mes réponses</button>
+    <button type="button" class="pv-no-print" id="reset">Recommencer</button>
+    <span class="score" id="score"></span>
+  </div>
+
+  <p class="foot">Page interactive publiée depuis le Drive — le téléchargement donne un PDF figé.</p>
+</div>
+
+<script>
+(function () {
+  var ANSWERS = { q1:'b', q2:'a', q3:'c', q4:'a', q5:'a', q6:'b', q7:'c', q8:'a', q9:'a', q10:'a' };
+  var FIX = {
+    q1: 'To give up = abandonner, arrêter.',
+    q2: 'Reliable = fiable.',
+    q3: 'A deadline = une date limite.',
+    q4: 'Eventually = finalement, à la fin.',
+    q5: 'An achievement = une réussite.',
+    q6: 'To look forward to = avoir hâte de.',
+    q7: 'Although = even though = bien que.',
+    q8: 'Accurate = précis, exact.',
+    q9: 'A shortcut = un raccourci.',
+    q10: 'To be about to = être sur le point de.'
+  };
+  var form = document.getElementById('qcm');
+
+  function fieldOf(k) { return document.getElementById('fb' + k.slice(1)).closest('fieldset'); }
+
+  function show(k, ok, answered) {
+    var fb = document.getElementById('fb' + k.slice(1));
+    var fs = fieldOf(k);
+    fs.classList.remove('answered-ok', 'answered-ko');
+    if (!answered) { fb.textContent = ''; fb.className = 'fb'; return; }
+    fb.textContent = (ok ? '✔ Bonne réponse ! ' : '✘ Réponse incorrecte. ') + FIX[k];
+    fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+    fs.classList.add(ok ? 'answered-ok' : 'answered-ko');
+  }
+
+  document.getElementById('check').addEventListener('click', function () {
+    var score = 0, total = 0, k;
+    for (k in ANSWERS) {
+      total++;
+      var sel = form.querySelector('input[name=' + k + ']:checked');
+      var ok = !!sel && sel.value === ANSWERS[k];
+      if (ok) score++;
+      show(k, ok, true);
+    }
+    document.getElementById('score').textContent = 'Score : ' + score + ' / ' + total;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    form.reset();
+    for (var k in ANSWERS) show(k, false, false);
+    document.getElementById('score').textContent = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  form.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t && t.name && ANSWERS[t.name]) show(t.name, t.value === ANSWERS[t.name], true);
+  });
+})();
+</script>
+</body>
+</html>

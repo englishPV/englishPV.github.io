@@ -51,16 +51,20 @@ const DriveStore = (() => {
     const e = extOf(name), m = String(mime || '');
     if (['tex', 'latex', 'ltx'].includes(e)) return 'latex';
     if (['md', 'markdown'].includes(e)) return 'markdown';
+    // Pages HTML interactives (QCM…) — y compris le nom de publication
+    // « .html.txt » (le suffixe .txt empêche GitHub Pages d'exécuter la page)
+    if (/\.html?\.txt$/i.test(String(name || ''))) return 'html';
+    if (m === 'text/html' || ['html', 'htm'].includes(e)) return 'html';
     if (m.startsWith('image/') || ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'avif', 'ico'].includes(e)) return 'image';
     if (m === 'application/pdf' || e === 'pdf') return 'pdf';
     if (m.startsWith('audio/') || ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'].includes(e)) return 'audio';
     if (m.startsWith('video/') || ['mp4', 'webm', 'mov', 'mkv', 'avi'].includes(e)) return 'video';
     if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2'].includes(e)) return 'archive';
-    if (m.startsWith('text/') || ['txt', 'csv', 'tsv', 'json', 'log', 'ini', 'yml', 'yaml', 'xml', 'html', 'css', 'js', 'py', 'c', 'cpp', 'h', 'java', 'sql', 'rtf'].includes(e)) return 'text';
+    if (m.startsWith('text/') || ['txt', 'csv', 'tsv', 'json', 'log', 'ini', 'yml', 'yaml', 'xml', 'css', 'js', 'py', 'c', 'cpp', 'h', 'java', 'sql', 'rtf'].includes(e)) return 'text';
     return 'file';
   }
 
-  const TEXT_KINDS = ['text', 'latex', 'markdown'];
+  const TEXT_KINDS = ['text', 'latex', 'markdown', 'html'];
   const isTextKind = k => TEXT_KINDS.includes(k);
 
   /* ── IndexedDB (contenu des fichiers) ──────────────────────── */
@@ -184,6 +188,10 @@ const DriveStore = (() => {
             walk(n.id, p + '/');
           } else {
             let base = safeName(n.name);
+            // Pages HTML : publiées en « .html.txt » — GitHub Pages sert du
+            // texte brut (jamais exécuté, jamais téléchargé comme du HTML),
+            // l'application seule les restitue dans son lecteur.
+            if (n.kind === 'html' && !/\.txt$/i.test(base)) base += '.txt';
             let p = prefix + base, i = 2;
             while (used.has(p.toLowerCase())) { const e = extOf(base); p = e ? `${prefix}${base.slice(0, -(e.length + 1))}-${i++}.${e}` : `${prefix}${base}-${i++}`; }
             used.add(p.toLowerCase());
@@ -251,12 +259,12 @@ const DriveStore = (() => {
   async function addTextFile(driveId, parentId, name, text, kind) {
     const d = drive(driveId); if (!d) return null;
     let nm = String(name || 'sans-titre').trim();
-    if (!extOf(nm)) nm += kind === 'latex' ? '.tex' : kind === 'markdown' ? '.md' : '.txt';
+    if (!extOf(nm)) nm += kind === 'latex' ? '.tex' : kind === 'markdown' ? '.md' : kind === 'html' ? '.html' : '.txt';
     const k = kind || kindOf(nm);
     const n = {
       id: uid('fil'), driveId, parentId: parentId || null,
       name: uniqueName(driveId, parentId, nm), kind: k,
-      mime: k === 'latex' ? 'application/x-tex' : 'text/plain',
+      mime: k === 'latex' ? 'application/x-tex' : k === 'html' ? 'text/html' : 'text/plain',
       size: new Blob([text || '']).size, addedAt: now(), updatedAt: now(),
       dirty: true, by: adminEmail()
     };

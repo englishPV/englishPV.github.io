@@ -12,8 +12,8 @@ const Drive = (() => {
   'use strict';
 
   const S = DriveStore;
-  const KIND_ICON = { folder: 'folder', text: 'file-text', latex: 'file-code', markdown: 'list', image: 'image', pdf: 'book', audio: 'music', video: 'video', archive: 'archive', file: 'paperclip' };
-  const KIND_LABEL = { folder: 'Dossier', text: 'Texte', latex: 'LaTeX', markdown: 'Markdown', image: 'Image', pdf: 'PDF', audio: 'Audio', video: 'Vidéo', archive: 'Archive', file: 'Fichier' };
+  const KIND_ICON = { folder: 'folder', text: 'file-text', latex: 'file-code', markdown: 'list', html: 'puzzle', image: 'image', pdf: 'book', audio: 'music', video: 'video', archive: 'archive', file: 'paperclip' };
+  const KIND_LABEL = { folder: 'Dossier', text: 'Texte', latex: 'LaTeX', markdown: 'Markdown', html: 'Page HTML', image: 'Image', pdf: 'PDF', audio: 'Audio', video: 'Vidéo', archive: 'Archive', file: 'Fichier' };
   const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
 
   /* ─────────── utilitaires ─────────── */
@@ -31,6 +31,7 @@ const Drive = (() => {
   let booted = false;
   let fileView = {};         // fileId -> 'render' | 'source'
   let pdfViewer = null;      // lecteur PDF actif (js/11_drive_pdf.js)
+  let htmlView = null;       // page HTML interactive courante (js/16_drive_html.js)
   let paintToken = 0;        // invalide les rendus de fichier en cours
   const objUrls = [];
 
@@ -203,6 +204,7 @@ const Drive = (() => {
     if (!isOpen) { if (!silent) { try { goDeck(false); } catch {} } return; }
     isOpen = false; cur = null; stack = []; query = '';
     destroyPdf();
+    destroyHtml();
     setChromeMin(false);
     const v = D.getElementById('view');
     if (v) v.classList.remove('drive-open');
@@ -233,6 +235,7 @@ const Drive = (() => {
     if (!v || !cur) return;
     paintToken++;                 // annule les chargements de fichier en cours
     destroyPdf();                 // libère le lecteur PDF (canvas, worker, écouteurs)
+    destroyHtml();                // libère la page HTML interactive courante
     setChromeMin(false);          // l'en-tête revient à chaque changement d'écran
     v.classList.add('drive-open');
     try { setBot({ actions: false, revision: false }); hideRevAct(); } catch {}
@@ -282,6 +285,7 @@ const Drive = (() => {
           <button class="dbtn" data-act="new-text" title="Nouveau fichier texte">${ico('file-text','ico--sm')}Texte</button>
           <button class="dbtn" data-act="new-latex" title="Nouveau fichier LaTeX">${ico('file-code','ico--sm')}LaTeX</button>
           <button class="dbtn" data-act="new-md" title="Nouveau fichier Markdown">${ico('list','ico--sm')}Markdown</button>
+          <button class="dbtn" data-act="new-html" title="Nouvelle page HTML interactive (QCM, fiche…)">${ico('puzzle','ico--sm')}HTML</button>
           <button class="dbtn" data-act="new-folder" title="Nouveau dossier">${ico('folder','ico--sm')}Dossier</button>
           <button class="dbtn dbtn-accent" data-act="import" title="Importer des fichiers">${ico('upload','ico--sm')}Importer</button>
           <input type="file" id="driveImport" multiple class="hidden">
@@ -333,7 +337,7 @@ const Drive = (() => {
           </div>
         </div>
         <div class="drow-acts">
-          ${!isFolder ? `<button class="dact" data-act="download" title="Télécharger">${ico('download','ico--sm')}</button>` : ''}
+          ${!isFolder ? `<button class="dact" data-act="download" title="${n.kind === 'html' ? 'Télécharger (PDF figé)' : 'Télécharger'}">${ico('download','ico--sm')}</button>` : ''}
           ${admin() ? `<button class="dact" data-act="rename" title="Renommer">${ico('pencil','ico--sm')}</button>
                        <button class="dact" data-act="move" title="Déplacer">${ico('folder-open','ico--sm')}</button>
                        <button class="dact dact-danger" data-act="delete" title="Supprimer">${ico('trash','ico--sm')}</button>` : ''}
@@ -387,7 +391,7 @@ const Drive = (() => {
         e.stopPropagation();
         const act = b.dataset.act;
         if (act === 'root') { goRoot(); return; }
-        if (act === 'new-text' || act === 'new-latex' || act === 'new-md') return newFileModal(act === 'new-latex' ? 'latex' : act === 'new-md' ? 'markdown' : 'text');
+        if (act === 'new-text' || act === 'new-latex' || act === 'new-md' || act === 'new-html') return newFileModal(act === 'new-latex' ? 'latex' : act === 'new-md' ? 'markdown' : act === 'new-html' ? 'html' : 'text');
         if (act === 'new-folder') return newFolderModal(d.id, cur.folderId || null);
         if (act === 'import') { const i = v.querySelector('#driveImport'); i && i.click(); return; }
         if (act === 'clear-search') { query = ''; paint(); return; }
@@ -473,7 +477,7 @@ const Drive = (() => {
         </div>
 
         <div class="dfile-actions">
-          <button class="dbtn" data-act="download">${ico('download','ico--sm')}Télécharger</button>
+          <button class="dbtn" data-act="download">${ico('download','ico--sm')}${n.kind === 'html' ? 'Télécharger (PDF)' : 'Télécharger'}</button>
           ${(n.kind === 'latex' || n.kind === 'markdown') ? `
             <div class="dseg">
               <button class="dseg-b ${mode === 'render' ? 'on' : ''}" data-act="view-render">Rendu</button>
@@ -481,6 +485,7 @@ const Drive = (() => {
             </div>` : ''}
           ${n.kind === 'latex' || n.kind === 'markdown' || n.kind === 'text' ? `<button class="dbtn" data-act="print"><span>🖨</span>PDF</button>` : ''}
           ${n.kind === 'pdf' ? `<button class="dbtn" data-act="newtab">${ico('external-link','ico--sm')}Nouvel onglet</button>` : ''}
+          ${admin() && n.kind === 'html' ? `<button class="dbtn" data-act="download-src" title="Télécharger le fichier HTML source (admin)">${ico('file-text','ico--sm')}Source .html</button>` : ''}
           ${admin() ? `<button class="dbtn" data-act="edit">${ico('pencil','ico--sm')}Éditer</button>
                        <button class="dbtn dbtn-danger" data-act="delete" title="Supprimer">${ico('trash','ico--sm')}</button>` : ''}
         </div>
@@ -496,6 +501,7 @@ const Drive = (() => {
       e.stopPropagation();
       const act = b.dataset.act;
       if (act === 'download') return downloadNode(n);
+      if (act === 'download-src') return downloadRaw(n);
       if (act === 'toggle-info') {
         const head = v.querySelector('#dfileHead');
         if (!head) return;
@@ -525,6 +531,20 @@ const Drive = (() => {
           : `<div class="dmd">${mdToHtml(text, n)}</div>`;
       } else if (n.kind === 'text') {
         body.innerHTML = `<pre class="dsrc"><code>${esc(text)}</code></pre>`;
+      } else if (n.kind === 'html') {
+        /* Page interactive (QCM…) : bac à sable auto-grandissant — elle
+           défile comme un document dans le lecteur. Le code source n'est
+           jamais exposé ; le seul téléchargement est le PDF figé. */
+        body.classList.add('dfile-body--html');
+        htmlView = W.DriveHtml ? W.DriveHtml.mount({
+          host: body,
+          nodeId: n.id,
+          text,
+          name: n.name,
+          baseHref: htmlBaseFor(n),
+          resolveUrl: u => resolveAssetUrlFor(n, u)
+        }) : null;
+        if (!htmlView) throw new Error('Module HTML indisponible (js/16_drive_html.js)');
       } else if (n.kind === 'image') {
         const u = await objectUrlFor(n);
         body.innerHTML = `<div class="dimgwrap"><img class="dimg" src="${esc(u)}" alt="${esc(n.name)}"></div>
@@ -628,6 +648,12 @@ const Drive = (() => {
     if (!pdfViewer) return;
     try { pdfViewer.destroy(); } catch (e) { /* déjà détruit */ }
     pdfViewer = null;
+  }
+
+  function destroyHtml() {
+    if (!htmlView) return;
+    try { htmlView.destroy(); } catch (e) { /* déjà détruit */ }
+    htmlView = null;
   }
 
   function resolveAssetFrom(node, name) {
@@ -740,8 +766,8 @@ const Drive = (() => {
   }
 
   async function newFileModal(kind) {
-    const labels = { latex: 'LaTeX (.tex)', markdown: 'Markdown (.md)', text: 'Texte (.txt)' };
-    const exts = { latex: '.tex', markdown: '.md', text: '.txt' };
+    const labels = { latex: 'LaTeX (.tex)', markdown: 'Markdown (.md)', text: 'Texte (.txt)', html: 'HTML (.html)' };
+    const exts = { latex: '.tex', markdown: '.md', text: '.txt', html: '.html' };
     const templates = {
       latex: `\\documentclass[12pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}
@@ -778,6 +804,135 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
 - élément 2
 
 **gras**, *italique*, \`code\`
+`,
+html: `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test de vocabulaire - QCM</title>
+<style>
+  :root { --ink:#1e293b; --muted:#64748b; --line:#e2e8f0; --accent:#2563eb; --good:#16a34a; --bad:#dc2626; --bg:#f8fafc; }
+  * { box-sizing:border-box; }
+  body { font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:24px 16px 48px; line-height:1.5; }
+  .sheet { max-width:760px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:14px; padding:28px 26px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:13px; margin:0 0 18px; }
+  fieldset { border:1px solid var(--line); border-radius:10px; margin:0 0 14px; padding:14px 16px 10px; }
+  legend { font-weight:600; font-size:14px; padding:0 6px; }
+  .opts { list-style:none; margin:8px 0 6px; padding:0; }
+  .opts li { margin:2px 0; }
+  label { display:flex; gap:8px; align-items:baseline; padding:5px 8px; border-radius:8px; cursor:pointer; }
+  label:hover { background:var(--bg); }
+  input[type=radio] { accent-color:var(--accent); }
+  .fb { font-size:12.5px; margin:2px 0 4px 8px; min-height:1em; }
+  .fb.ok { color:var(--good); }
+  .fb.ko { color:var(--bad); }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:18px 2px 4px; }
+  button { font:inherit; font-size:14px; border-radius:10px; border:1px solid var(--line); background:#fff; padding:9px 16px; cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .score { font-size:15px; font-weight:600; }
+  @media print { .sheet { border:0; padding:0; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>Test de vocabulaire - QCM</h1>
+  <p class="sub">Choisis la bonne réponse pour chaque question, puis clique sur « Verifier mes reponses ».</p>
+  <form id="qcm">
+    <fieldset>
+      <legend>1. « To give up » veut dire…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q1" value="a"> donner</label></li>
+        <li><label><input type="radio" name="q1" value="b"> abandonner</label></li>
+        <li><label><input type="radio" name="q1" value="c"> preter</label></li>
+      </ul>
+      <div class="fb" id="fb1"></div>
+    </fieldset>
+    <fieldset>
+      <legend>2. « Reliable » se traduit par…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q2" value="a"> fiable</label></li>
+        <li><label><input type="radio" name="q2" value="b"> rapide</label></li>
+        <li><label><input type="radio" name="q2" value="c"> dangereux</label></li>
+      </ul>
+      <div class="fb" id="fb2"></div>
+    </fieldset>
+    <fieldset>
+      <legend>3. « A deadline » est…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q3" value="a"> une reunion</label></li>
+        <li><label><input type="radio" name="q3" value="b"> une ligne droite</label></li>
+        <li><label><input type="radio" name="q3" value="c"> une date limite</label></li>
+      </ul>
+      <div class="fb" id="fb3"></div>
+    </fieldset>
+    <fieldset>
+      <legend>4. « Eventually » signifie…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q4" value="a"> finalement</label></li>
+        <li><label><input type="radio" name="q4" value="b"> rarement</label></li>
+        <li><label><input type="radio" name="q4" value="c"> soudainement</label></li>
+      </ul>
+      <div class="fb" id="fb4"></div>
+    </fieldset>
+    <fieldset>
+      <legend>5. « An achievement » est…</legend>
+      <ul class="opts">
+        <li><label><input type="radio" name="q5" value="a"> une reussite</label></li>
+        <li><label><input type="radio" name="q5" value="b"> un avertissement</label></li>
+        <li><label><input type="radio" name="q5" value="c"> une echelle</label></li>
+      </ul>
+      <div class="fb" id="fb5"></div>
+    </fieldset>
+  </form>
+  <div class="toolbar">
+    <button type="button" class="primary pv-no-print" id="check">Verifier mes reponses</button>
+    <button type="button" class="pv-no-print" id="reset">Recommencer</button>
+    <span class="score" id="score"></span>
+  </div>
+</div>
+<script>
+(function () {
+  var ANSWERS = { q1: 'b', q2: 'a', q3: 'c', q4: 'a', q5: 'a' };
+  var FIX = {
+    q1: 'To give up = abandonner.',
+    q2: 'Reliable = fiable.',
+    q3: 'A deadline = une date limite.',
+    q4: 'Eventually = finalement, a la fin.',
+    q5: 'An achievement = une reussite.'
+  };
+  var form = document.getElementById('qcm');
+  function show(k, ok, answered) {
+    var fb = document.getElementById('fb' + k.slice(1));
+    if (!answered) { fb.textContent = ''; fb.className = 'fb'; return; }
+    fb.textContent = (ok ? 'Bonne reponse ! ' : 'Reponse incorrecte. ') + FIX[k];
+    fb.className = 'fb ' + (ok ? 'ok' : 'ko');
+  }
+  document.getElementById('check').addEventListener('click', function () {
+    var score = 0, total = 0, k;
+    for (k in ANSWERS) {
+      total++;
+      var sel = form.querySelector('input[name=' + k + ']:checked');
+      var ok = !!sel && sel.value === ANSWERS[k];
+      if (ok) score++;
+      show(k, ok, true);
+    }
+    document.getElementById('score').textContent = 'Score : ' + score + ' / ' + total;
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    form.reset();
+    for (var k in ANSWERS) show(k, false, false);
+    document.getElementById('score').textContent = '';
+  });
+  form.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t && t.name && ANSWERS[t.name]) show(t.name, t.value === ANSWERS[t.name], true);
+  });
+})();
+</script>
+</body>
+</html>
 `,
       text: ''
     };
@@ -846,16 +1001,99 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
   }
 
   async function downloadNode(n) {
+    // Pages HTML : le téléchargement est TOUJOURS un PDF figé —
+    // jamais le fichier HTML source.
+    if (n.kind === 'html') return exportHtmlPdf(n);
     try {
       const c = await S.getContent(n);
       if (!c) throw new Error('Contenu indisponible');
-      const u = URL.createObjectURL(c.blob);
-      const a = D.createElement('a');
-      a.href = u; a.download = n.name; a.rel = 'noopener';
-      D.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(u), 4000);
+      saveBlobAs(c.blob, n.name);
       notify('Téléchargement lancé', 'success');
     } catch (e) { notify('Téléchargement impossible : ' + (e.message || e), 'error'); }
+  }
+
+  function saveBlobAs(blob, filename) {
+    const u = URL.createObjectURL(blob);
+    const a = D.createElement('a');
+    a.href = u; a.download = filename; a.rel = 'noopener';
+    D.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 4000);
+  }
+
+  // Source brute (admin uniquement, à des fins d'édition hors ligne)
+  async function downloadRaw(n) {
+    if (!admin()) return notify('Réservé aux administrateurs', 'error');
+    try {
+      const c = await S.getContent(n);
+      if (!c) throw new Error('Contenu indisponible');
+      saveBlobAs(c.blob, n.name);
+      notify('Source téléchargée (admin)', 'success');
+    } catch (e) { notify('Téléchargement impossible : ' + (e.message || e), 'error'); }
+  }
+
+  /* Export PDF figé d'une page HTML : capture de l'état courant (ou de la
+     version propre si elle n'est pas ouverte), téléchargement direct ;
+     repli sur la fenêtre d'impression si la capture échoue. */
+  async function exportHtmlPdf(n) {
+    if (!W.DriveHtml) return notify('Module HTML indisponible', 'error');
+    notify('Préparation du PDF…', 'info');
+    try {
+      const live = !!(htmlView && htmlView.nodeId === n.id);
+      if (live && htmlView.ready) await htmlView.ready.catch(() => {});   // attend le montage
+      let html = live ? htmlView.html : null;
+      let text = null;
+      if (!html) {
+        const c = await S.getContent(n);
+        if (!c) throw new Error('Contenu indisponible');
+        text = await S.blobText(c.blob);
+      }
+      await W.DriveHtml.exportPdf({
+        live,
+        html,
+        text,
+        name: n.name,
+        baseHref: htmlBaseFor(n),
+        resolveUrl: u => resolveAssetUrlFor(n, u),
+        notify
+      });
+    } catch (e) {
+      notify('Export PDF impossible : ' + (e.message || e), 'error');
+    }
+  }
+
+  // Dossier publié du fichier → <base> pour les ressources relatives
+  function htmlBaseFor(n) {
+    const p = n.path || n.publishedPath;
+    if (!p) return siteBase();
+    const dir = String(p).replace(/[^/]*$/, '');
+    try { return new URL(S.pagesUrl(dir), location.href).href; } catch { return siteBase(); }
+  }
+
+  // URL absolue d'une ressource référencée par une page HTML : d'abord les
+  // fichiers du Drive (même dossier, puis onglet, puis tout), sinon les
+  // images du site. Une copie locale non publiée est servie depuis IndexedDB.
+  async function resolveAssetUrlFor(n, name) {
+    const raw = String(name || '').split(/[?#]/)[0];
+    const base = raw.split('/').pop();
+    const tryNames = [raw, base].filter(Boolean);
+    const scopes = [S.nodesOf(n.driveId, n.parentId || null), S.liveNodes().filter(x => x.driveId === n.driveId), S.liveNodes()];
+    for (const scope of scopes) {
+      for (const cand of tryNames) {
+        const hit = scope.find(x => x.kind !== 'folder' && (x.name === cand || x.name.toLowerCase() === cand.toLowerCase()));
+        if (hit) {
+          if (hit.dirty || (hit.path || hit.publishedPath) === null) {
+            try {
+              const b = await S.localBlob(hit.id);
+              if (b) return trackUrl(URL.createObjectURL(b));
+            } catch (e) { /* on retombe sur l'URL publiée */ }
+          }
+          const p = hit.path || hit.publishedPath;
+          if (p) return new URL(S.pagesUrl(p), location.href).href;
+          return null;
+        }
+      }
+    }
+    try { return new URL('images/' + base.split('/').map(encodeURIComponent).join('/'), location.href).href; } catch { return null; }
   }
 
   /* ══════════════════════════════════════════════════════════
@@ -892,7 +1130,7 @@ Texte avec des maths : $E = mc^2$ et une équation numérotée
       </div>
       <div class="dedit-name">
         <input class="input" id="edName" value="${esc(n.name)}" spellcheck="false">
-        <button class="dbtn" id="edPreviewBtn" ${n.kind === 'text' ? 'disabled' : ''}>${ico('eye','ico--sm')}Aperçu</button>
+        <button class="dbtn" id="edPreviewBtn" ${n.kind === 'text' || n.kind === 'html' ? 'disabled' : ''}>${ico('eye','ico--sm')}Aperçu</button>
       </div>
       ${isTex ? `<div class="dedit-tools">${SNIPPETS.map((s, i) => `<button class="dtool" data-sn="${i}" title="${esc(s.v)}">${esc(s.l)}</button>`).join('')}</div>` : ''}
       <div class="dedit-body">

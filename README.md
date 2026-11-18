@@ -18,6 +18,7 @@ Site : <https://englishpv.github.io> · Emploi du temps : <https://schedulepv.we
 | Police | Inter variable, **auto-hébergée** (`fonts/`, ≈ 100 Ko : romain et italique ; aucune requête tierce) |
 | Formules | MathJax 3 chargé à la demande |
 | PDF | **PDF.js 3.11 auto-hébergé** (`vendor/pdfjs/`), chargé à la demande — lecteur maison avec zoom |
+| Pages HTML | rendu **bac à sable** dans le Drive + **export PDF figé** (html2canvas-pro + jsPDF auto-hébergés, chargés à la demande) |
 | Sync | Firebase Realtime Database + Google Auth (optionnel) |
 | Stockage local | `localStorage` (données) + IndexedDB (médias importés) |
 | Mon Drive | Google Drive **personnel** de l'utilisateur (OAuth `drive.file`), optionnel — dossier `EnglishPV` |
@@ -40,9 +41,11 @@ js/12_voice.js                 révision à la voix (Web Speech API, évaluation
 js/13_perso_drive.js           « Mon Drive » : Google Drive personnel de chaque utilisateur
 js/14_media_library.js         bibliothèque d'images (galerie, usage par carte, sélecteur)
 js/15_import_wizard.js         assistant d'import + moteur du format « pv-import »
+js/16_drive_html.js            pages HTML interactives du Drive (QCM, fiches) + export PDF figé
 css/05_voice.css               mode vocal : micro, bandeau d'état, correction colorée
 css/06_library.css             images, Mon Drive, assistant d'import
 vendor/pdfjs/                  PDF.js 3.11 (copie locale, chargée au premier PDF ouvert)
+vendor/html2canvas-pro/ · vendor/jspdf/   capture DOM + génération PDF (export figé des pages HTML, chargés à la demande)
 fonts/                         Inter variable (woff2, subset latin)
 images/ · content/drive/       médias et documents publiés
 tests/                         tests automatisés : `node --test tests/*.cjs`
@@ -357,6 +360,33 @@ ou par double-tap, et le bouton ⛶ bascule le lecteur en pleine fenêtre.
 Sur ordinateur, `Maj` + molette agit sur la face survolée en révision (recto ou verso)
 et sur les deux tailles ailleurs ; un petit indicateur affiche la valeur courante. La
 grille de cartes suit également ces deux réglages.
+
+## Pages HTML interactives du Drive
+
+Le Drive accueille aussi des **pages HTML** : QCM de vocabulaire, fiches
+révisables, exercices interactifs. Elles se créent avec le bouton **HTML** de la
+barre d'outils (modèle QCM prêt à l'emploi) ou s'importent comme des fichiers
+`.html` (glisser-déposer), puis se publient comme le reste.
+
+| Aspect | Comportement |
+| --- | --- |
+| Rendu | La page s'affiche dans une **iframe bac à sable** (`allow-scripts allow-modals`, sans accès à l'appli) qui grandit avec son contenu : elle défile comme un PDF ou une image longue dans le lecteur du Drive. Les ressources relatives (fichiers du même dossier, images du site) sont résolues automatiquement, avant publication aussi. |
+| Interactivité | Le JavaScript de la page fonctionne (QCM cliquables, score, validation…) ; `localStorage`/`sessionStorage` disposent d'un substitut mémoire dans l'iframe isolée. |
+| Téléchargement | **Jamais le HTML source** : *Télécharger (PDF)* produit un **PDF figé** — l'état courant (réponses cochées, score) est capturé tel quel, scripts et boutons retirés. |
+| Export PDF | Capture raster (`html2canvas-pro`, gère `oklch`/`color-mix`) → PDF A4 paginé (`jsPDF`) téléchargé directement ; en cas de page géante ou d'échec de capture, repli automatique sur la fenêtre d'impression (destination « Enregistrer au format PDF »). |
+| `pv-no-print` | Classe à mettre sur un élément pour l'exclure du PDF figé (boutons *Vérifier*, *Recommencer*, etc.). |
+| Publication | Publiée sous `<nom>.html.txt` : GitHub Pages sert du **texte brut** — la page ne s'exécute jamais hors de l'appli et ne peut pas être récupérée comme page HTML. |
+| Source | L'administrateur la retrouve via *Éditer* (source) ou *Source .html* (téléchargement réservé à l'admin) ; les lecteurs ne voient que le rendu. |
+
+Limite honnête : sur un site statique public, le code source publié reste lisible
+pour qui va chercher le fichier dans le dépôt ; le suffixe `.txt` empêche
+l'exécution et le téléchargement « naturel » du HTML, l'interface ne propose
+que le PDF figé.
+
+Ressources : `<img src="photo.png">` résout d'abord les fichiers du **même
+dossier** (puis du même onglet, puis tout le Drive), sinon les images du site ;
+une copie locale non publiée est servie directement depuis IndexedDB pour que
+l'aperçu admin fonctionne avant publication.
 
 ## Développement
 
