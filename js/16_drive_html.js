@@ -12,7 +12,8 @@
      → téléchargement direct ; repli automatique sur la fenêtre
      d'impression (« Enregistrer au format PDF ») en cas de souci.
    ══════════════════════════════════════════════════════════════ */
-const DriveHtml = (() => {
+// The Drive UI consumes this module through window.DriveHtml.
+window.DriveHtml = (() => {
   'use strict';
 
   const W = window, D = document;
