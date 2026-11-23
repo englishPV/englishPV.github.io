@@ -175,15 +175,22 @@ const DriveHtml = (() => {
       meta.setAttribute('charset', 'utf-8');
       head.insertBefore(meta, head.firstChild);
     }
+    /* Place metadata after the first head child when present; an empty
+       <head> has no firstChild, so passing an undefined reference to
+       insertBefore would throw and prevent the HTML page from rendering. */
+    const insertAfterFirstChild = (parent, child) => {
+      const first = parent.firstChild;
+      parent.insertBefore(child, first ? first.nextSibling : null);
+    };
     if (opts.name) {
       let t = head.querySelector('title');
-      if (!t) { t = doc.createElement('title'); head.insertBefore(t, head.firstChild.nextSibling || head.firstChild); }
+      if (!t) { t = doc.createElement('title'); insertAfterFirstChild(head, t); }
       t.textContent = String(opts.name).replace(/\.html?\.txt$/i, '').replace(/\.html?$/i, '');
     }
     if (opts.baseHref && !head.querySelector('base')) {
       const b = doc.createElement('base');
       b.setAttribute('href', String(opts.baseHref));
-      head.insertBefore(b, head.firstChild.nextSibling || head.firstChild);
+      insertAfterFirstChild(head, b);
     }
 
     /* ressources relatives → URLs résolues (fichiers du Drive, images) */
