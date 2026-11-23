@@ -1,7 +1,7 @@
 {
  "v": 1,
- "rev": 1795397693224,
- "generatedAt": 1795397693224,
+ "rev": 1795426859967,
+ "generatedAt": 1795426859967,
  "repo": "englishPV/englishPV.github.io",
  "branch": "main",
  "publishedBy": "jb.cedric0@gmail.com",
@@ -26,7 +26,7 @@
    "size": 188690,
    "addedAt": 1791407479217,
    "updatedAt": 1791407496765,
-   "publishedAt": 1795397693224,
+   "publishedAt": 1795426859967,
    "path": "content/drive/exemple-41se/Verbe irréguliers.pdf",
    "by": "jb.cedric0@gmail.com"
   },
@@ -40,7 +40,7 @@
    "size": 75371,
    "addedAt": 1791407711596,
    "updatedAt": 1791407711596,
-   "publishedAt": 1795397693224,
+   "publishedAt": 1795426859967,
    "path": "content/drive/exemple-41se/Vocabulaire 06_10_2026.pdf",
    "by": "jb.cedric0@gmail.com"
   },
@@ -48,14 +48,14 @@
    "id": "fil-mv0qcmd1-demo1",
    "driveId": "drv-mux87w0o-ury3b",
    "parentId": null,
-   "name": "Test QCM démo.html",
+   "name": "Test QCM démo (IA).html",
    "kind": "html",
    "mime": "text/html",
-   "size": 9422,
+   "size": 87260,
    "addedAt": 1794961435429,
-   "updatedAt": 1794961435429,
-   "publishedAt": 1795397693224,
-   "path": "content/drive/exemple-41se/Test QCM démo.html.txt",
+   "updatedAt": 1795426854539,
+   "publishedAt": 1795426859967,
+   "path": "content/drive/exemple-41se/Test QCM démo (IA).html.txt",
    "by": "jb.cedric0@gmail.com"
   }
  ]

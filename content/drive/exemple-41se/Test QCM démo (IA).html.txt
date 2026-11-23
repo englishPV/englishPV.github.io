@@ -1,0 +1,1409 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM Intégral - La fin de l'enfant unique en Chine ? (INED n°535)</title>
+    <style>
+        :root {
+            --ined-red: #e63946;
+            --ined-dark: #1d3557;
+            --ined-blue: #457b9d;
+            --ined-light: #f1faee;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2b2d42;
+            --success: #2a9d8f;
+            --error: #e76f51;
+            --border: #dee2e6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--ined-dark), var(--ined-blue));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; font-size: 0.95rem; max-width: 700px; margin: 0 auto; }
+        .badge-header {
+            display: inline-block;
+            background: var(--ined-red);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: -25px auto 0;
+            padding: 0 1rem;
+        }
+
+        .toolbar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        select, .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select { background: white; color: var(--text); flex-grow: 1; max-width: 350px; }
+        .btn-primary { background: var(--ined-dark); color: white; border: none; }
+        .btn-primary:hover { background: var(--ined-blue); }
+        .btn-accent { background: var(--ined-red); color: white; border: none; }
+        .btn-accent:hover { opacity: 0.9; }
+        .btn-outline { background: transparent; color: var(--ined-dark); border: 1px solid var(--ined-dark); }
+        .btn-outline:hover { background: var(--ined-dark); color: white; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            padding: 0.8rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .stat-box .val { font-size: 1.4rem; font-weight: 800; color: var(--ined-dark); }
+        .stat-box .lbl { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ined-blue), var(--ined-red));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--ined-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--ined-dark);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .option-btn {
+            text-align: left;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: #ffffff;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--ined-blue);
+            background: #f4f9fc;
+        }
+
+        .option-letter {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--ined-dark);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background-color: rgba(42, 157, 143, 0.1);
+        }
+        .option-btn.correct .option-letter {
+            background: var(--success);
+            color: white;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--error);
+            background-color: rgba(231, 111, 81, 0.1);
+        }
+        .option-btn.wrong .option-letter {
+            background: var(--error);
+            color: white;
+        }
+
+        .explanation-box {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 5px solid var(--ined-blue);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-title {
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .quote-box {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #eef3f7;
+            border-radius: 6px;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #3d5a80;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        /* Results & Study Mode */
+        .hidden { display: none !important; }
+
+        .category-breakdown {
+            margin: 1.5rem 0;
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .cat-row {
+            background: #f8f9fa;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .study-item {
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 0;
+        }
+        .study-item:last-child { border-bottom: none; }
+        .study-ans {
+            color: var(--success);
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .card { padding: 1.25rem; }
+            .question-text { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge-header">Population & Sociétés • N° 535 • Août 2016</div>
+    <h1>La fin de l’enfant unique en Chine ?</h1>
+    <p>Système d'évaluation intégrale du texte d'Isabelle Attané (INED) — 50 questions couvrant 100 % des données, graphiques, cartes et tableaux.</p>
+</header>
+
+<div class="container">
+    <!-- Barre d'outils -->
+    <div class="toolbar">
+        <select id="categorySelect" onchange="filterByCategory()">
+            <option value="ALL">📚 Toutes les sections (50 questions)</option>
+            <option value="HIST">1. Historique & Politiques (1970-1990)</option>
+            <option value="DEMO">2. Fécondité basse, Sexes & Vieillissement</option>
+            <option value="DATA">3. Graphiques, Carte & Tableau statistique</option>
+            <option value="REFORM">4. Assouplissements (2012-2016) & Natalité</option>
+            <option value="SOCIO">5. Paradoxe du genre, Coûts & Normes familiales</option>
+        </select>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-outline" onclick="toggleStudyMode()" id="studyBtn">📖 Mode Fiches de révision</button>
+            <button class="btn btn-primary" onclick="restartQuiz()">🔄 Réinitialiser</button>
+        </div>
+    </div>
+
+    <!-- Barre de statistiques -->
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-box">
+            <div class="val" id="statProgress">1 / 50</div>
+            <div class="lbl">Progression</div>
+        </div>
+        <div class="stat-box">
+            <div class="val" id="statScore" style="color: var(--success);">0</div>
+            <div class="lbl">Bonnes réponses</div>
+        </div>
+        <div class="stat-box">
+            <div class="val" id="statErrors" style="color: var(--error);">0</div>
+            <div class="lbl">Erreurs à revoir</div>
+        </div>
+        <div class="stat-box">
+            <div class="val" id="statPercent">0%</div>
+            <div class="lbl">Taux de maîtrise</div>
+        </div>
+    </div>
+
+    <div class="progress-container" id="progressBarContainer">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Zone du QCM -->
+    <div class="card" id="quizCard">
+        <div class="question-meta">
+            <span id="qCategory">Catégorie</span>
+            <span id="qNumber">Question #1</span>
+        </div>
+        <div class="question-text" id="qText">Chargement de la question...</div>
+        <div class="options-list" id="optionsList"></div>
+
+        <div class="explanation-box" id="explanationBox">
+            <div class="explanation-title" id="expTitle"></div>
+            <div id="expText"></div>
+            <div class="quote-box" id="expQuote"></div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn btn-outline" id="prevBtn" onclick="prevQuestion()">⬅ Précédent</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Suivant ➡</button>
+        </div>
+    </div>
+
+    <!-- Écran de résultats finaux -->
+    <div class="card hidden" id="resultsCard">
+        <h2 style="color: var(--ined-dark); margin-bottom: 0.5rem;">📊 Bilan de maîtrise du texte</h2>
+        <p id="finalSummaryText" style="margin-bottom: 1.5rem;"></p>
+
+        <div class="category-breakdown" id="categoryBreakdown"></div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+            <button class="btn btn-accent" id="retryWrongBtn" onclick="retryWrongQuestions()">
+                🎯 Rejouer uniquement mes erreurs (Garantie 100%)
+            </button>
+            <button class="btn btn-primary" onclick="restartQuiz()">
+                🔄 Recommencer tout le QCM
+            </button>
+        </div>
+    </div>
+
+    <!-- Mode Étude / Fiches de révision -->
+    <div class="card hidden" id="studyCard">
+        <h2 style="color: var(--ined-dark); margin-bottom: 1rem;">📖 Base de connaissances intégrale (50 points)</h2>
+        <p style="margin-bottom: 1.5rem; color: #6c757d;">Lisez l'ensemble des questions, réponses et citations exactes du texte pour une mémorisation totale.</p>
+        <div id="studyList"></div>
+    </div>
+</div>
+
+<script>
+const MASTER_QUESTIONS = [
+    // --- 1. HISTORIQUE & POLITIQUES (1970-1990) ---
+    {
+        id: 1,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Selon le chapeau de l'article, quelle est la raison principale avancée par Isabelle Attané pour expliquer que la « politique de deux enfants » (annoncée en 2015) ne permettra sans doute pas une remontée de la fécondité ?",
+        options: [
+            "Les difficultés que les Chinoises rencontrent actuellement pour concilier vie familiale et vie professionnelle.",
+            "Le maintien d'amendes résiduelles pour les couples non mariés dans les provinces côtières.",
+            "Une stérilité biologique croissante liée à la pollution urbaine et au recul de l'âge au mariage.",
+            "L'attachement idéologique des jeunes générations urbaines au modèle patriotique de l'enfant unique."
+        ],
+        correct: 0,
+        exp: "Dès l'introduction, l'auteure souligne que le frein majeur réside dans l'articulation entre sphère familiale et sphère professionnelle pour les femmes.",
+        quote: "« Isabelle Attané explique que ce ne sera sans doute pas le cas, en raison notamment des difficultés que les Chinoises rencontrent actuellement pour concilier vie familiale et vie professionnelle. » (p. 1)"
+    },
+    {
+        id: 2,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "À quel moment précis la fécondité a-t-elle commencé à baisser en Chine, et quelles étaient les trois règles imposées lors de cette campagne ?",
+        options: [
+            "Au début des années 1970 (3e campagne « Wan, xi, shao ») : retard du mariage, espacement des naissances, limitation à 2 ou 3 enfants.",
+            "En 1979 (politique de l'enfant unique) : interdiction du mariage avant 25 ans, stérilisation après le 1er enfant, quota par province.",
+            "En 1978 (réformes économiques) : suppression des allocations familiales, espacement de 5 ans, limitation à 2 enfants.",
+            "Au milieu des années 1960 (2e campagne) : envoi des jeunes à la campagne, retard du mariage et contraception obligatoire."
+        ],
+        correct: 0,
+        exp: "La baisse précède de près d'une décennie la politique de l'enfant unique : elle débute avec la 3e campagne (1971-1979), appelée « Wan, xi, shao » (Tard, espacé, peu nombreux).",
+        quote: "« La fécondité s’est mise à baisser en Chine au début des années 1970, au moment de la troisième campagne de contrôle des naissances qui imposa un retard du mariage, un espacement des naissances et une limitation du nombre d’enfants à deux ou trois. » (p. 1 & Figure 1)"
+    },
+    {
+        id: 3,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Que précise la note de bas de page (1) concernant l'application du contrôle des naissances au début des années 1970 ?",
+        options: [
+            "Certaines minorités ethniques n’étaient pas soumises au contrôle des naissances à l'époque.",
+            "Les familles de militaires et de cadres du Parti bénéficiaient d'une dérogation pour un troisième enfant.",
+            "Les provinces frontalières de l'Ouest avaient un délai de 10 ans avant d'appliquer les quotas.",
+            "Les paysans produisant au-dessus des quotas agricoles étaient exemptés de la limitation."
+        ],
+        correct: 0,
+        exp: "La note (1) en bas de la première page mentionne explicitement l'exemption de certaines minorités ethniques.",
+        quote: "« (1) À l’époque, certaines minorités ethniques n’étaient pas soumises au contrôle des naissances. » (p. 1)"
+    },
+    {
+        id: 4,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Comment a évolué le nombre moyen d'enfants par femme en Chine entre 1970 et 1979, et quel était son niveau dans les villes en 1979 ?",
+        options: [
+            "Il a chuté de 5,8 en 1970 à 2,8 en 1979 au niveau national (et est tombé à 1,4 dans les villes en 1979).",
+            "Il a chuté de 6,2 en 1970 à 2,1 en 1979 au niveau national (et est tombé à 1,2 dans les villes en 1979).",
+            "Il a chuté de 5,8 en 1970 à 1,8 en 1979 au niveau national (et est tombé à 1,0 dans les villes en 1979).",
+            "Il a chuté de 4,9 en 1970 à 2,5 en 1979 au niveau national (et est tombé à 1,5 dans les villes en 1979)."
+        ],
+        correct: 0,
+        exp: "Cette chute de 5,8 à 2,8 en 9 ans représente l'une des plus fortes baisses jamais enregistrées dans le monde en un temps si court. En ville, il atteignait déjà 1,4 en 1979.",
+        quote: "« ...le nombre moyen d’enfants par femme ayant chuté de 5,8 en 1970 à 2,8 en 1979 (figure 1). Dans les villes chinoises, il est tombé dès cette époque très en dessous du seuil de remplacement des générations (1,4 enfant par femme en 1979). » (p. 1)"
+    },
+    {
+        id: 5,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Que s'est-il passé concernant la fécondité tout au long des années 1980, juste après l'instauration de la politique de l'enfant unique en 1979 ?",
+        options: [
+            "La baisse ne s'est pas poursuivie : la fécondité a fluctué au-dessus de 2 enfants par femme toute la décennie en raison de la résistance rurale.",
+            "La fécondité est passée immédiatement sous la barre de 1,5 enfant par femme grâce aux lourdes sanctions financières.",
+            "La fécondité a stagné exactement à 2,0 enfants par femme avant de remonter à 3,0 en 1989.",
+            "Elle a chuté à 1,1 dans les campagnes mais a rebondi à 2,5 dans les villes suite aux réformes économiques."
+        ],
+        correct: 0,
+        exp: "Paradoxalement, la mise en place de l'enfant unique en 1979 n'a pas prolongé la baisse dans les années 1980 : l'indicateur a fluctué au-dessus de 2.",
+        quote: "« ...cette baisse ne s’est pas poursuivie. Le nombre moyen d’enfants par femme a fluctué au-dessus de deux tout au long de la décennie 1980. [...] une forte résistance s’est manifestée dans les campagnes... » (p. 1)"
+    },
+    {
+        id: 6,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "En quelle année et de quelle manière les autorités ont-elles dû assouplir pour la première fois la règle de l'enfant unique dans les campagnes ?",
+        options: [
+            "Dès 1984, en autorisant généralement un deuxième enfant en milieu rural, notamment lorsque l'aînée est une fille.",
+            "En 1988, en autorisant un deuxième enfant uniquement aux agriculteurs n'ayant pas de retraite publique.",
+            "En 1982, en permettant à toutes les provinces rurales de fixer une limite uniforme de 2,5 enfants.",
+            "En 1990, après le recensement, en supprimant les sanctions pour les naissances de rang 2."
+        ],
+        correct: 0,
+        exp: "Face à la résistance rurale, l'assouplissement intervient dès 1984 (début de la « Politique à plusieurs vitesses » selon la Figure 1).",
+        quote: "« ...contraignant les autorités chinoises à y assouplir la règle de l’enfant unique dès 1984. Depuis lors, un deuxième enfant est généralement autorisé en milieu rural, notamment lorsque l’aînée est une fille, mais les réglementations diffèrent selon les provinces (figure 2). » (p. 1)"
+    },
+    {
+        id: 7,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Quel était l'objectif initial de la politique de l'enfant unique adoptée en 1979 ?",
+        options: [
+            "Ralentir la croissance démographique afin de favoriser le développement économique dans le cadre des réformes lancées en 1978.",
+            "Éviter une famine imminente suite aux mauvaises récoltes de la fin des années 1970.",
+            "Réduire la densité urbaine pour permettre la privatisation du parc immobilier d'État.",
+            "Aligner la structure familiale chinoise sur celle du Japon et des dragons asiatiques."
+        ],
+        correct: 0,
+        exp: "Cette politique démographique était directement subordonnée aux réformes économiques de Deng Xiaoping lancées en 1978.",
+        quote: "« La politique de l’enfant unique a eu pour objectif de ralentir la croissance démographique afin de favoriser le développement économique dans le cadre des réformes lancées en 1978. » (p. 2)"
+    },
+
+    // --- 2. FÉCONDITÉ BASSE, SEXES & VIEILLISSEMENT ---
+    {
+        id: 8,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "À quel niveau se situe la fécondité chinoise depuis la seconde moitié de la décennie 1990 selon la majorité des sources chinoises ?",
+        options: [
+            "Elle est tombée sous le seuil de 1,5 dans la seconde moitié des années 1990, pour se situer par la suite entre 1,2 et 1,5.",
+            "Elle s'est stabilisée autour de 1,8 dans les années 1990 avant de chuter à 1,0 après 2010.",
+            "Elle oscille entre 1,5 et 1,7 depuis 1995.",
+            "Elle est passée sous la barre de 1,2 dès 1992 pour atteindre 0,9 en 2013."
+        ],
+        correct: 0,
+        exp: "La décennie 1990 marque le passage durable sous le seuil de remplacement, puis sous 1,5 dans la seconde moitié de la décennie, fluctuant ensuite entre 1,2 et 1,5.",
+        quote: "« La majorité des sources chinoises s’accordent sur le fait que la fécondité serait tombée sous le seuil de 1,5 enfant par femme dans la seconde moitié de la décennie 1990, pour se situer par la suite entre 1,2 et 1,5 [1]... » (p. 1)"
+    },
+    {
+        id: 9,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Outre le contrôle des naissances, quels facteurs socio-économiques ont ouvert la voie à la réduction de la fécondité dans les années 1990 ?",
+        options: [
+            "Les progrès sanitaires, la hausse du coût de la vie et l'augmentation du niveau d'instruction, qui ont fait évoluer les normes familiales.",
+            "L'instauration d'une taxe carbone par enfant, l'exode rural forcé et la fermeture des crèches d'entreprises.",
+            "Le recul de la mortalité adulte, la baisse des salaires agricoles et l'interdiction du travail des enfants.",
+            "L'ouverture migratoire internationale et l'effondrement du marché matrimonial rural."
+        ],
+        correct: 0,
+        exp: "Le texte mentionne explicitement trois exemples de changements sociaux et économiques ayant modifié les normes familiales.",
+        quote: "« Mais les changements sociaux et économiques amorcés simultanément (progrès sanitaires, hausse du coût de la vie, augmentation du niveau d’instruction, etc.), en faisant évoluer les normes en matière de famille, ont eux aussi ouvert la voie à la réduction de la fécondité. » (p. 1)"
+    },
+    {
+        id: 10,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Quelles sont les trois grandes conséquences démographiques annoncées par cette très faible fécondité (p. 2) ?",
+        options: [
+            "La fin de la croissance démographique, un vieillissement exceptionnellement rapide et une réduction significative du nombre d'adultes d'âge actif.",
+            "Une baisse de la densité urbaine, un rajeunissement des provinces de l'Ouest et une hausse de l'immigration.",
+            "Une explosion de la taille des ménages multigénérationnels, la fin du chômage urbain et la baisse de l'espérance de vie.",
+            "Une stabilisation de la population à 1,5 milliard d'habitants et une parité hommes-femmes en 2030."
+        ],
+        correct: 0,
+        exp: "Ces trois conséquences structurelles résument le défi démographique majeur de la Chine.",
+        quote: "« Cette situation annonce non seulement la fin de la croissance démographique chinoise, mais encore un vieillissement exceptionnellement rapide de la population et une réduction significative du nombre d’adultes d’âge actif (tableau). » (p. 2)"
+    },
+    {
+        id: 11,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Quels éléments conjugués à partir de la fin des années 1980 ont provoqué le développement massif des avortements sélectifs ?",
+        options: [
+            "La baisse de la fécondité, la diffusion des échographies prénatales et un contexte socioculturel de préférence pour les fils.",
+            "La gratuité de l'avortement dans les hôpitaux ruraux, la hausse des dots pour les filles et la suppression des retraites.",
+            "La loi de 1988 sur l'héritage patrilinéaire et la pénurie de main-d'œuvre agricole masculine.",
+            "L'obligation légale de connaître le sexe du fœtus lors des visites prénatales du planning familial."
+        ],
+        correct: 0,
+        exp: "C'est la rencontre entre la contrainte du faible nombre d'enfants, la technologie (échographie à la fin des années 1980) et la norme culturelle (préférence pour les fils).",
+        quote: "« Dans ce contexte, la baisse de la fécondité et la diffusion des échographies prénatales à partir de la fin des années 1980 se sont traduites par un développement massif des avortements sélectifs, destinés à empêcher les naissances de filles dans un contexte socioculturel de préférence pour les fils. » (p. 2)"
+    },
+    {
+        id: 12,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Quelle est la valeur normale du rapport de masculinité à la naissance, et comment a-t-il évolué en Chine en 1981, 2008 (pic) et 2015 ?",
+        options: [
+            "Normal : ~105 garçons pour 100 filles | 1981 : 107,2 | Pic en 2008 : 120,6 | 2015 : 113,5.",
+            "Normal : ~102 garçons pour 100 filles | 1981 : 105,0 | Pic en 2008 : 125,4 | 2015 : 110,2.",
+            "Normal : ~105 garçons pour 100 filles | 1981 : 110,5 | Pic en 2005 : 118,9 | 2015 : 115,0.",
+            "Normal : ~100 garçons pour 100 filles | 1981 : 107,2 | Pic en 2010 : 122,0 | 2015 : 108,5."
+        ],
+        correct: 0,
+        exp: "Tous ces chiffres précis montrent l'ampleur de la distorsion jusqu'en 2008 (120,6) suivie d'un lent rééquilibrage (113,5 en 2015).",
+        quote: "« Le rapport de masculinité se situe normalement autour de 105 garçons pour 100 filles, et il en était encore proche en 1981 (107,2). Il s’est ensuite mis à augmenter pour atteindre un pic en 2008 (120,6) avant d’amorcer un lent rééquilibrage (tombant à 113,5 garçons pour 100 filles en 2015). » (p. 2)"
+    },
+    {
+        id: 13,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Quels étaient les taux de mortalité infantile (avant le premier anniversaire) des garçons et des filles en 1990 puis en 2009 ?",
+        options: [
+            "En 1990 : 25 ‰ chez les garçons et 29 ‰ chez les filles ; en 2009 : 13 ‰ chez les garçons et 14 ‰ chez les filles.",
+            "En 1990 : 29 ‰ chez les garçons et 25 ‰ chez les filles ; en 2009 : 14 ‰ chez les garçons et 13 ‰ chez les filles.",
+            "En 1990 : 35 ‰ chez les garçons et 42 ‰ chez les filles ; en 2009 : 10 ‰ chez les garçons et 15 ‰ chez les filles.",
+            "En 1990 : 20 ‰ chez les garçons et 28 ‰ chez les filles ; en 2009 : 12 ‰ chez les deux sexes."
+        ],
+        correct: 0,
+        exp: "Le déséquilibre des sexes à la naissance a été renforcé par une surmortalité infantile anormale des filles depuis les années 1980.",
+        quote: "« ...renforcé par une surmortalité des filles avant le premier anniversaire depuis les années 1980 (le taux de mortalité infantile était de 25 ‰ chez les garçons et de 29 ‰ chez les filles en 1990, et de 13 ‰ et 14 ‰ respectivement en 2009)... » (p. 2)"
+    },
+
+    // --- 3. GRAPHIQUES, CARTE & TABLEAU STATISTIQUE ---
+    {
+        id: 14,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Dans la Figure 1 (Évolution de la fécondité de 1970 à 2013), quelles sont les trois périodes politiques délimitées sur le graphique ?",
+        options: [
+            "1) Troisième campagne « Wan, xi, shao » (1971-1979) ; 2) Politique de l'enfant unique (1979-1984) ; 3) Politique à plusieurs vitesses (depuis 1984).",
+            "1) Révolution culturelle (1970-1976) ; 2) Politique de l'enfant unique stricte (1979-1995) ; 3) Transition démographique (depuis 1995).",
+            "1) Campagne rurale (1970-1978) ; 2) Enfant unique (1979-2002) ; 3) Loi sur la population (2002-2013).",
+            "1) Contrôle souple (1971-1980) ; 2) Contrôle coercitif (1980-1990) ; 3) Stabilisation (1990-2013)."
+        ],
+        correct: 0,
+        exp: "La Figure 1 montre que la « Politique de l'enfant unique » stricte au sens national n'a duré que de 1979 à 1984 avant de laisser place à une « Politique à plusieurs vitesses ».",
+        quote: "Figure 1 : « Troisième campagne \"Wan, xi, shao\" (1971-1979) | Politique de l'enfant unique (1979-1984) | Politique à plusieurs vitesses (depuis 1984) » (p. 1)"
+    },
+    {
+        id: 15,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "D'après la Figure 2 (Carte de la fécondité requise par province depuis les années 1990), quelles sont les trois catégories de la légende « Objectifs de fécondité » ?",
+        options: [
+            "< 1,3 enfant par femme | 1,3 ≤ n < 2 | ≥ 2 enfants par femme.",
+            "≤ 1,0 enfant par femme | 1,0 < n ≤ 1,5 | > 1,5 enfant par femme.",
+            "< 1,5 enfant par femme | 1,5 ≤ n < 2,5 | ≥ 2,5 enfants par femme.",
+            "1 enfant strict | 1,5 enfant (rural) | 2 enfants (minorités)."
+        ],
+        correct: 0,
+        exp: "La carte classe les provinces selon trois seuils d'objectifs de fécondité : moins de 1,3 ; de 1,3 à moins de 2 ; et 2 ou plus.",
+        quote: "Figure 2 - Légende : « Objectifs de fécondité (nombre d'enfants par femme) : < 1,3 | 1,3 ≤ n < 2 | ≥ 2 » (p. 2)"
+    },
+    {
+        id: 16,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Selon la carte (Figure 2), quelles entités provinciales ont l'objectif de fécondité requis le plus bas de Chine (1,06 enfant par femme) et laquelle a le plus élevé (2,37) ?",
+        options: [
+            "Les plus bas : Shanghai et Jiangsu (1,06) | Le plus élevé : Xinjiang (2,37).",
+            "Les plus bas : Beijing et Tianjin (1,06) | Le plus élevé : Tibet (2,37).",
+            "Les plus bas : Shanghai et Sichuan (1,06) | Le plus élevé : Yunnan (2,37).",
+            "Les plus bas : Guangdong et Fujian (1,06) | Le plus élevé : Qinghai (2,37)."
+        ],
+        correct: 0,
+        exp: "Sur la carte : Shanghai (1,06) et Jiangsu (1,06) détiennent le record du seuil le plus bas (devant Beijing à 1,09, Tianjin à 1,17, Sichuan à 1,19 et Chongqing à 1,27). Le Xinjiang est au sommet avec 2,37 (et le Tibet est laissé en blanc sans chiffre).",
+        quote: "Figure 2 : « Shanghai 1,06 ; Jiangsu 1,06 ; Beijing 1,09 ; Tianjin 1,17 ; Sichuan 1,19 ; Chongqing 1,27 [...] Xinjiang 2,37 » (p. 2)"
+    },
+    {
+        id: 17,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Toujours d'après la Figure 2, quelles sont les 5 provinces affichant un objectif de fécondité supérieur ou égal à 2 enfants par femme ?",
+        options: [
+            "Xinjiang (2,37), Hainan (2,14), Ningxia (2,12), Qinghai (2,10) et Yunnan (2,00).",
+            "Xinjiang (2,37), Tibet (2,30), Mongolie intérieure / Nei Menggu (2,15), Gansu (2,10) et Guangxi (2,00).",
+            "Xinjiang (2,37), Qinghai (2,10), Sichuan (2,05), Guizhou (2,02) et Yunnan (2,00).",
+            "Hainan (2,14), Guangdong (2,12), Guangxi (2,10), Yunnan (2,05) et Xinjiang (2,00)."
+        ],
+        correct: 0,
+        exp: "Ces 5 régions (colorées en rouge foncé sur la carte) sont les seules à avoir un objectif ≥ 2 : Xinjiang (2,37), Hainan (2,14), Ningxia (2,12), Qinghai (2,10) et Yunnan (2,00).",
+        quote: "Figure 2 : « Xinjiang 2,37 ; Hainan 2,14 ; N Ningxia 2,12 ; Qinghai 2,10 ; Yunnan 2,00 » (p. 2)"
+    },
+    {
+        id: 18,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "D'après le Tableau (Indicateurs de vieillissement en Chine, p. 3), comment évolue la population totale de la Chine en 1970, 2010 et 2050 (scénario moyen) ?",
+        options: [
+            "1970 : 808,0 millions | 2010 : 1 333,0 millions | 2050 : 1 348,0 millions.",
+            "1970 : 750,0 millions | 2010 : 1 300,0 millions | 2050 : 1 250,0 millions.",
+            "1970 : 808,0 millions | 2010 : 1 348,0 millions | 2050 : 1 410,0 millions.",
+            "1970 : 850,5 millions | 2010 : 1 333,0 millions | 2050 : 1 180,0 millions."
+        ],
+        correct: 0,
+        exp: "Le tableau montre une quasi-stagnation de la population totale entre 2010 (1 333,0 millions) et 2050 (1 348,0 millions), après le bond depuis 1970 (808,0 millions).",
+        quote: "Tableau : « Population totale (millions) - Total : 1970 = 808,0 | 2010 = 1 333,0 | 2050 = 1 348,0 » (p. 3)"
+    },
+    {
+        id: 19,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Selon le Tableau (p. 3), comment évolue le nombre et la part (%) des personnes de « 60 ans ou plus » en 1970, 2010 et 2050 ?",
+        options: [
+            "1970 : 49,3 millions (6,1 %) | 2010 : 177,6 millions (13,3 %) | 2050 : 491,5 millions (36,5 %).",
+            "1970 : 40,7 millions (5,0 %) | 2010 : 150,0 millions (11,2 %) | 2050 : 430,3 millions (31,9 %).",
+            "1970 : 49,3 millions (6,1 %) | 2010 : 240,0 millions (16,6 %) | 2050 : 510,0 millions (40,0 %).",
+            "1970 : 61,0 millions (7,5 %) | 2010 : 177,6 millions (13,3 %) | 2050 : 380,2 millions (28,2 %)."
+        ],
+        correct: 0,
+        exp: "La population des 60 ans et plus est multipliée par 10 en effectif entre 1970 et 2050 (de 49,3 M à 491,5 M), passant de 6,1 % à 36,5 % de la population totale.",
+        quote: "Tableau : « 60 ans ou + : 49,3M (6,1%) en 1970 | 177,6M (13,3%) en 2010 | 491,5M (36,5%) en 2050 » (p. 3)"
+    },
+    {
+        id: 20,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Selon le Tableau (p. 3), comment évolue la tranche d'âge actif « 15-59 ans » (en millions et en %) entre 1970, 2010 et 2050 ?",
+        options: [
+            "1970 : 430,3 M (53,2 %) | 2010 : 915,2 M (70,1 %) | 2050 : 674,4 M (50,0 %).",
+            "1970 : 328,9 M (40,7 %) | 2010 : 915,2 M (70,1 %) | 2050 : 750,0 M (55,6 %).",
+            "1970 : 430,3 M (53,2 %) | 2010 : 850,0 M (63,8 %) | 2050 : 600,0 M (44,5 %).",
+            "1970 : 500,0 M (61,9 %) | 2010 : 915,2 M (70,1 %) | 2050 : 674,4 M (50,0 %)."
+        ],
+        correct: 0,
+        exp: "Après avoir culminé à 70,1 % (915,2 M) en 2010, la population des 15-59 ans chutera à 50,0 % (674,4 M) en 2050, soit une perte de plus de 240 millions d'actifs potentiels.",
+        quote: "Tableau : « 15-59 ans : 430,3M (53,2%) en 1970 | 915,2M (70,1%) en 2010 | 674,4M (50,0%) en 2050 » (p. 3)"
+    },
+    {
+        id: 21,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Selon le Tableau (p. 3), comment évoluent la part des « 0-14 ans » et l'« Âge médian » en Chine en 1970, 2010 et 2050 ?",
+        options: [
+            "0-14 ans : 328,9 M / 40,7 % (1970), 240,0 M / 16,6 % (2010), 182,1 M / 13,5 % (2050) — Âge médian : 19,2 ans (1970), 35,2 ans (2010), 49,6 ans (2050).",
+            "0-14 ans : 300,0 M / 37,1 % (1970), 220,0 M / 16,5 % (2010), 150,0 M / 11,1 % (2050) — Âge médian : 21,0 ans (1970), 34,0 ans (2010), 45,2 ans (2050).",
+            "0-14 ans : 328,9 M / 40,7 % (1970), 240,0 M / 16,6 % (2010), 182,1 M / 13,5 % (2050) — Âge médian : 18,5 ans (1970), 38,0 ans (2010), 52,4 ans (2050).",
+            "0-14 ans : 350,2 M / 43,3 % (1970), 260,0 M / 19,5 % (2010), 190,0 M / 14,1 % (2050) — Âge médian : 19,2 ans (1970), 35,2 ans (2010), 49,6 ans (2050)."
+        ],
+        correct: 0,
+        exp: "L'âge médian gagne plus de 30 ans entre 1970 (19,2 ans) et 2050 (49,6 ans), tandis que la part des moins de 15 ans est divisée par trois (de 40,7 % à 13,5 %).",
+        quote: "Tableau : « 0-14 ans : 328,9 (40,7%) | 240,0 (16,6%) | 182,1 (13,5%) — Âge médian (années) : 19,2 (1970) | 35,2 (2010) | 49,6 (2050) » (p. 3)"
+    },
+
+    // --- 4. ASSOUPLISSEMENTS (2012-2016) & NATALITÉ ---
+    {
+        id: 22,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Comment la politique de l'enfant unique fut-elle conçue lors de son adoption en 1979, et en quelle année le discours officiel inflexible a-t-il commencé à changer ?",
+        options: [
+            "Elle fut d'emblée conçue comme provisoire ; le discours a commencé à changer à partir de 2012 (année de publication des résultats du recensement de 2010).",
+            "Elle fut conçue pour durer 50 ans ; le discours a changé dès 2008 suite au pic du déséquilibre des sexes.",
+            "Elle fut conçue comme définitive ; le discours a changé en 2013 lors de l'arrivée de la nouvelle équipe gouvernementale.",
+            "Elle fut conçue pour un siècle ; le discours a changé en 2010 lors de l'Exposition universelle de Shanghai."
+        ],
+        correct: 0,
+        exp: "Adoptée en 1979 comme mesure provisoire, il a pourtant fallu attendre 2012 et les chiffres du recensement de 2010 pour que la rhétorique officielle s'infléchisse.",
+        quote: "« La politique de l’enfant unique, adoptée en 1979, fut d’emblée conçue comme provisoire. Ce n’est cependant qu’à partir de 2012 (année de publication des résultats du recensement de 2010) que le discours des autorités chinoises, jusque-là inflexible, a commencé à changer. » (p. 2)"
+    },
+    {
+        id: 23,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Quel nouvel objectif officiel a remplacé en 2012 la volonté politique de « stabiliser la fécondité à un bas niveau » ?",
+        options: [
+            "« Parfaire la politique de population afin de promouvoir un développement démographique équilibré sur le long terme ».",
+            "« Encourager le renouvellement des générations pour soutenir le rêve chinois et la croissance économique ».",
+            "« Harmoniser la taille des familles avec les capacités écologiques et économiques des provinces ».",
+            "« Rétablir l'équilibre naturel des sexes et garantir la solidarité intergénérationnelle »."
+        ],
+        correct: 0,
+        exp: "La formulation exacte issue des textes officiels cités par [1] marque le passage d'une logique de basse fécondité à une logique de « développement démographique équilibré ».",
+        quote: "« La volonté politique de « stabiliser la fécondité à un bas niveau » a cédé la place à un nouvel objectif consistant à « parfaire la politique de population afin de promouvoir un développement démographique équilibré sur le long terme » [1]. » (p. 2)"
+    },
+    {
+        id: 24,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "En quoi consistait l'assouplissement décidé fin 2013, quand a-t-il été étendu à toutes les provinces, et combien de couples rendait-il éligibles ?",
+        options: [
+            "Il autorisait les couples de citadins dont l'un des deux conjoints est enfant unique à avoir 2 enfants (contre les deux conjoints auparavant) ; étendu au 1er semestre 2014 à ~11 millions de couples.",
+            "Il autorisait tous les couples ruraux et urbains mariés depuis plus de 5 ans à avoir 2 enfants ; étendu fin 2014 à ~25 millions de couples.",
+            "Il autorisait les couples dont la femme avait plus de 30 ans à avoir un second enfant ; étendu début 2014 à ~15 millions de couples.",
+            "Il supprimait les quotas dans les villes de moins d'un million d'habitants ; étendu au 2e semestre 2014 à ~11 millions de couples."
+        ],
+        correct: 0,
+        exp: "Avant fin 2013, en ville, il fallait que les DEUX conjoints soient enfants uniques. Fin 2013, il suffit que L'UN des deux le soit.",
+        quote: "« Dès fin 2013, la politique de l’enfant unique a été assouplie par une disposition autorisant les couples de citadins dont l’un des deux conjoints est lui-même enfant unique à avoir deux enfants – alors que jusque-là, seuls ceux dont les deux conjoints étaient des enfants uniques pouvaient prétendre à cette dérogation. Cette mesure a été progressivement étendue à l’ensemble des provinces au cours du premier semestre 2014 [2], portant le nombre de couples éligibles à un deuxième enfant à environ 11 millions. » (p. 2)"
+    },
+    {
+        id: 25,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "À quelle date précise l'abandon de la politique de l'enfant unique a-t-il été annoncé, quels sont ses deux objectifs explicites, et combien de couples sont devenus éligibles ?",
+        options: [
+            "En octobre 2015, dans l'espoir de ralentir le vieillissement et de remédier au déséquilibre des sexes à la naissance, portant les couples éligibles à environ 90 millions.",
+            "En janvier 2015, pour relancer la consommation intérieure et stopper le déclin de la main-d'œuvre, portant les couples éligibles à 120 millions.",
+            "En décembre 2015, pour lutter contre le célibat masculin et financer les retraites, portant les couples éligibles à 50 millions.",
+            "En octobre 2014, pour ralentir le vieillissement et équilibrer les sexes, portant les couples éligibles à 90 millions."
+        ],
+        correct: 0,
+        exp: "L'annonce date d'octobre 2015 (soit deux ans après l'assouplissement de fin 2013) et concerne environ 90 millions de couples parents d'un enfant unique.",
+        quote: "« Deux ans plus tard, en octobre 2015, les autorités chinoises annonçaient l’abandon de la politique de l’enfant unique. La nouvelle politique, mise en place dans l’espoir de ralentir le vieillissement mais aussi de remédier au déséquilibre des sexes à la naissance, permet désormais à chaque couple d’avoir deux enfants. [...] L’adoption de la politique de deux enfants par couple a porté le nombre de couples éligibles (c’est-à-dire ceux parents d’un enfant unique) à environ 90 millions. » (p. 2)"
+    },
+    {
+        id: 26,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Malgré la nouvelle politique de deux enfants, quelle contrainte administrative demeure obligatoire, et quelles sont les deux barrières levées début 2016 lors de la révision de la loi de 2002 ?",
+        options: [
+            "Une autorisation préalable des bureaux de planning familial reste nécessaire ; la révision de début 2016 a levé l'incitation au mariage et à la procréation tardifs ainsi que la contraception obligatoire.",
+            "Un examen médical prénuptial reste obligatoire ; la révision de début 2016 a supprimé les amendes rétroactives et le livret de famille urbain (hukou).",
+            "Un délai de 4 ans entre deux naissances reste requis ; la révision de 2016 a aboli les stérilisations et l'interdiction des échographies.",
+            "Une taxe sociale réduite reste en vigueur ; la révision de 2016 a levé l'âge légal au mariage et l'obligation du stérilet."
+        ],
+        correct: 0,
+        exp: "Le contrôle d'État ne disparaît pas (autorisation préalable requise), mais la révision début 2016 de la loi de 2002 abolit deux piliers historiques des années 1970.",
+        quote: "« Une autorisation préalable à la naissance d’un enfant, délivrée par les bureaux de planning familial, reste cependant nécessaire. [...] La révision, début 2016, de la loi de 2002 sur la population et le contrôle des naissances, a en outre levé deux barrières importantes à une reprise de la fécondité : l’incitation au mariage et à la procréation tardifs et la contraception obligatoire qui ont été, depuis les années 1970, les piliers du programme de contrôle des naissances en Chine. » (p. 2-3)"
+    },
+    {
+        id: 27,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Combien de demandes d'autorisation pour un 2e enfant avaient été déposées fin 2014 puis en septembre 2015 (sur les 11 millions de couples éligibles de la réforme de fin 2013) ?",
+        options: [
+            "Fin 2014 : un peu plus d'un million ; en septembre 2015 : 1,8 million (soit environ 16 % des couples éligibles).",
+            "Fin 2014 : 500 000 ; en septembre 2015 : 1,1 million (soit environ 10 % des couples éligibles).",
+            "Fin 2014 : 2 millions ; en septembre 2015 : 4,3 millions (soit environ 39 % des couples éligibles).",
+            "Fin 2014 : 1,8 million ; en septembre 2015 : 3,5 millions (soit environ 32 % des couples éligibles)."
+        ],
+        correct: 0,
+        exp: "Le faible engouement est patent : seulement 16 % des couples éligibles (1,8 M sur 11 M) avaient fait la démarche un mois avant l'abandon de l'enfant unique.",
+        quote: "« ...fin 2014, sur les quelque 11 millions de couples éligibles, seuls un peu plus d’un million avaient déposé une demande d’autorisation pour un deuxième enfant ; en septembre 2015, un mois avant l’abandon de la politique de l’enfant unique, ils n’étaient encore que 1,8 million, soit environ 16 % des couples éligibles. » (p. 3)"
+    },
+    {
+        id: 28,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Quels pourcentages de couples concernés par l'assouplissement de fin 2013 avaient pourtant déclaré vouloir un 2e enfant lors des deux enquêtes officielles menées en 2014 et 2015 ?",
+        options: [
+            "43 % selon le Bureau national de la statistique (en 2014) et 39 % selon la Commission nationale sur la santé et la planification familiale (en 2015).",
+            "39 % selon le Bureau national de la statistique (en 2014) et 43 % selon la Commission nationale sur la santé et la planification familiale (en 2015).",
+            "57 % selon le Bureau national de la statistique (en 2014) et 35 % selon la Commission nationale sur la santé et la planification familiale (en 2015).",
+            "50 % en 2014 et 25 % en 2015."
+        ],
+        correct: 0,
+        exp: "Attention à l'ordre précis : 43 % pour l'enquête du BNS en 2014 et 39 % pour celle de la Commission nationale en 2015, bien loin des 16 % de demandes effectives.",
+        quote: "« Ce résultat est en deçà de ce que laissaient présager deux enquêtes menées par le Bureau national de la statistique (en 2014) et par la Commission nationale sur la santé et la planification familiale (en 2015), lors desquelles respectivement 43 % et 39 % des couples concernés par l’assouplissement de fin 2013 avaient déclaré leur projet de mettre au monde le deuxième enfant désormais autorisé. » (p. 3)"
+    },
+    {
+        id: 29,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Comment a évolué le rythme mensuel des demandes d'autorisation pour un deuxième enfant entre l'été 2014 et l'été 2015 ?",
+        options: [
+            "D'environ 150 000 demandes en juillet 2014 et autant en août 2014, le chiffre est tombé un an plus tard à 80 000 à 90 000 demandes par mois.",
+            "De 200 000 demandes par mois à l'été 2014, il est tombé à 50 000 par mois un an plus tard.",
+            "D'environ 100 000 demandes en juillet-août 2014, il a diminué à 30 000-40 000 par mois en 2015.",
+            "De 80 000 demandes en juillet 2014, il est monté à 150 000 en août 2014 avant de retomber à 60 000."
+        ],
+        correct: 0,
+        exp: "Ces chiffres illustrent que l'enthousiasme initial s'est très vite essoufflé.",
+        quote: "« ...environ 150 000 demandes d’autorisation pour un deuxième enfant ont été déposées en juillet 2014, puis autant en août 2014 ; mais un an plus tard, seules 80 000 à 90 000 demandes étaient déposées chaque mois. » (p. 3)"
+    },
+    {
+        id: 30,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Quel a été le nombre exact de naissances en Chine en 2014 et en 2015, et quelles sont les variations correspondantes ?",
+        options: [
+            "En 2014 : 16,9 millions (+470 000 par rapport à 2013) ; en 2015 : 16,6 millions (-320 000 par rapport à 2014).",
+            "En 2014 : 16,6 millions (+320 000 par rapport à 2013) ; en 2015 : 16,9 millions (+300 000 par rapport à 2014).",
+            "En 2014 : 17,5 millions (+800 000 par rapport à 2013) ; en 2015 : 16,0 millions (-1,5 million par rapport à 2014).",
+            "En 2014 : 15,8 millions (+470 000 par rapport à 2013) ; en 2015 : 15,5 millions (-300 000 par rapport à 2014)."
+        ],
+        correct: 0,
+        exp: "En dépit de l'assouplissement de fin 2013, les naissances ont reculé en 2015 de 320 000 (passant de 16,9 M à 16,6 M).",
+        quote: "« En 2014, la Chine a enregistré 16,9 millions de naissances (soit 470 000 de plus qu’en 2013), mais en 2015, leur nombre est tombé à 16,6 millions (soit une baisse de 320 000 naissances par rapport à 2014...) » (p. 3)"
+    },
+    {
+        id: 31,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "À quels deux facteurs démographiques la baisse de 320 000 naissances entre 2014 et 2015 est-elle en partie imputable ?",
+        options: [
+            "À la réduction de 5 millions, entre 2014 et 2015, du nombre de femmes en âge d'avoir des enfants et à une tendance de fond de retard de l'âge moyen au mariage.",
+            "À l'émigration des jeunes diplômées vers l'étranger et à une hausse de 15 % des divorces en milieu urbain.",
+            "À une réduction de 2 millions du nombre de femmes fécondes et à l'augmentation du coût des logements en 2015.",
+            "À l'année astrologique de la Chèvre (2015) jugée néfaste et au recul de 3 millions du nombre de mariages."
+        ],
+        correct: 0,
+        exp: "La structure par âge (moins 5 millions de femmes en âge de procréer en un seul an !) et le recul de l'âge au mariage tirent structurellement la natalité vers le bas.",
+        quote: "« ...en partie imputable à la réduction de cinq millions, entre 2014 et 2015, du nombre de femmes en âge d’avoir des enfants et à une tendance de fond de retard de l’âge moyen au mariage). » (p. 3)"
+    },
+    {
+        id: 32,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Selon la Commission nationale sur la santé et la planification familiale, combien d'enfants sont nés en 2015 dans le cadre de la politique de deux enfants, comparé aux attentes initiales ?",
+        options: [
+            "800 000 enfants sont nés en 2015 dans ce cadre, très en deçà des quelque 2 millions de naissances annuelles supplémentaires attendues.",
+            "470 000 enfants sont nés en 2015 dans ce cadre, contre 1,5 million attendus.",
+            "1,2 million d'enfants sont nés en 2015 dans ce cadre, contre 3 millions attendus.",
+            "320 000 enfants sont nés en 2015 dans ce cadre, contre 1 million attendu."
+        ],
+        correct: 0,
+        exp: "Le chiffre de 800 000 naissances issues de l'assouplissement en 2015 est inférieur de plus de moitié aux 2 millions escomptés.",
+        quote: "« Selon la Commission nationale sur la santé et la planification familiale, 800 000 enfants seraient nés en 2015 dans le cadre de la politique de deux enfants – un chiffre très en deçà des quelques deux millions de naissances annuelles supplémentaires attendues du fait de l’assouplissement de la loi fin 2013. » (p. 3)"
+    },
+    {
+        id: 33,
+        cat: "REFORM",
+        catName: "4. Assouplissements (2012-2016) & Natalité",
+        q: "Que nous apprend l'exemple de Shanghai concernant le vieillissement, les incitations publiques et le niveau de fécondité ?",
+        options: [
+            "C'est là où le vieillissement est le plus avancé du pays ; bien que les couples de deux enfants uniques y soient activement encouragés à avoir un 2e enfant dès 2009, la fécondité y était de 0,7 enfant par femme en 2014.",
+            "Bien que Shanghai ait aboli toute restriction dès 2010, sa fécondité stagne à 1,06 enfant par femme en 2014.",
+            "Les couples y reçoivent une prime dès 2008, mais la fécondité est tombée à 0,9 enfant par femme en 2013.",
+            "C'est la seule ville où la fécondité a légèrement rebondi, passant de 0,7 en 2009 à 1,07 en 2014."
+        ],
+        correct: 0,
+        exp: "Ne pas confondre : à Shanghai, l'objectif requis (carte Fig. 2) est de 1,06, le nombre moyen d'enfants souhaités en 2008 est de 1,07 (p. 4), mais la fécondité réelle en 2014 est extraordinairement basse : 0,7 enfant par femme !",
+        quote: "« À Shanghai, où le vieillissement démographique est le plus avancé du pays mais où, dès 2009, les couples dont les deux conjoints sont eux-mêmes des enfants uniques ont été activement encouragés à avoir un deuxième enfant, la fécondité reste extraordinairement basse (0,7 enfant par femme en 2014). » (p. 3)"
+    },
+
+    // --- 5. PARADOXE DU GENRE, COÛTS & NORMES FAMILIALES ---
+    {
+        id: 34,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Quels étaient les niveaux de fécondité du Japon et de la Corée du Sud en 2013, et quel « paradoxe » (théorisé par P. McDonald [3]) explique cette situation ?",
+        options: [
+            "1,4 au Japon et 1,2 en Corée du Sud en 2013 : le maintien d'inégalités hommes-femmes au sein de la famille alors que les femmes accèdent progressivement à davantage d'égalité dans la sphère publique.",
+            "1,2 au Japon et 1,4 en Corée du Sud en 2013 : une hausse des revenus féminins accompagnée d'une baisse des aides d'État à la petite enfance.",
+            "1,3 dans les deux pays en 2013 : le désir élevé d'enfants chez les femmes mais le refus des employeurs d'accorder des congés parentaux.",
+            "1,5 au Japon et 1,1 en Corée du Sud en 2013 : l'égalité domestique atteinte mais la fermeture du marché du travail aux mères."
+        ],
+        correct: 0,
+        exp: "Attention à l'ordre : Japon = 1,4 et Corée du Sud = 1,2 en 2013. Le paradoxe réside dans le décalage entre égalité croissante dans la sphère publique et maintien des inégalités dans la sphère familiale.",
+        quote: "« Au Japon et en Corée du Sud, la très faible fécondité (1,4 et 1,2 enfant par femme respectivement en 2013) tiendrait à un paradoxe : le maintien d’inégalités entre hommes et femmes au sein de la famille, alors même que ces dernières accèdent progressivement à davantage d’égalité avec les hommes dans la sphère publique. » (p. 3)"
+    },
+    {
+        id: 35,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Quel a été le bilan de la « parenthèse communiste » (depuis les années 1950) sur la condition des femmes et les rôles conjugaux en Chine ?",
+        options: [
+            "Les femmes ont gagné en indépendance et l'activité féminine hors de la sphère domestique a été favorisée, mais les stéréotypes de genre (époux soutien économique / épouse centrée sur la maternité et les tâches domestiques) restent ancrés.",
+            "Les stéréotypes de genre avaient disparu sous Mao mais ont été réintroduits par les réformes libérales de 1978.",
+            "Les femmes sont restées exclues du marché du travail jusqu'aux années 1980 malgré l'idéologie officielle.",
+            "Les tâches domestiques sont désormais partagées à égalité en ville, mais restent l'apanage des femmes à la campagne."
+        ],
+        correct: 0,
+        exp: "L'émancipation par le travail sous le communisme n'a pas aboli la division traditionnelle des rôles au sein du couple, tant dans les pratiques que dans les attentes mutuelles.",
+        quote: "« La parenthèse communiste a favorisé l’activité féminine hors de la sphère domestique, mais elle n’est pas venue à bout des stéréotypes de genre. Le rôle de l’époux comme soutien économique de la famille et celui de l’épouse, centré sur la maternité et les tâches domestiques, restent ancrés non seulement dans les pratiques conjugales mais aussi dans les attentes que chaque conjoint nourrit vis-à-vis de son partenaire. » (p. 3)"
+    },
+    {
+        id: 36,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Comment a évolué la part des citadines exerçant une activité rémunérée entre 1990 et 2010, et qu'en est-il à la campagne ?",
+        options: [
+            "En ville, elle a diminué de manière significative, passant de 76 % en 1990 à 61 % en 2010 ; à la campagne, l'emploi féminin a résisté avec plus de 8 femmes sur 10 exerçant une activité.",
+            "En ville, elle est passée de 85 % en 1990 à 70 % en 2010 ; à la campagne, elle a chuté à 50 %.",
+            "En ville, elle a augmenté de 61 % en 1990 à 76 % en 2010 ; à la campagne, 6 femmes sur 10 travaillent.",
+            "Elle a reculé de 76 % à 61 % tant à la ville qu'à la campagne suite aux réformes structurelles."
+        ],
+        correct: 0,
+        exp: "Cheval de bataille de Mao, l'emploi féminin a reculé en ville (de 76 % à 61 % entre 1990 et 2010) face aux réformes du marché du travail, mais s'est maintenu à la campagne (> 8 sur 10).",
+        quote: "« ...la part de citadines exerçant une activité rémunérée a diminué de manière significative, passant de 76 % en 1990 à 61 % en 2010. L’emploi féminin, qui avait été un cheval de bataille du gouvernement de Mao, n’a en effet résisté aux réformes structurelles du marché du travail qu’à la campagne (où plus de huit femmes sur dix exercent une activité). » (p. 3)"
+    },
+    {
+        id: 37,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Quel est le niveau du chômage des femmes par rapport aux hommes dans les villes chinoises, et quelles sont les quatre formes de discriminations citées dans le texte ?",
+        options: [
+            "Un taux de chômage deux fois plus élevé que les hommes ; discriminations : moindre salaire à poste égal, licenciements abusifs suite à un congé de maternité, discrimination à l'embauche, départs forcés en retraite anticipée.",
+            "Un taux de chômage trois fois plus élevé ; discriminations : interdiction d'accès aux postes de cadres, non-paiement des heures supplémentaires, contrats précaires, perte du hukou.",
+            "Un taux de chômage supérieur de 50 % ; discriminations : baisse de salaire après le mariage, absence d'assurance maladie, refus de promotion, congé maternité non payé.",
+            "Un taux de chômage égal mais des emplois moins qualifiés, avec des licenciements dès la déclaration de grossesse."
+        ],
+        correct: 0,
+        exp: "Ces quatre discriminations précises (référence [4] d'Isabelle Attané, 2012) et le chômage doublé fragilisent considérablement les citadines.",
+        quote: "« Dans les villes, les femmes connaissent un taux de chômage deux fois plus élevé que les hommes et sont victimes de discriminations (moindre salaire à poste égal, licenciements abusifs à la suite d’un congé de maternité, discrimination à l’embauche, départs forcés en retraite anticipée) [4]. » (p. 3)"
+    },
+    {
+        id: 38,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Quel changement majeur est intervenu dans les années 1980 concernant les services publics liés à l'enfant, et quel a été l'impact de la chute de la fécondité sur la place de l'enfant ?",
+        options: [
+            "L'accès à l'école et aux soins de santé est devenu payant dans les années 1980 ; parallèlement, la transmission familiale (matérielle et symbolique), les attentes, l'écoute, l'affection et les investissements se sont concentrés sur un petit nombre d'enfants.",
+            "Les crèches gratuites ont été privatisées en 1989 ; l'enfant unique a été envoyé en pensionnat dès le primaire pour favoriser sa réussite.",
+            "Les allocations familiales ont été supprimées en 1984 ; la solidarité familiale s'est détournée des enfants vers les grands-parents.",
+            "L'enseignement supérieur est devenu payant en 1980, réduisant les investissements affectifs sur les filles."
+        ],
+        correct: 0,
+        exp: "La libéralisation du système éducatif et de santé (devenus payants dans les années 1980) s'est combinée à une concentration extrême des attentes et investissements parentaux sur l'enfant.",
+        quote: "« Les diverses dimensions de la transmission familiale, aussi bien matérielle que symbolique, sont désormais concentrées sur un petit nombre d’enfants [...] Mais alors que l’accès à l’école et aux soins de santé est devenu payant pour les familles dans les années 1980, l’enfant chinois impose désormais d’importants sacrifices financiers à ses parents. » (p. 4)"
+    },
+    {
+        id: 39,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Entre 1995 et 2007, de combien ont augmenté en moyenne par an les dépenses de scolarité, de logement et de frais de santé, comparativement à la hausse des revenus du travail ?",
+        options: [
+            "Scolarité : +12 %/an ; Logement : +16 %/an ; Frais de santé : +15 %/an — contre +9 %/an en moyenne pour les revenus du travail.",
+            "Scolarité : +15 %/an ; Logement : +12 %/an ; Frais de santé : +16 %/an — contre +8 %/an en moyenne pour les revenus du travail.",
+            "Scolarité : +16 %/an ; Logement : +15 %/an ; Frais de santé : +12 %/an — contre +9 %/an en moyenne pour les revenus du travail.",
+            "Scolarité : +10 %/an ; Logement : +20 %/an ; Frais de santé : +14 %/an — contre +7 %/an en moyenne pour les revenus du travail."
+        ],
+        correct: 0,
+        exp: "Retenez bien l'ordre croissant/décroissant entre 1995 et 2007 : Revenus (+9 %) < Scolarité (+12 %) < Santé (+15 %) < Logement (+16 %).",
+        quote: "« Des dépenses en hausse constante grèvent le budget des familles : scolarité des enfants (+ 12 % par an en moyenne entre 1995 et 2007) ; logement (+ 16 %), frais de santé (+ 15 %) – des hausses qui excèdent celle des revenus du travail (qui ont été de 9 % par an en moyenne sur la période) [5]. » (p. 4)"
+    },
+    {
+        id: 40,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Comment a évolué l'âge moyen des Chinoises à la première maternité entre 2005 et 2010 ?",
+        options: [
+            "En l'espace de 5 ans (2005-2010), il a augmenté de deux ans, passant de 24,6 à 26,6 ans.",
+            "En l'espace de 5 ans (2005-2010), il a augmenté d'un an et demi, passant de 23,5 à 25,0 ans.",
+            "Il est passé de 25,2 ans en 2005 à 28,2 ans en 2010.",
+            "Il est passé de 22,6 ans en 2005 à 24,6 ans en 2010."
+        ],
+        correct: 0,
+        exp: "Une hausse très rapide de 2 ans en seulement 5 ans (de 24,6 à 26,6 ans), illustrant la priorité donnée à la carrière professionnelle.",
+        quote: "« En l’espace de cinq ans, entre 2005 et 2010, l’âge moyen des Chinoises à la première maternité a augmenté de deux ans, passant de 24,6 à 26,6 ans [1]... » (p. 4)"
+    },
+    {
+        id: 41,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Que révèlent l'enquête de 2001 auprès des femmes de 20 à 49 ans et les données de 2008 à Shanghai sur le nombre d'enfants souhaités ?",
+        options: [
+            "En 2001, 35 % des femmes de 20-49 ans n'en souhaitaient qu'un seul et 57 % en souhaitaient deux ; à Shanghai, le nombre moyen d'enfants souhaités était de 1,07 en 2008.",
+            "En 2001, 57 % des femmes de 20-49 ans n'en souhaitaient qu'un seul et 35 % en souhaitaient deux ; à Shanghai, il était de 0,7 en 2008.",
+            "En 2001, 43 % des femmes souhaitaient un enfant et 39 % en souhaitaient deux ; à Shanghai, il était de 1,2 en 2008.",
+            "En 2001, 25 % ne voulaient pas d'enfant et 65 % en voulaient un seul ; à Shanghai, il était de 1,06 en 2008."
+        ],
+        correct: 0,
+        exp: "La préférence pour une petite famille est désormais intériorisée : 35 % (1 enfant) et 57 % (2 enfants) en 2001 (soit 92 % voulant 1 ou 2 enfants max), et un désir moyen de 1,07 à Shanghai en 2008.",
+        quote: "« Une enquête de 2001 indique que 35 % des femmes de 20 à 49 ans n’en souhaitaient qu’un seul et 57 % en souhaitaient deux. À Shanghai, le nombre moyen d’enfants souhaités était de 1,07 en 2008 [6]. » (p. 4)"
+    },
+    {
+        id: 42,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "En conclusion (« Vers des mesures natalistes ? »), quelles sont les conditions *a minima* identifiées par l'auteure pour obtenir un rebond durable de la fécondité ?",
+        options: [
+            "Améliorer la protection des femmes sur le marché du travail et soutenir davantage les familles dans la prise en charge des personnes économiquement dépendantes (les enfants et les personnes âgées).",
+            "Instaurer des allocations familiales universelles dès le premier enfant et abaisser l'âge légal du mariage à 18 ans.",
+            "Abolir l'autorisation préalable des bureaux de planning familial et rendre gratuits le logement et l'université.",
+            "Taxer le célibat urbain et imposer des quotas de crèches dans les entreprises d'État."
+        ],
+        correct: 0,
+        exp: "L'auteure insiste sur deux leviers structurels : protéger les femmes au travail et aider les familles à prendre en charge les DEUX catégories de personnes dépendantes (enfants ET personnes âgées).",
+        quote: "« Un rebond durable de la fécondité nécessitera en effet, a minima, d’améliorer la protection des femmes sur le marché du travail et de soutenir davantage les familles dans la prise en charge des personnes économiquement dépendantes, à savoir les enfants et les personnes âgées. » (p. 4)"
+    },
+
+    // --- QUESTIONS DE PRÉCISION SUPPLÉMENTAIRES (100% COUVERTURE) ---
+    {
+        id: 43,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Quelles sont les sources précises utilisées pour construire la Figure 1 (Évolution de la fécondité de 1970 à 2013) ?",
+        options: [
+            "1970-1990 : Chen S., Coale A. (1993) | 1991-2010 : Guo Z., Gu B. (2014) [1] | 2011-2013 : données officielles du Bureau national de la statistique.",
+            "1970-2000 : Division de la population des Nations Unies | 2001-2013 : Recensements chinois de 2000 et 2010.",
+            "1970-1984 : Commission nationale du planning familial | 1985-2013 : Enquêtes annuelles de l'INED.",
+            "1970-2013 : Données unifiées de la Banque mondiale et de l'OMS."
+        ],
+        correct: 0,
+        exp: "La légende de la Figure 1 distingue trois sources successives selon les sous-périodes : Chen & Coale (1970-1990), la référence [1] (1991-2010) et le Bureau national de la statistique (2011-2013).",
+        quote: "« Sources : 1970-1990 : Chen S., Coale, A., 1993 [...] ; 1991-2010 : [1] ; 2011-2013 : données officielles du Bureau national de la statistique disponibles à l’adresse : http://www.renkou.org.cn/... » (p. 1)"
+    },
+    {
+        id: 44,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Quelles sont les sources utilisées pour le Tableau des indicateurs de vieillissement (1970, 2010 et 2050) ?",
+        options: [
+            "Pour 2010 : le recensement chinois ; pour 1970 et 2050 : la Division de la population des Nations Unies.",
+            "Pour 1970 et 2010 : les recensements chinois ; pour 2050 : le Bureau national de la statistique de Pékin.",
+            "Pour les trois dates : les projections de la Division de la population des Nations Unies.",
+            "Pour 1970 : Chen & Coale ; pour 2010 : le recensement chinois ; pour 2050 : l'INED."
+        ],
+        correct: 0,
+        exp: "Le tableau combine les données réelles du recensement chinois pour 2010 et les estimations/projections de l'ONU pour 1970 et 2050.",
+        quote: "« Sources : 2010 : recensement chinois ; 1970 et 2050 : Division de la population des Nations Unies. » (p. 3)"
+    },
+    {
+        id: 45,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Sur la carte (Figure 2), combien d'entités provinciales exactement appartiennent à la tranche la plus stricte (< 1,3 enfant par femme) et quelles sont leurs valeurs ?",
+        options: [
+            "6 entités : Shanghai (1,06), Jiangsu (1,06), Beijing (1,09), Tianjin (1,17), Sichuan (1,19) et Chongqing (1,27).",
+            "4 entités : Shanghai (1,06), Beijing (1,09), Tianjin (1,17) et Chongqing (1,27).",
+            "5 entités : Shanghai (1,06), Jiangsu (1,06), Beijing (1,09), Liaoning (1,25) et Heilongjiang (1,29).",
+            "7 entités : les 4 municipalités autonomes ainsi que le Jiangsu, le Zhejiang et le Shandong."
+        ],
+        correct: 0,
+        exp: "En observant la carte et les encadrés : outre les 4 municipalités (Shanghai 1,06 ; Beijing 1,09 ; Tianjin 1,17 ; Chongqing 1,27), deux provinces sont sous 1,3 : le Jiangsu (1,06) et le Sichuan (1,19).",
+        quote: "Figure 2 : « Shanghai 1,06 ; Jiangsu 1,06 ; B Beijing 1,09 ; T Tianjin 1,17 ; Sichuan 1,19 ; C Chongqing 1,27 » (p. 2)"
+    },
+    {
+        id: 46,
+        cat: "DATA",
+        catName: "3. Graphiques, Carte & Tableau statistique",
+        q: "Sur la carte (Figure 2), quels sont les objectifs de fécondité requis dans les trois provinces du Nord-Est (Mandchourie : Liaoning, Jilin, Heilongjiang) ?",
+        options: [
+            "Liaoning : 1,38 | Heilongjiang : 1,39 | Jilin : 1,45.",
+            "Liaoning : 1,06 | Heilongjiang : 1,19 | Jilin : 1,27.",
+            "Liaoning : 1,50 | Heilongjiang : 1,60 | Jilin : 1,55.",
+            "Les trois provinces sont exactement à 1,40 enfant par femme."
+        ],
+        correct: 0,
+        exp: "Ces trois provinces figurent dans la tranche intermédiaire (1,3 ≤ n < 2) mais avec des valeurs relativement basses : 1,38 (Liaoning), 1,39 (Heilongjiang) et 1,45 (Jilin).",
+        quote: "Figure 2 : « Heilongjiang 1,39 ; Jilin 1,45 ; Liaoning 1,38 » (p. 2)"
+    },
+    {
+        id: 47,
+        cat: "DEMO",
+        catName: "2. Fécondité basse, Sexes & Vieillissement",
+        q: "Comment le déséquilibre des sexes à la naissance observé depuis les années 1980 se répercute-t-il aujourd'hui dans la société chinoise ?",
+        options: [
+            "Il se répercute aujourd'hui aux âges adultes au fur et à mesure de l'avancée en âge des cohortes déficitaires en filles, engendrant des conséquences sociales qui préoccupent les autorités.",
+            "Il provoque une féminisation paradoxale des universités car les garçons entrent plus tôt sur le marché du travail.",
+            "Il ne concerne plus que les personnes âgées de plus de 60 ans et s'est résorbé chez les jeunes adultes.",
+            "Il a entraîné une immigration féminine massive organisée par l'État depuis les pays voisins."
+        ],
+        correct: 0,
+        exp: "Les générations nées après 1980-1990 avec un déficit de filles arrivent désormais à l'âge adulte (et donc à l'âge du mariage et de la procréation).",
+        quote: "« Ce déséquilibre des sexes à la naissance [...] se répercute aujourd’hui aux âges adultes au fur et à mesure de l’avancée en âge des cohortes déficitaires en filles. Les conséquences sociales de ce phénomène, associées à celles du vieillissement démographique, constituent des préoccupations majeures des autorités chinoises... » (p. 2)"
+    },
+    {
+        id: 48,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Quels arbitrages les couples chinois sont-ils contraints de faire face à la difficulté et au coût financier de l'articulation entre vie familiale et vie professionnelle ?",
+        options: [
+            "Ils sont conduits à retarder la naissance d'un enfant voire, pour certains, à y renoncer.",
+            "Ils choisissent majoritairement de quitter les grandes métropoles pour s'installer dans des villes moyennes moins coûteuses.",
+            "Ils confient systématiquement l'éducation de l'enfant unique aux grands-parents ruraux jusqu'à l'âge de 12 ans.",
+            "Les hommes réduisent leur temps de travail tandis que les femmes cumulent deux emplois."
+        ],
+        correct: 0,
+        exp: "Le manque de soutien de l'État et la précarité féminine au travail débouchent sur le report du calendrier fécond ou le renoncement pur et simple.",
+        quote: "« Les couples doivent donc procéder à des arbitrages qui les conduisent à retarder la naissance d’un enfant voire, pour certains, à y renoncer. » (p. 3-4)"
+    },
+    {
+        id: 49,
+        cat: "HIST",
+        catName: "1. Historique & Politiques (1970-1990)",
+        q: "Dans quel contexte sociopolitique les mesures de la troisième campagne du début des années 1970 ont-elles été mises en œuvre ?",
+        options: [
+            "Dans un contexte de contrôle social important.",
+            "Dans un contexte de libéralisation économique et d'ouverture aux capitaux étrangers.",
+            "Sur la base du strict volontariat et d'incitations fiscales positives.",
+            "Uniquement dans les municipalités côtières avant d'être étendues aux campagnes en 1979."
+        ],
+        correct: 0,
+        exp: "Bien que moins coercitive juridiquement que la politique de 1979, la campagne des années 1970 s'appuyait déjà sur un fort encadrement social.",
+        quote: "« Mises en œuvre dans un contexte de contrôle social important, ces mesures ont été associées à l’une des plus fortes baisses de la fécondité jamais enregistrées dans le monde en un temps si court... » (p. 1)"
+    },
+    {
+        id: 50,
+        cat: "SOCIO",
+        catName: "5. Paradoxe du genre, Coûts & Normes familiales",
+        q: "Qui est l'auteure de ce numéro 535 de *Population & Sociétés*, à quel institut appartient-elle et qui est le rédacteur en chef de la publication mentionné en page 4 ?",
+        options: [
+            "Auteure : Isabelle Attané | Institut : INED (Institut national d'études démographiques) | Rédacteur en chef : Gilles Pison (Directrice de la publication : Magda Tomasini).",
+            "Auteure : Isabelle Attané | Institut : CNRS | Rédacteur en chef : Magda Tomasini.",
+            "Auteure : Magda Tomasini | Institut : INED | Rédacteur en chef : Isabelle Attané.",
+            "Auteure : Isabelle Attané | Institut : Division de la population de l'ONU | Rédacteur en chef : Patrick McDonald."
+        ],
+        correct: 0,
+        exp: "Toutes les métadonnées éditoriales du document (p. 1 et ours en p. 4) sont ainsi vérifiées.",
+        quote: "« Isabelle Attané* — * Institut national d’études démographiques. » (p. 1) | « Directrice de la publication : Magda Tomasini ; Rédacteur en chef : Gilles Pison » (p. 4)"
+    }
+];
+
+// État de l'application
+let activeQuestions = [];
+let currentIndex = 0;
+let userAnswers = {}; // { questionId: { selectedOriginalIdx, isCorrect } }
+let studyMode = false;
+
+function shuffleOptions(questionObj) {
+    // Crée une copie mélangée des options tout en gardant la trace de la bonne réponse
+    const mapped = questionObj.options.map((text, idx) => ({
+        text,
+        isCorrect: idx === questionObj.correct
+    }));
+    for (let i = mapped.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [mapped[i], mapped[j]] = [mapped[j], mapped[i]];
+    }
+    return mapped;
+}
+
+function initQuiz(questionsSubset = null) {
+    const selectedCat = document.getElementById('categorySelect').value;
+    let baseList = questionsSubset || MASTER_QUESTIONS;
+
+    if (!questionsSubset && selectedCat !== 'ALL') {
+        baseList = MASTER_QUESTIONS.filter(q => q.cat === selectedCat);
+    }
+
+    activeQuestions = baseList.map(q => ({
+        ...q,
+        shuffledOptions: shuffleOptions(q)
+    }));
+
+    currentIndex = 0;
+    userAnswers = {};
+    document.getElementById('resultsCard').classList.add('hidden');
+    document.getElementById('studyCard').classList.add('hidden');
+    document.getElementById('quizCard').classList.remove('hidden');
+    document.getElementById('statsBar').classList.remove('hidden');
+    document.getElementById('progressBarContainer').classList.remove('hidden');
+    studyMode = false;
+    document.getElementById('studyBtn').textContent = "📖 Mode Fiches de révision";
+
+    renderQuestion();
+    updateStats();
+}
+
+function filterByCategory() {
+    initQuiz();
+}
+
+function renderQuestion() {
+    const q = activeQuestions[currentIndex];
+    document.getElementById('qCategory').textContent = q.catName;
+    document.getElementById('qNumber').textContent = `Question ${currentIndex + 1} sur ${activeQuestions.length}`;
+    document.getElementById('qText').textContent = q.q;
+
+    const optionsList = document.getElementById('optionsList');
+    optionsList.innerHTML = '';
+
+    const letters = ['A', 'B', 'C', 'D'];
+    const savedAnswer = userAnswers[q.id];
+
+    q.shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span class="option-letter">${letters[idx]}</span><span>${opt.text}</span>`;
+
+        if (savedAnswer !== undefined) {
+            btn.disabled = true;
+            if (opt.isCorrect) {
+                btn.classList.add('correct');
+            } else if (savedAnswer.selectedIdx === idx) {
+                btn.classList.add('wrong');
+            }
+        } else {
+            btn.onclick = () => selectOption(idx);
+        }
+
+        optionsList.appendChild(btn);
+    });
+
+    const expBox = document.getElementById('explanationBox');
+    if (savedAnswer !== undefined) {
+        showExplanation(q, savedAnswer.isCorrect);
+    } else {
+        expBox.style.display = 'none';
+    }
+
+    document.getElementById('prevBtn').disabled = currentIndex === 0;
+    document.getElementById('nextBtn').textContent =
+        currentIndex === activeQuestions.length - 1 ? "Voir le bilan final 🏁" : "Suivant ➡";
+}
+
+function selectOption(idx) {
+    const q = activeQuestions[currentIndex];
+    const chosenOpt = q.shuffledOptions[idx];
+    const isCorrect = chosenOpt.isCorrect;
+
+    userAnswers[q.id] = {
+        selectedIdx: idx,
+        isCorrect: isCorrect
+    };
+
+    renderQuestion();
+    updateStats();
+}
+
+function showExplanation(q, isCorrect) {
+    const expBox = document.getElementById('explanationBox');
+    const expTitle = document.getElementById('expTitle');
+    expBox.style.display = 'block';
+    expBox.style.borderLeftColor = isCorrect ? 'var(--success)' : 'var(--error)';
+
+    expTitle.textContent = isCorrect ? "✅ Exact !" : "❌ Réponse incorrecte";
+    expTitle.style.color = isCorrect ? 'var(--success)' : 'var(--error)';
+
+    document.getElementById('expText').textContent = q.exp;
+    document.getElementById('expQuote').textContent = q.quote;
+}
+
+function updateStats() {
+    const answeredCount = Object.keys(userAnswers).length;
+    const correctCount = Object.values(userAnswers).filter(a => a.isCorrect).length;
+    const errorCount = answeredCount - correctCount;
+    const percent = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+    document.getElementById('statProgress').textContent = `${currentIndex + 1} / ${activeQuestions.length}`;
+    document.getElementById('statScore').textContent = correctCount;
+    document.getElementById('statErrors').textContent = errorCount;
+    document.getElementById('statPercent').textContent = `${percent}%`;
+
+    const progressPercent = (answeredCount / activeQuestions.length) * 100;
+    document.getElementById('progressFill').style.width = `${progressPercent}%`;
+}
+
+function prevQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+        updateStats();
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+        updateStats();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quizCard').classList.add('hidden');
+    document.getElementById('resultsCard').classList.remove('hidden');
+
+    const total = activeQuestions.length;
+    const correct = Object.values(userAnswers).filter(a => a.isCorrect).length;
+    const wrongCount = total - correct;
+    const pct = Math.round((correct / total) * 100);
+
+    let msg = `Vous avez obtenu <strong>${correct} / ${total} (${pct}%)</strong>. `;
+    if (pct === 100) {
+        msg += `🏆 Félicitations ! Vous maîtrisez 100 % des informations du texte d'Isabelle Attané.`;
+    } else {
+        msg += `Il reste <strong>${wrongCount} question(s)</strong> non maîtrisée(s). Cliquez sur le bouton rouge ci-dessous pour retravailler uniquement vos erreurs jusqu'à atteindre 100 %.`;
+    }
+    document.getElementById('finalSummaryText').innerHTML = msg;
+
+    // Détail par catégorie
+    const breakdownDiv = document.getElementById('categoryBreakdown');
+    breakdownDiv.innerHTML = '';
+
+    const categories = {};
+    activeQuestions.forEach(q => {
+        if (!categories[q.cat]) {
+            categories[q.cat] = { name: q.catName, total: 0, correct: 0 };
+        }
+        categories[q.cat].total++;
+        if (userAnswers[q.id] && userAnswers[q.id].isCorrect) {
+            categories[q.cat].correct++;
+        }
+    });
+
+    Object.values(categories).forEach(c => {
+        const cPct = Math.round((c.correct / c.total) * 100);
+        const row = document.createElement('div');
+        row.className = 'cat-row';
+        row.innerHTML = `
+            <span style="font-weight: 600;">${c.name}</span>
+            <span style="font-weight: 800; color: ${cPct === 100 ? 'var(--success)' : 'var(--ined-dark)'}">
+                ${c.correct} / ${c.total} (${cPct}%)
+            </span>
+        `;
+        breakdownDiv.appendChild(row);
+    });
+
+    const retryBtn = document.getElementById('retryWrongBtn');
+    if (wrongCount === 0) {
+        retryBtn.classList.add('hidden');
+    } else {
+        retryBtn.classList.remove('hidden');
+        retryBtn.textContent = `🎯 Rejouer uniquement les ${wrongCount} question(s) ratée(s) ou non répondues`;
+    }
+}
+
+function retryWrongQuestions() {
+    const wrongQuestions = activeQuestions.filter(q => !userAnswers[q.id] || !userAnswers[q.id].isCorrect);
+    if (wrongQuestions.length > 0) {
+        initQuiz(wrongQuestions);
+    }
+}
+
+function restartQuiz() {
+    initQuiz();
+}
+
+function toggleStudyMode() {
+    studyMode = !studyMode;
+    const studyCard = document.getElementById('studyCard');
+    const quizCard = document.getElementById('quizCard');
+    const resultsCard = document.getElementById('resultsCard');
+    const studyBtn = document.getElementById('studyBtn');
+
+    if (studyMode) {
+        quizCard.classList.add('hidden');
+        resultsCard.classList.add('hidden');
+        studyCard.classList.remove('hidden');
+        studyBtn.textContent = "📝 Retour au QCM interactif";
+        renderStudyList();
+    } else {
+        studyCard.classList.add('hidden');
+        quizCard.classList.remove('hidden');
+        studyBtn.textContent = "📖 Mode Fiches de révision";
+    }
+}
+
+function renderStudyList() {
+    const selectedCat = document.getElementById('categorySelect').value;
+    const list = selectedCat === 'ALL'
+        ? MASTER_QUESTIONS
+        : MASTER_QUESTIONS.filter(q => q.cat === selectedCat);
+
+    const container = document.getElementById('studyList');
+    container.innerHTML = '';
+
+    list.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'study-item';
+        div.innerHTML = `
+            <div style="font-size: 0.8rem; color: var(--ined-blue); font-weight: bold;">${q.catName} — #${idx + 1}</div>
+            <div style="font-weight: 700; font-size: 1.05rem; margin-top: 0.25rem;">${q.q}</div>
+            <div class="study-ans">✔ Réponse : ${q.options[q.correct]}</div>
+            <div style="font-size: 0.92rem;">${q.exp}</div>
+            <div class="quote-box">${q.quote}</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// Démarrage initial
+window.onload = () => initQuiz();
+</script>
+
+</body>
+</html>
